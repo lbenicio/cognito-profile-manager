@@ -13,6 +13,11 @@ const i18nMiddleware = createMiddleware({
 const publicPages = [pathnames['/login']]; 
 
 export default function middleware(request: NextRequest) {
+  // Skip middleware for API routes, letting them pass through.
+  if (request.nextUrl.pathname.startsWith('/api')) {
+    return NextResponse.next();
+  }
+
   const session = request.cookies.get('auth_session');
   const pathname = request.nextUrl.pathname;
 
@@ -40,7 +45,7 @@ export default function middleware(request: NextRequest) {
 
 export const config = {
   // Match all pathnames except for
-  // - … if they start with `/api`, `/_next` or `/_vercel`
+  // - … if they start with `/_next` or `/_vercel`
   // - … the ones containing a dot (e.g. `favicon.ico`)
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
+  matcher: ['/((?!_next|_vercel|.*\\..*).*)'],
 };
