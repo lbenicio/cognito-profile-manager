@@ -25,7 +25,7 @@ export default function RootLayout({
               __html: `
                 (function() {
                   try {
-                    var fontSize = localStorage.getItem('font-size') || '14';
+                    var fontSize = localStorage.getItem('font-size') || '12';
                     document.documentElement.style.fontSize = fontSize + 'pt';
                   } catch (e) {}
                 })();
