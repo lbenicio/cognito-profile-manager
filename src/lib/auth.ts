@@ -52,6 +52,7 @@ const mockAdminUser: User = {
   groups: ['users', process.env.COGNITO_ADMIN_GROUP_NAME || 'admins'],
   isAdmin: true,
   twoFactorEnabled: true,
+  passkeysEnabled: true,
 };
 
 
@@ -123,8 +124,8 @@ export const getUser = cache(async (): Promise<User | null> => {
       // auth_time is in seconds, convert to ISO string
       creationDate: new Date((payload.auth_time as number) * 1000).toISOString(),
       userStatus: 'CONFIRMED', // OIDC tokens don't have a user status, assume CONFIRMED
-      twoFactorEnabled: !!payload['custom:mfa'],
-      passkeysEnabled: false, // This info isn't in standard OIDC tokens.
+      twoFactorEnabled: (payload['custom:mfa'] as string) === 'true',
+      passkeysEnabled: (payload['custom:pless'] as string) === 'true',
       groups: groups,
       isAdmin: isAdmin,
       picture: (payload.picture as string) || '',

@@ -119,11 +119,17 @@
       "addPasskey": "Add Passkey",
       "addPasskeyToastTitle": "Add Passkey",
       "addPasskeyToastDescription": "Follow your browser instructions to add a new passkey.",
+      "addPasskeyCancelledTitle": "Add Passkey Cancelled",
+      "nameYourPasskeyPrompt": "Give your new passkey a name to help you identify it later.",
       "addedOn": "Added on {date}",
       "removePasskey": "Remove passkey",
       "passkeyRemovedTitle": "Passkey Removed",
       "passkeyRemovedDescription": "The selected passkey has been removed.",
-      "noPasskeys": "You have no passkeys registered."
+      "passkeyRemovedErrorTitle": "Removal Failed",
+      "passkeyAddedSuccessTitle": "Passkey Added",
+      "passkeyAddedErrorTitle": "Registration Failed",
+      "noPasskeys": "You have no passkeys registered.",
+      "loadingPasskeys": "Loading passkeys..."
     }
   },
   "Settings": {

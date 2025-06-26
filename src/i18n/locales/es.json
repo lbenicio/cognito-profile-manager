@@ -119,11 +119,17 @@
       "addPasskey": "Añadir Passkey",
       "addPasskeyToastTitle": "Añadir Passkey",
       "addPasskeyToastDescription": "Sigue las instrucciones de tu navegador para añadir una nueva passkey.",
+      "addPasskeyCancelledTitle": "Adición de Passkey Cancelada",
+      "nameYourPasskeyPrompt": "Dale un nombre a tu nueva passkey para ayudarte a identificarla más tarde.",
       "addedOn": "Añadido el {date}",
       "removePasskey": "Eliminar passkey",
       "passkeyRemovedTitle": "Passkey Eliminada",
       "passkeyRemovedDescription": "La passkey seleccionada ha sido eliminada.",
-      "noPasskeys": "No tienes passkeys registradas."
+      "passkeyRemovedErrorTitle": "Fallo al Eliminar",
+      "passkeyAddedSuccessTitle": "Passkey Añadida",
+      "passkeyAddedErrorTitle": "Fallo en el Registro",
+      "noPasskeys": "No tienes passkeys registradas.",
+      "loadingPasskeys": "Cargando passkeys..."
     }
   },
   "Settings": {
