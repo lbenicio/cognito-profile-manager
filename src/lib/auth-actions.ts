@@ -7,6 +7,10 @@ import { redirect } from '@/navigation';
 export async function ssoLogin() {
   const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
   if (!wellknownUrl) throw new Error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
+
+  if (!process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL) {
+    throw new Error('Missing NEXT_PUBLIC_OAUTH2_CALLBACK_URL env var');
+  }
   
   const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
   if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
@@ -18,7 +22,7 @@ export async function ssoLogin() {
     client_id: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
     response_type: 'code',
     scope: process.env.NEXT_PUBLIC_OAUTH2_SCOPE!,
-    redirect_uri: process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL!,
+    redirect_uri: process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL,
   });
 
   const loginUrl = `${authorizationEndpoint}?${params.toString()}`;
@@ -56,7 +60,10 @@ export async function logout() {
         const logoutEndpoint = wellknown.logout_endpoint;
 
         // The logout redirect URL must be one of the "Allowed sign-out URLs" in Cognito
-        const logoutRedirectUrl = new URL(process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL!).origin;
+        if (!process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL) {
+          throw new Error('Missing NEXT_PUBLIC_OAUTH2_CALLBACK_URL env var for logout');
+        }
+        const logoutRedirectUrl = new URL(process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL).origin;
         
         const params = new URLSearchParams({
           client_id: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,

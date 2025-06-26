@@ -20,10 +20,14 @@ export async function GET(request: NextRequest) {
     
     const tokenEndpoint = wellknown.token_endpoint;
 
+    if (!process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL) {
+      throw new Error('Missing NEXT_PUBLIC_OAUTH2_CALLBACK_URL env var');
+    }
+
     const params = new URLSearchParams({
       grant_type: 'authorization_code',
       code: code,
-      redirect_uri: process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL!,
+      redirect_uri: process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL,
       client_id: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
     });
 
@@ -59,15 +63,22 @@ export async function GET(request: NextRequest) {
       sameSite: 'lax',
     });
     
-    // Redirect to the dashboard
-    const dashboardUrl = new URL('/', request.url);
+    // Redirect to the dashboard by constructing the URL from the known callback URL origin.
+    // This is more reliable than using request.url, which can be inconsistent in some proxy/cloud environments.
+    const redirectUrl = new URL(process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL);
+    const dashboardUrl = new URL('/', redirectUrl.origin);
+    
     return NextResponse.redirect(dashboardUrl);
 
   } catch (error) {
     console.error('Callback handler error:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-    const loginUrl = new URL('/login', request.url);
+    
+    // Construct the login URL from the configured redirect origin to ensure consistency
+    const redirectUrl = new URL(process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL || request.url);
+    const loginUrl = new URL('/login', redirectUrl.origin);
     loginUrl.searchParams.set('error', errorMessage);
+
     return NextResponse.redirect(loginUrl);
   }
 }
