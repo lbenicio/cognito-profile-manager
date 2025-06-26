@@ -27,7 +27,7 @@ export function AvatarEditor({ user, onUpdate, onClose }: AvatarEditorProps) {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
-      if (selectedFile.size > 4 * 1024 * 1024) {
+      if (selectedFile.size > 2 * 1024 * 1024) {
         setError(t('fileTooLarge'));
         return;
       }

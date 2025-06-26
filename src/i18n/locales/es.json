@@ -49,7 +49,7 @@
       "changePhoto": "Cambiar Foto",
       "uploadAndSave": "Subir y Guardar",
       "cancel": "Cancelar",
-      "fileTooLarge": "El archivo es demasiado grande. El tamaño máximo es de 4MB.",
+      "fileTooLarge": "El archivo es demasiado grande. El tamaño máximo es de 2MB.",
       "invalidFileType": "Tipo de archivo no válido. Utilice PNG, JPG o WEBP.",
       "genericError": "Ocurrió un error desconocido. Por favor, inténtelo de nuevo.",
       "successTitle": "Avatar Actualizado",
