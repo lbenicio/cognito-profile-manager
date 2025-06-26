@@ -94,7 +94,8 @@ export const getUser = cache(async (): Promise<User | null> => {
     });
 
     const adminGroupName = process.env.COGNITO_ADMIN_GROUP_NAME || 'admins';
-    const groups = (payload['cognito:groups'] as string[]) || [];
+    const groupsClaimKey = process.env.COGNITO_GROUPS_CLAIM_KEY || 'cognito:groups';
+    const groups = (payload[groupsClaimKey] as string[]) || [];
     const isAdmin = groups.includes(adminGroupName);
     
     // OIDC address claim is an object, we get the formatted version.
