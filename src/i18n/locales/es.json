@@ -43,6 +43,19 @@
   "Profile": {
     "title": "Perfil",
     "description": "Gestiona tu información personal y la seguridad de tu cuenta.",
+    "editAvatarTitle": "Editar Avatar",
+    "editAvatarDescription": "Sube una nueva foto de perfil. El tamaño recomendado es 200x200px.",
+    "avatar": {
+      "changePhoto": "Cambiar Foto",
+      "uploadAndSave": "Subir y Guardar",
+      "cancel": "Cancelar",
+      "fileTooLarge": "El archivo es demasiado grande. El tamaño máximo es de 4MB.",
+      "invalidFileType": "Tipo de archivo no válido. Utilice PNG, JPG o WEBP.",
+      "genericError": "Ocurrió un error desconocido. Por favor, inténtelo de nuevo.",
+      "successTitle": "Avatar Actualizado",
+      "successDescription": "Tu avatar ha sido actualizado exitosamente.",
+      "errorTitle": "Error al Subir"
+    },
     "display": {
       "status": "Estado: {status}",
       "memberSince": "Miembro desde: {date}"

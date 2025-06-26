@@ -30,7 +30,7 @@ export function ProfileView({ initialUser }: ProfileViewProps) {
       </header>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1 flex flex-col gap-8">
-          <ProfileDisplay user={user} />
+          <ProfileDisplay user={user} onUpdate={handleProfileUpdate} />
           <Verification user={user} />
         </div>
         <div className="lg:col-span-2 flex flex-col gap-8">

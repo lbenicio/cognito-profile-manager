@@ -43,6 +43,19 @@
   "Profile": {
     "title": "Profile",
     "description": "Manage your personal information and account security.",
+    "editAvatarTitle": "Edit Avatar",
+    "editAvatarDescription": "Upload a new profile picture. Recommended size is 200x200px.",
+    "avatar": {
+      "changePhoto": "Change Photo",
+      "uploadAndSave": "Upload & Save",
+      "cancel": "Cancel",
+      "fileTooLarge": "File is too large. Maximum size is 4MB.",
+      "invalidFileType": "Invalid file type. Please use PNG, JPG, or WEBP.",
+      "genericError": "An unknown error occurred. Please try again.",
+      "successTitle": "Avatar Updated",
+      "successDescription": "Your avatar has been successfully updated.",
+      "errorTitle": "Upload Failed"
+    },
     "display": {
       "status": "Status: {status}",
       "memberSince": "Member since: {date}"
