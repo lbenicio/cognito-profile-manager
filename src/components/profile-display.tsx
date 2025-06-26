@@ -150,7 +150,7 @@ export function ProfileDisplay({ user, onUpdate }: { user: User, onUpdate: (data
           </div>
           <div className="flex items-center gap-2">
               <CalendarDays className="w-4 h-4" />
-              <span>{tProfile('memberSince', {date: format(parseISO(user.creationDate), "MMMM d, yyyy")})}</span>
+              <span>{tProfile('display.memberSince', {date: format(parseISO(user.creationDate), "MMMM d, yyyy")})}</span>
           </div>
         </CardFooter>
       </Card>
