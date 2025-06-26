@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname, useRouter } from '@/navigation';
+import { useRouter } from '@/navigation';
 import { useTransition } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -11,17 +11,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { setLocale } from '@/lib/locale-actions';
 
 export function LanguageSelect() {
   const t = useTranslations('Settings.appearance');
   const [isPending, startTransition] = useTransition();
   const locale = useLocale();
   const router = useRouter();
-  const pathname = usePathname();
 
   function onSelectChange(value: string) {
-    startTransition(() => {
-      router.replace(pathname, { locale: value });
+    startTransition(async () => {
+      await setLocale(value);
+      router.refresh();
     });
   }
 
