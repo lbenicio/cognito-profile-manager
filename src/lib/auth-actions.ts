@@ -17,7 +17,7 @@ export async function ssoLogin() {
   const params = new URLSearchParams({
     client_id: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
     response_type: 'code',
-    scope: 'openid profile email phone address',
+    scope: process.env.NEXT_PUBLIC_OAUTH2_SCOPE!,
     redirect_uri: process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL!,
   });
 
