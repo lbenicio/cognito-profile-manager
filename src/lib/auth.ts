@@ -81,7 +81,7 @@ export const getUser = cache(async (): Promise<User | null> => {
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     if (!wellknownUrl) throw new Error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
     
-    const wellknownResponse = await fetch(wellknownUrl, { cache: 'force-cache' });
+    const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
     if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
     const wellknown = await wellknownResponse.json();
 

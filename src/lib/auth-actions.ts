@@ -8,7 +8,7 @@ export async function ssoLogin() {
   const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
   if (!wellknownUrl) throw new Error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
   
-  const wellknownResponse = await fetch(wellknownUrl);
+  const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
   if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
   const wellknown = await wellknownResponse.json();
 
@@ -51,7 +51,7 @@ export async function logout() {
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     if (wellknownUrl) {
       try {
-        const wellknownResponse = await fetch(wellknownUrl);
+        const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
         const wellknown = await wellknownResponse.json();
         const logoutEndpoint = wellknown.logout_endpoint;
 
