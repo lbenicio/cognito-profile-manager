@@ -91,7 +91,7 @@
     "verification": {
       "title": "Verify Attributes",
       "description": "Verify your contact information to secure your account.",
-      "verify": "Verify",
+      "resend": "Resend",
       "sentTitle": "Verification Sent",
       "emailSentDescription": "A verification email has been sent to {email}.",
       "phoneSentDescription": "A verification SMS has been sent to {phone}."
