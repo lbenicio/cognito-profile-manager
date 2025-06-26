@@ -2,7 +2,7 @@
 
 import { useTransition } from 'react';
 import { Link } from '@/navigation';
-import { User, LogOut, Settings, LayoutDashboard } from 'lucide-react';
+import { User, LogOut, Settings, LayoutDashboard, Menu } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +11,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetClose,
+} from '@/components/ui/sheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from './theme-toggle';
@@ -32,10 +38,48 @@ export function Header({ user }: { user: UserType | null }) {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card shadow-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
-        <Link href="/" className="flex items-center gap-2">
-          <LayoutDashboard className="h-6 w-6 text-primary" />
-          <span className="text-xl font-bold">{t('title')}</span>
-        </Link>
+        <div className="flex items-center gap-2">
+          {user && (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                  <Menu className="h-6 w-6" />
+                  <span className="sr-only">Open menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left">
+                 <nav className="grid gap-6 text-lg font-medium p-4 pt-8">
+                    <Link
+                        href="/"
+                        className="flex items-center gap-2 text-lg font-semibold mb-4"
+                    >
+                        <LayoutDashboard className="h-6 w-6 text-primary" />
+                        <span>{t('title')}</span>
+                    </Link>
+                    <SheetClose asChild>
+                        <Link href="/" className="text-foreground transition-colors hover:text-primary">
+                        {t('home')}
+                        </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                        <Link href="/profile" className="text-muted-foreground transition-colors hover:text-primary">
+                        {t('userMenu.profile')}
+                        </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                        <Link href="/settings" className="text-muted-foreground transition-colors hover:text-primary">
+                        {t('userMenu.settings')}
+                        </Link>
+                    </SheetClose>
+                </nav>
+              </SheetContent>
+            </Sheet>
+          )}
+           <Link href="/" className="flex items-center gap-2 text-xl font-bold">
+              <LayoutDashboard className="h-6 w-6 text-primary" />
+              <span className="hidden sm:inline-block">{t('title')}</span>
+           </Link>
+        </div>
 
         {user && (
             <nav className="hidden md:flex items-center gap-6 text-sm font-medium">

@@ -29,7 +29,7 @@ export function DashboardView({ user }: DashboardViewProps) {
         {/* Profile Card */}
         <Card className="lg:col-span-2">
           <CardHeader className="flex flex-row items-center gap-4">
-             <Avatar className="h-16 w-16">
+             <Avatar className="h-12 w-12 sm:h-16 sm:w-16">
                 <AvatarImage src={`https://placehold.co/128x128.png`} alt={user.name} data-ai-hint="profile picture" />
                 <AvatarFallback>{user.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
              </Avatar>
@@ -40,10 +40,10 @@ export function DashboardView({ user }: DashboardViewProps) {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="text-muted-foreground flex items-center gap-2"><User className="h-4 w-4" /> {t('profileCard.email')}</span>
                     <div className="flex items-center gap-2">
-                        <span>{user.email}</span>
+                        <span className="truncate">{user.email}</span>
                         {user.email_verified ? (
                             <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">{t('verified')}</Badge>
                         ) : (

@@ -14,7 +14,7 @@ export function ProfileDisplay({ user }: { user: User }) {
     <Card>
       <CardHeader>
         <div className="flex items-center gap-4">
-          <Avatar className="h-16 w-16">
+          <Avatar className="h-12 w-12 sm:h-16 sm:w-16">
             <AvatarImage src={`https://placehold.co/128x128.png`} alt={user.name} data-ai-hint="profile picture" />
             <AvatarFallback>{user.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
           </Avatar>
@@ -25,22 +25,22 @@ export function ProfileDisplay({ user }: { user: User }) {
         </div>
       </CardHeader>
       <CardContent className="space-y-4 text-sm">
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <Mail className="w-5 h-5 text-muted-foreground" />
-          <span className="flex-1 truncate">{user.email}</span>
+          <span className="flex-1 truncate min-w-0">{user.email}</span>
           {user.email_verified ? (
-            <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">{t('verified')}</Badge>
+            <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 flex-shrink-0">{t('verified')}</Badge>
           ) : (
-            <Badge variant="destructive">{t('unverified')}</Badge>
+            <Badge variant="destructive" className="flex-shrink-0">{t('unverified')}</Badge>
           )}
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <Phone className="w-5 h-5 text-muted-foreground" />
           <span className="flex-1">{user.phone_number}</span>
           {user.phone_number_verified ? (
-             <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">{t('verified')}</Badge>
+             <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 flex-shrink-0">{t('verified')}</Badge>
           ) : (
-            <Badge variant="destructive">{t('unverified')}</Badge>
+            <Badge variant="destructive" className="flex-shrink-0">{t('unverified')}</Badge>
           )}
         </div>
         <div className="flex items-start gap-3">
