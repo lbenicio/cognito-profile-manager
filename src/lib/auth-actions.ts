@@ -8,10 +8,11 @@ import { redirect } from '@/navigation';
 // the authorization code from Cognito, exchanges it for tokens, and then
 // creates the session. For now, it simulates a successful login.
 export async function login(prevState: string | undefined, formData: FormData) {
-  // Simulate a successful login for 'testuser'. In a real app, this username
+  // Simulate a successful login. In a real app, this username
   // would come from a successful Cognito authentication response (ID token).
-  const username = 'testuser';
-  const email = 'sso-user@example.com'; // Mock email from SSO
+  // We check the 'sso_provider' to allow for admin testing in development.
+  const username = formData.get('sso_provider') === 'admin_sso' ? 'admin' : 'testuser';
+  const email = username === 'admin' ? 'sso-admin@example.com' : 'sso-user@example.com'; 
   
   try {
     // Set a session cookie containing basic user info.

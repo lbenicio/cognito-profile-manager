@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Mail, Home, Phone, CalendarDays, BadgeCheck } from 'lucide-react';
+import { Mail, Home, Phone, CalendarDays, BadgeCheck, Shield, Users } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { useTranslations } from 'next-intl';
 import type { User } from '@/lib/auth';
@@ -9,6 +9,7 @@ import type { User } from '@/lib/auth';
 export function ProfileDisplay({ user }: { user: User }) {
   const t = useTranslations('Dashboard');
   const tProfile = useTranslations('Profile.display');
+  const tDashboard = useTranslations('Dashboard.profileCard');
 
   return (
     <Card>
@@ -19,7 +20,14 @@ export function ProfileDisplay({ user }: { user: User }) {
             <AvatarFallback>{user.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
           </Avatar>
           <div>
-            <CardTitle className="text-2xl font-headline">{user.name}</CardTitle>
+            <div className="flex items-center gap-2">
+                <CardTitle className="text-2xl font-headline">{user.name}</CardTitle>
+                {user.isAdmin ? (
+                    <Badge><Shield className="w-3 h-3 mr-1"/>{tDashboard('adminBadge')}</Badge>
+                ) : (
+                    <Badge variant="secondary">{tDashboard('userBadge')}</Badge>
+                )}
+            </div>
             <CardDescription>@{user.username}</CardDescription>
           </div>
         </div>
@@ -46,6 +54,19 @@ export function ProfileDisplay({ user }: { user: User }) {
         <div className="flex items-start gap-3">
           <Home className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
           <span className="flex-1">{user.address}</span>
+        </div>
+         <div className="flex items-start gap-3 pt-4 border-t">
+          <Users className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
+          <div className="flex-1">
+            <span className="font-semibold">{tDashboard('groups')}</span>
+            <div className="flex flex-wrap gap-2 mt-2">
+                {user.groups.length > 0 ? user.groups.map(group => (
+                    <Badge key={group} variant="outline">{group}</Badge>
+                )) : (
+                    <span className="text-muted-foreground">{tDashboard('noGroups')}</span>
+                )}
+            </div>
+          </div>
         </div>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 pt-4 border-t text-xs text-muted-foreground">

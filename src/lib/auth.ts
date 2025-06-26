@@ -1,6 +1,6 @@
 import 'server-only';
 import { cache } from 'react';
-import { CognitoIdentityProviderClient, AdminGetUserCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { CognitoIdentityProviderClient, AdminGetUserCommand, AdminListGroupsForUserCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { cookies } from 'next/headers';
 
 // Define the User type, which should match what the components expect.
@@ -15,6 +15,8 @@ export type User = {
   creationDate: string; // ISO string
   userStatus: string;
   twoFactorEnabled: boolean;
+  groups: string[];
+  isAdmin: boolean;
 };
 
 // Mock user data for development environment
@@ -29,7 +31,18 @@ const mockUser: User = {
   creationDate: new Date().toISOString(),
   userStatus: 'CONFIRMED',
   twoFactorEnabled: true,
+  groups: ['users', 'beta-testers'],
+  isAdmin: false,
 };
+
+const mockAdminUser: User = {
+  ...mockUser,
+  username: 'adminuser_dev',
+  name: 'Admin User',
+  groups: ['users', process.env.COGNITO_ADMIN_GROUP_NAME || 'admins'],
+  isAdmin: true,
+};
+
 
 // This function safely parses the session cookie.
 export const getSession = cache(async () => {
@@ -55,13 +68,18 @@ export const getUser = cache(async (): Promise<User | null> => {
   // In a development environment, we can return mock data for convenience.
   if (process.env.NODE_ENV === 'development') {
     console.log("Using mock user data for development.");
+     // A simple way to test admin flow: check for a specific username in the session.
+    if (session.username === 'admin') {
+         return { ...mockAdminUser, email: session.email, username: session.username };
+    }
     return { ...mockUser, email: session.email, username: session.username };
   }
 
   // In production, fetch the user from Cognito.
   const username = session.username; 
+  const adminGroupName = process.env.COGNITO_ADMIN_GROUP_NAME;
 
-  if (!process.env.COGNITO_USER_POOL_ID || !process.env.AWS_REGION || !process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY) {
+  if (!process.env.COGNITO_USER_POOL_ID || !process.env.AWS_REGION || !process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY || !adminGroupName) {
     console.error('Cognito environment variables are not fully set. Cannot fetch real user data.');
     return null;
   }
@@ -74,13 +92,23 @@ export const getUser = cache(async (): Promise<User | null> => {
     }
   });
 
-  const command = new AdminGetUserCommand({
+  const getUserCommand = new AdminGetUserCommand({
+    UserPoolId: process.env.COGNITO_USER_POOL_ID,
+    Username: username,
+  });
+
+  const listGroupsCommand = new AdminListGroupsForUserCommand({
     UserPoolId: process.env.COGNITO_USER_POOL_ID,
     Username: username,
   });
 
   try {
-    const response = await client.send(command);
+    const [userResponse, groupsResponse] = await Promise.all([
+        client.send(getUserCommand),
+        client.send(listGroupsCommand)
+    ]);
+
+    const response = userResponse;
 
     if (!response.UserAttributes || !response.UserCreateDate || !response.UserStatus) {
         throw new Error('Incomplete user data received from Cognito.');
@@ -93,6 +121,9 @@ export const getUser = cache(async (): Promise<User | null> => {
         return acc;
     }, {} as Record<string, string | undefined>);
 
+    const groups = groupsResponse.Groups?.map(g => g.GroupName ?? '').filter(g => g) ?? [];
+    const isAdmin = groups.includes(adminGroupName);
+
     const user: User = {
       username: response.Username ?? 'N/A',
       email: attributes.email ?? '',
@@ -104,6 +135,8 @@ export const getUser = cache(async (): Promise<User | null> => {
       creationDate: response.UserCreateDate.toISOString(),
       userStatus: response.UserStatus,
       twoFactorEnabled: response.MFAOptions ? response.MFAOptions.length > 0 : false,
+      groups: groups,
+      isAdmin: isAdmin,
     };
 
     return user;

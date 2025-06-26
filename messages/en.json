@@ -3,10 +3,11 @@
     "title": "Outpost",
     "home": "Home",
     "userMenu": {
-      "triggerLabel": "Open user menu",
+      "triggerLabel": "Open menu",
       "profile": "Profile",
       "settings": "Settings",
-      "logout": "Log out"
+      "logout": "Log out",
+      "adminDashboard": "Admin Dashboard"
     },
     "mobileMenuTitle": "Main Menu",
     "language": "Language"
@@ -20,7 +21,11 @@
     "profileCard": {
       "title": "Profile",
       "email": "Email",
-      "twoFactorStatus": "2FA Status"
+      "twoFactorStatus": "2FA Status",
+      "groups": "Groups",
+      "adminBadge": "Admin",
+      "userBadge": "User",
+      "noGroups": "No groups assigned."
     },
     "manageProfile": "Manage Profile",
     "quickActions": {
@@ -118,6 +123,7 @@
     "title": "Sign in to Outpost",
     "description": "Use your company's single sign-on (SSO) to continue.",
     "signInButton": "Sign In with SSO",
+    "signInAdminButton": "Sign In as Admin (Dev)",
     "errorTitle": "Sign In Failed",
     "errorDescription": "Could not sign in. Please try again or contact support."
   }

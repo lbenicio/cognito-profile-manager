@@ -2,7 +2,7 @@
 
 import { useTransition } from 'react';
 import { Link } from '@/navigation';
-import { User, LogOut, Settings, LayoutDashboard, Menu } from 'lucide-react';
+import { User, LogOut, Settings, LayoutDashboard, Menu, Shield } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,6 +37,8 @@ export function Header({ user }: { user: UserType | null }) {
     });
   };
 
+  const adminDashboardUrl = process.env.NEXT_PUBLIC_ADMIN_DASHBOARD_URL || '#';
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card shadow-sm">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-8">
@@ -66,6 +68,13 @@ export function Header({ user }: { user: UserType | null }) {
                         {t('home')}
                         </Link>
                     </SheetClose>
+                     {user?.isAdmin && (
+                        <SheetClose asChild>
+                            <Link href={adminDashboardUrl} className="text-muted-foreground transition-colors hover:text-primary flex items-center gap-2">
+                                <Shield className="h-5 w-5"/> {t('userMenu.adminDashboard')}
+                            </Link>
+                        </SheetClose>
+                    )}
                     <SheetClose asChild>
                         <Link href="/profile" className="text-muted-foreground transition-colors hover:text-primary">
                         {t('userMenu.profile')}
@@ -115,6 +124,14 @@ export function Header({ user }: { user: UserType | null }) {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                {user.isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <a href={adminDashboardUrl} target="_blank" rel="noopener noreferrer">
+                      <Shield className="mr-2 h-4 w-4" />
+                      <span>{t('userMenu.adminDashboard')}</span>
+                    </a>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem asChild>
                   <Link href="/profile">
                     <User className="mr-2 h-4 w-4" />

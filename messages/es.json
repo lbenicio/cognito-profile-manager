@@ -6,7 +6,8 @@
       "triggerLabel": "Abrir menú de usuario",
       "profile": "Perfil",
       "settings": "Ajustes",
-      "logout": "Cerrar sesión"
+      "logout": "Cerrar sesión",
+      "adminDashboard": "Panel de Administrador"
     },
     "mobileMenuTitle": "Menú Principal",
     "language": "Idioma"
@@ -20,7 +21,11 @@
     "profileCard": {
       "title": "Perfil",
       "email": "Correo electrónico",
-      "twoFactorStatus": "Estado 2FA"
+      "twoFactorStatus": "Estado 2FA",
+      "groups": "Grupos",
+      "adminBadge": "Administrador",
+      "userBadge": "Usuario",
+      "noGroups": "No hay grupos asignados."
     },
     "manageProfile": "Gestionar Perfil",
     "quickActions": {
@@ -118,6 +123,7 @@
     "title": "Inicia sesión en Outpost",
     "description": "Usa el inicio de sesión único (SSO) de tu empresa para continuar.",
     "signInButton": "Iniciar Sesión con SSO",
+    "signInAdminButton": "Iniciar Sesión como Admin (Dev)",
     "errorTitle": "Fallo al Iniciar Sesión",
     "errorDescription": "No se pudo iniciar sesión. Por favor, inténtalo de nuevo o contacta a soporte."
   }
