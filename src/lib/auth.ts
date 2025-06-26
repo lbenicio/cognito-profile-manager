@@ -1,6 +1,7 @@
 import 'server-only';
 import { cache } from 'react';
 import { CognitoIdentityProviderClient, AdminGetUserCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { cookies } from 'next/headers';
 
 // Define the User type, which should match what the components expect.
 export type User = {
@@ -30,22 +31,39 @@ const mockUser: User = {
   twoFactorEnabled: true,
 };
 
-// This function is cached per request, so you can call it multiple times
-// in a request without making multiple API calls.
-export const getUser = cache(async (): Promise<User> => {
-  if (process.env.NODE_ENV === 'development') {
-    console.log("Using mock user data for development.");
-    return mockUser;
+// This function safely parses the session cookie.
+export const getSession = cache(async () => {
+    const sessionCookie = cookies().get('auth_session')?.value;
+    if (!sessionCookie) return null;
+    try {
+        return JSON.parse(sessionCookie);
+    } catch {
+        // If the cookie is malformed, treat it as no session.
+        return null;
+    }
+});
+
+// This function is cached per request and retrieves the authenticated user's data.
+export const getUser = cache(async (): Promise<User | null> => {
+  const session = await getSession();
+
+  // If there's no session, there's no user.
+  if (!session?.username) {
+    return null;
   }
 
-  // In a real application, you would get the username from the user's session.
-  // For this example, we'll hardcode it.
-  const username = 'testuser'; 
+  // In a development environment, we can return mock data for convenience.
+  if (process.env.NODE_ENV === 'development') {
+    console.log("Using mock user data for development.");
+    return { ...mockUser, email: session.email, username: session.username };
+  }
 
-  // Ensure environment variables are set
+  // In production, fetch the user from Cognito.
+  const username = session.username; 
+
   if (!process.env.COGNITO_USER_POOL_ID || !process.env.AWS_REGION || !process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY) {
-    console.error('Cognito environment variables are not fully set. Falling back to mock data.');
-    return mockUser;
+    console.error('Cognito environment variables are not fully set. Cannot fetch real user data.');
+    return null;
   }
 
   const client = new CognitoIdentityProviderClient({
@@ -91,8 +109,9 @@ export const getUser = cache(async (): Promise<User> => {
     return user;
 
   } catch (error) {
-    console.error("Failed to fetch user from Cognito:", error);
-    // Throw an error to signal that the production data source is failing.
-    throw new Error(`Could not fetch user '${username}' from Cognito.`);
+    console.error(`Failed to fetch user '${username}' from Cognito:`, error);
+    // If the user is not found in Cognito, invalidate the local session.
+    cookies().set('auth_session', '', { expires: new Date(0) });
+    return null;
   }
 });

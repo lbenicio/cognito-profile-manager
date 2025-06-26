@@ -112,5 +112,14 @@
       "english": "Inglés",
       "spanish": "Español"
     }
+  },
+  "Login": {
+    "title": "Inicia sesión en Outpost",
+    "description": "Introduce tus credenciales para acceder a tu cuenta.",
+    "emailLabel": "Correo electrónico",
+    "passwordLabel": "Contraseña",
+    "signInButton": "Iniciar Sesión",
+    "errorTitle": "Fallo al Iniciar Sesión",
+    "errorDescription": "Credenciales inválidas. Por favor, inténtalo de nuevo."
   }
 }

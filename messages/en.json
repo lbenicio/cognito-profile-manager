@@ -112,5 +112,14 @@
       "english": "English",
       "spanish": "Spanish"
     }
+  },
+  "Login": {
+    "title": "Sign in to Outpost",
+    "description": "Enter your credentials to access your account.",
+    "emailLabel": "Email Address",
+    "passwordLabel": "Password",
+    "signInButton": "Sign In",
+    "errorTitle": "Sign In Failed",
+    "errorDescription": "Invalid credentials. Please try again."
   }
 }
