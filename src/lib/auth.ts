@@ -1,7 +1,7 @@
 import 'server-only';
 import { cache } from 'react';
-import { CognitoIdentityProviderClient, AdminGetUserCommand, AdminListGroupsForUserCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { cookies } from 'next/headers';
+import { jwtVerify, createRemoteJWKSet } from 'jose';
 
 // Define the User type, which should match what the components expect.
 export type User = {
@@ -43,7 +43,6 @@ const mockAdminUser: User = {
   name: 'Admin User',
   groups: ['users', process.env.COGNITO_ADMIN_GROUP_NAME || 'admins'],
   isAdmin: true,
-  passkeysEnabled: true,
 };
 
 
@@ -63,82 +62,57 @@ export const getSession = cache(async () => {
 export const getUser = cache(async (): Promise<User | null> => {
   const session = await getSession();
 
-  // If there's no session, there's no user.
-  if (!session?.username) {
-    return null;
-  }
-
-  // In a development environment, we can return mock data for convenience.
-  if (process.env.NODE_ENV === 'development') {
+  // Handle mock development session (which doesn't have an id_token)
+  if (process.env.NODE_ENV === 'development' && session?.username && !session?.id_token) {
     console.log("Using mock user data for development.");
-     // A simple way to test admin flow: check for a specific username in the session.
     if (session.username === 'admin') {
-         return { ...mockAdminUser, email: session.email, username: session.username };
+      return { ...mockAdminUser, email: session.email, username: session.username };
     }
     return { ...mockUser, email: session.email, username: session.username };
   }
 
-  // In production, fetch the user from Cognito.
-  const username = session.username; 
-  const adminGroupName = process.env.COGNITO_ADMIN_GROUP_NAME;
-
-  if (!process.env.COGNITO_USER_POOL_ID || !process.env.AWS_REGION || !process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY || !adminGroupName) {
-    console.error('Cognito environment variables are not fully set. Cannot fetch real user data.');
+  // If there's no session or no id_token, there's no real user.
+  if (!session?.id_token) {
     return null;
   }
 
-  const client = new CognitoIdentityProviderClient({
-    region: process.env.AWS_REGION,
-    credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    }
-  });
-
-  const getUserCommand = new AdminGetUserCommand({
-    UserPoolId: process.env.COGNITO_USER_POOL_ID,
-    Username: username,
-  });
-
-  const listGroupsCommand = new AdminListGroupsForUserCommand({
-    UserPoolId: process.env.COGNITO_USER_POOL_ID,
-    Username: username,
-  });
-
   try {
-    const [userResponse, groupsResponse] = await Promise.all([
-        client.send(getUserCommand),
-        client.send(listGroupsCommand)
-    ]);
+    // In production, verify the JWT and extract claims.
+    const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
+    if (!wellknownUrl) throw new Error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
+    
+    const wellknownResponse = await fetch(wellknownUrl, { cache: 'force-cache' });
+    if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
+    const wellknown = await wellknownResponse.json();
 
-    const response = userResponse;
+    const jwksUri = wellknown.jwks_uri;
+    const JWKS = createRemoteJWKSet(new URL(jwksUri));
 
-    if (!response.UserAttributes || !response.UserCreateDate || !response.UserStatus) {
-        throw new Error('Incomplete user data received from Cognito.');
-    }
+    const { payload } = await jwtVerify(session.id_token, JWKS, {
+      issuer: wellknown.issuer,
+      audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
+    });
 
-    const attributes = response.UserAttributes.reduce((acc, attr) => {
-        if (attr.Name) {
-            acc[attr.Name] = attr.Value;
-        }
-        return acc;
-    }, {} as Record<string, string | undefined>);
-
-    const groups = groupsResponse.Groups?.map(g => g.GroupName ?? '').filter(g => g) ?? [];
+    const adminGroupName = process.env.COGNITO_ADMIN_GROUP_NAME || 'admins';
+    const groups = (payload['cognito:groups'] as string[]) || [];
     const isAdmin = groups.includes(adminGroupName);
+    
+    // OIDC address claim is an object, we get the formatted version.
+    const addressClaim = payload.address as { formatted?: string } | undefined;
 
     const user: User = {
-      username: response.Username ?? 'N/A',
-      email: attributes.email ?? '',
-      email_verified: attributes.email_verified === 'true',
-      name: attributes.name ?? '',
-      address: attributes.address ?? '',
-      phone_number: attributes.phone_number ?? '',
-      phone_number_verified: attributes.phone_number_verified === 'true',
-      creationDate: response.UserCreateDate.toISOString(),
-      userStatus: response.UserStatus,
-      twoFactorEnabled: response.MFAOptions ? response.MFAOptions.length > 0 : false,
-      passkeysEnabled: false, // NOTE: Cognito AdminGetUser doesn't easily expose passkey status. Defaulting to false.
+      username: (payload['cognito:username'] as string) || '',
+      email: (payload.email as string) || '',
+      email_verified: (payload.email_verified as boolean) || false,
+      name: (payload.name as string) || '',
+      address: addressClaim?.formatted ?? '',
+      phone_number: (payload.phone_number as string) || '',
+      phone_number_verified: (payload.phone_number_verified as boolean) || false,
+      // auth_time is in seconds, convert to ISO string
+      creationDate: new Date((payload.auth_time as number) * 1000).toISOString(),
+      userStatus: 'CONFIRMED', // OIDC tokens don't have a user status, assume CONFIRMED
+      twoFactorEnabled: Array.isArray(payload.amr) && payload.amr.includes('mfa'),
+      passkeysEnabled: false, // This info isn't in standard OIDC tokens.
       groups: groups,
       isAdmin: isAdmin,
     };
@@ -146,8 +120,8 @@ export const getUser = cache(async (): Promise<User | null> => {
     return user;
 
   } catch (error) {
-    console.error(`Failed to fetch user '${username}' from Cognito:`, error);
-    // If the user is not found in Cognito, invalidate the local session.
+    console.error("JWT Verification failed or user data processing error:", error);
+    // If the token is invalid for any reason, clear the session cookie.
     cookies().set('auth_session', '', { expires: new Date(0) });
     return null;
   }

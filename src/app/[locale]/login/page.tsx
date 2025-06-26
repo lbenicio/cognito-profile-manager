@@ -2,18 +2,25 @@
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { login } from '@/lib/auth-actions';
-import { useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
-import { Shield } from 'lucide-react';
+import { ssoLogin, devAdminLogin } from '@/lib/auth-actions';
+import { useTransition } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Shield, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
-function SubmitButton() {
-    const { pending } = useFormStatus();
+function SsoSubmitButton() {
+    const [isPending, startTransition] = useTransition();
     const t = useTranslations('Login');
 
+    const handleLogin = () => {
+      startTransition(() => {
+        ssoLogin();
+      });
+    };
+
     return (
-        <Button type="submit" name="sso_provider" value="default_sso" className="w-full" disabled={pending}>
-            {pending ? (
+        <Button type="button" onClick={handleLogin} className="w-full" disabled={isPending}>
+            {isPending ? (
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
             ) : (
                 <Shield className="mr-2 h-4 w-4" />
@@ -24,11 +31,17 @@ function SubmitButton() {
 }
 
 function AdminSubmitButton() {
-    const { pending } = useFormStatus();
+    const [isPending, startTransition] = useTransition();
     const t = useTranslations('Login');
 
+    const handleLogin = () => {
+      startTransition(() => {
+        devAdminLogin();
+      });
+    };
+
     return (
-        <Button type="submit" name="sso_provider" value="admin_sso" variant="secondary" className="w-full" disabled={pending}>
+        <Button type="button" onClick={handleLogin} variant="secondary" className="w-full" disabled={isPending}>
             <Shield className="mr-2 h-4 w-4" />
             {t('signInAdminButton')}
         </Button>
@@ -37,7 +50,8 @@ function AdminSubmitButton() {
 
 export default function LoginPage() {
   const t = useTranslations('Login');
-  const [errorMessage, dispatch] = useActionState(login, undefined);
+  const searchParams = useSearchParams();
+  const error = searchParams.get('error');
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center p-4">
@@ -47,15 +61,17 @@ export default function LoginPage() {
                 <CardDescription>{t('description')}</CardDescription>
             </CardHeader>
             <CardContent>
-              <form action={dispatch} className="space-y-4">
-                 {errorMessage && (
-                    <div className="text-sm font-medium text-destructive text-center mb-4">
-                        {t('errorDescription')}
-                    </div>
+              <div className="space-y-4">
+                 {error && (
+                    <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>{t('errorTitle')}</AlertTitle>
+                        <AlertDescription>{t('errorDescription')}</AlertDescription>
+                    </Alert>
                 )}
-                <SubmitButton />
+                <SsoSubmitButton />
                 {process.env.NODE_ENV === 'development' && <AdminSubmitButton />}
-              </form>
+              </div>
             </CardContent>
         </Card>
     </div>
