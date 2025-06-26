@@ -6,8 +6,8 @@ import { Footer } from '@/components/footer';
 import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
-  title: 'Cognito Profile Manager',
-  description: 'Manage your AWS Cognito user profile',
+  title: 'Outpost',
+  description: 'Manage your Outpost user profile',
 };
 
 export default function RootLayout({
