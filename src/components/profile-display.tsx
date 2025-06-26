@@ -3,18 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Mail, Home, Phone, CalendarDays, BadgeCheck } from 'lucide-react';
 import { format } from 'date-fns';
-
-type User = {
-  username: string;
-  email: string;
-  email_verified: boolean;
-  name: string;
-  address: string;
-  phone_number: string;
-  phone_number_verified: boolean;
-  creationDate: string;
-  userStatus: string;
-};
+import type { User } from '@/lib/auth';
 
 export function ProfileDisplay({ user }: { user: User }) {
   return (

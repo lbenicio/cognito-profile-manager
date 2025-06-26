@@ -18,6 +18,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import { Save } from 'lucide-react';
 import React from 'react';
+import type { User as UserType } from '@/lib/auth';
 
 const profileFormSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }).max(50),
@@ -29,14 +30,8 @@ const profileFormSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
-type User = {
-  name: string;
-  address: string;
-  phone_number: string;
-};
-
 interface ProfileFormProps {
-    user: User;
+    user: UserType;
     onUpdate: (data: ProfileFormValues) => void;
 }
 
@@ -55,11 +50,16 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
   });
 
   React.useEffect(() => {
-    form.reset(user);
+    form.reset({
+        name: user.name,
+        address: user.address,
+        phone_number: user.phone_number,
+    });
   }, [user, form]);
 
   async function onSubmit(data: ProfileFormValues) {
     setIsSubmitting(true);
+    // In a real app, this would be an API call to Cognito to update user attributes.
     await new Promise(resolve => setTimeout(resolve, 1000));
     try {
         onUpdate(data);

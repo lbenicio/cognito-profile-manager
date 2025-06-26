@@ -4,13 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { Mail, Phone } from 'lucide-react';
 import React from 'react';
+import type { User } from '@/lib/auth';
 
-type User = {
-    email: string;
-    email_verified: boolean;
-    phone_number: string;
-    phone_number_verified: boolean;
-};
 
 export function Verification({ user }: { user: User }) {
     const { toast } = useToast();
@@ -19,6 +14,7 @@ export function Verification({ user }: { user: User }) {
 
     const handleSendVerificationEmail = async () => {
         setEmailLoading(true);
+        // In a real app, this would trigger an API call to Cognito to send a verification email.
         await new Promise(resolve => setTimeout(resolve, 1000));
         toast({
             title: 'Verification Sent',
@@ -29,6 +25,7 @@ export function Verification({ user }: { user: User }) {
     
     const handleSendVerificationSms = async () => {
         setPhoneLoading(true);
+        // In a real app, this would trigger an API call to Cognito to send a verification SMS.
         await new Promise(resolve => setTimeout(resolve, 1000));
         toast({
             title: 'Verification Sent',
