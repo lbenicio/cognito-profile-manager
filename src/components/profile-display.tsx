@@ -156,9 +156,9 @@ export function ProfileDisplay({ user, onUpdate }: { user: User, onUpdate: (data
       </Card>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{tProfile('display.editAvatarTitle')}</DialogTitle>
+          <DialogTitle>{tProfile('editAvatarTitle')}</DialogTitle>
           <DialogDescription>
-            {tProfile('display.editAvatarDescription')}
+            {tProfile('editAvatarDescription')}
           </DialogDescription>
         </DialogHeader>
         <AvatarEditor user={user} onUpdate={onUpdate} onClose={() => setIsEditorOpen(false)} />
