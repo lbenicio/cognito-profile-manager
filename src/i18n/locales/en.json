@@ -1,0 +1,130 @@
+{
+  "Header": {
+    "title": "Outpost",
+    "userMenu": {
+      "profile": "Profile",
+      "settings": "Settings",
+      "logout": "Log out",
+      "adminDashboard": "Admin Dashboard"
+    },
+    "mobileMenuTitle": "Main Menu",
+    "mobileMenuTrigger": "Open main menu",
+    "language": "Language"
+  },
+  "Footer": {
+    "copyright": "© {year} Outpost. All rights reserved."
+  },
+  "Dashboard": {
+    "welcome": "Welcome back, {name}!",
+    "description": "Here's a quick overview of your Outpost account.",
+    "profileCard": {
+      "title": "Profile",
+      "email": "Email",
+      "twoFactorStatus": "2FA Status",
+      "passkeyStatus": "Passkey Status",
+      "groups": "Groups",
+      "adminBadge": "Admin",
+      "userBadge": "User",
+      "noGroups": "No groups assigned."
+    },
+    "manageProfile": "Manage Profile",
+    "quickActions": {
+      "title": "Quick Actions",
+      "description": "Commonly used settings and actions.",
+      "changePassword": "Change Password",
+      "manageSecurity": "Manage Security",
+      "appearanceSettings": "Appearance Settings"
+    },
+    "verified": "Verified",
+    "unverified": "Unverified",
+    "enabled": "Enabled",
+    "disabled": "Disabled"
+  },
+  "Profile": {
+    "title": "Profile",
+    "description": "Manage your personal information and account security.",
+    "display": {
+      "status": "Status: {status}",
+      "memberSince": "Member since: {date}"
+    },
+    "form": {
+      "title": "Edit Profile",
+      "description": "Update your personal information.",
+      "nameLabel": "Full Name",
+      "addressLabel": "Address",
+      "phoneLabel": "Phone Number",
+      "phoneDescription": "Must be in E.164 format (e.g., +12223334444).",
+      "save": "Save Changes",
+      "successTitle": "Profile Updated",
+      "successDescription": "Your profile has been successfully updated.",
+      "errorTitle": "Update Failed",
+      "errorDescription": "Could not update your profile. Please try again."
+    },
+    "passwordForm": {
+      "title": "Change Password",
+      "description": "Choose a strong new password to keep your account secure.",
+      "currentPasswordLabel": "Current Password",
+      "newPasswordLabel": "New Password",
+      "confirmPasswordLabel": "Confirm New Password",
+      "passwordMismatch": "New passwords do not match.",
+      "successTitle": "Password Changed",
+      "successDescription": "Your password has been successfully changed.",
+      "errorTitle": "Error",
+      "errorDescription": "Your current password is incorrect.",
+      "incorrectPassword": "Incorrect password"
+    },
+    "verification": {
+      "title": "Verify Attributes",
+      "description": "Verify your contact information to secure your account.",
+      "verify": "Verify",
+      "sentTitle": "Verification Sent",
+      "emailSentDescription": "A verification email has been sent to {email}.",
+      "phoneSentDescription": "A verification SMS has been sent to {phone}."
+    },
+    "twoFactor": {
+      "title": "Two-Factor Authentication",
+      "description": "Add an extra layer of security to your account.",
+      "authenticatorApp": "Authenticator App",
+      "qrInstructions": "Scan the QR code with your authenticator app, then enter the 6-digit code below.",
+      "codeInputPlaceholder": "6-digit code",
+      "verify": "Verify",
+      "otpSuccessTitle": "Authenticator App Enabled",
+      "otpSuccessDescription": "2FA via authenticator app has been successfully enabled.",
+      "verificationFailedTitle": "Verification Failed",
+      "verificationFailedDescription": "The code is incorrect. Please try again.",
+      "passkeysTitle": "Passkeys / Security Keys",
+      "addPasskey": "Add Passkey",
+      "addPasskeyToastTitle": "Add Passkey",
+      "addPasskeyToastDescription": "Follow your browser instructions to add a new passkey.",
+      "addedOn": "Added on {date}",
+      "removePasskey": "Remove passkey",
+      "passkeyRemovedTitle": "Passkey Removed",
+      "passkeyRemovedDescription": "The selected passkey has been removed.",
+      "noPasskeys": "You have no passkeys registered."
+    }
+  },
+  "Settings": {
+    "title": "Settings",
+    "description": "Manage your account and appearance settings.",
+    "appearance": {
+      "title": "Appearance",
+      "description": "Customize the look and feel of your account.",
+      "theme": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System",
+      "textSize": "Text Size",
+      "language": "Language",
+      "english": "English",
+      "spanish": "Spanish"
+    }
+  },
+  "Login": {
+    "title": "Sign in to Outpost",
+    "description": "Use your company's single sign-on (SSO) to continue.",
+    "signInButton": "Sign In with SSO",
+    "signInAdminButton": "Sign In as Admin (Dev)",
+    "errorTitle": "Sign In Failed",
+    "errorDescription": "Could not sign in. Please try again or contact support."
+  }
+}
