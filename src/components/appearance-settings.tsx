@@ -23,7 +23,7 @@ export function AppearanceSettings() {
       const size = parseInt(storedFontSize, 10)
       if (!isNaN(size)) {
         setFontSize(size)
-        document.documentElement.style.fontSize = `${size}px`
+        document.documentElement.style.fontSize = `${size}pt`
       }
     }
   }, [])
@@ -32,7 +32,7 @@ export function AppearanceSettings() {
     const newSize = value[0]
     if (newSize) {
       setFontSize(newSize)
-      document.documentElement.style.fontSize = `${newSize}px`
+      document.documentElement.style.fontSize = `${newSize}pt`
       localStorage.setItem('font-size', newSize.toString())
     }
   }
@@ -99,7 +99,7 @@ export function AppearanceSettings() {
               value={[fontSize]}
               onValueChange={handleFontSizeChange}
             />
-            <span className="w-12 text-right text-sm text-muted-foreground">{fontSize}px</span>
+            <span className="w-12 text-right text-sm text-muted-foreground">{fontSize}pt</span>
           </div>
         </div>
 
