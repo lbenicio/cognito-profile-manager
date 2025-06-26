@@ -39,6 +39,7 @@ export async function GET(request: NextRequest) {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: params.toString(),
+      cache: 'no-store',
     });
 
     const tokens = await response.json();
