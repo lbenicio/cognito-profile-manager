@@ -15,7 +15,7 @@ import { LanguageSelect } from './language-select'
 export function AppearanceSettings() {
   const { theme, setTheme } = useTheme()
   const t = useTranslations('Settings.appearance');
-  const [fontSize, setFontSize] = useState(10)
+  const [fontSize, setFontSize] = useState(12)
 
   useEffect(() => {
     const storedFontSize = localStorage.getItem('font-size')
