@@ -27,7 +27,7 @@ export default async function LocaleLayout({
         disableTransitionOnChange
       >
         <Header user={user} />
-        <main className="flex-grow">
+        <main className="flex-grow flex flex-col">
           {children}
         </main>
         <Footer />

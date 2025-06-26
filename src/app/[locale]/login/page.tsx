@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { login } from '@/lib/auth-actions';
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
-import { Shield, LayoutDashboard } from 'lucide-react';
+import { Shield } from 'lucide-react';
 
 function SubmitButton() {
     const { pending } = useFormStatus();
@@ -28,11 +28,7 @@ export default function LoginPage() {
   const [errorMessage, dispatch] = useActionState(login, undefined);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
-        <div className="absolute top-8 flex items-center gap-2">
-            <LayoutDashboard className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">Outpost</span>
-        </div>
+    <div className="flex flex-col flex-1 items-center justify-center p-4">
         <Card className="w-full max-w-sm">
             <CardHeader className="text-center">
             <CardTitle className="text-2xl">{t('title')}</CardTitle>
