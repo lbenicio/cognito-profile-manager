@@ -28,7 +28,6 @@ import type { User as UserType } from '@/lib/auth';
 
 type HeaderTranslations = {
   title: string;
-  home: string;
   userMenu: {
     profile: string;
     settings: string;
@@ -75,11 +74,6 @@ export function Header({ user, translations: t }: { user: UserType | null, trans
                         <LayoutDashboard className="h-6 w-6 text-primary" />
                         <span>{t.title}</span>
                     </Link>
-                    <SheetClose asChild>
-                        <Link href="/" className="text-foreground transition-colors hover:text-primary">
-                        {t.home}
-                        </Link>
-                    </SheetClose>
                      {user?.isAdmin && (
                         <SheetClose asChild>
                             <Link href={adminDashboardUrl} className="text-muted-foreground transition-colors hover:text-primary flex items-center gap-2">
@@ -106,12 +100,6 @@ export function Header({ user, translations: t }: { user: UserType | null, trans
               <span className="hidden sm:inline-block">{t.title}</span>
            </Link>
         </div>
-
-        {user && (
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-                <Link href="/" className="text-foreground transition-colors hover:text-primary">{t.home}</Link>
-            </nav>
-        )}
         
         <div className="flex items-center gap-2">
           <ThemeToggle />
