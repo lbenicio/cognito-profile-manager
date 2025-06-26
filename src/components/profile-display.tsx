@@ -9,12 +9,39 @@ import type { User } from '@/lib/auth';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { useState } from 'react';
 import { AvatarEditor } from './avatar-editor';
+import { Button } from './ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 export function ProfileDisplay({ user, onUpdate }: { user: User, onUpdate: (data: Partial<User>) => void }) {
   const t = useTranslations('Dashboard');
-  const tProfile = useTranslations('Profile.display');
+  const tProfile = useTranslations('Profile');
   const tDashboard = useTranslations('Dashboard.profileCard');
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+
+  // Logic for verification actions
+  const { toast } = useToast();
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [phoneLoading, setPhoneLoading] = useState(false);
+
+  const handleSendVerificationEmail = async () => {
+    setEmailLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    toast({
+        title: tProfile('verification.sentTitle'),
+        description: tProfile('verification.emailSentDescription', {email: user.email}),
+    });
+    setEmailLoading(false);
+  };
+    
+  const handleSendVerificationSms = async () => {
+      setPhoneLoading(true);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast({
+          title: tProfile('verification.sentTitle'),
+          description: tProfile('verification.phoneSentDescription', {phone: user.phone_number}),
+      });
+      setPhoneLoading(false);
+  };
 
   return (
     <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
@@ -46,23 +73,37 @@ export function ProfileDisplay({ user, onUpdate }: { user: User, onUpdate: (data
           </div>
         </CardHeader>
         <CardContent className="space-y-4 text-sm">
-          <div className="flex flex-wrap items-center gap-2">
-            <Mail className="w-5 h-5 text-muted-foreground" />
-            <span className="flex-1 truncate min-w-0">{user.email}</span>
-            {user.email_verified ? (
-              <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 flex-shrink-0">{t('verified')}</Badge>
-            ) : (
-              <Badge variant="destructive" className="flex-shrink-0">{t('unverified')}</Badge>
-            )}
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <Mail className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+              <span className="truncate">{user.email}</span>
+            </div>
+              {user.email_verified ? (
+                <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 flex items-center gap-1 flex-shrink-0">
+                  <BadgeCheck className="w-3.5 h-3.5"/>
+                  {t('verified')}
+                </Badge>
+              ) : (
+                <Button variant="outline" size="sm" onClick={handleSendVerificationEmail} disabled={emailLoading} className='flex-shrink-0'>
+                  {emailLoading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div> : tProfile('verification.resend')}
+                </Button>
+              )}
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Phone className="w-5 h-5 text-muted-foreground" />
-            <span className="flex-1">{user.phone_number}</span>
-            {user.phone_number_verified ? (
-              <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 flex-shrink-0">{t('verified')}</Badge>
-            ) : (
-              <Badge variant="destructive" className="flex-shrink-0">{t('unverified')}</Badge>
-            )}
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <Phone className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+              <span className="text-sm">{user.phone_number}</span>
+            </div>
+              {user.phone_number_verified ? (
+                <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 flex items-center gap-1 flex-shrink-0">
+                  <BadgeCheck className="w-3.5 h-3.5"/>
+                  {t('verified')}
+                </Badge>
+              ) : (
+                <Button variant="outline" size="sm" onClick={handleSendVerificationSms} disabled={phoneLoading} className='flex-shrink-0'>
+                  {phoneLoading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div> : tProfile('verification.resend')}
+                </Button>
+              )}
           </div>
           <div className="flex items-start gap-3">
             <Home className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
@@ -105,7 +146,7 @@ export function ProfileDisplay({ user, onUpdate }: { user: User, onUpdate: (data
         <CardFooter className="flex-col items-start gap-2 pt-4 border-t text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
               <BadgeCheck className="w-4 h-4" />
-              <span>{tProfile('status', {status: user.userStatus})}</span>
+              <span>{tProfile('display.status', {status: user.userStatus})}</span>
           </div>
           <div className="flex items-center gap-2">
               <CalendarDays className="w-4 h-4" />
@@ -115,9 +156,9 @@ export function ProfileDisplay({ user, onUpdate }: { user: User, onUpdate: (data
       </Card>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{tProfile('editAvatarTitle')}</DialogTitle>
+          <DialogTitle>{tProfile('display.editAvatarTitle')}</DialogTitle>
           <DialogDescription>
-            {tProfile('editAvatarDescription')}
+            {tProfile('display.editAvatarDescription')}
           </DialogDescription>
         </DialogHeader>
         <AvatarEditor user={user} onUpdate={onUpdate} onClose={() => setIsEditorOpen(false)} />
