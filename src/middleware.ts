@@ -1,45 +1,18 @@
-import createMiddleware from 'next-intl/middleware';
 import { NextRequest, NextResponse } from 'next/server';
-import { locales, localePrefix, pathnames } from './navigation';
+import { authMiddleware } from './middlewares/auth';
+import { i18nMiddleware } from './middlewares/i18n';
 
-const i18nMiddleware = createMiddleware({
-  locales,
-  localePrefix,
-  pathnames,
-  defaultLocale: 'en',
-});
-
-// All pages that are public and don't require authentication
-const publicPages = [pathnames['/login']]; 
-
-export default function middleware(request: NextRequest) {
-  // Skip middleware for API routes, letting them pass through.
+export function middleware(request: NextRequest) {
+  // Skip all middleware for API routes
   if (request.nextUrl.pathname.startsWith('/api')) {
     return NextResponse.next();
   }
 
-  const session = request.cookies.get('auth_session');
-  const pathname = request.nextUrl.pathname;
-
-  // Check if the current path is a public page
-  const isPublicPage = publicPages.includes(pathname as (typeof publicPages)[number]);
-
-  // If the user is logged in and tries to access a public page (like /login),
-  // redirect them to the dashboard.
-  if (session && isPublicPage) {
-    return NextResponse.redirect(new URL(pathnames['/'], request.url));
-  }
-
-  // If the user is not logged in and tries to access a protected page,
-  // redirect them to the login page.
-  if (!session && !isPublicPage) {
-    const loginUrl = new URL(pathnames['/login'], request.url);
-    // You could optionally add a 'from' query parameter to redirect back after login
-    // loginUrl.searchParams.set('from', pathname);
-    return NextResponse.redirect(loginUrl);
+  const authResponse = authMiddleware(request);
+  if (authResponse) {
+    return authResponse;
   }
   
-  // If authentication checks pass, proceed with the i18n middleware.
   return i18nMiddleware(request);
 }
 
