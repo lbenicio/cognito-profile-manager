@@ -16,7 +16,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { AiHint } from './ai-hint';
 import { Save } from 'lucide-react';
 import React from 'react';
 
@@ -83,7 +82,7 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
     <Card>
       <CardHeader>
         <CardTitle>Edit Profile</CardTitle>
-        <CardDescription>Update your personal information. Click the lightbulb for help.</CardDescription>
+        <CardDescription>Update your personal information.</CardDescription>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -93,10 +92,7 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <div className="flex items-center">
-                    <FormLabel>Full Name</FormLabel>
-                    <AiHint fieldDescription="The user's full name, including first and last name." />
-                  </div>
+                  <FormLabel>Full Name</FormLabel>
                   <FormControl>
                     <Input placeholder="John Doe" {...field} />
                   </FormControl>
@@ -109,10 +105,7 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
               name="address"
               render={({ field }) => (
                 <FormItem>
-                   <div className="flex items-center">
-                    <FormLabel>Address</FormLabel>
-                    <AiHint fieldDescription="The user's full street address, including street number, street name, city, state/province, and postal code." />
-                  </div>
+                  <FormLabel>Address</FormLabel>
                   <FormControl>
                     <Input placeholder="123 Main St, Anytown, USA" {...field} />
                   </FormControl>
@@ -125,10 +118,7 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
               name="phone_number"
               render={({ field }) => (
                 <FormItem>
-                   <div className="flex items-center">
-                    <FormLabel>Phone Number</FormLabel>
-                    <AiHint fieldDescription="The user's phone number in international E.164 format. It must start with a '+' followed by the country code and the number." />
-                  </div>
+                  <FormLabel>Phone Number</FormLabel>
                   <FormControl>
                     <Input placeholder="+15551234567" {...field} />
                   </FormControl>
