@@ -115,11 +115,9 @@
   },
   "Login": {
     "title": "Sign in to Outpost",
-    "description": "Enter your credentials to access your account.",
-    "emailLabel": "Email Address",
-    "passwordLabel": "Password",
-    "signInButton": "Sign In",
+    "description": "Use your company's single sign-on (SSO) to continue.",
+    "signInButton": "Sign In with SSO",
     "errorTitle": "Sign In Failed",
-    "errorDescription": "Invalid credentials. Please try again."
+    "errorDescription": "Could not sign in. Please try again or contact support."
   }
 }

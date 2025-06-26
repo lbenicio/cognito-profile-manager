@@ -115,11 +115,9 @@
   },
   "Login": {
     "title": "Inicia sesión en Outpost",
-    "description": "Introduce tus credenciales para acceder a tu cuenta.",
-    "emailLabel": "Correo electrónico",
-    "passwordLabel": "Contraseña",
-    "signInButton": "Iniciar Sesión",
+    "description": "Usa el inicio de sesión único (SSO) de tu empresa para continuar.",
+    "signInButton": "Iniciar Sesión con SSO",
     "errorTitle": "Fallo al Iniciar Sesión",
-    "errorDescription": "Credenciales inválidas. Por favor, inténtalo de nuevo."
+    "errorDescription": "No se pudo iniciar sesión. Por favor, inténtalo de nuevo o contacta a soporte."
   }
 }
