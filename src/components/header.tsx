@@ -23,12 +23,22 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from './theme-toggle';
 import { LanguageSwitcher } from './language-switcher';
-import { useTranslations } from 'next-intl';
 import { logout } from '@/lib/auth-actions';
 import type { User as UserType } from '@/lib/auth';
 
-export function Header({ user }: { user: UserType | null }) {
-  const t = useTranslations('Header');
+type HeaderTranslations = {
+  title: string;
+  home: string;
+  profile: string;
+  settings: string;
+  logout: string;
+  adminDashboard: string;
+  mobileMenuTitle: string;
+  mobileMenuTrigger: string;
+  language: string;
+};
+
+export function Header({ user, translations: t }: { user: UserType | null, translations: HeaderTranslations }) {
   const [isPending, startTransition] = useTransition();
 
   const handleLogout = () => {
@@ -48,12 +58,12 @@ export function Header({ user }: { user: UserType | null }) {
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden">
                   <Menu className="h-6 w-6" />
-                  <span className="sr-only">{t('mobileMenuTrigger')}</span>
+                  <span className="sr-only">{t.mobileMenuTrigger}</span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="left">
                  <SheetHeader>
-                    <SheetTitle className="sr-only">{t('mobileMenuTitle')}</SheetTitle>
+                    <SheetTitle className="sr-only">{t.mobileMenuTitle}</SheetTitle>
                  </SheetHeader>
                  <nav className="grid gap-6 text-lg font-medium p-4 pt-8">
                     <Link
@@ -61,28 +71,28 @@ export function Header({ user }: { user: UserType | null }) {
                         className="flex items-center gap-2 text-lg font-semibold mb-4"
                     >
                         <LayoutDashboard className="h-6 w-6 text-primary" />
-                        <span>{t('title')}</span>
+                        <span>{t.title}</span>
                     </Link>
                     <SheetClose asChild>
                         <Link href="/" className="text-foreground transition-colors hover:text-primary">
-                        {t('home')}
+                        {t.home}
                         </Link>
                     </SheetClose>
                      {user?.isAdmin && (
                         <SheetClose asChild>
                             <Link href={adminDashboardUrl} className="text-muted-foreground transition-colors hover:text-primary flex items-center gap-2">
-                                <Shield className="h-5 w-5"/> {t('userMenu.adminDashboard')}
+                                <Shield className="h-5 w-5"/> {t.adminDashboard}
                             </Link>
                         </SheetClose>
                     )}
                     <SheetClose asChild>
                         <Link href="/profile" className="text-muted-foreground transition-colors hover:text-primary">
-                        {t('userMenu.profile')}
+                        {t.profile}
                         </Link>
                     </SheetClose>
                     <SheetClose asChild>
                         <Link href="/settings" className="text-muted-foreground transition-colors hover:text-primary">
-                        {t('userMenu.settings')}
+                        {t.settings}
                         </Link>
                     </SheetClose>
                 </nav>
@@ -91,19 +101,19 @@ export function Header({ user }: { user: UserType | null }) {
           )}
            <Link href="/" className="flex items-center gap-2 text-xl font-bold">
               <LayoutDashboard className="h-6 w-6 text-primary" />
-              <span className="hidden sm:inline-block">{t('title')}</span>
+              <span className="hidden sm:inline-block">{t.title}</span>
            </Link>
         </div>
 
         {user && (
             <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-                <Link href="/" className="text-foreground transition-colors hover:text-primary">{t('home')}</Link>
+                <Link href="/" className="text-foreground transition-colors hover:text-primary">{t.home}</Link>
             </nav>
         )}
         
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <LanguageSwitcher />
+          <LanguageSwitcher languageLabel={t.language} />
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -128,26 +138,26 @@ export function Header({ user }: { user: UserType | null }) {
                   <DropdownMenuItem asChild>
                     <a href={adminDashboardUrl} target="_blank" rel="noopener noreferrer">
                       <Shield className="mr-2 h-4 w-4" />
-                      <span>{t('userMenu.adminDashboard')}</span>
+                      <span>{t.adminDashboard}</span>
                     </a>
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem asChild>
                   <Link href="/profile">
                     <User className="mr-2 h-4 w-4" />
-                    <span>{t('userMenu.profile')}</span>
+                    <span>{t.profile}</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/settings">
                     <Settings className="mr-2 h-4 w-4" />
-                    <span>{t('userMenu.settings')}</span>
+                    <span>{t.settings}</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={handleLogout} disabled={isPending} className="cursor-pointer">
                   <LogOut className="mr-2 h-4 w-4" />
-                  <span>{t('userMenu.logout')}</span>
+                  <span>{t.logout}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

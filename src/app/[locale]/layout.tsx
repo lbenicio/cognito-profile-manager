@@ -1,5 +1,5 @@
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+import { getMessages, getTranslations } from 'next-intl/server';
 import { Toaster } from "@/components/ui/toaster";
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
@@ -17,6 +17,19 @@ export default async function LocaleLayout({
 }) {
   const messages = await getMessages();
   const user = await getUser();
+  const t = await getTranslations('Header');
+
+  const headerTranslations = {
+    title: t('title'),
+    home: t('home'),
+    profile: t('userMenu.profile'),
+    settings: t('userMenu.settings'),
+    logout: t('userMenu.logout'),
+    adminDashboard: t('adminDashboard'),
+    mobileMenuTitle: t('mobileMenuTitle'),
+    mobileMenuTrigger: t('mobileMenuTrigger'),
+    language: t('language'),
+  };
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
@@ -26,7 +39,7 @@ export default async function LocaleLayout({
         enableSystem
         disableTransitionOnChange
       >
-        <Header user={user} />
+        <Header user={user} translations={headerTranslations} />
         <main className="flex-grow flex flex-col">
           {children}
         </main>
