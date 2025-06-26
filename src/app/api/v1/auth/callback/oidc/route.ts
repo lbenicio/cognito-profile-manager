@@ -6,10 +6,8 @@ export async function GET(request: NextRequest) {
 
   // Helper to construct login URL with an error message from a reliable base URL
   const getLoginUrlWithError = (errorMessage: string) => {
-    const redirectOrigin = process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL 
-      ? new URL(process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL).origin
-      : request.nextUrl.origin;
-    const loginUrl = new URL('/login', redirectOrigin);
+    // Use the request's origin for error redirects to ensure consistency
+    const loginUrl = new URL('/login', request.nextUrl.origin);
     loginUrl.searchParams.set('error', errorMessage);
     return loginUrl;
   }
@@ -61,8 +59,8 @@ export async function GET(request: NextRequest) {
       throw new Error(`Token exchange failed: ${errorDetails}`);
     }
 
-    // Construct the redirect URL to the dashboard using the callback URL's origin
-    const dashboardUrl = new URL('/', new URL(process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL).origin);
+    // Construct the redirect URL using the request's origin for maximum reliability.
+    const dashboardUrl = new URL('/', request.nextUrl.origin);
     
     // Create the redirect response *first*
     const response = NextResponse.redirect(dashboardUrl);
