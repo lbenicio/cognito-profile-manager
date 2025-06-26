@@ -1,13 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const code = url.searchParams.get('code');
 
+  // Helper to construct login URL with an error message from a reliable base URL
+  const getLoginUrlWithError = (errorMessage: string) => {
+    const redirectOrigin = process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL 
+      ? new URL(process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL).origin
+      : request.nextUrl.origin;
+    const loginUrl = new URL('/login', redirectOrigin);
+    loginUrl.searchParams.set('error', errorMessage);
+    return loginUrl;
+  }
+
   if (!code) {
     console.error('Authorization code missing from callback.');
-    return NextResponse.redirect(new URL('/login?error=auth_code_missing', request.url));
+    return NextResponse.redirect(getLoginUrlWithError('auth_code_missing'));
   }
 
   try {
@@ -31,13 +40,11 @@ export async function GET(request: NextRequest) {
       client_id: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
     });
 
-    // Conditionally add client_secret if it exists.
-    // This supports both public (no secret) and confidential (with secret) Cognito app clients.
     if (process.env.COGNITO_CLIENT_SECRET) {
       params.append('client_secret', process.env.COGNITO_CLIENT_SECRET);
     }
 
-    const response = await fetch(tokenEndpoint, {
+    const tokenResponse = await fetch(tokenEndpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -46,39 +53,34 @@ export async function GET(request: NextRequest) {
       cache: 'no-store',
     });
 
-    const tokens = await response.json();
+    const tokens = await tokenResponse.json();
 
-    if (!response.ok) {
+    if (!tokenResponse.ok) {
       console.error("Failed to exchange code for tokens. Response:", tokens);
       const errorDetails = tokens.error_description || tokens.error || "Unknown token exchange error";
       throw new Error(`Token exchange failed: ${errorDetails}`);
     }
 
-    // Set tokens in a secure, httpOnly cookie
-    cookies().set('auth_session', JSON.stringify(tokens), {
+    // Construct the redirect URL to the dashboard using the callback URL's origin
+    const dashboardUrl = new URL('/', new URL(process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL).origin);
+    
+    // Create the redirect response *first*
+    const response = NextResponse.redirect(dashboardUrl);
+
+    // Now, set the cookie on that specific response object
+    response.cookies.set('auth_session', JSON.stringify(tokens), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: tokens.expires_in || 3600, // Use token lifetime, default to 1 hour
+      maxAge: tokens.expires_in || 3600,
       path: '/',
       sameSite: 'lax',
     });
     
-    // Redirect to the dashboard by constructing the URL from the known callback URL origin.
-    // This is more reliable than using request.url, which can be inconsistent in some proxy/cloud environments.
-    const redirectUrl = new URL(process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL);
-    const dashboardUrl = new URL('/', redirectUrl.origin);
-    
-    return NextResponse.redirect(dashboardUrl);
+    return response;
 
   } catch (error) {
     console.error('Callback handler error:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-    
-    // Construct the login URL from the configured redirect origin to ensure consistency
-    const redirectUrl = new URL(process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL || request.url);
-    const loginUrl = new URL('/login', redirectUrl.origin);
-    loginUrl.searchParams.set('error', errorMessage);
-
-    return NextResponse.redirect(loginUrl);
+    return NextResponse.redirect(getLoginUrlWithError(errorMessage));
   }
 }
