@@ -25,7 +25,7 @@ export default async function LocaleLayout({
     profile: t('userMenu.profile'),
     settings: t('userMenu.settings'),
     logout: t('userMenu.logout'),
-    adminDashboard: t('adminDashboard'),
+    adminDashboard: t('userMenu.adminDashboard'),
     mobileMenuTitle: t('mobileMenuTitle'),
     mobileMenuTrigger: t('mobileMenuTrigger'),
     language: t('language'),
