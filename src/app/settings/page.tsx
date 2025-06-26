@@ -1,12 +1,15 @@
 import { AppearanceSettings } from '@/components/appearance-settings';
+import { getTranslations } from 'next-intl/server';
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const t = await getTranslations('Settings');
+
   return (
     <div className="container mx-auto p-4 md:p-8 space-y-6">
         <header>
-            <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+            <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
             <p className="text-muted-foreground">
-                Manage your account and appearance settings.
+                {t('description')}
             </p>
         </header>
         <div className="max-w-3xl">
