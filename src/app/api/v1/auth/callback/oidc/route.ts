@@ -25,8 +25,13 @@ export async function GET(request: NextRequest) {
       code: code,
       redirect_uri: process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL!,
       client_id: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
-      client_secret: process.env.NEXT_PUBLIC_COGNITO_CLIENT_SECRET!,
     });
+
+    // Conditionally add client_secret if it exists.
+    // This supports both public (no secret) and confidential (with secret) Cognito app clients.
+    if (process.env.COGNITO_CLIENT_SECRET) {
+      params.append('client_secret', process.env.COGNITO_CLIENT_SECRET);
+    }
 
     const response = await fetch(tokenEndpoint, {
       method: 'POST',
