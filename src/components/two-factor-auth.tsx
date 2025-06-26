@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from 'next-intl';
 import type { User } from '@/lib/auth';
 import { generateMfaSetup, verifyAndEnableMfa, disableMfa } from '@/lib/mfa-actions';
+import { cn } from '@/lib/utils';
 
 export function TwoFactorAuth({ user }: { user: User }) {
     const { toast } = useToast();
@@ -188,8 +189,14 @@ export function TwoFactorAuth({ user }: { user: User }) {
                                 {user.passkeysEnabled ? t('passkeysEnabled') : t('passkeysDisabled')}
                              </p>
                             <div className="pt-4">
-                                 <Button asChild variant="outline" size="sm" disabled={!cognitoAccountManagementUrl}>
-                                    <a href={cognitoAccountManagementUrl} target="_blank" rel="noopener noreferrer">
+                                 <Button asChild variant="outline" size="sm">
+                                    <a 
+                                        href={cognitoAccountManagementUrl} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        aria-disabled={!cognitoAccountManagementUrl}
+                                        className={cn(!cognitoAccountManagementUrl && "pointer-events-none opacity-50")}
+                                    >
                                         {t('managePasskeys')} <ExternalLink className="ml-2 h-3 w-3" />
                                     </a>
                                 </Button>
