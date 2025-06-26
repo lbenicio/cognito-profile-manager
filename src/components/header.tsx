@@ -14,6 +14,8 @@ import {
 import {
   Sheet,
   SheetContent,
+  SheetHeader,
+  SheetTitle,
   SheetTrigger,
   SheetClose,
 } from '@/components/ui/sheet';
@@ -44,10 +46,13 @@ export function Header({ user }: { user: UserType | null }) {
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden">
                   <Menu className="h-6 w-6" />
-                  <span className="sr-only">Open menu</span>
+                  <span className="sr-only">{t('userMenu.label')}</span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="left">
+                 <SheetHeader>
+                    <SheetTitle className="sr-only">{t('mobileMenuTitle')}</SheetTitle>
+                 </SheetHeader>
                  <nav className="grid gap-6 text-lg font-medium p-4 pt-8">
                     <Link
                         href="/"
