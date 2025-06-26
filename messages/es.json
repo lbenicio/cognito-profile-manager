@@ -3,7 +3,7 @@
     "title": "Outpost",
     "home": "Inicio",
     "userMenu": {
-      "label": "Abrir menú de usuario",
+      "menuLabel": "Abrir menú de usuario",
       "profile": "Perfil",
       "settings": "Ajustes",
       "logout": "Cerrar sesión",

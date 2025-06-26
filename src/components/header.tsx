@@ -48,7 +48,7 @@ export function Header({ user }: { user: UserType | null }) {
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden">
                   <Menu className="h-6 w-6" />
-                  <span className="sr-only">{t('userMenu.label')}</span>
+                  <span className="sr-only">{t('userMenu.menuLabel')}</span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="left">
