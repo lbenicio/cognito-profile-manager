@@ -17,19 +17,10 @@ export default async function LocaleLayout({
 }) {
   const messages = await getMessages();
   const user = await getUser();
-  const t = await getTranslations('Header');
+  const t = await getTranslations();
 
-  const headerTranslations = {
-    title: t('title'),
-    home: t('home'),
-    profile: t('userMenu.profile'),
-    settings: t('userMenu.settings'),
-    logout: t('userMenu.logout'),
-    adminDashboard: t('userMenu.adminDashboard'),
-    mobileMenuTitle: t('mobileMenuTitle'),
-    mobileMenuTrigger: t('mobileMenuTrigger'),
-    language: t('language'),
-  };
+  // Pass the entire 'Header' namespace to the component for robustness.
+  const headerTranslations = t.raw('Header');
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>

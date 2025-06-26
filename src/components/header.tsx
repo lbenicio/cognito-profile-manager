@@ -29,10 +29,12 @@ import type { User as UserType } from '@/lib/auth';
 type HeaderTranslations = {
   title: string;
   home: string;
-  profile: string;
-  settings: string;
-  logout: string;
-  adminDashboard: string;
+  userMenu: {
+    profile: string;
+    settings: string;
+    logout: string;
+    adminDashboard: string;
+  };
   mobileMenuTitle: string;
   mobileMenuTrigger: string;
   language: string;
@@ -81,18 +83,18 @@ export function Header({ user, translations: t }: { user: UserType | null, trans
                      {user?.isAdmin && (
                         <SheetClose asChild>
                             <Link href={adminDashboardUrl} className="text-muted-foreground transition-colors hover:text-primary flex items-center gap-2">
-                                <Shield className="h-5 w-5"/> {t.adminDashboard}
+                                <Shield className="h-5 w-5"/> {t.userMenu.adminDashboard}
                             </Link>
                         </SheetClose>
                     )}
                     <SheetClose asChild>
                         <Link href="/profile" className="text-muted-foreground transition-colors hover:text-primary">
-                        {t.profile}
+                        {t.userMenu.profile}
                         </Link>
                     </SheetClose>
                     <SheetClose asChild>
                         <Link href="/settings" className="text-muted-foreground transition-colors hover:text-primary">
-                        {t.settings}
+                        {t.userMenu.settings}
                         </Link>
                     </SheetClose>
                 </nav>
@@ -138,26 +140,26 @@ export function Header({ user, translations: t }: { user: UserType | null, trans
                   <DropdownMenuItem asChild>
                     <a href={adminDashboardUrl} target="_blank" rel="noopener noreferrer">
                       <Shield className="mr-2 h-4 w-4" />
-                      <span>{t.adminDashboard}</span>
+                      <span>{t.userMenu.adminDashboard}</span>
                     </a>
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem asChild>
                   <Link href="/profile">
                     <User className="mr-2 h-4 w-4" />
-                    <span>{t.profile}</span>
+                    <span>{t.userMenu.profile}</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/settings">
                     <Settings className="mr-2 h-4 w-4" />
-                    <span>{t.settings}</span>
+                    <span>{t.userMenu.settings}</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={handleLogout} disabled={isPending} className="cursor-pointer">
                   <LogOut className="mr-2 h-4 w-4" />
-                  <span>{t.logout}</span>
+                  <span>{t.userMenu.logout}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
