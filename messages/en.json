@@ -3,13 +3,13 @@
     "title": "Outpost",
     "home": "Home",
     "userMenu": {
-      "menuLabel": "Open user menu",
       "profile": "Profile",
       "settings": "Settings",
       "logout": "Log out",
       "adminDashboard": "Admin Dashboard"
     },
     "mobileMenuTitle": "Main Menu",
+    "mobileMenuTrigger": "Open main menu",
     "language": "Language"
   },
   "Footer": {
