@@ -69,6 +69,7 @@
       "phoneDescription": "Debe estar en formato E.164 (ej. +12223334444).",
       "websiteLabel": "Sitio web",
       "zoneinfoLabel": "Zona horaria",
+      "zoneinfoDescription": "Selecciona la zona horaria en la que te encuentras.",
       "save": "Guardar cambios",
       "successTitle": "Perfil Actualizado",
       "successDescription": "Tu perfil ha sido actualizado exitosamente.",

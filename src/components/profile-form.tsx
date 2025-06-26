@@ -20,6 +20,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Save } from 'lucide-react';
 import React from 'react';
 import type { User as UserType } from '@/lib/auth';
+import { TimezoneSelect } from './timezone-select';
 
 const profileFormSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }).max(50),
@@ -153,11 +154,17 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
               control={form.control}
               name="zoneinfo"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex flex-col">
                   <FormLabel>{t('zoneinfoLabel')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="America/New_York" {...field} />
+                    <TimezoneSelect 
+                      value={field.value || ''} 
+                      onChange={field.onChange} 
+                    />
                   </FormControl>
+                  <FormDescription>
+                    {t('zoneinfoDescription')}
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
