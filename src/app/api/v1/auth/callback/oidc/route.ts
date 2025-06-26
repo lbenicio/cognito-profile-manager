@@ -45,8 +45,9 @@ export async function GET(request: NextRequest) {
     const tokens = await response.json();
 
     if (!response.ok) {
-      console.error("Failed to exchange code for tokens:", tokens);
-      throw new Error(tokens.error_description || 'Token exchange failed');
+      console.error("Failed to exchange code for tokens. Response:", tokens);
+      const errorDetails = tokens.error_description || tokens.error || "Unknown token exchange error";
+      throw new Error(`Token exchange failed: ${errorDetails}`);
     }
 
     // Set tokens in a secure, httpOnly cookie
