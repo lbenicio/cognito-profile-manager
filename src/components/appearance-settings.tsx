@@ -86,10 +86,10 @@ export function AppearanceSettings() {
         <Separator />
 
         <div className="space-y-4">
-          <Label htmlFor="font-size-slider" className="font-semibold">Font Size</Label>
+          <Label htmlFor="text-size-slider" className="font-semibold">Text Size</Label>
           <div className="flex items-center gap-4 pt-2">
             <Slider
-              id="font-size-slider"
+              id="text-size-slider"
               min={12}
               max={20}
               step={1}
