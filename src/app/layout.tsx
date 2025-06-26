@@ -1,21 +1,26 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { getLocale, getMessages } from 'next-intl/server';
+import { NextIntlClientProvider } from 'next-intl';
+import { ThemeProvider } from '@/components/theme-provider';
+
 
 export const metadata: Metadata = {
   title: 'Outpost',
   description: 'Manage your Outpost user profile',
 };
 
-// This is the root layout. For path-based i18n, it must contain
-// the <html> and <body> tags. The locale-specific layout at
-// /app/[locale]/layout.tsx will be rendered within this one.
-export default function RootLayout({
+// This is the root layout. It now includes the i18n and theme providers.
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="en" className="h-full" suppressHydrationWarning>
+    <html lang={locale} className="h-full" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon/favicon.svg" sizes="any" type="image/svg+xml" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -35,7 +40,16 @@ export default function RootLayout({
           />
       </head>
       <body className="font-body antialiased flex flex-col min-h-screen">
-        {children}
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
