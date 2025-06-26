@@ -1,7 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Mail, Home, Phone } from 'lucide-react';
+import { Mail, Home, Phone, CalendarDays, BadgeCheck } from 'lucide-react';
+import { format } from 'date-fns';
 
 type User = {
   username: string;
@@ -11,6 +12,8 @@ type User = {
   address: string;
   phone_number: string;
   phone_number_verified: boolean;
+  creationDate: string;
+  userStatus: string;
 };
 
 export function ProfileDisplay({ user }: { user: User }) {
@@ -52,6 +55,16 @@ export function ProfileDisplay({ user }: { user: User }) {
           <span className="flex-1">{user.address}</span>
         </div>
       </CardContent>
+      <CardFooter className="flex-col items-start gap-2 pt-4 border-t text-xs text-muted-foreground">
+         <div className="flex items-center gap-2">
+            <BadgeCheck className="w-4 h-4" />
+            <span>Status: {user.userStatus}</span>
+         </div>
+         <div className="flex items-center gap-2">
+            <CalendarDays className="w-4 h-4" />
+            <span>Member since: {format(new Date(user.creationDate), "MMMM d, yyyy")}</span>
+         </div>
+      </CardFooter>
     </Card>
   );
 }

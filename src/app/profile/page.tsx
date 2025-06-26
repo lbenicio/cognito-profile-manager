@@ -15,6 +15,8 @@ const initialUser = {
   address: '123 Main St, Anytown, USA',
   phone_number: '+15551234567',
   phone_number_verified: false,
+  creationDate: '2023-01-15T10:30:00Z',
+  userStatus: 'CONFIRMED',
 };
 
 export default function ProfilePage() {
