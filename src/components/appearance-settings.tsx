@@ -15,7 +15,7 @@ import { LanguageSelect } from './language-select'
 export function AppearanceSettings() {
   const { theme, setTheme } = useTheme()
   const t = useTranslations('Settings.appearance');
-  const [fontSize, setFontSize] = useState(12)
+  const [fontSize, setFontSize] = useState(10)
 
   useEffect(() => {
     const storedFontSize = localStorage.getItem('font-size')
@@ -93,7 +93,7 @@ export function AppearanceSettings() {
           <div className="flex items-center gap-4 pt-2">
             <Slider
               id="text-size-slider"
-              min={12}
+              min={10}
               max={20}
               step={1}
               value={[fontSize]}
