@@ -40,14 +40,27 @@ export async function GET(request: NextRequest) {
       grant_type: 'authorization_code',
       code: code,
       redirect_uri: callbackUrl,
-      client_id: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
     });
+
+    const headers: HeadersInit = {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    };
+    
+    const clientSecret = process.env.COGNITO_CLIENT_SECRET;
+    
+    if (clientSecret) {
+      // For confidential clients, use Basic Auth.
+      headers['Authorization'] = `Basic ${Buffer.from(
+        `${process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!}:${clientSecret}`
+      ).toString('base64')}`;
+    } else {
+      // For public clients, send client_id in the body.
+      params.append('client_id', process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!);
+    }
 
     const tokenResponse = await fetch(tokenEndpoint, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+      headers: headers,
       body: params.toString(),
       cache: 'no-store',
     });
