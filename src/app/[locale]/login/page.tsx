@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { login } from '@/lib/auth-actions';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { LogIn, LayoutDashboard } from 'lucide-react';
 import { Link } from '@/navigation';
 
@@ -37,7 +38,7 @@ function SubmitButton() {
 
 export default function LoginPage() {
   const t = useTranslations('Login');
-  const [errorMessage, dispatch] = useFormState(login, undefined);
+  const [errorMessage, dispatch] = useActionState(login, undefined);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
