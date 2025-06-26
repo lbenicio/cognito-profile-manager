@@ -59,6 +59,13 @@ export async function GET(request: NextRequest) {
       throw new Error(`Token exchange failed: ${errorDetails}`);
     }
 
+    // Create a smaller session object to store in the cookie, excluding the refresh token.
+    const sessionData = {
+        id_token: tokens.id_token,
+        access_token: tokens.access_token,
+        expires_in: tokens.expires_in,
+    };
+
     // Construct the redirect URL using the request's origin for maximum reliability.
     const dashboardUrl = new URL('/', request.nextUrl.origin);
     
@@ -66,10 +73,10 @@ export async function GET(request: NextRequest) {
     const response = NextResponse.redirect(dashboardUrl);
 
     // Now, set the cookie on that specific response object
-    response.cookies.set('auth_session', JSON.stringify(tokens), {
+    response.cookies.set('auth_session', JSON.stringify(sessionData), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: tokens.expires_in || 3600,
+      maxAge: sessionData.expires_in || 3600,
       path: '/',
       sameSite: 'lax',
     });
