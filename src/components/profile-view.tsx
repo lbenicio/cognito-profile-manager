@@ -34,7 +34,7 @@ export function ProfileView({ initialUser }: ProfileViewProps) {
         <div className="lg:col-span-2 flex flex-col gap-8">
           <ProfileForm user={user} onUpdate={handleProfileUpdate} />
           <PasswordForm />
-          <TwoFactorAuth />
+          <TwoFactorAuth user={user} />
         </div>
       </div>
     </div>
