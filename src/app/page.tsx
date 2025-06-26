@@ -5,6 +5,7 @@ import { ProfileForm } from '@/components/profile-form';
 import { PasswordForm } from '@/components/password-form';
 import { Verification } from '@/components/verification';
 import { TwoFactorAuth } from '@/components/two-factor-auth';
+import { AppearanceSettings } from '@/components/appearance-settings';
 
 // Mock user data as we don't have a real backend
 const initialUser = {
@@ -35,6 +36,7 @@ export default function Home() {
           <ProfileForm user={user} onUpdate={handleProfileUpdate} />
           <PasswordForm />
           <TwoFactorAuth />
+          <AppearanceSettings />
         </div>
       </div>
     </div>
