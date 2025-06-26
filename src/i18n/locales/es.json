@@ -114,22 +114,11 @@
       "mfaDisabledTitle": "App de Autenticación Deshabilitada",
       "mfaDisabledDescription": "La 2FA mediante app de autenticación ha sido deshabilitada.",
       "verificationFailedTitle": "Verificación Fallida",
-      "verificationFailedDescription": "El código es incorrecto. Por favor, inténtalo de nuevo.",
       "passkeysTitle": "Passkeys / Llaves de Seguridad",
-      "addPasskey": "Añadir Passkey",
-      "addPasskeyToastTitle": "Añadir Passkey",
-      "addPasskeyToastDescription": "Sigue las instrucciones de tu navegador para añadir una nueva passkey.",
-      "addPasskeyCancelledTitle": "Adición de Passkey Cancelada",
-      "nameYourPasskeyPrompt": "Dale un nombre a tu nueva passkey para ayudarte a identificarla más tarde.",
-      "addedOn": "Añadido el {date}",
-      "removePasskey": "Eliminar passkey",
-      "passkeyRemovedTitle": "Passkey Eliminada",
-      "passkeyRemovedDescription": "La passkey seleccionada ha sido eliminada.",
-      "passkeyRemovedErrorTitle": "Fallo al Eliminar",
-      "passkeyAddedSuccessTitle": "Passkey Añadida",
-      "passkeyAddedErrorTitle": "Fallo en el Registro",
-      "noPasskeys": "No tienes passkeys registradas.",
-      "loadingPasskeys": "Cargando passkeys..."
+      "passkeysEnabled": "Las passkeys están habilitadas y se pueden usar para iniciar sesión.",
+      "passkeysDisabled": "Añade una passkey para un método de inicio de sesión más rápido y seguro.",
+      "managePasskeys": "Gestionar Passkeys",
+      "managementUrlNotConfigured": "La URL de gestión de cuentas no está configurada."
     }
   },
   "Settings": {

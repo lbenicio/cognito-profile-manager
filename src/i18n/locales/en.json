@@ -114,22 +114,11 @@
       "mfaDisabledTitle": "Authenticator App Disabled",
       "mfaDisabledDescription": "2FA via authenticator app has been disabled.",
       "verificationFailedTitle": "Verification Failed",
-      "verificationFailedDescription": "The code is incorrect. Please try again.",
       "passkeysTitle": "Passkeys / Security Keys",
-      "addPasskey": "Add Passkey",
-      "addPasskeyToastTitle": "Add Passkey",
-      "addPasskeyToastDescription": "Follow your browser instructions to add a new passkey.",
-      "addPasskeyCancelledTitle": "Add Passkey Cancelled",
-      "nameYourPasskeyPrompt": "Give your new passkey a name to help you identify it later.",
-      "addedOn": "Added on {date}",
-      "removePasskey": "Remove passkey",
-      "passkeyRemovedTitle": "Passkey Removed",
-      "passkeyRemovedDescription": "The selected passkey has been removed.",
-      "passkeyRemovedErrorTitle": "Removal Failed",
-      "passkeyAddedSuccessTitle": "Passkey Added",
-      "passkeyAddedErrorTitle": "Registration Failed",
-      "noPasskeys": "You have no passkeys registered.",
-      "loadingPasskeys": "Loading passkeys..."
+      "passkeysEnabled": "Passkeys are enabled and can be used for signing in.",
+      "passkeysDisabled": "Add a passkey for a faster and more secure sign-in method.",
+      "managePasskeys": "Manage Passkeys",
+      "managementUrlNotConfigured": "Account management URL is not configured."
     }
   },
   "Settings": {
