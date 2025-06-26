@@ -18,6 +18,10 @@ export type User = {
   passkeysEnabled: boolean;
   groups: string[];
   isAdmin: boolean;
+  picture: string;
+  locale: string;
+  zoneinfo: string;
+  website: string;
 };
 
 // Mock user data for development environment
@@ -35,6 +39,10 @@ const mockUser: User = {
   passkeysEnabled: true,
   groups: ['users', 'beta-testers'],
   isAdmin: false,
+  picture: `https://placehold.co/128x128.png`,
+  locale: 'en-US',
+  zoneinfo: 'America/New_York',
+  website: 'https://example.com'
 };
 
 const mockAdminUser: User = {
@@ -100,12 +108,14 @@ export const getUser = cache(async (): Promise<User | null> => {
     
     // OIDC address claim is an object, we get the formatted version.
     const addressClaim = payload.address as { formatted?: string } | undefined;
+    const givenName = (payload.given_name as string) || '';
+    const familyName = (payload.family_name as string) || '';
 
     const user: User = {
       username: (payload['cognito:username'] as string) || '',
       email: (payload.email as string) || '',
       email_verified: (payload.email_verified as boolean) || false,
-      name: (payload.name as string) || '',
+      name: [givenName, familyName].filter(Boolean).join(' '),
       address: addressClaim?.formatted ?? '',
       phone_number: (payload.phone_number as string) || '',
       phone_number_verified: (payload.phone_number_verified as boolean) || false,
@@ -116,6 +126,10 @@ export const getUser = cache(async (): Promise<User | null> => {
       passkeysEnabled: false, // This info isn't in standard OIDC tokens.
       groups: groups,
       isAdmin: isAdmin,
+      picture: (payload.picture as string) || '',
+      locale: (payload.locale as string) || '',
+      zoneinfo: (payload.zoneinfo as string) || '',
+      website: (payload.website as string) || '',
     };
 
     return user;

@@ -54,6 +54,8 @@
       "addressLabel": "Address",
       "phoneLabel": "Phone Number",
       "phoneDescription": "Must be in E.164 format (e.g., +12223334444).",
+      "websiteLabel": "Website",
+      "zoneinfoLabel": "Timezone",
       "save": "Save Changes",
       "successTitle": "Profile Updated",
       "successDescription": "Your profile has been successfully updated.",

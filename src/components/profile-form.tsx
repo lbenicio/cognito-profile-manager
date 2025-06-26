@@ -27,13 +27,15 @@ const profileFormSchema = z.object({
   phone_number: z.string().refine((phone) => /^\+[1-9]\d{1,14}$/.test(phone), {
     message: 'Phone number must be in E.164 format (e.g., +12223334444).',
   }),
+  website: z.string().url({ message: 'Please enter a valid URL.' }).or(z.literal('')).optional(),
+  zoneinfo: z.string().max(50).optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 interface ProfileFormProps {
     user: UserType;
-    onUpdate: (data: ProfileFormValues) => void;
+    onUpdate: (data: Partial<UserType>) => void;
 }
 
 export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
@@ -47,6 +49,8 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
       name: user.name || '',
       address: user.address || '',
       phone_number: user.phone_number || '',
+      website: user.website || '',
+      zoneinfo: user.zoneinfo || '',
     },
     mode: 'onChange',
   });
@@ -56,6 +60,8 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
         name: user.name,
         address: user.address,
         phone_number: user.phone_number,
+        website: user.website,
+        zoneinfo: user.zoneinfo,
     });
   }, [user, form]);
 
@@ -126,6 +132,32 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
                   <FormDescription>
                     {t('phoneDescription')}
                   </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="website"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('websiteLabel')}</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://example.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="zoneinfo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('zoneinfoLabel')}</FormLabel>
+                  <FormControl>
+                    <Input placeholder="America/New_York" {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

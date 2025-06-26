@@ -109,7 +109,7 @@ export function Header({ user, translations: t }: { user: UserType | null, trans
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src="https://placehold.co/128x128.png" alt={user.name} data-ai-hint="profile picture" />
+                    <AvatarImage src={user.picture || ''} alt={user.name} data-ai-hint="profile picture" />
                     <AvatarFallback>{user.name ? user.name.split(' ').map(n => n[0]).join('') : 'U'}</AvatarFallback>
                   </Avatar>
                 </Button>

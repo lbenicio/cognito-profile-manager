@@ -30,7 +30,7 @@ export function DashboardView({ user }: DashboardViewProps) {
         <Card className="lg:col-span-2">
           <CardHeader className="flex flex-row items-center gap-4">
              <Avatar className="h-12 w-12 sm:h-16 sm:w-16">
-                <AvatarImage src={`https://placehold.co/128x128.png`} alt={user.name} data-ai-hint="profile picture" />
+                <AvatarImage src={user.picture || ''} alt={user.name} data-ai-hint="profile picture" />
                 <AvatarFallback>{user.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
              </Avatar>
              <div>

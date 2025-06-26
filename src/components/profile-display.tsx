@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Mail, Home, Phone, CalendarDays, BadgeCheck, Shield, Users } from 'lucide-react';
+import { Mail, Home, Phone, CalendarDays, BadgeCheck, Shield, Users, Globe, Clock, Languages } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { useTranslations } from 'next-intl';
 import type { User } from '@/lib/auth';
@@ -16,7 +16,7 @@ export function ProfileDisplay({ user }: { user: User }) {
       <CardHeader>
         <div className="flex items-center gap-4">
           <Avatar className="h-12 w-12 sm:h-16 sm:w-16">
-            <AvatarImage src={`https://placehold.co/128x128.png`} alt={user.name} data-ai-hint="profile picture" />
+            <AvatarImage src={user.picture || ''} alt={user.name} data-ai-hint="profile picture" />
             <AvatarFallback>{user.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
           </Avatar>
           <div>
@@ -55,6 +55,26 @@ export function ProfileDisplay({ user }: { user: User }) {
           <Home className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
           <span className="flex-1">{user.address}</span>
         </div>
+         {user.website && (
+            <div className="flex items-center gap-3">
+                <Globe className="w-5 h-5 text-muted-foreground" />
+                <a href={user.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                    {user.website}
+                </a>
+            </div>
+        )}
+        {user.zoneinfo && (
+            <div className="flex items-center gap-3">
+                <Clock className="w-5 h-5 text-muted-foreground" />
+                <span>{user.zoneinfo}</span>
+            </div>
+        )}
+        {user.locale && (
+            <div className="flex items-center gap-3">
+                <Languages className="w-5 h-5 text-muted-foreground" />
+                <span>{user.locale}</span>
+            </div>
+        )}
          <div className="flex items-start gap-3 pt-4 border-t">
           <Users className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
           <div className="flex-1">
