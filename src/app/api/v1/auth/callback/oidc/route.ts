@@ -1,30 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Helper to construct login URL with an error message from a reliable base URL
-const getLoginUrlWithError = (errorMessage: string, request: NextRequest) => {
-  // Prefer the publicly configured URL's origin, but fall back to the request's origin.
-  // This handles cases where the env var might be missing when an error is thrown.
-  const baseUrl = process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL
-    ? new URL(process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL).origin
-    : request.nextUrl.origin;
-  
-  const loginUrl = new URL('/login', baseUrl);
-  loginUrl.searchParams.set('error', errorMessage);
-  return loginUrl;
-}
-
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get('code');
+  const requestUrl = new URL(request.url); // Use the incoming request URL as the base for redirects
 
   if (!code) {
     console.error('Authorization code missing from callback.');
-    return NextResponse.redirect(getLoginUrlWithError('auth_code_missing', request));
+    const loginUrl = new URL('/login', requestUrl.origin);
+    loginUrl.searchParams.set('error', 'auth_code_missing');
+    return NextResponse.redirect(loginUrl);
   }
 
   try {
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     if (!wellknownUrl) throw new Error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
 
+    // This URL is for the server-to-server call and MUST match Cognito config.
     const callbackUrl = process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL;
     if (!callbackUrl) {
       throw new Error('Missing NEXT_PUBLIC_OAUTH2_CALLBACK_URL env var');
@@ -39,7 +30,7 @@ export async function GET(request: NextRequest) {
     const params = new URLSearchParams({
       grant_type: 'authorization_code',
       code: code,
-      redirect_uri: callbackUrl,
+      redirect_uri: callbackUrl, // Use the configured URL for the API call
       client_id: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
     });
 
@@ -77,9 +68,8 @@ export async function GET(request: NextRequest) {
         expires_in: tokens.expires_in,
     };
 
-    // Construct the redirect URL using the configured public callback URL's origin.
-    // This ensures that the redirect and the cookie domain are always consistent.
-    const dashboardUrl = new URL('/', callbackUrl);
+    // For the user-facing redirect, use the origin of the request they made.
+    const dashboardUrl = new URL('/', requestUrl.origin);
     
     const response = NextResponse.redirect(dashboardUrl);
 
@@ -96,6 +86,9 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Callback handler error:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-    return NextResponse.redirect(getLoginUrlWithError(errorMessage, request));
+    
+    const loginUrl = new URL('/login', requestUrl.origin);
+    loginUrl.searchParams.set('error', errorMessage);
+    return NextResponse.redirect(loginUrl);
   }
 }
