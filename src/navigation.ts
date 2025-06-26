@@ -4,7 +4,7 @@ import {
 } from 'next-intl/navigation';
  
 export const locales = ['en', 'es'] as const;
-export const localePrefix = 'as-needed';
+export const localePrefix = 'never';
  
 export const pathnames = {
   '/': '/',
