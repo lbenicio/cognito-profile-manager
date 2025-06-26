@@ -22,6 +22,7 @@
       "title": "Profile",
       "email": "Email",
       "twoFactorStatus": "2FA Status",
+      "passkeyStatus": "Passkey Status",
       "groups": "Groups",
       "adminBadge": "Admin",
       "userBadge": "User",

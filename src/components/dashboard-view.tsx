@@ -59,6 +59,14 @@ export function DashboardView({ user }: DashboardViewProps) {
                         <Badge variant="destructive">{t('disabled')}</Badge>
                     )}
                 </div>
+                <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground flex items-center gap-2"><KeyRound className="h-4 w-4" /> {t('profileCard.passkeyStatus')}</span>
+                    {user.passkeysEnabled ? (
+                        <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">{t('enabled')}</Badge>
+                    ) : (
+                        <Badge variant="destructive">{t('disabled')}</Badge>
+                    )}
+                </div>
             </div>
           </CardContent>
            <div className="p-6 pt-0">

@@ -15,6 +15,7 @@ export type User = {
   creationDate: string; // ISO string
   userStatus: string;
   twoFactorEnabled: boolean;
+  passkeysEnabled: boolean;
   groups: string[];
   isAdmin: boolean;
 };
@@ -31,6 +32,7 @@ const mockUser: User = {
   creationDate: new Date().toISOString(),
   userStatus: 'CONFIRMED',
   twoFactorEnabled: true,
+  passkeysEnabled: true,
   groups: ['users', 'beta-testers'],
   isAdmin: false,
 };
@@ -41,6 +43,7 @@ const mockAdminUser: User = {
   name: 'Admin User',
   groups: ['users', process.env.COGNITO_ADMIN_GROUP_NAME || 'admins'],
   isAdmin: true,
+  passkeysEnabled: true,
 };
 
 
@@ -135,6 +138,7 @@ export const getUser = cache(async (): Promise<User | null> => {
       creationDate: response.UserCreateDate.toISOString(),
       userStatus: response.UserStatus,
       twoFactorEnabled: response.MFAOptions ? response.MFAOptions.length > 0 : false,
+      passkeysEnabled: false, // NOTE: Cognito AdminGetUser doesn't easily expose passkey status. Defaulting to false.
       groups: groups,
       isAdmin: isAdmin,
     };
