@@ -43,10 +43,6 @@ export async function GET(request: NextRequest) {
       client_id: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
     });
 
-    if (process.env.COGNITO_CLIENT_SECRET) {
-      params.append('client_secret', process.env.COGNITO_CLIENT_SECRET);
-    }
-
     const tokenResponse = await fetch(tokenEndpoint, {
       method: 'POST',
       headers: {
