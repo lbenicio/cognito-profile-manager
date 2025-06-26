@@ -1,0 +1,116 @@
+{
+  "Header": {
+    "title": "Outpost",
+    "home": "Inicio",
+    "userMenu": {
+      "label": "Abrir menú de usuario",
+      "profile": "Perfil",
+      "settings": "Ajustes",
+      "logout": "Cerrar sesión"
+    },
+    "language": "Idioma"
+  },
+  "Footer": {
+    "copyright": "© {year} Outpost. Todos los derechos reservados."
+  },
+  "Dashboard": {
+    "welcome": "¡Bienvenido de nuevo, {name}!",
+    "description": "Aquí hay un resumen rápido de tu cuenta de Outpost.",
+    "profileCard": {
+      "title": "Perfil",
+      "email": "Correo electrónico",
+      "twoFactorStatus": "Estado 2FA"
+    },
+    "manageProfile": "Gestionar Perfil",
+    "quickActions": {
+      "title": "Acciones rápidas",
+      "description": "Ajustes y acciones de uso común.",
+      "changePassword": "Cambiar contraseña",
+      "manageSecurity": "Gestionar seguridad",
+      "appearanceSettings": "Ajustes de apariencia"
+    },
+    "verified": "Verificado",
+    "unverified": "No verificado",
+    "enabled": "Habilitado",
+    "disabled": "Deshabilitado"
+  },
+  "Profile": {
+    "title": "Perfil",
+    "description": "Gestiona tu información personal y la seguridad de tu cuenta.",
+    "display": {
+      "status": "Estado: {status}",
+      "memberSince": "Miembro desde: {date}"
+    },
+    "form": {
+      "title": "Editar Perfil",
+      "description": "Actualiza tu información personal.",
+      "nameLabel": "Nombre completo",
+      "addressLabel": "Dirección",
+      "phoneLabel": "Número de teléfono",
+      "phoneDescription": "Debe estar en formato E.164 (ej. +12223334444).",
+      "save": "Guardar cambios",
+      "successTitle": "Perfil Actualizado",
+      "successDescription": "Tu perfil ha sido actualizado exitosamente.",
+      "errorTitle": "Fallo al Actualizar",
+      "errorDescription": "No se pudo actualizar tu perfil. Por favor, inténtalo de nuevo."
+    },
+    "passwordForm": {
+      "title": "Cambiar Contraseña",
+      "description": "Elige una nueva contraseña fuerte para mantener tu cuenta segura.",
+      "currentPasswordLabel": "Contraseña Actual",
+      "newPasswordLabel": "Nueva Contraseña",
+      "confirmPasswordLabel": "Confirmar Nueva Contraseña",
+      "passwordMismatch": "Las contraseñas nuevas no coinciden.",
+      "successTitle": "Contraseña Cambiada",
+      "successDescription": "Tu contraseña ha sido cambiada exitosamente.",
+      "errorTitle": "Error",
+      "errorDescription": "Tu contraseña actual es incorrecta.",
+      "incorrectPassword": "Contraseña incorrecta"
+    },
+    "verification": {
+      "title": "Verificar Atributos",
+      "description": "Verifica tu información de contacto para asegurar tu cuenta.",
+      "verify": "Verificar",
+      "sentTitle": "Verificación Enviada",
+      "emailSentDescription": "Se ha enviado un correo de verificación a {email}.",
+      "phoneSentDescription": "Se ha enviado un SMS de verificación a {phone}."
+    },
+    "twoFactor": {
+      "title": "Autenticación de Dos Factores",
+      "description": "Añade una capa extra de seguridad a tu cuenta.",
+      "authenticatorApp": "App de Autenticación",
+      "qrInstructions": "Escanea el código QR con tu app de autenticación, luego introduce el código de 6 dígitos.",
+      "codeInputPlaceholder": "código de 6 dígitos",
+      "verify": "Verificar",
+      "otpSuccessTitle": "App de Autenticación Habilitada",
+      "otpSuccessDescription": "La 2FA mediante app de autenticación ha sido habilitada exitosamente.",
+      "verificationFailedTitle": "Verificación Fallida",
+      "verificationFailedDescription": "El código es incorrecto. Por favor, inténtalo de nuevo.",
+      "passkeysTitle": "Passkeys / Llaves de Seguridad",
+      "addPasskey": "Añadir Passkey",
+      "addPasskeyToastTitle": "Añadir Passkey",
+      "addPasskeyToastDescription": "Sigue las instrucciones de tu navegador para añadir una nueva passkey.",
+      "addedOn": "Añadido el {date}",
+      "removePasskey": "Eliminar passkey",
+      "passkeyRemovedTitle": "Passkey Eliminada",
+      "passkeyRemovedDescription": "La passkey seleccionada ha sido eliminada.",
+      "noPasskeys": "No tienes passkeys registradas."
+    }
+  },
+  "Settings": {
+    "title": "Ajustes",
+    "description": "Gestiona los ajustes de tu cuenta y apariencia.",
+    "appearance": {
+      "title": "Apariencia",
+      "description": "Personaliza la apariencia de tu cuenta.",
+      "theme": "Tema",
+      "light": "Claro",
+      "dark": "Oscuro",
+      "system": "Sistema",
+      "textSize": "Tamaño del texto",
+      "language": "Idioma",
+      "english": "Inglés",
+      "spanish": "Español"
+    }
+  }
+}

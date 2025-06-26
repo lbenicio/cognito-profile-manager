@@ -5,10 +5,12 @@ import { useToast } from '@/hooks/use-toast';
 import { Mail, Phone } from 'lucide-react';
 import React from 'react';
 import type { User } from '@/lib/auth';
+import { useTranslations } from 'next-intl';
 
 
 export function Verification({ user }: { user: User }) {
     const { toast } = useToast();
+    const t = useTranslations('Profile.verification');
     const [emailLoading, setEmailLoading] = React.useState(false);
     const [phoneLoading, setPhoneLoading] = React.useState(false);
 
@@ -17,8 +19,8 @@ export function Verification({ user }: { user: User }) {
         // In a real app, this would trigger an API call to Cognito to send a verification email.
         await new Promise(resolve => setTimeout(resolve, 1000));
         toast({
-            title: 'Verification Sent',
-            description: `A verification email has been sent to ${user.email}.`,
+            title: t('sentTitle'),
+            description: t('emailSentDescription', {email: user.email}),
         });
         setEmailLoading(false);
     };
@@ -28,8 +30,8 @@ export function Verification({ user }: { user: User }) {
         // In a real app, this would trigger an API call to Cognito to send a verification SMS.
         await new Promise(resolve => setTimeout(resolve, 1000));
         toast({
-            title: 'Verification Sent',
-            description: `A verification SMS has been sent to ${user.phone_number}.`,
+            title: t('sentTitle'),
+            description: t('phoneSentDescription', {phone: user.phone_number}),
         });
         setPhoneLoading(false);
     };
@@ -37,8 +39,8 @@ export function Verification({ user }: { user: User }) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Verify Attributes</CardTitle>
-                <CardDescription>Verify your contact information to secure your account.</CardDescription>
+                <CardTitle>{t('title')}</CardTitle>
+                <CardDescription>{t('description')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="flex items-center justify-between gap-4">
@@ -48,7 +50,7 @@ export function Verification({ user }: { user: User }) {
                     </div>
                     {!user.email_verified && (
                         <Button variant="outline" size="sm" onClick={handleSendVerificationEmail} disabled={emailLoading} className='flex-shrink-0'>
-                            {emailLoading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div> : "Verify"}
+                            {emailLoading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div> : t('verify')}
                         </Button>
                     )}
                 </div>
@@ -59,7 +61,7 @@ export function Verification({ user }: { user: User }) {
                     </div>
                     {!user.phone_number_verified && (
                         <Button variant="outline" size="sm" onClick={handleSendVerificationSms} disabled={phoneLoading} className='flex-shrink-0'>
-                           {phoneLoading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div> : "Verify"}
+                           {phoneLoading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div> : t('verify')}
                         </Button>
                     )}
                 </div>

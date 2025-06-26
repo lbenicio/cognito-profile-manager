@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -37,6 +38,7 @@ interface ProfileFormProps {
 
 export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
   const { toast } = useToast();
+  const t = useTranslations('Profile.form');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   
   const form = useForm<ProfileFormValues>({
@@ -59,19 +61,18 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
 
   async function onSubmit(data: ProfileFormValues) {
     setIsSubmitting(true);
-    // In a real app, this would be an API call to Cognito to update user attributes.
     await new Promise(resolve => setTimeout(resolve, 1000));
     try {
         onUpdate(data);
         toast({
-            title: 'Profile Updated',
-            description: 'Your profile has been successfully updated.',
+            title: t('successTitle'),
+            description: t('successDescription'),
         });
     } catch (error) {
         toast({
             variant: 'destructive',
-            title: 'Update Failed',
-            description: 'Could not update your profile. Please try again.',
+            title: t('errorTitle'),
+            description: t('errorDescription'),
         });
     } finally {
         setIsSubmitting(false);
@@ -81,8 +82,8 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Edit Profile</CardTitle>
-        <CardDescription>Update your personal information.</CardDescription>
+        <CardTitle>{t('title')}</CardTitle>
+        <CardDescription>{t('description')}</CardDescription>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -92,7 +93,7 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel>{t('nameLabel')}</FormLabel>
                   <FormControl>
                     <Input placeholder="John Doe" {...field} />
                   </FormControl>
@@ -105,7 +106,7 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Address</FormLabel>
+                  <FormLabel>{t('addressLabel')}</FormLabel>
                   <FormControl>
                     <Input placeholder="123 Main St, Anytown, USA" {...field} />
                   </FormControl>
@@ -118,12 +119,12 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
               name="phone_number"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
+                  <FormLabel>{t('phoneLabel')}</FormLabel>
                   <FormControl>
                     <Input placeholder="+15551234567" {...field} />
                   </FormControl>
                   <FormDescription>
-                    Must be in E.164 format (e.g., +12223334444).
+                    {t('phoneDescription')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -137,7 +138,7 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
               ) : (
                 <Save />
               )}
-              <span className='ml-2'>Save Changes</span>
+              <span className='ml-2'>{t('save')}</span>
             </Button>
           </CardFooter>
         </form>

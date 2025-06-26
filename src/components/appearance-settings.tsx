@@ -3,15 +3,18 @@
 import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
 import { Moon, Palette, Sun } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Separator } from '@/components/ui/separator'
 import { Slider } from '@/components/ui/slider'
+import { LanguageSelect } from './language-select'
 
 export function AppearanceSettings() {
   const { theme, setTheme } = useTheme()
+  const t = useTranslations('Settings.appearance');
   const [fontSize, setFontSize] = useState(16)
 
   useEffect(() => {
@@ -37,14 +40,14 @@ export function AppearanceSettings() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Appearance</CardTitle>
+        <CardTitle>{t('title')}</CardTitle>
         <CardDescription>
-          Customize the look and feel of your account.
+          {t('description')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-8">
         <div>
-          <Label className="font-semibold">Theme</Label>
+          <Label className="font-semibold">{t('theme')}</Label>
           <RadioGroup
             value={theme}
             onValueChange={setTheme}
@@ -57,7 +60,7 @@ export function AppearanceSettings() {
                 className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
               >
                 <Sun className="mb-3 h-6 w-6" />
-                Light
+                {t('light')}
               </Label>
             </div>
             <div>
@@ -67,7 +70,7 @@ export function AppearanceSettings() {
                 className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
               >
                 <Moon className="mb-3 h-6 w-6" />
-                Dark
+                {t('dark')}
               </Label>
             </div>
             <div>
@@ -77,7 +80,7 @@ export function AppearanceSettings() {
                 className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
               >
                 <Palette className="mb-3 h-6 w-6" />
-                System
+                {t('system')}
               </Label>
             </div>
           </RadioGroup>
@@ -86,7 +89,7 @@ export function AppearanceSettings() {
         <Separator />
 
         <div className="space-y-4">
-          <Label htmlFor="text-size-slider" className="font-semibold">Text Size</Label>
+          <Label htmlFor="text-size-slider" className="font-semibold">{t('textSize')}</Label>
           <div className="flex items-center gap-4 pt-2">
             <Slider
               id="text-size-slider"
@@ -98,6 +101,13 @@ export function AppearanceSettings() {
             />
             <span className="w-12 text-right text-sm text-muted-foreground">{fontSize}px</span>
           </div>
+        </div>
+
+        <Separator />
+
+        <div className="space-y-2">
+          <Label className="font-semibold">{t('language')}</Label>
+          <LanguageSelect />
         </div>
       </CardContent>
     </Card>

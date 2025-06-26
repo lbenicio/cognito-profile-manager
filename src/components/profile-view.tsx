@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { ProfileDisplay } from '@/components/profile-display';
 import { ProfileForm } from '@/components/profile-form';
 import { PasswordForm } from '@/components/password-form';
@@ -13,6 +14,7 @@ interface ProfileViewProps {
 
 export function ProfileView({ initialUser }: ProfileViewProps) {
   const [user, setUser] = useState(initialUser);
+  const t = useTranslations('Profile');
 
   const handleProfileUpdate = (updatedData: Partial<UserType>) => {
     setUser((prevUser) => ({ ...prevUser, ...updatedData }));
@@ -21,9 +23,9 @@ export function ProfileView({ initialUser }: ProfileViewProps) {
   return (
     <div className="container mx-auto p-4 md:p-8">
       <header className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">Profile</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
           <p className="text-muted-foreground">
-              Manage your personal information and account security.
+              {t('description')}
           </p>
       </header>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

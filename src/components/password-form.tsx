@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -18,23 +19,24 @@ import { useToast } from '@/hooks/use-toast';
 import { KeyRound } from 'lucide-react';
 import React from 'react';
 
-const passwordFormSchema = z.object({
+const passwordFormSchema = (t: (key: string) => string) => z.object({
     currentPassword: z.string().min(1, { message: "Current password is required." }),
     newPassword: z.string().min(8, { message: "Password must be at least 8 characters." }),
     confirmPassword: z.string()
 }).refine(data => data.newPassword === data.confirmPassword, {
-    message: "New passwords do not match.",
+    message: t('passwordMismatch'),
     path: ["confirmPassword"]
 });
 
-type PasswordFormValues = z.infer<typeof passwordFormSchema>;
+type PasswordFormValues = z.infer<ReturnType<typeof passwordFormSchema>>;
 
 export function PasswordForm() {
   const { toast } = useToast();
+  const t = useTranslations('Profile.passwordForm');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   
   const form = useForm<PasswordFormValues>({
-    resolver: zodResolver(passwordFormSchema),
+    resolver: zodResolver(passwordFormSchema(t)),
     defaultValues: {
       currentPassword: '',
       newPassword: '',
@@ -49,17 +51,17 @@ export function PasswordForm() {
 
     if (data.currentPassword === 'password123') { 
         toast({
-            title: 'Password Changed',
-            description: 'Your password has been successfully changed.',
+            title: t('successTitle'),
+            description: t('successDescription'),
         });
         form.reset();
     } else {
         toast({
             variant: 'destructive',
-            title: 'Error',
-            description: 'Your current password is incorrect.',
+            title: t('errorTitle'),
+            description: t('errorDescription'),
         });
-        form.setError("currentPassword", { type: "manual", message: "Incorrect password" });
+        form.setError("currentPassword", { type: "manual", message: t('incorrectPassword') });
     }
     
     setIsSubmitting(false);
@@ -68,9 +70,9 @@ export function PasswordForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Change Password</CardTitle>
+        <CardTitle>{t('title')}</CardTitle>
         <CardDescription>
-          Choose a strong new password to keep your account secure.
+          {t('description')}
         </CardDescription>
       </CardHeader>
       <Form {...form}>
@@ -81,7 +83,7 @@ export function PasswordForm() {
               name="currentPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Current Password</FormLabel>
+                  <FormLabel>{t('currentPasswordLabel')}</FormLabel>
                   <FormControl>
                     <Input type="password" placeholder="••••••••" {...field} />
                   </FormControl>
@@ -94,7 +96,7 @@ export function PasswordForm() {
               name="newPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>New Password</FormLabel>
+                  <FormLabel>{t('newPasswordLabel')}</FormLabel>
                   <FormControl>
                     <Input type="password" placeholder="••••••••" {...field} />
                   </FormControl>
@@ -107,7 +109,7 @@ export function PasswordForm() {
               name="confirmPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm New Password</FormLabel>
+                  <FormLabel>{t('confirmPasswordLabel')}</FormLabel>
                   <FormControl>
                     <Input type="password" placeholder="••••••••" {...field} />
                   </FormControl>
@@ -123,7 +125,7 @@ export function PasswordForm() {
               ) : (
                 <KeyRound />
               )}
-              <span className='ml-2'>Change Password</span>
+              <span className='ml-2'>{t('title')}</span>
             </Button>
           </CardFooter>
         </form>
