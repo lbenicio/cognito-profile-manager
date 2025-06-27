@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Link } from '@/navigation';
+import { Link, useRouter } from '@/navigation';
 import { LogOut, Settings, LayoutDashboard, Menu, Shield, Contact, CircleUserRound, ShieldCheck, Loader2 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -47,16 +47,16 @@ type HeaderTranslations = {
 export function Header({ user, translations: t }: { user: UserType | null, translations: HeaderTranslations }) {
   const adminDashboardUrl = process.env.NEXT_PUBLIC_ADMIN_DASHBOARD_URL || '#';
   const currentLanguage = user?.preferences?.language || 'en';
+  const router = useRouter();
   const [isLoggingOut, startTransition] = useTransition();
   const { toast } = useToast();
 
   const handleLogout = () => {
     startTransition(async () => {
       try {
-        const response = await fetch('/api/v1/auth/logout');
+        const response = await fetch('/api/v1/auth/logout', { method: 'POST' });
         if (response.ok) {
-          const data = await response.json();
-          window.location.href = data.logoutUrl;
+          router.push('/login');
         } else {
           toast({
             variant: 'destructive',

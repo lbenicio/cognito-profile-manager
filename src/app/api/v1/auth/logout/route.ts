@@ -1,59 +1,53 @@
 
-import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
-  const sessionCookie = cookies().get('auth_session')?.value;
+export async function POST(request: NextRequest) {
+  const sessionCookie = request.cookies.get('auth_session')?.value;
   
-  const host = request.nextUrl.origin;
-  
-  let logoutUrl = new URL('/login', host).toString();
-  let isOidcSession = false;
-
   if (sessionCookie) {
     try {
-      const sessionData = JSON.parse(sessionCookie);
-      if (sessionData?.id_token) {
-        isOidcSession = true;
-      }
-    } catch {
-      isOidcSession = false;
-    }
-  }
+        const session = JSON.parse(sessionCookie);
+        const refreshToken = session.refresh_token;
 
-  if (isOidcSession) {
-    try {
-      const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
-      const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
+        if (refreshToken) {
+            const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
+            const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
+            const clientSecret = process.env.COGNITO_CLIENT_SECRET;
 
-      if (wellknownUrl && clientId) {
-        const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
-        if (wellknownResponse.ok) {
-          const wellknown = await wellknownResponse.json();
-          const authorizationEndpoint = wellknown.authorization_endpoint;
-          
-          if (authorizationEndpoint) {
-            const cognitoDomain = new URL(authorizationEndpoint).origin;
-            const cognitoLogoutUrl = new URL('/logout', cognitoDomain);
-            
-            const logoutRedirectUri = new URL('/login', host).toString();
+            if (wellknownUrl && clientId) {
+                const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
+                if (wellknownResponse.ok) {
+                    const wellknown = await wellknownResponse.json();
+                    const revokeEndpoint = wellknown.revocation_endpoint;
+                    
+                    if (revokeEndpoint) {
+                        const params = new URLSearchParams({ token: refreshToken, client_id: clientId });
+                        const headers: HeadersInit = { 'Content-Type': 'application/x-www-form-urlencoded' };
 
-            cognitoLogoutUrl.searchParams.set('client_id', clientId);
-            cognitoLogoutUrl.searchParams.set('logout_uri', logoutRedirectUri);
-            
-            logoutUrl = cognitoLogoutUrl.toString();
-          }
+                        // Add Authorization header only if it's a confidential client
+                        if (clientSecret) {
+                            const authString = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+                            headers['Authorization'] = `Basic ${authString}`;
+                        }
+                        
+                        // We await this but don't let it block logout if it fails.
+                        await fetch(revokeEndpoint, {
+                            method: 'POST',
+                            headers,
+                            body: params.toString(),
+                        }).catch(e => console.error("Background token revocation failed:", e));
+                    }
+                }
+            }
         }
-      }
     } catch (e) {
-      console.error("Error building Cognito logout URL, falling back to local redirect.", e);
+        console.error("Could not parse session cookie for logout revocation:", e);
     }
   }
 
-  const response = NextResponse.json({ success: true, logoutUrl });
-  
+  // Always clear local cookies and respond successfully.
+  const response = NextResponse.json({ success: true });
   response.cookies.set('auth_session', '', { expires: new Date(0), path: '/' });
   response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
-
   return response;
 }
