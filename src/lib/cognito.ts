@@ -11,6 +11,7 @@ import {
   NotAuthorizedException,
   ListDevicesCommand,
   ForgetDeviceCommand,
+  ListWebAuthnCredentialsCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
 
 const region = process.env.AWS_REGION;
@@ -34,5 +35,6 @@ export {
   NotAuthorizedException,
   ListDevicesCommand,
   ForgetDeviceCommand,
+  ListWebAuthnCredentialsCommand,
   CognitoIdentityProviderClient,
 };

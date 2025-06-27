@@ -250,6 +250,7 @@
       "deleteSuccessTitle": "Passkey Deleted",
       "deleteSuccessDescription": "The selected passkey has been removed from your account.",
       "deleteErrorTitle": "Deletion Failed",
+      "deleteNotSupported": "Deleting passkeys is not supported from this interface yet.",
       "success": {
         "title": "Passkey Updated",
         "description": "Your passkeys have been successfully managed."

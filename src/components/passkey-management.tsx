@@ -11,6 +11,7 @@ import { useTranslations } from 'next-intl';
 import type { User } from '@/lib/auth';
 import { deletePasskey } from '@/lib/passkey-actions';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { format } from 'date-fns';
 
 interface PasskeyManagementProps {
@@ -120,19 +121,23 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
                                                         {isMounted && device.createDate ? format(new Date(device.createDate), "PPP") : '...'}
                                                     </TableCell>
                                                     <TableCell className="text-right">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => handleDeletePasskey(device.key)}
-                                                            disabled={isPending && isDeleting === device.key}
-                                                            aria-label={`Delete passkey ${device.name}`}
-                                                        >
-                                                            {isPending && isDeleting === device.key ? (
-                                                                <Loader2 className="h-4 w-4 animate-spin" />
-                                                            ) : (
-                                                                <Trash2 className="h-4 w-4 text-destructive" />
-                                                            )}
-                                                        </Button>
+                                                        <TooltipProvider>
+                                                            <Tooltip>
+                                                                <TooltipTrigger asChild>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        disabled={true}
+                                                                        aria-label={`Delete passkey ${device.name}`}
+                                                                    >
+                                                                        <Trash2 className="h-4 w-4 text-muted-foreground" />
+                                                                    </Button>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent>
+                                                                    <p>{t('deleteNotSupported')}</p>
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        </TooltipProvider>
                                                     </TableCell>
                                                 </TableRow>
                                             ))}

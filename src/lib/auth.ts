@@ -2,7 +2,9 @@ import 'server-only';
 import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
-import { cognitoClient, GetUserCommand, ListDevicesCommand } from '@/lib/cognito';
+import { cognitoClient, GetUserCommand, ListWebAuthnCredentialsCommand } from '@/lib/cognito';
+import UAParser from 'ua-parser-js';
+
 
 // Define the User type, which should match what the components expect.
 export type UserPreferences = {
@@ -322,23 +324,53 @@ export const getUser = cache(async (): Promise<User | null> => {
         }
     }
     
-    // Fetch user's registered passkeys/devices.
-    const listDevicesCommand = new ListDevicesCommand({
-        AccessToken: session.access_token,
-        Limit: 60,
-    });
-    const devicesResponse = await cognitoClient.send(listDevicesCommand);
-    const devices: Device[] = (devicesResponse.Devices || []).map((d) => {
-        const nameAttribute = d.DeviceAttributes?.find(
-            (attr) => attr.Name === 'device_name'
-        );
-        return {
-            key: d.DeviceKey || '',
-            name: nameAttribute?.Value || 'Unnamed Device',
-            createDate: d.DeviceCreateDate,
-            lastAuthDate: d.DeviceLastAuthenticatedDate,
-        };
-    }).filter(d => d.key); // Ensure device key exists
+    // Fetch user's registered passkeys/devices using ListWebAuthnCredentials.
+    let devices: Device[] = [];
+    try {
+        if (cognitoUser.Username) {
+            const userPoolId = wellknown.issuer.split('/').pop();
+            const listCredentialsCommand = new ListWebAuthnCredentialsCommand({
+                UserPoolId: userPoolId,
+                Username: cognitoUser.Username,
+            });
+
+            // This is an admin-level API call and requires appropriate IAM permissions
+            // for the server's execution role.
+            const credentialsResponse = await cognitoClient.send(listCredentialsCommand);
+
+            devices = (credentialsResponse.Credentials || []).map((cred) => {
+                let name = 'Unnamed Device';
+                if (cred.UserAgent) {
+                    try {
+                        const ua = new UAParser(cred.UserAgent);
+                        const browser = ua.getBrowser();
+                        const os = ua.getOS();
+                        if (browser.name && os.name) {
+                            name = `${browser.name} on ${os.name}`;
+                        } else if (browser.name) {
+                            name = browser.name;
+                        } else if (os.name) {
+                            name = os.name;
+                        }
+                    } catch (uaError) {
+                        console.error("Could not parse user agent string:", cred.UserAgent);
+                    }
+                }
+                
+                return {
+                    key: cred.CredentialId || '',
+                    name: name,
+                    createDate: cred.CreatedAt,
+                    lastAuthDate: cred.LastUsedAt,
+                };
+            }).filter(d => d.key);
+        }
+    } catch(e: any) {
+        // This can fail if the IAM role for the backend doesn't have permissions.
+        // Log the error but don't block the entire user fetch for this.
+        // An empty device list will be shown, which is better than a full crash.
+        console.error("Could not fetch WebAuthn credentials, you may need to grant 'cognito-idp:ListWebAuthnCredentials' IAM permission to the server role.", e.name);
+    }
 
     return {
       sub: payload.sub as string,

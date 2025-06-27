@@ -250,6 +250,7 @@
       "deleteSuccessTitle": "Passkey Eliminada",
       "deleteSuccessDescription": "La passkey seleccionada ha sido eliminada de tu cuenta.",
       "deleteErrorTitle": "Error al Eliminar",
+      "deleteNotSupported": "La eliminación de passkeys aún no es compatible desde esta interfaz.",
       "success": {
         "title": "Passkey Actualizada",
         "description": "Tus passkeys han sido gestionadas exitosamente."
