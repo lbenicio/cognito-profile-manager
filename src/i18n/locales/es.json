@@ -64,7 +64,10 @@
     "form": {
       "title": "Editar Perfil",
       "description": "Actualiza tu información personal.",
-      "nameLabel": "Nombre completo",
+      "givenNameLabel": "Nombre",
+      "familyNameLabel": "Apellido",
+      "givenNameRequired": "El nombre es obligatorio.",
+      "familyNameRequired": "El apellido es obligatorio.",
       "addressLabel": "Dirección",
       "phoneLabel": "Número de teléfono",
       "phonePlaceholder": "555 123 4567",

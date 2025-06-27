@@ -64,7 +64,10 @@
     "form": {
       "title": "Edit Profile",
       "description": "Update your personal information.",
-      "nameLabel": "Full Name",
+      "givenNameLabel": "Given Name",
+      "familyNameLabel": "Family Name",
+      "givenNameRequired": "Given name is required.",
+      "familyNameRequired": "Family name is required.",
       "addressLabel": "Address",
       "phoneLabel": "Phone Number",
       "phonePlaceholder": "555 123 4567",

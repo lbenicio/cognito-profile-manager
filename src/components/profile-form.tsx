@@ -20,11 +20,13 @@ import { useToast } from '@/hooks/use-toast';
 import { Save } from 'lucide-react';
 import React from 'react';
 import type { User as UserType } from '@/lib/auth';
+import { updateUserProfile } from '@/lib/profile-actions';
 import { TimezoneSelect } from './timezone-select';
 import { PhoneInput } from './phone-input';
 
 const profileFormSchema = (t: (key: string) => string) => z.object({
-  name: z.string().min(2, { message: 'Name must be at least 2 characters.' }).max(50),
+  given_name: z.string().min(1, { message: t('givenNameRequired') }).max(50),
+  family_name: z.string().min(1, { message: t('familyNameRequired') }).max(50),
   address: z.string().min(10, { message: 'Please enter a full address.' }).max(100),
   phone_number: z.string().refine((phone) => /^\+[1-9]\d{7,14}$/.test(phone), {
     message: t('phoneInvalid'),
@@ -48,7 +50,8 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema(t)),
     defaultValues: {
-      name: user.name || '',
+      given_name: '',
+      family_name: '',
       address: user.address || '',
       phone_number: user.phone_number || '',
       website: user.website || '',
@@ -58,8 +61,13 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
   });
 
   React.useEffect(() => {
+    const nameParts = user.name?.split(' ') || [''];
+    const given_name = nameParts[0] || '';
+    const family_name = nameParts.slice(1).join(' ');
+
     form.reset({
-        name: user.name,
+        given_name,
+        family_name,
         address: user.address,
         phone_number: user.phone_number,
         website: user.website,
@@ -69,13 +77,33 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
 
   async function onSubmit(data: ProfileFormValues) {
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    
     try {
-        onUpdate(data);
-        toast({
-            title: t('successTitle'),
-            description: t('successDescription'),
+        const result = await updateUserProfile({
+            ...data,
+            website: data.website || '',
+            zoneinfo: data.zoneinfo || '',
         });
+
+        if (result.success) {
+            onUpdate({
+                name: `${data.given_name} ${data.family_name}`.trim(),
+                address: data.address,
+                phone_number: data.phone_number,
+                website: data.website,
+                zoneinfo: data.zoneinfo,
+            });
+            toast({
+                title: t('successTitle'),
+                description: t('successDescription'),
+            });
+        } else {
+            toast({
+                variant: 'destructive',
+                title: t('errorTitle'),
+                description: result.message,
+            });
+        }
     } catch (error) {
         toast({
             variant: 'destructive',
@@ -96,19 +124,34 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardContent className="space-y-6">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('nameLabel')}</FormLabel>
-                  <FormControl>
-                    <Input placeholder="John Doe" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="given_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('givenNameLabel')}</FormLabel>
+                      <FormControl>
+                        <Input placeholder="John" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="family_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('familyNameLabel')}</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Doe" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+            </div>
             <FormField
               control={form.control}
               name="address"
