@@ -1,9 +1,16 @@
+
 import { AppearanceSettings } from '@/components/appearance-settings';
 import { getTranslations } from 'next-intl/server';
-import { unstable_setRequestLocale } from 'next-intl/server';
+import { getUser } from '@/lib/auth';
+import { redirect } from '@/navigation';
 
 export default async function SettingsPage({params: {locale}}: {params: {locale: string}}) {
-  unstable_setRequestLocale(locale);
+  const user = await getUser();
+
+  if (!user) {
+    redirect('/login');
+  }
+  
   const t = await getTranslations('Settings');
 
   return (
@@ -15,7 +22,7 @@ export default async function SettingsPage({params: {locale}}: {params: {locale:
             </p>
         </header>
         <div className="max-w-3xl">
-            <AppearanceSettings />
+            <AppearanceSettings user={user} />
         </div>
     </div>
   );
