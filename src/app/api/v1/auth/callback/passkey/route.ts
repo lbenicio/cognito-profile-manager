@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   const state = searchParams.get('state');
   const storedState = request.cookies.get('oauth_state')?.value;
 
-  const profileUrl = new URL(pathnames['/profile'], origin);
+  const accountUrl = new URL(pathnames['/account'], origin);
 
   const clearStateCookie = (response: NextResponse) => {
     response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
@@ -23,23 +23,23 @@ export async function GET(request: NextRequest) {
   // --- CSRF check ---
   if (!state || !storedState || state !== storedState) {
     console.error('Passkey callback state mismatch or state missing.');
-    profileUrl.searchParams.set('error', 'invalid_state');
-    return clearStateCookie(NextResponse.redirect(profileUrl));
+    accountUrl.searchParams.set('error', 'invalid_state');
+    return clearStateCookie(NextResponse.redirect(accountUrl));
   }
   
   if (error) {
     console.error(`Cognito passkey callback error: ${error} - ${errorDescription}`);
-    profileUrl.searchParams.set('error', error);
+    accountUrl.searchParams.set('error', error);
     if (errorDescription) {
-      profileUrl.searchParams.set('error_description', errorDescription);
+      accountUrl.searchParams.set('error_description', errorDescription);
     }
-    return clearStateCookie(NextResponse.redirect(profileUrl));
+    return clearStateCookie(NextResponse.redirect(accountUrl));
   }
 
   if (!code) {
     console.error('Authorization code missing from passkey callback.');
-    profileUrl.searchParams.set('error', 'auth_code_missing');
-    return clearStateCookie(NextResponse.redirect(profileUrl));
+    accountUrl.searchParams.set('error', 'auth_code_missing');
+    return clearStateCookie(NextResponse.redirect(accountUrl));
   }
 
   // If we got a code, it means the passkey was added successfully.
@@ -104,8 +104,8 @@ export async function GET(request: NextRequest) {
         expires_in: tokens.expires_in,
     };
     
-    profileUrl.searchParams.set('result', 'success');
-    const response = NextResponse.redirect(profileUrl);
+    accountUrl.searchParams.set('result', 'success');
+    const response = NextResponse.redirect(accountUrl);
 
     response.cookies.set('auth_session', JSON.stringify(sessionData), {
       httpOnly: true,
@@ -115,15 +115,15 @@ export async function GET(request: NextRequest) {
       sameSite: 'lax',
     });
     
-    revalidatePath(pathnames['/profile']);
+    revalidatePath(pathnames['/account']);
     revalidatePath('/'); // Revalidate dashboard as well
     return clearStateCookie(response);
 
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
     console.error('Passkey callback handler error:', e);
-    profileUrl.searchParams.set('error', 'passkey_update_failed');
-    profileUrl.searchParams.set('error_description', errorMessage);
-    return clearStateCookie(NextResponse.redirect(profileUrl));
+    accountUrl.searchParams.set('error', 'passkey_update_failed');
+    accountUrl.searchParams.set('error_description', errorMessage);
+    return clearStateCookie(NextResponse.redirect(accountUrl));
   }
 }
