@@ -39,6 +39,8 @@ export type User = {
   locale: string;
   zoneinfo: string;
   website: string;
+  gender: string;
+  aboutMe: string;
   preferences: UserPreferences;
   notificationPreferences: NotificationPreferences;
 };
@@ -77,6 +79,8 @@ const mockUser: User = {
   locale: 'en-US',
   zoneinfo: 'America/New_York',
   website: 'https://example.com',
+  gender: 'Prefer not to say',
+  aboutMe: 'This is a mock user bio for the development environment. I enjoy coding and building cool things with Next.js.',
   preferences: defaultPreferences,
   notificationPreferences: defaultNotificationPreferences,
 };
@@ -176,6 +180,8 @@ export const getUser = cache(async (): Promise<User | null> => {
       locale: (payload.locale as string) || '',
       zoneinfo: (payload.zoneinfo as string) || '',
       website: (payload.website as string) || '',
+      gender: (payload.gender as string) || '',
+      aboutMe: (payload['custom:aboutme'] as string) || '',
       preferences: preferences,
       notificationPreferences: { ...defaultNotificationPreferences },
     };
@@ -232,6 +238,8 @@ export const getUser = cache(async (): Promise<User | null> => {
                 locale: attributes.locale || user.locale,
                 zoneinfo: attributes.zoneinfo || user.zoneinfo,
                 website: attributes.website || user.website,
+                gender: attributes.gender || user.gender,
+                aboutMe: attributes['custom:aboutme'] || user.aboutMe,
                 preferences: preferences,
                 notificationPreferences: notificationPreferences,
                 // Crucially, update the custom attributes from the fresh data

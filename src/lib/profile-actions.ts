@@ -12,6 +12,8 @@ type UserProfileAttributes = {
     phone_number: string;
     website: string;
     zoneinfo: string;
+    gender: string;
+    aboutMe: string;
 }
 
 export async function updateUserProfile(data: UserProfileAttributes): Promise<{ success: boolean; message: string }> {
@@ -30,6 +32,8 @@ export async function updateUserProfile(data: UserProfileAttributes): Promise<{ 
                 { Name: 'phone_number', Value: data.phone_number },
                 { Name: 'website', Value: data.website },
                 { Name: 'zoneinfo', Value: data.zoneinfo },
+                { Name: 'gender', Value: data.gender },
+                { Name: 'custom:aboutme', Value: data.aboutMe },
                 // We combine given and family name for the 'name' attribute which is often used for display
                 { Name: 'name', Value: `${data.given_name} ${data.family_name}`.trim() },
             ],

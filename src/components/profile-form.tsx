@@ -23,6 +23,8 @@ import type { User as UserType } from '@/lib/auth';
 import { updateUserProfile } from '@/lib/profile-actions';
 import { TimezoneSelect } from './timezone-select';
 import { PhoneInput } from './phone-input';
+import { Textarea } from './ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 const profileFormSchema = (t: (key: string) => string) => z.object({
   given_name: z.string().min(1, { message: t('givenNameRequired') }).max(50),
@@ -33,6 +35,8 @@ const profileFormSchema = (t: (key: string) => string) => z.object({
   }),
   website: z.string().url({ message: 'Please enter a valid URL.' }).or(z.literal('')).optional(),
   zoneinfo: z.string().max(50).optional(),
+  gender: z.string().optional(),
+  aboutMe: z.string().max(250, { message: t('aboutMeTooLong') }).optional(),
 });
 
 type ProfileFormValues = z.infer<ReturnType<typeof profileFormSchema>>;
@@ -56,6 +60,8 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
       phone_number: user.phone_number || '',
       website: user.website || '',
       zoneinfo: user.zoneinfo || '',
+      gender: user.gender || '',
+      aboutMe: user.aboutMe || '',
     },
     mode: 'onChange',
   });
@@ -72,6 +78,8 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
         phone_number: user.phone_number,
         website: user.website,
         zoneinfo: user.zoneinfo,
+        gender: user.gender,
+        aboutMe: user.aboutMe,
     });
   }, [user, form]);
 
@@ -83,6 +91,8 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
             ...data,
             website: data.website || '',
             zoneinfo: data.zoneinfo || '',
+            gender: data.gender || '',
+            aboutMe: data.aboutMe || '',
         });
 
         if (result.success) {
@@ -92,6 +102,8 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
                 phone_number: data.phone_number,
                 website: data.website,
                 zoneinfo: data.zoneinfo,
+                gender: data.gender,
+                aboutMe: data.aboutMe,
             });
             toast({
                 title: t('successTitle'),
@@ -154,6 +166,26 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
             </div>
             <FormField
               control={form.control}
+              name="aboutMe"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('aboutMeLabel')}</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder={t('aboutMePlaceholder')}
+                      className="resize-none"
+                      {...field}
+                    />
+                  </FormControl>
+                   <FormDescription>
+                    {t('aboutMeDescription')}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="address"
               render={({ field }) => (
                 <FormItem>
@@ -165,22 +197,43 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="phone_number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('phoneLabel')}</FormLabel>
-                  <FormControl>
-                    <PhoneInput {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    {t('phoneDescription')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="phone_number"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('phoneLabel')}</FormLabel>
+                      <FormControl>
+                        <PhoneInput {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="gender"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('genderLabel')}</FormLabel>
+                       <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={t('genderPlaceholder')} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Male">{t('genderMale')}</SelectItem>
+                          <SelectItem value="Female">{t('genderFemale')}</SelectItem>
+                          <SelectItem value="Prefer not to say">{t('genderPreferNotToSay')}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+            </div>
             <FormField
               control={form.control}
               name="website"

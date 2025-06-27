@@ -59,7 +59,9 @@
     },
     "display": {
       "status": "Status: {status}",
-      "memberSince": "Member since: {date}"
+      "memberSince": "Member since: {date}",
+      "aboutMeTitle": "About Me",
+      "notSet": "Not set"
     },
     "form": {
       "title": "Edit Profile",
@@ -76,6 +78,15 @@
       "websiteLabel": "Website",
       "zoneinfoLabel": "Timezone",
       "zoneinfoDescription": "Select the timezone you are in.",
+      "aboutMeLabel": "About Me",
+      "aboutMePlaceholder": "Tell us a little bit about yourself...",
+      "aboutMeDescription": "Write a short bio about yourself (max 250 characters).",
+      "aboutMeTooLong": "Your bio cannot be longer than 250 characters.",
+      "genderLabel": "Gender",
+      "genderPlaceholder": "Select your gender",
+      "genderMale": "Male",
+      "genderFemale": "Female",
+      "genderPreferNotToSay": "Prefer not to say",
       "save": "Save Changes",
       "successTitle": "Profile Updated",
       "successDescription": "Your profile has been successfully updated.",

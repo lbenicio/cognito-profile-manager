@@ -59,7 +59,9 @@
     },
     "display": {
       "status": "Estado: {status}",
-      "memberSince": "Miembro desde: {date}"
+      "memberSince": "Miembro desde: {date}",
+      "aboutMeTitle": "Sobre mí",
+      "notSet": "No establecido"
     },
     "form": {
       "title": "Editar Perfil",
@@ -76,6 +78,15 @@
       "websiteLabel": "Sitio web",
       "zoneinfoLabel": "Zona horaria",
       "zoneinfoDescription": "Selecciona la zona horaria en la que te encuentras.",
+      "aboutMeLabel": "Sobre mí",
+      "aboutMePlaceholder": "Cuéntanos un poco sobre ti...",
+      "aboutMeDescription": "Escribe una breve biografía sobre ti (máx. 250 caracteres).",
+      "aboutMeTooLong": "Tu biografía no puede tener más de 250 caracteres.",
+      "genderLabel": "Género",
+      "genderPlaceholder": "Selecciona tu género",
+      "genderMale": "Masculino",
+      "genderFemale": "Femenino",
+      "genderPreferNotToSay": "Prefiero no decirlo",
       "save": "Guardar cambios",
       "successTitle": "Perfil Actualizado",
       "successDescription": "Tu perfil ha sido actualizado exitosamente.",

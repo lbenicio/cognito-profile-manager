@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Mail, Home, Phone, CalendarDays, BadgeCheck, Shield, Users, Globe, Clock, Languages, Edit } from 'lucide-react';
+import { Mail, Home, Phone, CalendarDays, BadgeCheck, Shield, Users, Globe, Clock, Languages, Edit, PersonStanding, BookUser } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { useTranslations } from 'next-intl';
 import type { User } from '@/lib/auth';
@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react';
 import { AvatarEditor } from './avatar-editor';
 import { Button } from './ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { Separator } from './ui/separator';
 
 export function ProfileDisplay({ user, onUpdate }: { user: User, onUpdate: (data: Partial<User>) => void }) {
   const t = useTranslations('Dashboard');
@@ -101,22 +102,28 @@ export function ProfileDisplay({ user, onUpdate }: { user: User, onUpdate: (data
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0">
               <Phone className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-              <span className="text-sm">{user.phone_number}</span>
+              <span className="text-sm">{user.phone_number || tProfile('display.notSet')}</span>
             </div>
-              {user.phone_number_verified ? (
-                <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 flex items-center gap-1 flex-shrink-0">
-                  <BadgeCheck className="w-3.5 h-3.5"/>
-                  {t('verified')}
-                </Badge>
-              ) : (
-                <Button variant="outline" size="sm" onClick={handleSendVerificationSms} disabled={phoneLoading} className='flex-shrink-0'>
-                  {phoneLoading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div> : tProfile('verification.resend')}
-                </Button>
+              {user.phone_number && (
+                 user.phone_number_verified ? (
+                  <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 flex items-center gap-1 flex-shrink-0">
+                    <BadgeCheck className="w-3.5 h-3.5"/>
+                    {t('verified')}
+                  </Badge>
+                ) : (
+                  <Button variant="outline" size="sm" onClick={handleSendVerificationSms} disabled={phoneLoading} className='flex-shrink-0'>
+                    {phoneLoading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div> : tProfile('verification.resend')}
+                  </Button>
+                )
               )}
           </div>
           <div className="flex items-start gap-3">
             <Home className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
-            <span className="flex-1">{user.address}</span>
+            <span className="flex-1">{user.address || tProfile('display.notSet')}</span>
+          </div>
+          <div className="flex items-start gap-3">
+            <PersonStanding className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
+            <span className="flex-1">{user.gender || tProfile('display.notSet')}</span>
           </div>
           {user.website && (
               <div className="flex items-center gap-3">
@@ -138,7 +145,15 @@ export function ProfileDisplay({ user, onUpdate }: { user: User, onUpdate: (data
                   <span>{user.locale}</span>
               </div>
           )}
-          <div className="flex items-start gap-3 pt-4 border-t">
+           <Separator className="my-4" />
+           <div className="space-y-2">
+                <h4 className="font-semibold">{tProfile('display.aboutMeTitle')}</h4>
+                <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                    {user.aboutMe || tProfile('display.notSet')}
+                </p>
+            </div>
+           <Separator className="my-4" />
+          <div className="flex items-start gap-3">
             <Users className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
             <div className="flex-1">
               <span className="font-semibold">{tDashboard('groups')}</span>
