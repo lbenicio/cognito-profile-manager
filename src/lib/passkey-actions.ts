@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { cognitoClient, DeleteDeviceCommand } from './cognito';
+import { cognitoClient, ForgetDeviceCommand } from './cognito';
 import { getSession } from './auth';
 
 export async function deletePasskey(
@@ -17,7 +17,7 @@ export async function deletePasskey(
   }
 
   try {
-    const command = new DeleteDeviceCommand({
+    const command = new ForgetDeviceCommand({
       AccessToken: session.access_token,
       DeviceKey: deviceKey,
     });
