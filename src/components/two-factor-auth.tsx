@@ -142,13 +142,13 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
             const authorizationEndpoint = wellknown.authorization_endpoint;
 
             const cognitoDomain = new URL(authorizationEndpoint).origin;
-            const passkeyUrl = new URL(`${cognitoDomain}/passkeys/manage`);
-            passkeyUrl.searchParams.set('client_id', clientId);
-            passkeyUrl.searchParams.set('redirect_uri', callbackUrl);
-            passkeyUrl.searchParams.set('response_type', 'code');
-            passkeyUrl.searchParams.set('scope', scope);
+            const profileUrl = new URL(`${cognitoDomain}/profile`);
+            profileUrl.searchParams.set('client_id', clientId);
+            profileUrl.searchParams.set('redirect_uri', callbackUrl);
+            profileUrl.searchParams.set('response_type', 'code');
+            profileUrl.searchParams.set('scope', scope);
 
-            window.location.href = passkeyUrl.toString();
+            window.location.href = profileUrl.toString();
 
         } catch (error: any) {
             toast({
