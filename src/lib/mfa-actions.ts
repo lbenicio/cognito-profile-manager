@@ -71,7 +71,7 @@ export async function verifyAndEnableMfa(
     });
     await cognitoClient.send(updateUserAttrCommand);
 
-    revalidatePath('/profile');
+    revalidatePath('/security');
     revalidatePath('/');
 
     return { success: true, message: 'Authenticator app enabled successfully.' };
@@ -112,7 +112,7 @@ export async function disableMfa(): Promise<{ success: boolean; message: string 
     });
     await cognitoClient.send(updateUserAttrCommand);
 
-    revalidatePath('/profile');
+    revalidatePath('/security');
     revalidatePath('/');
 
     return { success: true, message: 'Authenticator app disabled successfully.' };
