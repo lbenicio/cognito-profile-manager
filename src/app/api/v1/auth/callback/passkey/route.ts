@@ -6,8 +6,22 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
   const error = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
+  const state = searchParams.get('state');
+  const storedState = request.cookies.get('oauth_state')?.value;
 
   const profileUrl = new URL(pathnames['/profile'], origin);
+
+  const clearStateCookie = (response: NextResponse) => {
+    response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
+    return response;
+  };
+
+  // --- CSRF check ---
+  if (!state || !storedState || state !== storedState) {
+    console.error('Passkey callback state mismatch or state missing.');
+    profileUrl.searchParams.set('error', 'invalid_state');
+    return clearStateCookie(NextResponse.redirect(profileUrl));
+  }
 
   // --- Cognito error check ---
   if (error) {
@@ -16,7 +30,7 @@ export async function GET(request: NextRequest) {
     if (errorDescription) {
       profileUrl.searchParams.set('error_description', errorDescription);
     }
-    return NextResponse.redirect(profileUrl);
+    return clearStateCookie(NextResponse.redirect(profileUrl));
   }
 
   // --- Success ---
@@ -26,5 +40,5 @@ export async function GET(request: NextRequest) {
   revalidatePath(pathnames['/profile']);
   profileUrl.searchParams.set('passkey_status', 'success');
   
-  return NextResponse.redirect(profileUrl);
+  return clearStateCookie(NextResponse.redirect(profileUrl));
 }
