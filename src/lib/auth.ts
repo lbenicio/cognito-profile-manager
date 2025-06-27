@@ -3,6 +3,7 @@ import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
 import { cognitoClient, GetUserCommand } from '@/lib/cognito';
+import { refreshAuthTokens } from './session-actions';
 
 // Define the User type, which should match what the components expect.
 export type UserPreferences = {
@@ -174,7 +175,7 @@ export const getSession = cache(async () => {
 
 // This function is cached per request and retrieves the authenticated user's data.
 export const getUser = cache(async (): Promise<User | null> => {
-  const session = await getSession();
+  let session = await getSession();
 
   // Handle mock development session (which doesn't have an id_token)
   if (process.env.NODE_ENV === 'development' && session?.username && !session?.id_token) {
@@ -187,184 +188,148 @@ export const getUser = cache(async (): Promise<User | null> => {
   if (!session?.id_token) {
     return null;
   }
+  
+  const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
+  if (!wellknownUrl) {
+      console.error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
+      return null;
+  }
 
   try {
-    // In production, first verify the JWT to confirm the session is valid.
-    const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
-    if (!wellknownUrl) throw new Error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
-    
     const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
     if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
     const wellknown = await wellknownResponse.json();
+    const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
 
-    const jwksUri = wellknown.jwks_uri;
-    const JWKS = createRemoteJWKSet(new URL(jwksUri));
+    try {
+        await jwtVerify(session.id_token, JWKS, {
+            issuer: wellknown.issuer,
+            audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
+        });
+    } catch (error: any) {
+        if (error.code === 'ERR_JWT_EXPIRED' && session.refresh_token) {
+            console.log('Access token expired. Attempting refresh...');
+            const newSession = await refreshAuthTokens(session.refresh_token);
+            if (newSession) {
+                console.log('Token refresh successful.');
+                session = newSession; // Continue with the new session
+            } else {
+                console.error('Token refresh failed. Clearing session.');
+                cookies().set('auth_session', '', { expires: new Date(0), path: '/' });
+                return null;
+            }
+        } else {
+            console.error('JWT validation error:', error.message);
+            cookies().set('auth_session', '', { expires: new Date(0), path: '/' });
+            return null;
+        }
+    }
+    
+    // If we've reached here, the session is valid (either originally or after a refresh).
+    // Now, fetch the most up-to-date user attributes from Cognito.
+    const { payload } = await jwtVerify(session.id_token, JWKS);
+    const getUserCommand = new GetUserCommand({ AccessToken: session.access_token });
+    const cognitoUser = await cognitoClient.send(getUserCommand);
+    const attributes = cognitoUser.UserAttributes?.reduce((acc, attr) => {
+        if (attr.Name && attr.Value) {
+            acc[attr.Name] = attr.Value;
+        }
+        return acc;
+    }, {} as Record<string, string>) || {};
 
-    const { payload } = await jwtVerify(session.id_token, JWKS, {
-      issuer: wellknown.issuer,
-      audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
-    });
-
-    // Initialize a base user object with claims from the (potentially stale) ID token.
     const adminGroupName = process.env.COGNITO_ADMIN_GROUP_NAME || 'admins';
     const groupsClaimKey = process.env.COGNITO_GROUPS_CLAIM_KEY || 'cognito:groups';
     const groups = (payload[groupsClaimKey] as string[]) || [];
     const isAdmin = groups.includes(adminGroupName);
-    const addressClaim = payload.address as { formatted?: string } | undefined;
-    const givenName = (payload.given_name as string) || '';
-    const familyName = (payload.family_name as string) || '';
     
+    const freshGivenName = attributes.given_name || '';
+    const freshFamilyName = attributes.family_name || '';
+
     let preferences: UserPreferences = { ...defaultPreferences };
-    const sessionClaim = payload['custom:session'] as string | undefined;
-    if (sessionClaim) {
+    if (attributes['custom:session']) {
         try {
-            const parsedPrefs = JSON.parse(sessionClaim);
-            preferences = { ...preferences, ...parsedPrefs };
+            preferences = { ...defaultPreferences, ...JSON.parse(attributes['custom:session']) };
         } catch (e) {
-            console.error('Failed to parse user preferences from custom:session claim', e);
+            console.error('Failed to parse user preferences from GetUser API call', e);
+        }
+    }
+    
+    let publicProfilePreferences: PublicProfilePreferences = { ...defaultPublicProfilePreferences };
+    const publicProfileClaim = attributes['custom:public-profile'];
+    if (publicProfileClaim) {
+        try {
+            const parsedPrefs = JSON.parse(publicProfileClaim);
+            publicProfilePreferences = {
+                isPublic: parsedPrefs.isPublic ?? defaultPublicProfilePreferences.isPublic,
+                publicFields: {
+                    ...defaultPublicProfilePreferences.publicFields,
+                    ...(parsedPrefs.publicFields || {}),
+                }
+            };
+        } catch (e) {
+            console.error('Failed to parse public profile preferences from GetUser API call', e);
         }
     }
 
+    const notificationPreferences: NotificationPreferences = {
+        email: attributes['custom:email-notification'] === 'true',
+        app: attributes['custom:app-notification'] === 'true',
+        telegram: attributes['custom:tlgm-notification'] === 'true',
+        user: attributes['custom:user-notifications'] === 'true',
+        system: attributes['custom:system-notifications'] === 'true',
+        marketing: attributes['custom:mkt-notifications'] === 'true',
+    };
 
-    let user: User = {
-      username: (payload['cognito:username'] as string) || '',
-      email: (payload.email as string) || '',
-      email_verified: (payload.email_verified as boolean) || false,
-      name: [givenName, familyName].filter(Boolean).join(' '),
-      address: addressClaim?.formatted ?? '',
-      phone_number: (payload.phone_number as string) || '',
-      phone_number_verified: (payload.phone_number_verified as boolean) || false,
+    let fingerprintData: Fingerprint[] = [];
+    if (attributes['custom:fingerprint']) {
+        try {
+            fingerprintData = JSON.parse(attributes['custom:fingerprint']);
+        } catch (e) {
+            console.error('Failed to parse user fingerprint from GetUser API call', e);
+        }
+    }
+    
+    let passkeysData: PasskeyInfo[] = [];
+    if (attributes['custom:passkeys']) {
+        try {
+            passkeysData = JSON.parse(attributes['custom:passkeys']);
+        } catch (e) {
+            console.error('Failed to parse user passkeys from GetUser API call', e);
+        }
+    }
+
+    return {
+      username: cognitoUser.Username || (payload['cognito:username'] as string) || '',
+      email: attributes.email || (payload.email as string) || '',
+      email_verified: attributes.email_verified === 'true',
+      name: [freshGivenName, freshFamilyName].filter(Boolean).join(' ') || (payload.name as string) || '',
+      address: attributes.address || '',
+      phone_number: attributes.phone_number || (payload.phone_number as string) || '',
+      phone_number_verified: attributes.phone_number_verified === 'true',
       creationDate: new Date((payload.auth_time as number) * 1000).toISOString(),
-      userStatus: 'CONFIRMED', // Placeholder, will be updated
-      twoFactorEnabled: false, // Placeholder, will be updated
-      passkeysEnabled: false, // Placeholder, will be updated
+      userStatus: cognitoUser.UserStatus || 'CONFIRMED',
+      twoFactorEnabled: attributes['custom:mfa'] === 'true',
+      passkeysEnabled: attributes['custom:pless'] === 'true',
       groups: groups,
       isAdmin: isAdmin,
-      picture: (payload.picture as string) || '',
-      banner: (payload['custom:banner'] as string) || '',
-      locale: (payload.locale as string) || '',
-      zoneinfo: (payload.zoneinfo as string) || '',
-      website: (payload.website as string) || '',
-      gender: (payload.gender as string) || '',
-      aboutMe: (payload['custom:aboutme'] as string) || '',
+      picture: attributes.picture || (payload.picture as string) || '',
+      banner: attributes['custom:banner'] || '',
+      locale: attributes.locale || (payload.locale as string) || '',
+      zoneinfo: attributes.zoneinfo || (payload.zoneinfo as string) || '',
+      website: attributes.website || (payload.website as string) || '',
+      gender: attributes.gender || (payload.gender as string) || '',
+      aboutMe: attributes['custom:aboutme'] || '',
       preferences: preferences,
-      notificationPreferences: { ...defaultNotificationPreferences },
-      publicProfilePreferences: { ...defaultPublicProfilePreferences },
-      fingerprint: [],
-      passkeys: [],
+      notificationPreferences: notificationPreferences,
+      publicProfilePreferences: publicProfilePreferences,
+      fingerprint: fingerprintData,
+      passkeys: passkeysData,
     };
-    
-    // Now, use the access token to fetch the most up-to-date user attributes from Cognito.
-    if (session.access_token) {
-        const getUserCommand = new GetUserCommand({ AccessToken: session.access_token });
-        const cognitoUser = await cognitoClient.send(getUserCommand);
-
-        const attributes = cognitoUser.UserAttributes?.reduce((acc, attr) => {
-            if (attr.Name && attr.Value) {
-                acc[attr.Name] = attr.Value;
-            }
-            return acc;
-        }, {} as Record<string, string>);
-
-        // Overwrite the initial user data with fresh attributes from the API call.
-        if (attributes) {
-             const freshGivenName = attributes.given_name || '';
-             const freshFamilyName = attributes.family_name || '';
-             let notificationPreferences: NotificationPreferences = { ...defaultNotificationPreferences };
-             let publicProfilePreferences: PublicProfilePreferences = { ...defaultPublicProfilePreferences };
-
-             // Re-parse preferences from the absolute latest data
-             if (attributes['custom:session']) {
-                 try {
-                     const parsedPrefs = JSON.parse(attributes['custom:session']);
-                     preferences = { ...defaultPreferences, ...parsedPrefs };
-                 } catch (e) {
-                     console.error('Failed to parse user preferences from GetUser API call', e);
-                 }
-             }
-            
-            // Re-parse public profile preferences from the absolute latest data
-            const publicProfileClaim = attributes['custom:public-profile'];
-            if (publicProfileClaim) {
-                try {
-                    const parsedPrefs = JSON.parse(publicProfileClaim);
-                    // Deep merge to handle cases where new fields are added to the defaults later
-                    publicProfilePreferences = {
-                        isPublic: parsedPrefs.isPublic ?? defaultPublicProfilePreferences.isPublic,
-                        publicFields: {
-                            ...defaultPublicProfilePreferences.publicFields,
-                            ...(parsedPrefs.publicFields || {}),
-                        }
-                    };
-                } catch (e) {
-                    console.error('Failed to parse public profile preferences from GetUser API call', e);
-                }
-            }
-
-             // Parse notification preferences
-             notificationPreferences = {
-                email: attributes['custom:email-notification'] === 'true',
-                app: attributes['custom:app-notification'] === 'true',
-                telegram: attributes['custom:tlgm-notification'] === 'true',
-                user: attributes['custom:user-notifications'] === 'true',
-                system: attributes['custom:system-notifications'] === 'true',
-                marketing: attributes['custom:mkt-notifications'] === 'true',
-             };
-
-             let fingerprintData: Fingerprint[] = [];
-             const fingerprintClaim = attributes['custom:fingerprint'];
-             if (fingerprintClaim) {
-                 try {
-                     fingerprintData = JSON.parse(fingerprintClaim);
-                 } catch (e) {
-                     console.error('Failed to parse user fingerprint from GetUser API call', e);
-                 }
-             }
-             
-             let passkeysData: PasskeyInfo[] = [];
-             const passkeysClaim = attributes['custom:passkeys'];
-             if (passkeysClaim) {
-                 try {
-                     passkeysData = JSON.parse(passkeysClaim);
-                 } catch (e) {
-                     console.error('Failed to parse user passkeys from GetUser API call', e);
-                 }
-             }
-
-             user = {
-                ...user,
-                username: cognitoUser.Username || user.username,
-                userStatus: cognitoUser.UserStatus || user.userStatus,
-                email: attributes.email || user.email,
-                email_verified: attributes.email_verified === 'true',
-                name: [freshGivenName, freshFamilyName].filter(Boolean).join(' ') || user.name,
-                address: attributes.address || user.address,
-                phone_number: attributes.phone_number || user.phone_number,
-                phone_number_verified: attributes.phone_number_verified === 'true',
-                picture: attributes.picture || user.picture,
-                banner: attributes['custom:banner'] || user.banner,
-                locale: attributes.locale || user.locale,
-                zoneinfo: attributes.zoneinfo || user.zoneinfo,
-                website: attributes.website || user.website,
-                gender: attributes.gender || user.gender,
-                aboutMe: attributes['custom:aboutme'] || user.aboutMe,
-                preferences: preferences,
-                notificationPreferences: notificationPreferences,
-                publicProfilePreferences: publicProfilePreferences,
-                fingerprint: fingerprintData,
-                passkeys: passkeysData,
-                // Crucially, update the custom attributes from the fresh data
-                twoFactorEnabled: attributes['custom:mfa'] === 'true',
-                passkeysEnabled: attributes['custom:pless'] === 'true',
-             };
-        }
-    }
-
-    return user;
 
   } catch (error: any) {
-    console.error("Authentication or user data fetch error:", error);
-    // The invalid cookie is now handled by the middleware, so we just return null.
+    console.error("General error in getUser:", error);
+    // Clearing the cookie here is a safe fallback
+    cookies().set('auth_session', '', { expires: new Date(0), path: '/' });
     return null;
   }
 });

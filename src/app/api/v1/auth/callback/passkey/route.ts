@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { cognitoClient, GetUserCommand, UpdateUserAttributesCommand } from '@/lib/cognito';
 import { pathnames } from '@/navigation';
-import { getSession } from '@/lib/auth';
+import { getSession, getUser } from '@/lib/auth';
 import UAParser from 'ua-parser-js';
 
 export async function GET(request: NextRequest) {
@@ -42,7 +42,6 @@ export async function GET(request: NextRequest) {
   }
 
   // The presence of a "code" from Cognito indicates the passkey was added successfully.
-  // We can now use the user's existing session to update their attributes.
   if (!code) {
     console.error('Authorization code missing from passkey callback.');
     securityUrl.searchParams.set('error', 'auth_code_missing');
@@ -50,9 +49,16 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    // Calling getUser() first ensures the session is validated and refreshed if necessary.
+    const user = await getUser();
+    if (!user) {
+        throw new Error('User session not found or has expired. Please log in again.');
+    }
+    
+    // Now that the session is guaranteed to be fresh, get the raw tokens.
     const session = await getSession();
     if (!session?.access_token) {
-        throw new Error('User session not found or access token missing.');
+        throw new Error('Access token could not be retrieved after session validation.');
     }
 
     // Get current user attributes to append to the passkeys list
