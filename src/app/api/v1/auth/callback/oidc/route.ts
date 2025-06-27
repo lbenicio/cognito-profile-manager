@@ -14,7 +14,10 @@ export async function GET(request: NextRequest) {
 
   // --- CSRF check ---
   if (!state || !storedState || state !== storedState) {
-    console.error('OIDC callback state mismatch or state missing.');
+    console.error('OIDC callback state mismatch or state missing.', {
+        queryState: state,
+        cookieState: storedState
+    });
     const loginUrl = new URL('/login', requestUrl.origin);
     loginUrl.searchParams.set('error', 'invalid_state');
     const response = NextResponse.redirect(loginUrl);
