@@ -1,8 +1,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
+import { UpdateUserAttributesCommand } from '@aws-sdk/client-cognito-identity-provider';
+import { cognitoClient } from '@/lib/cognito';
 import { pathnames } from '@/navigation';
-import { enablePasskey } from '@/lib/passkey-actions';
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
@@ -90,12 +91,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Now we have a fresh access token, use it to update the attribute
-    const updateResult = await enablePasskey(tokens.access_token);
-    if (!updateResult.success) {
-      throw new Error(updateResult.message || "Failed to set passkey attribute after token exchange.");
-    }
+    const updateCommand = new UpdateUserAttributesCommand({
+      AccessToken: tokens.access_token,
+      UserAttributes: [{ Name: 'custom:pless', Value: 'true' }],
+    });
+    await cognitoClient.send(updateCommand);
     
-    // Set the new session cookie
+    // Set the new session cookie with the refreshed tokens
     const sessionData = {
         id_token: tokens.id_token,
         access_token: tokens.access_token,
@@ -114,6 +116,7 @@ export async function GET(request: NextRequest) {
     });
     
     revalidatePath(pathnames['/profile']);
+    revalidatePath('/'); // Revalidate dashboard as well
     return clearStateCookie(response);
 
   } catch (e) {
