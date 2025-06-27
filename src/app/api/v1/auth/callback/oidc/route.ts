@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cognitoClient } from '@/lib/cognito';
 import { GetUserCommand, UpdateUserAttributesCommand } from '@aws-sdk/client-cognito-identity-provider';
-import { decodeJwt } from 'jose';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -144,15 +143,12 @@ export async function GET(request: NextRequest) {
     }
     // --- End fingerprint update ---
 
-    // Use the `exp` claim from the ID token for an authoritative session expiration time.
-    const idTokenPayload = decodeJwt(tokens.id_token);
-    const expires_at = (idTokenPayload.exp as number) * 1000; // exp is in seconds, convert to ms
-
+    // The session will contain the tokens received from Cognito.
+    // The middleware will be responsible for validating the token on each request.
     const sessionData = {
         id_token: tokens.id_token,
         access_token: tokens.access_token,
         refresh_token: tokens.refresh_token,
-        expires_at,
     };
 
     const dashboardUrl = new URL('/', requestUrl.origin);

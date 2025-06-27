@@ -1,7 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { pathnames, locales } from '@/navigation';
-import { jwtVerify, createRemoteJWKSet, decodeJwt } from 'jose';
+import { jwtVerify, createRemoteJWKSet } from 'jose';
 
 // All pages that are public and don't require authentication
 const publicPages = [pathnames['/login']]; 
@@ -40,66 +40,6 @@ async function verifyToken(token: string): Promise<boolean> {
   }
 }
 
-// New function to handle token refresh
-async function refreshAccessToken(refreshToken: string) {
-  try {
-    const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
-    if (!wellknownUrl) throw new Error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
-    
-    const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
-    if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
-    const wellknown = await wellknownResponse.json();
-    const tokenEndpoint = wellknown.token_endpoint;
-
-    const params = new URLSearchParams({
-      grant_type: 'refresh_token',
-      client_id: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
-      refresh_token: refreshToken,
-    });
-
-    const headers: HeadersInit = {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    };
-    
-    const clientSecret = process.env.COGNITO_CLIENT_SECRET;
-    if (clientSecret) {
-      headers['Authorization'] = `Basic ${Buffer.from(
-        `${process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!}:${clientSecret}`
-      ).toString('base64')}`;
-    }
-
-    const tokenResponse = await fetch(tokenEndpoint, {
-      method: 'POST',
-      headers: headers,
-      body: params.toString(),
-      cache: 'no-store',
-    });
-
-    const tokens = await tokenResponse.json();
-    if (!tokenResponse.ok) {
-      console.error("Failed to refresh tokens:", tokens);
-      throw new Error('Could not refresh token');
-    }
-
-    // Use the `exp` claim from the new ID token for an authoritative expiration time.
-    const idTokenPayload = decodeJwt(tokens.id_token);
-    const expires_at = (idTokenPayload.exp as number) * 1000;
-
-    // Cognito refresh response may include a new refresh token. We must store and use it.
-    const newSessionData = {
-      id_token: tokens.id_token,
-      access_token: tokens.access_token,
-      refresh_token: tokens.refresh_token || refreshToken,
-      expires_at: expires_at,
-    };
-    
-    return newSessionData;
-  } catch (error) {
-    console.error('Token refresh error:', error);
-    return null;
-  }
-}
-
 // Helper function to avoid repetition
 function redirectToLogin(request: NextRequest): NextResponse {
     const loginUrl = new URL(pathnames['/login'], request.url);
@@ -126,9 +66,6 @@ export async function authMiddleware(request: NextRequest): Promise<NextResponse
   }
 
   const isPublicPage = publicPathnameRegex.test(request.nextUrl.pathname);
-  
-  const hostname = request.nextUrl.hostname;
-  const domain = hostname === 'localhost' ? undefined : hostname;
 
   // Handle mock dev session
   if (process.env.NODE_ENV === 'development' && session?.username && !session.id_token) {
@@ -138,56 +75,31 @@ export async function authMiddleware(request: NextRequest): Promise<NextResponse
     return null; // Valid dev session on protected page
   }
   
-  // If no session and trying to access a protected page, redirect to login
-  if (!session && !isPublicPage) {
+  const hasIdToken = session?.id_token;
+
+  if (!hasIdToken) {
+    // No session token, if on a protected page, redirect to login
+    if (!isPublicPage) {
+      return redirectToLogin(request);
+    }
+    // If on a public page, allow access
+    return null;
+  }
+
+  // Has a session token, let's verify it
+  const isTokenValid = await verifyToken(session.id_token);
+
+  if (!isTokenValid) {
+    // Token is invalid (e.g., expired, revoked), redirect to login and clear cookies
     return redirectToLogin(request);
   }
-  
-  // If there is a session, check its validity
-  if (session) {
-    const isExpired = session.expires_at ? Date.now() > session.expires_at : true;
 
-    if (isExpired) {
-      if (session.refresh_token) {
-        const newSession = await refreshAccessToken(session.refresh_token);
-        if (newSession) {
-          // Token refreshed successfully. Let the request continue but set the new cookie.
-          const response = isPublicPage 
-            ? NextResponse.redirect(new URL(pathnames['/'], request.url))
-            : NextResponse.next();
-            
-          response.cookies.set('auth_session', JSON.stringify(newSession), {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: 30 * 24 * 60 * 60,
-            path: '/',
-            sameSite: 'lax',
-            domain: domain,
-          });
-          return response;
-        } else {
-          // Refresh failed, log the user out
-          return redirectToLogin(request);
-        }
-      } else {
-        // Expired and no refresh token, log out
-        return redirectToLogin(request);
-      }
-    } else {
-      // Session is not expired.
-      // We still do a quick verification of the token to ensure it wasn't revoked.
-      const isTokenValid = await verifyToken(session.id_token);
-      if (!isTokenValid) {
-        return redirectToLogin(request);
-      }
-
-      // Valid session, if on a public page, redirect to dashboard.
-      if (isPublicPage) {
-        return NextResponse.redirect(new URL(pathnames['/'], request.url));
-      }
-    }
+  // Token is valid. If user is trying to access a public page (like /login),
+  // redirect them to the dashboard.
+  if (isPublicPage) {
+    return NextResponse.redirect(new URL(pathnames['/'], request.url));
   }
   
-  // By default, let the request pass through
+  // By default, let the request pass through for valid sessions on protected pages
   return null;
 }
