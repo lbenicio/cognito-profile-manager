@@ -30,8 +30,7 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
     const [isGenerating, setIsGenerating] = useState(false);
     const [isVerifying, setIsVerifying] = useState(false);
     const [isDisablingMfa, setIsDisablingMfa] = useState(false);
-
-    const cognitoAccountManagementUrl = process.env.NEXT_PUBLIC_COGNITO_ACCOUNT_MANAGEMENT_URL;
+    const [isManagingPasskeys, setIsManagingPasskeys] = useState(false);
 
     const handleStartSetup = async () => {
         setIsGenerating(true);
@@ -124,30 +123,51 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
         }
     };
 
-    const handleManagePasskeys = () => {
-        const baseUrl = process.env.NEXT_PUBLIC_COGNITO_ACCOUNT_MANAGEMENT_URL;
+    const handleManagePasskeys = async () => {
+        setIsManagingPasskeys(true);
+        
+        const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
         const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
         const callbackUrl = process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL;
         const scope = process.env.NEXT_PUBLIC_OAUTH2_SCOPE;
 
-        if (!baseUrl || !clientId || !callbackUrl || !scope) {
+        if (!wellknownUrl || !clientId || !callbackUrl || !scope) {
             toast({
                 variant: 'destructive',
                 title: t('passkeyError.title'),
                 description: t('passkeyError.description'),
             });
+            setIsManagingPasskeys(false);
             return;
         }
 
-        const params = new URLSearchParams({
-            client_id: clientId,
-            redirect_uri: callbackUrl,
-            response_type: 'code',
-            scope: scope,
-        });
-        
-        const finalUrl = `${baseUrl}/add/passkeys?${params.toString()}`;
-        window.location.href = finalUrl;
+        try {
+            const wellknownResponse = await fetch(wellknownUrl);
+            if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID config');
+            const wellknown = await wellknownResponse.json();
+            const authorizationEndpoint = wellknown.authorization_endpoint;
+            if (!authorizationEndpoint) throw new Error('Auth endpoint not in OpenID config');
+    
+            const baseUrl = new URL(authorizationEndpoint).origin;
+    
+            const params = new URLSearchParams({
+                client_id: clientId,
+                redirect_uri: callbackUrl,
+                response_type: 'code',
+                scope: scope,
+            });
+            
+            const finalUrl = `${baseUrl}/add/passkeys?${params.toString()}`;
+            window.location.href = finalUrl;
+        } catch (error) {
+            console.error("Failed to construct passkey management URL:", error);
+            toast({
+                variant: 'destructive',
+                title: t('passkeyError.title'),
+                description: t('passkeyError.description'),
+            });
+            setIsManagingPasskeys(false);
+        }
     };
 
     return (
@@ -270,14 +290,12 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
                                      variant="outline" 
                                      size="sm"
                                      onClick={handleManagePasskeys}
-                                     disabled={!cognitoAccountManagementUrl}
+                                     disabled={isManagingPasskeys}
                                  >
+                                    {isManagingPasskeys && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                     {t('managePasskeys')} <ExternalLink className="ml-2 h-3 w-3" />
                                 </Button>
                             </div>
-                             {(!cognitoAccountManagementUrl && process.env.NODE_ENV === 'development') && (
-                                <p className="text-xs text-muted-foreground pt-2">{t('managementUrlNotConfigured')}</p>
-                            )}
                         </div>
                     </div>
                 </div>
