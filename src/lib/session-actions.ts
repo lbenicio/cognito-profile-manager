@@ -1,3 +1,4 @@
+
 'use server';
 
 import { cookies } from 'next/headers';
@@ -59,12 +60,14 @@ export async function refreshAuthTokens(refreshToken: string): Promise<NewSessio
       refresh_token: tokens.refresh_token || refreshToken,
     };
 
+    const isProd = process.env.NODE_ENV === 'production';
+
     cookies().set('auth_session', JSON.stringify(newSessionData), {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isProd,
       maxAge: 30 * 24 * 60 * 60, // 30 days
       path: '/',
-      sameSite: 'lax',
+      sameSite: isProd ? 'none' : 'lax',
     });
 
     return newSessionData;

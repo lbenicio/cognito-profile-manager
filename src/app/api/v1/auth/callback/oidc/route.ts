@@ -142,14 +142,16 @@ export async function GET(request: NextRequest) {
 
     const dashboardUrl = new URL('/', origin);
     const response = NextResponse.redirect(dashboardUrl);
+    
+    const isProd = process.env.NODE_ENV === 'production';
 
     // Set auth cookie AND clear state cookie on the SAME response object before returning.
     response.cookies.set('auth_session', JSON.stringify(sessionData), {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isProd,
       maxAge: 30 * 24 * 60 * 60, // 30 days
       path: '/',
-      sameSite: 'lax',
+      sameSite: isProd ? 'none' : 'lax',
     });
     
     response.cookies.set('oauth_state', '', { 
