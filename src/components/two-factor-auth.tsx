@@ -157,7 +157,7 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
                 scope: scope,
             });
             
-            const finalUrl = `${baseUrl}/add/passkeys?${params.toString()}`;
+            const finalUrl = `${baseUrl}/passkeys/add?${params.toString()}`;
             window.location.href = finalUrl;
         } catch (error) {
             console.error("Failed to construct passkey management URL:", error);
