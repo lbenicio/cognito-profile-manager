@@ -1,6 +1,6 @@
 'use server';
 
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { redirect } from '@/navigation';
 
 // Action for the main SSO login button
@@ -18,6 +18,10 @@ export async function ssoLogin() {
 
   const authorizationEndpoint = wellknown.authorization_endpoint;
 
+  const host = headers().get('host')!;
+  const hostname = new URL(`http://${host}`).hostname;
+  const domain = hostname === 'localhost' ? undefined : hostname;
+
   // --- CSRF protection ---
   const state = Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('hex');
   cookies().set('oauth_state', state, {
@@ -26,6 +30,7 @@ export async function ssoLogin() {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
+    domain,
   });
 
   const params = new URLSearchParams({
@@ -46,11 +51,17 @@ export async function devAdminLogin() {
     return 'This action is only available in development.';
   }
   const sessionData = { username: 'admin', email: 'sso-admin-dev@example.com' };
+  
+  const host = headers().get('host')!;
+  const hostname = new URL(`http://${host}`).hostname;
+  const domain = hostname === 'localhost' ? undefined : hostname;
+
   cookies().set('auth_session', JSON.stringify(sessionData), {
     httpOnly: true,
     secure: false, // dev only
     maxAge: 60 * 60 * 24 * 7,
     path: '/',
+    domain,
   });
   redirect('/');
 }
@@ -58,10 +69,15 @@ export async function devAdminLogin() {
 // This function is a server action that handles user logout.
 export async function logout() {
   const sessionCookie = cookies().get('auth_session')?.value;
+  
+  const host = headers().get('host')!;
+  const hostname = new URL(`http://${host}`).hostname;
+  const domain = hostname === 'localhost' ? undefined : hostname;
+
   // Destroy the session by clearing the auth cookie.
-  cookies().set('auth_session', '', { expires: new Date(0), path: '/' });
+  cookies().set('auth_session', '', { expires: new Date(0), path: '/', domain });
   // Also clear the oauth state cookie to prevent issues with stale states.
-  cookies().set('oauth_state', '', { expires: new Date(0), path: '/' });
+  cookies().set('oauth_state', '', { expires: new Date(0), path: '/', domain });
   
   // If the session was a real OIDC session, redirect to the Cognito logout endpoint.
   if (sessionCookie && JSON.parse(sessionCookie).id_token) {

@@ -35,6 +35,9 @@ export async function GET(request: NextRequest) {
 
     const response = NextResponse.redirect(passkeyUrl.toString());
 
+    const hostname = request.nextUrl.hostname;
+    const domain = hostname === 'localhost' ? undefined : hostname;
+
     // Set the cookie on the response that redirects the user
     response.cookies.set('oauth_state', state, {
       path: '/',
@@ -42,6 +45,7 @@ export async function GET(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
+      domain,
     });
 
     return response;

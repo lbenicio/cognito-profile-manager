@@ -97,7 +97,9 @@ function redirectToLogin(request: NextRequest, sessionCookie?: any): NextRespons
     const response = NextResponse.redirect(loginUrl);
     
     if (sessionCookie) {
-      response.cookies.set('auth_session', '', { expires: new Date(0), path: '/' });
+      const hostname = request.nextUrl.hostname;
+      const domain = hostname === 'localhost' ? undefined : hostname;
+      response.cookies.set('auth_session', '', { expires: new Date(0), path: '/', domain });
     }
     return response;
 }
@@ -114,6 +116,9 @@ export async function authMiddleware(request: NextRequest): Promise<NextResponse
   }
 
   const isPublicPage = publicPages.includes(pathname as (typeof publicPages)[number]);
+  
+  const hostname = request.nextUrl.hostname;
+  const domain = hostname === 'localhost' ? undefined : hostname;
 
   // Handle mock dev session
   if (process.env.NODE_ENV === 'development' && session?.username && !session.id_token) {
@@ -147,6 +152,7 @@ export async function authMiddleware(request: NextRequest): Promise<NextResponse
             maxAge: 30 * 24 * 60 * 60,
             path: '/',
             sameSite: 'lax',
+            domain: domain,
           });
           return response;
         } else {
