@@ -1,8 +1,9 @@
+
 'use client';
 
 import { useRouter } from '@/navigation';
 import { useTransition } from 'react';
-import { Globe } from 'lucide-react';
+import { Languages } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,7 +34,7 @@ export function LanguageSwitcher({ languageLabel, currentLanguage }: LanguageSwi
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="h-9 w-9" disabled={isPending}>
-          <Globe />
+          <Languages />
           <span className="sr-only">{languageLabel}</span>
         </Button>
       </DropdownMenuTrigger>
