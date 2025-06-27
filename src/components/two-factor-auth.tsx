@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from '@/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +13,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from 'next-intl';
 import type { User } from '@/lib/auth';
 import { generateMfaSetup, verifyAndEnableMfa, disableMfa } from '@/lib/mfa-actions';
-import { getPasskeyAddUrl } from '@/lib/passkey-actions';
 
 interface TwoFactorAuthProps {
     user: User;
@@ -24,6 +23,7 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
     const { toast } = useToast();
     const t = useTranslations('Account.twoFactor');
     const router = useRouter();
+    const searchParams = useSearchParams();
 
     // MFA/TOTP State
     const [showSetup, setShowSetup] = useState(false);
@@ -38,35 +38,35 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
     const [isManagingPasskeys, setIsManagingPasskeys] = useState(false);
 
     useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const result = params.get('result');
-        const error = params.get('error');
-        const errorDescription = params.get('error_description');
+        const result = searchParams.get('result');
+        const error = searchParams.get('error');
+        const errorDescription = searchParams.get('error_description');
 
         if (error || result) {
+            // Clean the URL to prevent the toast from re-appearing on refresh.
             const currentPath = window.location.pathname;
             window.history.replaceState(null, '', currentPath);
-        }
 
-        if (error) {
-            toast({
-                variant: 'destructive',
-                title: t('passkeyError.title'),
-                description: errorDescription || t('passkeyError.generic'),
-            });
-        }
+            if (error) {
+                toast({
+                    variant: 'destructive',
+                    title: t('passkeyError.title'),
+                    description: errorDescription || t('passkeyError.generic'),
+                });
+            }
 
-        if (result === 'success') {
-            toast({
-                title: t('passkeySuccess.title'),
-                description: t('passkeySuccess.description'),
-            });
-            // Optimistically update the UI to show passkeys are enabled.
-            onUpdate({ passkeysEnabled: true });
-            // Refresh server data to ensure consistency on next load.
-            router.refresh();
+            if (result === 'success') {
+                toast({
+                    title: t('passkeySuccess.title'),
+                    description: t('passkeySuccess.description'),
+                });
+                // Optimistically update the UI to show passkeys are enabled.
+                onUpdate({ passkeysEnabled: true });
+                // Refresh server data to ensure consistency on next load.
+                router.refresh();
+            }
         }
-    }, [router, t, toast, onUpdate]);
+    }, [searchParams, router, t, toast, onUpdate]);
 
     const handleStartSetup = async () => {
         setIsGenerating(true);
@@ -159,23 +159,11 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
         }
     };
 
-    const handleAddPasskey = async () => {
+    const handleAddPasskey = () => {
         setIsManagingPasskeys(true);
-        try {
-            const result = await getPasskeyAddUrl();
-            if (result.success && result.url) {
-                window.location.href = result.url;
-            } else {
-                throw new Error(result.message || t('passkeyError.generic'));
-            }
-        } catch (error: any) {
-            toast({
-                variant: 'destructive',
-                title: t('passkeyError.title'),
-                description: error.message || t('passkeyError.generic'),
-            });
-            setIsManagingPasskeys(false);
-        }
+        // This will navigate the user to our API route, which then redirects to Cognito.
+        // This server-side redirect flow ensures the CSRF cookie is set correctly.
+        window.location.href = '/api/v1/auth/passkey/start';
     };
 
     return (
