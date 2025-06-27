@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import type { User as UserType } from '@/lib/auth';
 import { PasswordForm } from '@/components/password-form';
 import { TwoFactorAuth } from '@/components/two-factor-auth';
+import { PasskeyManagement } from './passkey-management';
 
 interface SecurityViewProps {
     initialUser: UserType;
@@ -34,6 +35,7 @@ export function SecurityView({ initialUser, translations }: SecurityViewProps) {
       <div className="max-w-2xl mx-auto flex flex-col gap-8">
           <PasswordForm />
           <TwoFactorAuth user={user} onUpdate={handleProfileUpdate} />
+          <PasskeyManagement user={user} />
       </div>
     </div>
   );

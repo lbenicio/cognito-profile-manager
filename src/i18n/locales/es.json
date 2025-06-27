@@ -213,7 +213,7 @@
     },
     "twoFactor": {
       "title": "Autenticación de Dos Factores",
-      "description": "Añade una capa extra de seguridad a tu cuenta.",
+      "description": "Añade una capa extra de seguridad a tu cuenta con una aplicación de autenticación.",
       "authenticatorApp": "App de Autenticación",
       "statusEnabled": "La aplicación de autenticación está habilitada.",
       "statusDisabled": "Mejora la seguridad de tu cuenta habilitando la autenticación de dos factores.",
@@ -233,29 +233,33 @@
       "mfaDisabledTitle": "App de Autenticación Deshabilitada",
       "mfaDisabledDescription": "La 2FA mediante app de autenticación ha sido deshabilitada.",
       "verificationFailedTitle": "Verificación Fallida",
-      "passkeysTitle": "Passkeys / Llaves de Seguridad",
-      "passkeysDescription": "Usa una passkey para un inicio de sesión seguro y sin contraseña. Esta es la forma más segura de proteger tu cuenta.",
-      "passkeysEnabled": "Las passkeys están habilitadas en tu cuenta.",
-      "passkeysDisabled": "Las passkeys aún no están habilitadas en tu cuenta.",
-      "addPasskeyButton": "Añadir Passkey",
-      "passkeySuccess": {
+      "smsMessagingTitle": "Mensajería SMS",
+      "smsMessagingDescription": "Recibe códigos de verificación por mensaje de texto. Este método es menos seguro que una aplicación de autenticación o passkeys.",
+      "smsMessagingDisabled": "Esta función no está disponible actualmente."
+    },
+    "passkeys": {
+      "title": "Passkeys / Llaves de Seguridad",
+      "description": "Usa una passkey para un inicio de sesión seguro y sin contraseña. Esta es la forma más segura de proteger tu cuenta.",
+      "statusEnabled": "Las passkeys están habilitadas en tu cuenta.",
+      "statusDisabled": "Las passkeys aún no están habilitadas en tu cuenta.",
+      "addButton": "Añadir Passkey",
+      "deleteSuccessTitle": "Passkey Eliminada",
+      "deleteSuccessDescription": "La passkey seleccionada ha sido eliminada de tu cuenta.",
+      "deleteErrorTitle": "Error al Eliminar",
+      "success": {
         "title": "Passkey Actualizada",
         "description": "Tus passkeys han sido gestionadas exitosamente."
       },
-      "passkeyError": {
+      "error": {
         "title": "Acción Fallida",
         "generic": "Algo salió mal. Por favor, inténtalo de nuevo.",
         "configMissing": "Falta la configuración del cliente de Passkey. Por favor, contacta a soporte."
       },
-      "passkeyTable": {
+      "table": {
         "name": "Nombre",
         "addedOn": "Añadido el",
-        "ipAddress": "Dirección IP",
         "actions": "Acciones"
-      },
-      "smsMessagingTitle": "Mensajería SMS",
-      "smsMessagingDescription": "Recibe códigos de verificación por mensaje de texto. Este método es menos seguro que una aplicación de autenticación o passkeys.",
-      "smsMessagingDisabled": "Esta función no está disponible actualmente."
+      }
     }
   },
   "Profile": {

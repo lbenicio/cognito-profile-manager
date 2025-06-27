@@ -213,7 +213,7 @@
     },
     "twoFactor": {
       "title": "Two-Factor Authentication",
-      "description": "Add an extra layer of security to your account.",
+      "description": "Add an extra layer of security to your account with an authenticator app.",
       "authenticatorApp": "Authenticator App",
       "statusEnabled": "Authenticator app is enabled.",
       "statusDisabled": "Enhance your account security by enabling two-factor authentication.",
@@ -233,29 +233,33 @@
       "mfaDisabledTitle": "Authenticator App Disabled",
       "mfaDisabledDescription": "2FA via authenticator app has been disabled.",
       "verificationFailedTitle": "Verification Failed",
-      "passkeysTitle": "Passkeys / Security Keys",
-      "passkeysDescription": "Use a passkey for secure, passwordless sign-in. This is the most secure way to protect your account.",
-      "passkeysEnabled": "Passkeys are enabled on your account.",
-      "passkeysDisabled": "Passkeys are not yet enabled on your account.",
-      "addPasskeyButton": "Add Passkey",
-      "passkeySuccess": {
+      "smsMessagingTitle": "SMS Messaging",
+      "smsMessagingDescription": "Receive verification codes via text message. This method is less secure than an authenticator app or passkeys.",
+      "smsMessagingDisabled": "This feature is currently unavailable."
+    },
+    "passkeys": {
+      "title": "Passkeys / Security Keys",
+      "description": "Use a passkey for secure, passwordless sign-in. This is the most secure way to protect your account.",
+      "statusEnabled": "Passkeys are enabled on your account.",
+      "statusDisabled": "Passkeys are not yet enabled on your account.",
+      "addButton": "Add Passkey",
+      "deleteSuccessTitle": "Passkey Deleted",
+      "deleteSuccessDescription": "The selected passkey has been removed from your account.",
+      "deleteErrorTitle": "Deletion Failed",
+      "success": {
         "title": "Passkey Updated",
         "description": "Your passkeys have been successfully managed."
       },
-      "passkeyError": {
+      "error": {
         "title": "Action Failed",
         "generic": "Something went wrong. Please try again.",
         "configMissing": "Passkey client configuration is missing. Please contact support."
       },
-      "passkeyTable": {
+      "table": {
         "name": "Name",
         "addedOn": "Added On",
-        "ipAddress": "IP Address",
         "actions": "Actions"
-      },
-      "smsMessagingTitle": "SMS Messaging",
-      "smsMessagingDescription": "Receive verification codes via text message. This method is less secure than an authenticator app or passkeys.",
-      "smsMessagingDisabled": "This feature is currently unavailable."
+      }
     }
   },
   "Profile": {

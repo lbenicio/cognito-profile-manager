@@ -1,21 +1,17 @@
 
 'use client';
 
-import { useState, useEffect, useTransition } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { Smartphone, KeyRound, Loader2, Copy, Trash2 } from 'lucide-react';
+import { Smartphone, Loader2, Copy } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from 'next-intl';
 import type { User } from '@/lib/auth';
 import { generateMfaSetup, verifyAndEnableMfa, disableMfa } from '@/lib/mfa-actions';
-import { deletePasskey } from '@/lib/passkey-actions';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { format } from 'date-fns';
 
 
 interface TwoFactorAuthProps {
@@ -26,9 +22,6 @@ interface TwoFactorAuthProps {
 export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
     const { toast } = useToast();
     const t = useTranslations('Security.twoFactor');
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const [isPending, startTransition] = useTransition();
 
     // MFA/TOTP State
     const [showSetup, setShowSetup] = useState(false);
@@ -38,40 +31,6 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
     const [isGenerating, setIsGenerating] = useState(false);
     const [isVerifying, setIsVerifying] = useState(false);
     const [isDisablingMfa, setIsDisablingMfa] = useState(false);
-
-    // Passkey State
-    const [isManagingPasskeys, setIsManagingPasskeys] = useState(false);
-    const [isDeleting, setIsDeleting] = useState<string | null>(null);
-    const [isMounted, setIsMounted] = useState(false);
-
-    useEffect(() => {
-        setIsMounted(true);
-        const result = searchParams.get('result');
-        const error = searchParams.get('error');
-        const errorDescription = searchParams.get('error_description');
-
-        if (error || result) {
-            // Clean the URL to prevent the toast from re-appearing on refresh.
-            const currentPath = window.location.pathname;
-            window.history.replaceState(null, '', currentPath);
-
-            if (error) {
-                toast({
-                    variant: 'destructive',
-                    title: t('passkeyError.title'),
-                    description: errorDescription || t('passkeyError.generic'),
-                });
-            }
-
-            if (result === 'success') {
-                toast({
-                    title: t('passkeySuccess.title'),
-                    description: t('passkeySuccess.description'),
-                });
-                router.refresh();
-            }
-        }
-    }, [searchParams, router, t, toast]);
 
     const handleStartSetup = async () => {
         setIsGenerating(true);
@@ -164,33 +123,6 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
         }
     };
 
-    const handleAddPasskey = () => {
-        setIsManagingPasskeys(true);
-        window.location.href = '/api/v1/auth/passkey/start';
-    };
-
-    const handleDeletePasskey = (key: string) => {
-        startTransition(async () => {
-            setIsDeleting(key);
-            const result = await deletePasskey(key);
-            if (result.success) {
-                toast({
-                    title: 'Passkey Deleted',
-                    description: 'The selected passkey has been removed from your account.',
-                });
-                router.refresh();
-            } else {
-                 toast({
-                    variant: 'destructive',
-                    title: 'Deletion Failed',
-                    description: result.message,
-                });
-            }
-            setIsDeleting(null);
-        });
-    };
-
-
     return (
         <Card>
             <CardHeader>
@@ -200,7 +132,6 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-                {/* Authenticator App Section */}
                 <div className="space-y-2">
                     <div className="flex items-start gap-3">
                         <Smartphone className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
@@ -292,78 +223,22 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
                         </div>
                     </div>
                 </div>
-
-                <Separator />
-
-                {/* Passkeys Section */}
-                 <div className="space-y-4">
+                 <Separator />
+                <div className="space-y-4">
                     <div className="flex items-start gap-3">
-                        <KeyRound className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
+                        <Smartphone className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
                         <div className="w-full space-y-4">
-                            <h4 className="font-medium text-sm">{t('passkeysTitle')}</h4>
+                            <h4 className="font-medium text-sm">{t('smsMessagingTitle')}</h4>
                             <p className="text-sm text-muted-foreground">
-                                {t('passkeysDescription')}
+                                {t('smsMessagingDescription')}
                             </p>
-
-                             {user.devices && user.devices.length > 0 ? (
-                                <div className="space-y-4">
-                                    <p className="text-sm text-green-700 dark:text-green-400">{t('passkeysEnabled')}</p>
-                                    <div className="rounded-md border">
-                                        <Table>
-                                            <TableHeader>
-                                                <TableRow>
-                                                    <TableHead>{t('passkeyTable.name')}</TableHead>
-                                                    <TableHead>{t('passkeyTable.addedOn')}</TableHead>
-                                                    <TableHead className="text-right">{t('passkeyTable.actions')}</TableHead>
-                                                </TableRow>
-                                            </TableHeader>
-                                            <TableBody>
-                                                {user.devices.map((device) => (
-                                                    <TableRow key={device.key}>
-                                                        <TableCell className="font-medium">
-                                                            <div className="flex items-center gap-2">
-                                                                <KeyRound className="h-4 w-4 text-muted-foreground" />
-                                                                <span>{device.name}</span>
-                                                            </div>
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            {isMounted && device.createDate ? format(new Date(device.createDate), "PPP") : '...'}
-                                                        </TableCell>
-                                                        <TableCell className="text-right">
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                onClick={() => handleDeletePasskey(device.key)}
-                                                                disabled={isPending && isDeleting === device.key}
-                                                                aria-label={`Delete passkey ${device.name}`}
-                                                            >
-                                                                {isPending && isDeleting === device.key ? (
-                                                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                                                ) : (
-                                                                    <Trash2 className="h-4 w-4 text-destructive" />
-                                                                )}
-                                                            </Button>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
-                                            </TableBody>
-                                        </Table>
-                                    </div>
-                                </div>
-                            ) : (
-                                <p className="text-sm text-muted-foreground">{t('passkeysDisabled')}</p>
-                            )}
-
-                            <Button variant="outline" size="sm" onClick={handleAddPasskey} disabled={isManagingPasskeys || isPending}>
-                                {(isManagingPasskeys || isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                {t('addPasskeyButton')}
+                            <Button variant="outline" size="sm" disabled>
+                                {t('smsMessagingDisabled')}
                             </Button>
                         </div>
                     </div>
                 </div>
             </CardContent>
         </Card>
-    )
+    );
 }
-
-    
