@@ -10,10 +10,43 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import type { User as UserType } from '@/lib/auth';
 import { useTranslations } from 'next-intl';
 import { format } from 'date-fns';
+import UAParser from 'ua-parser-js';
 
 interface DashboardViewProps {
   user: UserType;
 }
+
+const formatUserAgent = (uaString: string): string => {
+  if (!uaString || uaString === 'Unknown') {
+    return 'Unknown';
+  }
+
+  try {
+    const parser = new UAParser(uaString);
+    const browser = parser.getBrowser();
+    const os = parser.getOS();
+    const device = parser.getDevice();
+  
+    const parts: string[] = [];
+    
+    if (browser.name) {
+      parts.push(browser.name);
+    }
+  
+    if (device.model && device.type !== 'desktop') {
+      parts.push(`on ${device.model}`);
+    } else if (os.name) {
+      parts.push(`on ${os.name}`);
+    }
+    
+    const friendlyString = parts.join(' ');
+    return friendlyString || uaString;
+  } catch (e) {
+    console.error("Could not parse user agent:", e);
+    return uaString; // Fallback to raw string on error
+  }
+};
+
 
 export function DashboardView({ user }: DashboardViewProps) {
   const t = useTranslations('Dashboard');
@@ -126,7 +159,7 @@ export function DashboardView({ user }: DashboardViewProps) {
                     <TableCell>
                       {format(new Date(entry.date), "PPP p")}
                     </TableCell>
-                    <TableCell className="max-w-xs truncate">{entry.device}</TableCell>
+                    <TableCell className="max-w-xs truncate">{formatUserAgent(entry.device)}</TableCell>
                     <TableCell>{entry.ip}</TableCell>
                   </TableRow>
                 ))
