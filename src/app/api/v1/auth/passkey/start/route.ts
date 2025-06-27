@@ -1,0 +1,73 @@
+
+import { NextRequest, NextResponse } from 'next/server';
+import { getSession } from '@/lib/auth';
+import { pathnames } from '@/navigation';
+
+export async function GET(request: NextRequest) {
+  try {
+    // 1. Check for active session
+    const session = await getSession();
+    if (!session) {
+      // Redirect to login if not authenticated
+      const loginUrl = new URL(pathnames['/login'], request.url);
+      loginUrl.searchParams.set('error', 'authentication_required');
+      loginUrl.searchParams.set('error_description', 'You must be logged in to add a passkey.');
+      return NextResponse.redirect(loginUrl);
+    }
+    
+    // 2. Get Cognito configuration
+    const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
+    const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
+    const callbackUrl = process.env.NEXT_PUBLIC_PASSKEY_CALLBACK_URL; // Use the specific passkey callback
+    const scope = 'openid email profile aws.cognito.signin.user.admin';
+
+    if (!wellknownUrl || !clientId) {
+      throw new Error('SSO client configuration is missing.');
+    }
+    
+    if (!callbackUrl) {
+      throw new Error('Missing NEXT_PUBLIC_PASSKEY_CALLBACK_URL env var.');
+    }
+
+    const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
+    if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
+    const wellknown = await wellknownResponse.json();
+    const authorizationEndpoint = wellknown.authorization_endpoint;
+    
+    // 3. CSRF protection
+    const state = Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('hex');
+    
+    const params = new URLSearchParams({
+      client_id: clientId,
+      response_type: 'code',
+      scope: scope,
+      redirect_uri: callbackUrl,
+      state: state,
+    });
+  
+    // 4. Redirect to Cognito
+    const passkeySetupUrl = `${authorizationEndpoint}?${params.toString()}`;
+    const response = NextResponse.redirect(passkeySetupUrl);
+    
+    const isProd = process.env.NODE_ENV === 'production';
+
+    // Set the state cookie on the response
+    response.cookies.set('oauth_state', state, {
+      path: '/',
+      maxAge: 600, // 10 minutes
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
+    });
+
+    return response;
+
+  } catch (error: any) {
+    console.error('Passkey start error:', error);
+    // Redirect back to the security page with an error
+    const securityUrl = new URL(pathnames['/security'], request.url);
+    securityUrl.searchParams.set('error', 'passkey_start_failed');
+    securityUrl.searchParams.set('error_description', error.message || 'Could not start the passkey setup process.');
+    return NextResponse.redirect(securityUrl);
+  }
+}
