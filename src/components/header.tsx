@@ -1,7 +1,8 @@
+
 'use client';
 
 import { Link } from '@/navigation';
-import { LogOut, Settings, LayoutDashboard, Menu, Shield, Contact, CircleUserRound, ShieldCheck } from 'lucide-react';
+import { LogOut, Settings, LayoutDashboard, Menu, Shield, Contact, CircleUserRound, ShieldCheck, Loader2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +25,9 @@ import { ThemeToggle } from './theme-toggle';
 import { LanguageSwitcher } from './language-switcher';
 import type { User as UserType } from '@/lib/auth';
 import { Separator } from '@/components/ui/separator';
+import { useTransition } from 'react';
+import { useToast } from '@/hooks/use-toast';
+
 
 type HeaderTranslations = {
   title: string;
@@ -43,6 +47,32 @@ type HeaderTranslations = {
 export function Header({ user, translations: t }: { user: UserType | null, translations: HeaderTranslations }) {
   const adminDashboardUrl = process.env.NEXT_PUBLIC_ADMIN_DASHBOARD_URL || '#';
   const currentLanguage = user?.preferences?.language || 'en';
+  const [isLoggingOut, startTransition] = useTransition();
+  const { toast } = useToast();
+
+  const handleLogout = () => {
+    startTransition(async () => {
+      try {
+        const response = await fetch('/api/v1/auth/logout');
+        if (response.ok) {
+          const data = await response.json();
+          window.location.href = data.logoutUrl;
+        } else {
+          toast({
+            variant: 'destructive',
+            title: 'Logout Failed',
+            description: 'Could not log out. Please try again.',
+          });
+        }
+      } catch (error) {
+        toast({
+            variant: 'destructive',
+            title: 'Logout Failed',
+            description: 'An error occurred during logout.',
+        });
+      }
+    });
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card shadow-sm">
@@ -116,11 +146,9 @@ export function Header({ user, translations: t }: { user: UserType | null, trans
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild className="cursor-pointer">
-                      <a href="/api/v1/auth/logout">
-                        <LogOut className="mr-2 h-4 w-4" />
-                        <span>{t.userMenu.logout}</span>
-                      </a>
+                    <DropdownMenuItem onClick={handleLogout} disabled={isLoggingOut} className="cursor-pointer">
+                      {isLoggingOut ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogOut className="mr-2 h-4 w-4" />}
+                      <span>{t.userMenu.logout}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -195,11 +223,9 @@ export function Header({ user, translations: t }: { user: UserType | null, trans
                     </nav>
                     <div className="mt-auto p-4 border-t">
                       <SheetClose asChild>
-                        <Button variant="outline" className="w-full justify-start cursor-pointer" asChild>
-                          <a href="/api/v1/auth/logout">
-                            <LogOut className="mr-3 h-4 w-4" />
-                            <span>{t.userMenu.logout}</span>
-                          </a>
+                        <Button variant="outline" className="w-full justify-start cursor-pointer" onClick={handleLogout} disabled={isLoggingOut}>
+                          {isLoggingOut ? <Loader2 className="mr-3 h-4 w-4 animate-spin" /> : <LogOut className="mr-3 h-4 w-4" />}
+                          <span>{t.userMenu.logout}</span>
                         </Button>
                       </SheetClose>
                     </div>

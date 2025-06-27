@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  const response = NextResponse.redirect(logoutUrl);
+  const response = NextResponse.json({ success: true, logoutUrl });
   
   response.cookies.set('auth_session', '', { expires: new Date(0), path: '/' });
   response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
