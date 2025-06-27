@@ -1,16 +1,24 @@
 'use client';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import type { User as UserType } from '@/lib/auth';
+import type { User as UserType, PublicProfilePreferences } from '@/lib/auth';
+import { PublicProfileDisplay } from './public-profile-display';
+import { ProfileSettingsForm } from './profile-settings-form';
 
 interface ProfileViewProps {
     user: UserType;
 }
 
-export function ProfileView({ user }: ProfileViewProps) {
+export function ProfileView({ user: initialUser }: ProfileViewProps) {
+  const [user, setUser] = useState(initialUser);
   const t = useTranslations('Profile');
+
+  const handleUpdate = (newPrefs: PublicProfilePreferences) => {
+    setUser(currentUser => ({
+      ...currentUser,
+      publicProfilePreferences: newPrefs,
+    }));
+  };
 
   return (
     <div className="container mx-auto p-4 md:p-8">
@@ -20,31 +28,15 @@ export function ProfileView({ user }: ProfileViewProps) {
               {t('description')}
           </p>
       </header>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
         <div className="md:col-span-2">
-            <Card>
-                <CardHeader>
-                    <CardTitle>{t('preview.title')}</CardTitle>
-                    <CardDescription>{t('preview.description')}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <p className="text-muted-foreground">{t('preview.comingSoon')}</p>
-                </CardContent>
-            </Card>
+          <PublicProfileDisplay user={user} />
         </div>
         <div className="md:col-span-1">
-            <Card>
-                <CardHeader>
-                    <CardTitle>{t('settings.title')}</CardTitle>
-                    <CardDescription>{t('settings.description')}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <Label htmlFor="profile-visibility" className="flex-grow pr-4">{t('settings.visibilityLabel')}</Label>
-                        <Switch id="profile-visibility" />
-                    </div>
-                </CardContent>
-            </Card>
+          <ProfileSettingsForm 
+            initialPreferences={user.publicProfilePreferences}
+            onUpdate={handleUpdate}
+          />
         </div>
       </div>
     </div>

@@ -1,0 +1,119 @@
+'use client';
+
+import { useState, useTransition } from 'react';
+import { useTranslations } from 'next-intl';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/hooks/use-toast';
+import { Save, Loader2 } from 'lucide-react';
+import type { PublicProfilePreferences } from '@/lib/auth';
+import { updatePublicProfilePreferences } from '@/lib/profile-settings-actions';
+
+interface ProfileSettingsFormProps {
+  initialPreferences: PublicProfilePreferences;
+  onUpdate: (newPrefs: PublicProfilePreferences) => void;
+}
+
+export function ProfileSettingsForm({ initialPreferences, onUpdate }: ProfileSettingsFormProps) {
+  const t = useTranslations('Profile.settings');
+  const { toast } = useToast();
+  const [prefs, setPrefs] = useState(initialPreferences);
+  const [isPending, startTransition] = useTransition();
+
+  const handleIsPublicChange = (value: boolean) => {
+    setPrefs(current => ({ ...current, isPublic: value }));
+  };
+
+  const handleFieldChange = (field: keyof PublicProfilePreferences['publicFields'], value: boolean) => {
+    setPrefs(current => ({
+      ...current,
+      publicFields: {
+        ...current.publicFields,
+        [field]: value,
+      },
+    }));
+  };
+
+  const handleSave = () => {
+    startTransition(async () => {
+      const result = await updatePublicProfilePreferences(prefs);
+      if (result.success) {
+        onUpdate(prefs);
+        toast({
+          title: t('successTitle'),
+          description: t('successDescription'),
+        });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: t('errorTitle'),
+          description: result.message,
+        });
+      }
+    });
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{t('title')}</CardTitle>
+        <CardDescription>{t('description')}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="flex items-start justify-between">
+          <div className="pr-4">
+            <Label htmlFor="profile-visibility">{t('isPublicLabel')}</Label>
+            <p className="text-sm text-muted-foreground">{t('isPublicDescription')}</p>
+          </div>
+          <Switch
+            id="profile-visibility"
+            checked={prefs.isPublic}
+            onCheckedChange={handleIsPublicChange}
+            disabled={isPending}
+          />
+        </div>
+        
+        <div className={`space-y-4 ${!prefs.isPublic ? 'opacity-50' : ''}`}>
+            <Separator />
+            <h4 className="font-semibold">{t('visibleFieldsTitle')}</h4>
+            <div className="flex items-center justify-between">
+                <Label htmlFor="show-email">{t('showEmailLabel')}</Label>
+                <Switch
+                    id="show-email"
+                    checked={prefs.publicFields.email}
+                    onCheckedChange={(value) => handleFieldChange('email', value)}
+                    disabled={isPending || !prefs.isPublic}
+                />
+            </div>
+            <div className="flex items-center justify-between">
+                <Label htmlFor="show-website">{t('showWebsiteLabel')}</Label>
+                <Switch
+                    id="show-website"
+                    checked={prefs.publicFields.website}
+                    onCheckedChange={(value) => handleFieldChange('website', value)}
+                    disabled={isPending || !prefs.isPublic}
+                />
+            </div>
+            <div className="flex items-center justify-between">
+                <Label htmlFor="show-aboutme">{t('showAboutMeLabel')}</Label>
+                <Switch
+                    id="show-aboutme"
+                    checked={prefs.publicFields.aboutMe}
+                    onCheckedChange={(value) => handleFieldChange('aboutMe', value)}
+                    disabled={isPending || !prefs.isPublic}
+                />
+            </div>
+        </div>
+      </CardContent>
+      <CardFooter>
+        <Button onClick={handleSave} disabled={isPending}>
+          {isPending ? <Loader2 className="animate-spin" /> : <Save />}
+          <span className="ml-2">{t('saveButton')}</span>
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}

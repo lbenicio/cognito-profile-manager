@@ -155,16 +155,26 @@
   },
   "Profile": {
     "title": "Perfil Público",
-    "description": "Gestiona la información de tu perfil público.",
+    "description": "Gestiona cómo aparece tu perfil a los demás.",
     "preview": {
-      "title": "Vista Previa del Perfil",
+      "title": "Vista Previa en Vivo",
       "description": "Así es como otros usuarios verán tu perfil.",
-      "comingSoon": "La vista previa del perfil público estará disponible pronto."
+      "isPrivate": "Tu perfil es actualmente privado."
     },
     "settings": {
       "title": "Ajustes del Perfil",
-      "description": "Controla la visibilidad de tu perfil público.",
-      "visibilityLabel": "Hacer perfil público"
+      "description": "Controla qué información es visible en tu perfil público.",
+      "isPublicLabel": "Hacer perfil público",
+      "isPublicDescription": "Permite que otros vean tu perfil.",
+      "visibleFieldsTitle": "Campos Visibles",
+      "showEmailLabel": "Mostrar correo",
+      "showWebsiteLabel": "Mostrar sitio web",
+      "showAboutMeLabel": "Mostrar 'Sobre mí'",
+      "saveButton": "Guardar Ajustes",
+      "successTitle": "Ajustes Guardados",
+      "successDescription": "Los ajustes de tu perfil han sido actualizados.",
+      "errorTitle": "Fallo al Actualizar",
+      "errorDescription": "No se pudieron guardar tus ajustes. Por favor, inténtalo de nuevo."
     }
   },
   "Settings": {

@@ -21,6 +21,15 @@ export type NotificationPreferences = {
   marketing: boolean;
 };
 
+export type PublicProfilePreferences = {
+  isPublic: boolean;
+  publicFields: {
+    email: boolean;
+    website: boolean;
+    aboutMe: boolean;
+  };
+};
+
 export type User = {
   username: string;
   email: string;
@@ -43,6 +52,7 @@ export type User = {
   aboutMe: string;
   preferences: UserPreferences;
   notificationPreferences: NotificationPreferences;
+  publicProfilePreferences: PublicProfilePreferences;
 };
 
 const defaultPreferences: UserPreferences = {
@@ -58,6 +68,15 @@ const defaultNotificationPreferences: NotificationPreferences = {
     user: true,
     system: true,
     marketing: false,
+};
+
+const defaultPublicProfilePreferences: PublicProfilePreferences = {
+  isPublic: false,
+  publicFields: {
+    email: false,
+    website: false,
+    aboutMe: true,
+  },
 };
 
 // Mock user data for development environment
@@ -83,6 +102,7 @@ const mockUser: User = {
   aboutMe: 'This is a mock user bio for the development environment. I enjoy coding and building cool things with Next.js.',
   preferences: defaultPreferences,
   notificationPreferences: defaultNotificationPreferences,
+  publicProfilePreferences: defaultPublicProfilePreferences,
 };
 
 const mockAdminUser: User = {
@@ -184,6 +204,7 @@ export const getUser = cache(async (): Promise<User | null> => {
       aboutMe: (payload['custom:aboutme'] as string) || '',
       preferences: preferences,
       notificationPreferences: { ...defaultNotificationPreferences },
+      publicProfilePreferences: { ...defaultPublicProfilePreferences },
     };
     
     // Now, use the access token to fetch the most up-to-date user attributes from Cognito.
@@ -203,6 +224,7 @@ export const getUser = cache(async (): Promise<User | null> => {
              const freshGivenName = attributes.given_name || '';
              const freshFamilyName = attributes.family_name || '';
              let notificationPreferences: NotificationPreferences = { ...defaultNotificationPreferences };
+             let publicProfilePreferences: PublicProfilePreferences = { ...defaultPublicProfilePreferences };
 
              // Re-parse preferences from the absolute latest data
              if (attributes['custom:session']) {
@@ -213,6 +235,24 @@ export const getUser = cache(async (): Promise<User | null> => {
                      console.error('Failed to parse user preferences from GetUser API call', e);
                  }
              }
+            
+            // Re-parse public profile preferences from the absolute latest data
+            const publicProfileClaim = attributes['custom:public-profile'];
+            if (publicProfileClaim) {
+                try {
+                    const parsedPrefs = JSON.parse(publicProfileClaim);
+                    // Deep merge to handle cases where new fields are added to the defaults later
+                    publicProfilePreferences = {
+                        isPublic: parsedPrefs.isPublic ?? defaultPublicProfilePreferences.isPublic,
+                        publicFields: {
+                            ...defaultPublicProfilePreferences.publicFields,
+                            ...(parsedPrefs.publicFields || {}),
+                        }
+                    };
+                } catch (e) {
+                    console.error('Failed to parse public profile preferences from GetUser API call', e);
+                }
+            }
 
              // Parse notification preferences
              notificationPreferences = {
@@ -242,6 +282,7 @@ export const getUser = cache(async (): Promise<User | null> => {
                 aboutMe: attributes['custom:aboutme'] || user.aboutMe,
                 preferences: preferences,
                 notificationPreferences: notificationPreferences,
+                publicProfilePreferences: publicProfilePreferences,
                 // Crucially, update the custom attributes from the fresh data
                 twoFactorEnabled: attributes['custom:mfa'] === 'true',
                 passkeysEnabled: attributes['custom:pless'] === 'true',

@@ -155,16 +155,26 @@
   },
   "Profile": {
     "title": "Public Profile",
-    "description": "Manage your public-facing profile information.",
+    "description": "Manage how your profile appears to others.",
     "preview": {
-      "title": "Profile Preview",
+      "title": "Live Preview",
       "description": "This is how other users will see your profile.",
-      "comingSoon": "Public profile preview coming soon."
+      "isPrivate": "Your profile is currently private."
     },
     "settings": {
       "title": "Profile Settings",
-      "description": "Control your public profile's visibility.",
-      "visibilityLabel": "Make profile public"
+      "description": "Control what information is visible on your public profile.",
+      "isPublicLabel": "Make profile public",
+      "isPublicDescription": "Allow others to view your profile.",
+      "visibleFieldsTitle": "Visible Fields",
+      "showEmailLabel": "Show email",
+      "showWebsiteLabel": "Show website",
+      "showAboutMeLabel": "Show 'About Me'",
+      "saveButton": "Save Settings",
+      "successTitle": "Settings Saved",
+      "successDescription": "Your profile settings have been updated.",
+      "errorTitle": "Update Failed",
+      "errorDescription": "Could not save your settings. Please try again."
     }
   },
   "Settings": {
