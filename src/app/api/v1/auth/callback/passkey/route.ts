@@ -1,13 +1,19 @@
 
+'use server';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { pathnames } from '@/navigation';
+import { getSession } from '@/lib/auth';
+import { cognitoClient, UpdateUserAttributesCommand } from '@/lib/cognito';
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
   const code = searchParams.get('result');
   const error = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
+  const state = searchParams.get('state');
+  const storedState = request.cookies.get('oauth_state')?.value;
 
   const securityUrl = new URL(pathnames['/security'], origin);
   
@@ -20,20 +26,28 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(securityUrl);
   }
 
-  // The presence of a "code" from Cognito indicates the passkey was added successfully.
   if (!code) {
     console.error('Authorization code missing from passkey callback.');
     securityUrl.searchParams.set('error', 'auth_code_missing');
+    securityUrl.searchParams.set('error_description', 'The operation could not be completed because the authorization code was missing.');
     return NextResponse.redirect(securityUrl);
   }
 
   try {
-    // We don't need to re-validate the user here. The CSRF state check is sufficient.
-    // The successful response from Cognito (with a `code`) confirms the operation succeeded
-    // for the user whose access token was provided in the /start route.
-    
-    // Cognito has already associated the new passkey with the user.
-    // All we need to do is redirect back to the security page.
+    const session = await getSession();
+    if (!session) {
+        throw new Error('User session not found during passkey callback.');
+    }
+
+    // Update user attribute to indicate passkey is set
+    const updateUserAttrCommand = new UpdateUserAttributesCommand({
+        AccessToken: session.access_token,
+        UserAttributes: [{
+            Name: 'custom:pless',
+            Value: 'true',
+        }],
+    });
+    await cognitoClient.send(updateUserAttrCommand);
 
     securityUrl.searchParams.set('result', 'success');
     const response = NextResponse.redirect(securityUrl);
