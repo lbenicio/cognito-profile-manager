@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   const state = searchParams.get('state');
   const storedState = request.cookies.get('oauth_state')?.value;
 
-  const accountUrl = new URL(pathnames['/account'], origin);
+  const securityUrl = new URL(pathnames['/security'], origin);
   
   const clearStateCookie = (response: NextResponse) => {
     response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
@@ -28,26 +28,26 @@ export async function GET(request: NextRequest) {
         queryState: state,
         cookieState: storedState
     });
-    accountUrl.searchParams.set('error', 'invalid_state');
-    accountUrl.searchParams.set('error_description', 'Your session has expired or is invalid. Please try adding the passkey again.');
-    return clearStateCookie(NextResponse.redirect(accountUrl));
+    securityUrl.searchParams.set('error', 'invalid_state');
+    securityUrl.searchParams.set('error_description', 'Your session has expired or is invalid. Please try adding the passkey again.');
+    return clearStateCookie(NextResponse.redirect(securityUrl));
   }
   
   if (error) {
     console.error(`Cognito passkey callback error: ${error} - ${errorDescription}`);
-    accountUrl.searchParams.set('error', error);
+    securityUrl.searchParams.set('error', error);
     if (errorDescription) {
-      accountUrl.searchParams.set('error_description', errorDescription);
+      securityUrl.searchParams.set('error_description', errorDescription);
     }
-    return clearStateCookie(NextResponse.redirect(accountUrl));
+    return clearStateCookie(NextResponse.redirect(securityUrl));
   }
 
   // The presence of a "code" from Cognito indicates the passkey was added successfully.
   // We can now use the user's existing session to update their attributes.
   if (!code) {
     console.error('Authorization code missing from passkey callback.');
-    accountUrl.searchParams.set('error', 'auth_code_missing');
-    return clearStateCookie(NextResponse.redirect(accountUrl));
+    securityUrl.searchParams.set('error', 'auth_code_missing');
+    return clearStateCookie(NextResponse.redirect(securityUrl));
   }
 
   try {
@@ -102,12 +102,12 @@ export async function GET(request: NextRequest) {
     });
     await cognitoClient.send(updateCommand);
     
-    // Redirect to the account page with a success message.
-    accountUrl.searchParams.set('result', 'success');
-    const response = NextResponse.redirect(accountUrl);
+    // Redirect to the security page with a success message.
+    securityUrl.searchParams.set('result', 'success');
+    const response = NextResponse.redirect(securityUrl);
     
     // Revalidate paths to ensure fresh data is shown.
-    revalidatePath(pathnames['/account']);
+    revalidatePath(pathnames['/security']);
     revalidatePath('/');
     
     // Clean up the state cookie and return the redirect response.
@@ -116,8 +116,8 @@ export async function GET(request: NextRequest) {
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
     console.error('Passkey callback handler error:', e);
-    accountUrl.searchParams.set('error', 'passkey_update_failed');
-    accountUrl.searchParams.set('error_description', errorMessage);
-    return clearStateCookie(NextResponse.redirect(accountUrl));
+    securityUrl.searchParams.set('error', 'passkey_update_failed');
+    securityUrl.searchParams.set('error_description', errorMessage);
+    return clearStateCookie(NextResponse.redirect(securityUrl));
   }
 }

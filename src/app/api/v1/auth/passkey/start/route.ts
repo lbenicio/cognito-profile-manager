@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { pathnames } from '@/navigation';
 
 export async function GET(request: NextRequest) {
   try {
@@ -47,9 +48,9 @@ export async function GET(request: NextRequest) {
 
   } catch (error: any) {
     console.error('Passkey start error:', error);
-    const accountUrl = new URL('/account', request.url);
-    accountUrl.searchParams.set('error', 'passkey_start_failed');
-    accountUrl.searchParams.set('error_description', error.message || 'Could not start the passkey process.');
-    return NextResponse.redirect(accountUrl);
+    const securityUrl = new URL(pathnames['/security'], request.url);
+    securityUrl.searchParams.set('error', 'passkey_start_failed');
+    securityUrl.searchParams.set('error_description', error.message || 'Could not start the passkey process.');
+    return NextResponse.redirect(securityUrl);
   }
 }
