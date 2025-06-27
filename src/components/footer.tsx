@@ -47,13 +47,18 @@ export function Footer() {
           </div>
           
           {/* Right side: Sitemap Columns */}
-          <div className="md:col-span-2 grid grid-cols-2 gap-8">
+          <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="font-semibold mb-4">{tSitemap('title')}</h3>
-              <nav className="grid grid-cols-2 gap-x-8 gap-y-2">
+              <h3 className="font-semibold mb-4">{tSitemap('accountColumnTitle')}</h3>
+              <nav className="flex flex-col gap-2">
                 <Link href="/" className="text-sm text-muted-foreground hover:text-primary transition-colors">{tSitemap('dashboard')}</Link>
                 <Link href="/account" className="text-sm text-muted-foreground hover:text-primary transition-colors">{tSitemap('account')}</Link>
                 <Link href="/profile" className="text-sm text-muted-foreground hover:text-primary transition-colors">{tSitemap('profile')}</Link>
+              </nav>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-4">{tSitemap('companyColumnTitle')}</h3>
+              <nav className="flex flex-col gap-2">
                 <Link href="/security" className="text-sm text-muted-foreground hover:text-primary transition-colors">{tSitemap('security')}</Link>
                 <Link href="/settings" className="text-sm text-muted-foreground hover:text-primary transition-colors">{tSitemap('settings')}</Link>
                 <Link href="/contact" className="text-sm text-muted-foreground hover:text-primary transition-colors">{tSitemap('contact')}</Link>
