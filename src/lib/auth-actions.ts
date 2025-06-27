@@ -31,48 +31,56 @@ export async function logout() {
   const host = headers().get('host')!;
   const hostname = new URL(`http://${host}`).hostname;
   const domain = hostname === 'localhost' ? undefined : hostname;
+  
+  // 1. Determine the appropriate logout URL.
+  let logoutUrl = '/login'; // Default/fallback URL
+  let isOidcSession = false;
 
-  // Always destroy the session by clearing the auth cookies first.
+  if (sessionCookie) {
+    try {
+      const sessionData = JSON.parse(sessionCookie);
+      if (sessionData?.id_token) {
+        isOidcSession = true;
+      }
+    } catch {
+      // Malformed cookie, just treat as logged out.
+      isOidcSession = false;
+    }
+  }
+
+  // If it's a real OIDC session, build the Cognito Single-Log-Out URL.
+  if (isOidcSession) {
+    try {
+      const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
+      const callbackUrl = process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL;
+      const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
+
+      if (wellknownUrl && callbackUrl && clientId) {
+        const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
+        if (wellknownResponse.ok) {
+          const wellknown = await wellknownResponse.json();
+          const logoutEndpoint = wellknown.logout_endpoint;
+
+          const logoutRedirectBase = new URL(callbackUrl).origin;
+          const logoutRedirectUri = new URL('/login', logoutRedirectBase).toString();
+
+          const params = new URLSearchParams({
+            client_id: clientId,
+            logout_uri: logoutRedirectUri,
+          });
+          logoutUrl = `${logoutEndpoint}?${params.toString()}`;
+        }
+      }
+    } catch (e) {
+      console.error("Error building Cognito logout URL, falling back to local redirect.", e);
+      // The default logoutUrl = '/login' will be used.
+    }
+  }
+
+  // 2. ALWAYS clear the session cookies.
   cookies().set('auth_session', '', { expires: new Date(0), path: '/', domain });
   cookies().set('oauth_state', '', { expires: new Date(0), path: '/', domain });
 
-  // If there was no session cookie to begin with, just go to login.
-  if (!sessionCookie) {
-    redirect('/login');
-    return;
-  }
-  
-  try {
-    const sessionData = JSON.parse(sessionCookie);
-
-    // If it was a real OIDC session (has an id_token), redirect to Cognito for a full Single-Log-Out.
-    if (sessionData && sessionData.id_token) {
-      const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
-      if (wellknownUrl) {
-          const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
-          if (wellknownResponse.ok) {
-            const wellknown = await wellknownResponse.json();
-            const logoutEndpoint = wellknown.logout_endpoint;
-
-            if (process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL && process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID) {
-              const logoutRedirectBase = new URL(process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL).origin;
-              const logoutRedirectUri = new URL('/login', logoutRedirectBase).toString();
-
-              const params = new URLSearchParams({
-                client_id: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID,
-                logout_uri: logoutRedirectUri,
-              });
-              const logoutUrl = `${logoutEndpoint}?${params.toString()}`;
-              redirect(logoutUrl);
-              return; // Exit after redirecting to Cognito
-            }
-          }
-      }
-    }
-  } catch (e) {
-    console.error("Error during logout, falling back to local redirect.", e);
-  }
-  
-  // Fallback for dev logout or if Cognito logout fails.
-  redirect('/login');
+  // 3. Finally, perform the redirect.
+  redirect(logoutUrl);
 }
