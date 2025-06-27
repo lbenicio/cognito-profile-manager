@@ -1,8 +1,7 @@
 'use server';
 
-import { UpdateUserAttributesCommand } from '@aws-sdk/client-cognito-identity-provider';
 import { revalidatePath } from 'next/cache';
-import { cognitoClient } from './cognito';
+import { cognitoClient, UpdateUserAttributesCommand } from './cognito';
 import { getSession } from './auth';
 
 type UserProfileAttributes = {

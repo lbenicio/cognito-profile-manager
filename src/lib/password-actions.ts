@@ -1,11 +1,11 @@
 'use server';
 
 import {
+  cognitoClient,
   ChangePasswordCommand,
   InvalidPasswordException,
   NotAuthorizedException,
-} from '@aws-sdk/client-cognito-identity-provider';
-import { cognitoClient } from './cognito';
+} from './cognito';
 import { getSession } from './auth';
 
 export async function changePassword(

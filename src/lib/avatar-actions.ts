@@ -6,8 +6,7 @@ import { randomUUID } from 'crypto';
 import { getUser, getSession } from '@/lib/auth';
 import { r2 } from '@/lib/r2';
 import { revalidatePath } from 'next/cache';
-import { cognitoClient } from './cognito';
-import { UpdateUserAttributesCommand } from '@aws-sdk/client-cognito-identity-provider';
+import { cognitoClient, UpdateUserAttributesCommand } from './cognito';
 
 const BUCKET_NAME = process.env.R2_BUCKET_NAME;
 const PUBLIC_URL = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;

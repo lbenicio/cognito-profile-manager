@@ -1,8 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
-import { GetUserCommand, UpdateUserAttributesCommand } from '@aws-sdk/client-cognito-identity-provider';
-import { cognitoClient } from '@/lib/cognito';
+import { cognitoClient, GetUserCommand, UpdateUserAttributesCommand } from '@/lib/cognito';
 import { pathnames } from '@/navigation';
 import { getSession } from '@/lib/auth';
 import UAParser from 'ua-parser-js';

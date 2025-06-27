@@ -4,12 +4,12 @@ import { authenticator } from 'otplib';
 import QRCode from 'qrcode';
 import { revalidatePath } from 'next/cache';
 import {
+  cognitoClient,
   AssociateSoftwareTokenCommand,
   VerifySoftwareTokenCommand,
   SetUserMFAPreferenceCommand,
   UpdateUserAttributesCommand,
-} from '@aws-sdk/client-cognito-identity-provider';
-import { cognitoClient } from './cognito';
+} from './cognito';
 import { getUser, getSession } from './auth';
 
 export async function generateMfaSetup() {

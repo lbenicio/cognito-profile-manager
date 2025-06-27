@@ -1,7 +1,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import { cognitoClient } from '@/lib/cognito';
-import { GetUserCommand, UpdateUserAttributesCommand } from '@aws-sdk/client-cognito-identity-provider';
+import { cognitoClient, GetUserCommand, UpdateUserAttributesCommand } from '@/lib/cognito';
 
 function createErrorResponse(origin: string, error: string, description?: string): NextResponse {
   const loginUrl = new URL('/login', origin);

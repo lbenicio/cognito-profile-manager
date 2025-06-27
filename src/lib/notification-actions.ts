@@ -1,8 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { UpdateUserAttributesCommand } from '@aws-sdk/client-cognito-identity-provider';
-import { cognitoClient } from './cognito';
+import { cognitoClient, UpdateUserAttributesCommand } from './cognito';
 import { getSession, type NotificationPreferences } from './auth';
 
 export async function updateNotificationPreferences(

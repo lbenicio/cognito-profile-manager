@@ -2,8 +2,7 @@ import 'server-only';
 import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
-import { GetUserCommand } from '@aws-sdk/client-cognito-identity-provider';
-import { cognitoClient } from '@/lib/cognito';
+import { cognitoClient, GetUserCommand } from '@/lib/cognito';
 
 // Define the User type, which should match what the components expect.
 export type UserPreferences = {
