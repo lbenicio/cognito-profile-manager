@@ -31,11 +31,11 @@ export function AccountView({ initialUser }: AccountViewProps) {
               {t('description')}
           </p>
       </header>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-1 flex flex-col gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+        <div className="flex flex-col gap-8">
           <AccountDisplay user={user} onUpdate={handleProfileUpdate} />
         </div>
-        <div className="lg:col-span-2 flex flex-col gap-8">
+        <div className="flex flex-col gap-8">
           <AccountForm user={user} onUpdate={handleProfileUpdate} />
           <PasswordForm />
           <TwoFactorAuth user={user} onUpdate={handleProfileUpdate} />

@@ -28,11 +28,11 @@ export function ProfileView({ user: initialUser }: ProfileViewProps) {
               {t('description')}
           </p>
       </header>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-        <div className="md:col-span-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+        <div>
           <PublicProfileDisplay user={user} />
         </div>
-        <div className="md:col-span-1">
+        <div>
           <ProfileSettingsForm 
             initialPreferences={user.publicProfilePreferences}
             onUpdate={handleUpdate}
