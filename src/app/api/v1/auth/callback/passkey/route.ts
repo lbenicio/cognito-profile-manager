@@ -2,7 +2,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { pathnames } from '@/navigation';
-import { getUser } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
@@ -47,11 +46,9 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Calling getUser() first ensures the session is validated and refreshed if necessary.
-    const user = await getUser();
-    if (!user) {
-        throw new Error('User session not found or has expired. Please log in again.');
-    }
+    // We don't need to re-validate the user here. The CSRF state check is sufficient.
+    // The successful response from Cognito (with a `code`) confirms the operation succeeded
+    // for the user whose access token was provided in the /start route.
     
     // Cognito has already associated the new passkey with the user.
     // All we need to do is redirect back to the security page.
