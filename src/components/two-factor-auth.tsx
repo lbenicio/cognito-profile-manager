@@ -38,8 +38,6 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
     const [isManagingPasskeys, setIsManagingPasskeys] = useState(false);
 
     useEffect(() => {
-        // This effect runs once on component mount to check for redirect parameters.
-        // It uses window.location directly for robustness after a hard redirect.
         const params = new URLSearchParams(window.location.search);
         const result = params.get('result');
         const error = params.get('error');
@@ -47,7 +45,6 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
 
         if (error || result) {
             const currentPath = window.location.pathname;
-            // Remove the query parameters from the URL to prevent them from being processed again on refresh.
             window.history.replaceState(null, '', currentPath);
         }
 
@@ -64,11 +61,12 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
                 title: t('passkeySuccess.title'),
                 description: t('passkeySuccess.description'),
             });
-            // Refresh server data. The parent component will receive new props
-            // and update the state, causing the UI to show the new status.
+            // Optimistically update the UI to show passkeys are enabled.
+            onUpdate({ passkeysEnabled: true });
+            // Refresh server data to ensure consistency on next load.
             router.refresh();
         }
-    }, [router, t, toast]);
+    }, [router, t, toast, onUpdate]);
 
     const handleStartSetup = async () => {
         setIsGenerating(true);
