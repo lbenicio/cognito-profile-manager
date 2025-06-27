@@ -71,7 +71,7 @@ export function DashboardView({ user }: DashboardViewProps) {
           </CardContent>
            <div className="p-6 pt-0">
              <Button asChild>
-                <Link href="/profile">{t('manageProfile')} <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                <Link href="/account">{t('manageAccount')} <ArrowRight className="ml-2 h-4 w-4" /></Link>
              </Button>
            </div>
         </Card>
@@ -84,12 +84,12 @@ export function DashboardView({ user }: DashboardViewProps) {
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
                 <Button variant="outline" className="justify-start" asChild>
-                    <Link href="/profile">
+                    <Link href="/account">
                         <KeyRound /> {t('quickActions.changePassword')}
                     </Link>
                 </Button>
                  <Button variant="outline" className="justify-start" asChild>
-                    <Link href="/profile">
+                    <Link href="/account">
                         <ShieldCheck /> {t('quickActions.manageSecurity')}
                     </Link>
                 </Button>

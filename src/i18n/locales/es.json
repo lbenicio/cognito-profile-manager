@@ -29,7 +29,7 @@
       "userBadge": "Usuario",
       "noGroups": "No hay grupos asignados."
     },
-    "manageProfile": "Gestionar Cuenta",
+    "manageAccount": "Gestionar Cuenta",
     "quickActions": {
       "title": "Acciones rápidas",
       "description": "Ajustes y acciones de uso común.",
@@ -42,7 +42,7 @@
     "enabled": "Habilitado",
     "disabled": "Deshabilitado"
   },
-  "Profile": {
+  "Account": {
     "title": "Cuenta",
     "description": "Gestiona tu información personal, ajustes y la seguridad de tu cuenta.",
     "editAvatarTitle": "Editar Avatar",
@@ -89,10 +89,10 @@
       "genderFemale": "Femenino",
       "genderPreferNotToSay": "Prefiero no decirlo",
       "save": "Guardar cambios",
-      "successTitle": "Perfil Actualizado",
-      "successDescription": "Tu perfil ha sido actualizado exitosamente.",
+      "successTitle": "Cuenta Actualizada",
+      "successDescription": "Tu cuenta ha sido actualizada exitosamente.",
       "errorTitle": "Fallo al Actualizar",
-      "errorDescription": "No se pudo actualizar tu perfil. Por favor, inténtalo de nuevo."
+      "errorDescription": "No se pudo actualizar tu cuenta. Por favor, inténtalo de nuevo."
     },
     "passwordForm": {
       "title": "Cambiar Contraseña",
@@ -151,6 +151,20 @@
         "generic": "Algo salió mal. Por favor, inténtalo de nuevo.",
         "configMissing": "Falta la configuración del cliente de Passkey. Por favor, contacta a soporte."
       }
+    }
+  },
+  "Profile": {
+    "title": "Perfil Público",
+    "description": "Gestiona la información de tu perfil público.",
+    "preview": {
+      "title": "Vista Previa del Perfil",
+      "description": "Así es como otros usuarios verán tu perfil.",
+      "comingSoon": "La vista previa del perfil público estará disponible pronto."
+    },
+    "settings": {
+      "title": "Ajustes del Perfil",
+      "description": "Controla la visibilidad de tu perfil público.",
+      "visibilityLabel": "Hacer perfil público"
     }
   },
   "Settings": {

@@ -1,29 +1,16 @@
 'use client';
-import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { ProfileDisplay } from '@/components/profile-display';
-import { ProfileForm } from '@/components/profile-form';
-import { PasswordForm } from '@/components/password-form';
-import { TwoFactorAuth } from '@/components/two-factor-auth';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import type { User as UserType } from '@/lib/auth';
 
 interface ProfileViewProps {
-    initialUser: UserType;
+    user: UserType;
 }
 
-export function ProfileView({ initialUser }: ProfileViewProps) {
-  const [user, setUser] = useState(initialUser);
+export function ProfileView({ user }: ProfileViewProps) {
   const t = useTranslations('Profile');
-
-  // Syncs the component's internal state when the `initialUser` prop changes.
-  // This is crucial for reflecting updates after a server data refresh (e.g., via router.refresh()).
-  useEffect(() => {
-    setUser(initialUser);
-  }, [initialUser]);
-
-  const handleProfileUpdate = (updatedData: Partial<UserType>) => {
-    setUser((prevUser) => ({ ...prevUser, ...updatedData }));
-  };
 
   return (
     <div className="container mx-auto p-4 md:p-8">
@@ -33,14 +20,31 @@ export function ProfileView({ initialUser }: ProfileViewProps) {
               {t('description')}
           </p>
       </header>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-1 flex flex-col gap-8">
-          <ProfileDisplay user={user} onUpdate={handleProfileUpdate} />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="md:col-span-2">
+            <Card>
+                <CardHeader>
+                    <CardTitle>{t('preview.title')}</CardTitle>
+                    <CardDescription>{t('preview.description')}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-muted-foreground">{t('preview.comingSoon')}</p>
+                </CardContent>
+            </Card>
         </div>
-        <div className="lg:col-span-2 flex flex-col gap-8">
-          <ProfileForm user={user} onUpdate={handleProfileUpdate} />
-          <PasswordForm />
-          <TwoFactorAuth user={user} onUpdate={handleProfileUpdate} />
+        <div className="md:col-span-1">
+            <Card>
+                <CardHeader>
+                    <CardTitle>{t('settings.title')}</CardTitle>
+                    <CardDescription>{t('settings.description')}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <Label htmlFor="profile-visibility" className="flex-grow pr-4">{t('settings.visibilityLabel')}</Label>
+                        <Switch id="profile-visibility" />
+                    </div>
+                </CardContent>
+            </Card>
         </div>
       </div>
     </div>

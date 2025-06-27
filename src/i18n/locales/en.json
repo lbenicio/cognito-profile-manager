@@ -29,7 +29,7 @@
       "userBadge": "User",
       "noGroups": "No groups assigned."
     },
-    "manageProfile": "Manage Account",
+    "manageAccount": "Manage Account",
     "quickActions": {
       "title": "Quick Actions",
       "description": "Commonly used settings and actions.",
@@ -42,7 +42,7 @@
     "enabled": "Enabled",
     "disabled": "Disabled"
   },
-  "Profile": {
+  "Account": {
     "title": "Account",
     "description": "Manage your personal information, settings, and account security.",
     "editAvatarTitle": "Edit Avatar",
@@ -89,10 +89,10 @@
       "genderFemale": "Female",
       "genderPreferNotToSay": "Prefer not to say",
       "save": "Save Changes",
-      "successTitle": "Profile Updated",
-      "successDescription": "Your profile has been successfully updated.",
+      "successTitle": "Account Updated",
+      "successDescription": "Your account has been successfully updated.",
       "errorTitle": "Update Failed",
-      "errorDescription": "Could not update your profile. Please try again."
+      "errorDescription": "Could not update your account. Please try again."
     },
     "passwordForm": {
       "title": "Change Password",
@@ -151,6 +151,20 @@
         "generic": "Something went wrong. Please try again.",
         "configMissing": "Passkey client configuration is missing. Please contact support."
       }
+    }
+  },
+  "Profile": {
+    "title": "Public Profile",
+    "description": "Manage your public-facing profile information.",
+    "preview": {
+      "title": "Profile Preview",
+      "description": "This is how other users will see your profile.",
+      "comingSoon": "Public profile preview coming soon."
+    },
+    "settings": {
+      "title": "Profile Settings",
+      "description": "Control your public profile's visibility.",
+      "visibilityLabel": "Make profile public"
     }
   },
   "Settings": {

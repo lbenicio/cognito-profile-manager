@@ -16,7 +16,7 @@ interface AvatarEditorProps {
 }
 
 export function AvatarEditor({ user, onUpdate, onClose }: AvatarEditorProps) {
-  const t = useTranslations('Profile.avatar');
+  const t = useTranslations('Account.avatar');
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(user.picture);

@@ -22,7 +22,7 @@ interface TwoFactorAuthProps {
 
 export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
     const { toast } = useToast();
-    const t = useTranslations('Profile.twoFactor');
+    const t = useTranslations('Account.twoFactor');
     const router = useRouter();
 
     // MFA/TOTP State

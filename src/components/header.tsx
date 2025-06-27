@@ -89,7 +89,7 @@ export function Header({ user, translations: t }: { user: UserType | null, trans
                         </Link>
                     </SheetClose>
                     <SheetClose asChild>
-                        <Link href="/profile" className="text-muted-foreground transition-colors hover:text-primary">
+                        <Link href="/account" className="text-muted-foreground transition-colors hover:text-primary">
                         {t.userMenu.account}
                         </Link>
                     </SheetClose>
@@ -149,7 +149,7 @@ export function Header({ user, translations: t }: { user: UserType | null, trans
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/profile">
+                  <Link href="/account">
                     <CircleUserRound className="mr-2 h-4 w-4" />
                     <span>{t.userMenu.account}</span>
                   </Link>

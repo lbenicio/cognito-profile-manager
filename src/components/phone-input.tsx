@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { countries, type Country } from '@/lib/countries';
@@ -35,7 +35,7 @@ interface PhoneInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElemen
 }
 
 export function PhoneInput({ value, onChange, ...props }: PhoneInputProps) {
-  const t = useTranslations('Profile.form');
+  const t = useTranslations('Account.form');
   const [open, setOpen] = React.useState(false);
 
   const { country, nationalNumber } = React.useMemo(() => parsePhoneNumber(value), [value]);
