@@ -58,11 +58,12 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
                 title: t('passkeySuccess.title'),
                 description: t('passkeySuccess.description'),
             });
+            onUpdate({ passkeysEnabled: true });
             // Clear the query params and refresh data from server
             window.history.replaceState(null, '', currentPath);
             router.refresh();
         }
-    }, [searchParams, toast, t, router]);
+    }, [searchParams, toast, t, router, onUpdate]);
 
     const handleStartSetup = async () => {
         setIsGenerating(true);
@@ -182,10 +183,10 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
             document.cookie = `oauth_state=${state};path=/;max-age=300;samesite=lax`; // 5 min expiry
 
             passkeyUrl.searchParams.set('client_id', clientId);
-            passkeyUrl.searchParams.set('redirect_uri', passkeyCallbackUrl);
             passkeyUrl.searchParams.set('response_type', 'code');
             passkeyUrl.searchParams.set('scope', scope);
             passkeyUrl.searchParams.set('state', state);
+            passkeyUrl.searchParams.set('redirect_uri', passkeyCallbackUrl);
 
             window.location.href = passkeyUrl.toString();
 
