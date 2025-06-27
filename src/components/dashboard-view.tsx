@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Link } from '@/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,6 +51,11 @@ const formatUserAgent = (uaString: string): string => {
 
 export function DashboardView({ user }: DashboardViewProps) {
   const t = useTranslations('Dashboard');
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <div className="container mx-auto p-4 md:p-8 space-y-8">
@@ -157,9 +163,9 @@ export function DashboardView({ user }: DashboardViewProps) {
                 user.fingerprint.slice(0, 5).map((entry, index) => (
                   <TableRow key={index}>
                     <TableCell>
-                      {format(new Date(entry.date), "PPP p")}
+                      {isMounted ? format(new Date(entry.date), "PPP p") : '...'}
                     </TableCell>
-                    <TableCell className="max-w-xs truncate">{formatUserAgent(entry.device)}</TableCell>
+                    <TableCell className="max-w-xs truncate">{isMounted ? formatUserAgent(entry.device) : '...'}</TableCell>
                     <TableCell>{entry.ip}</TableCell>
                   </TableRow>
                 ))
