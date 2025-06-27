@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition, useState } from 'react';
+import { useTransition } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { devAdminLogin } from '@/lib/auth-actions';
@@ -13,13 +13,7 @@ export function LoginView() {
     const t = useTranslations('Login');
     const searchParams = useSearchParams();
     const error = searchParams.get('error');
-    const [isSsoLoading, setIsSsoLoading] = useState(false);
     const [isAdminPending, startAdminTransition] = useTransition();
-
-    const handleSsoLogin = () => {
-        setIsSsoLoading(true);
-        window.location.href = '/api/v1/auth/sso/start';
-    };
 
     const handleAdminLogin = () => {
         startAdminTransition(() => {
@@ -45,23 +39,17 @@ export function LoginView() {
                         </Alert>
                     )}
                     <div className="space-y-4">
-                        <Button
-                            onClick={handleSsoLogin}
-                            disabled={isSsoLoading || isAdminPending}
-                            className="w-full"
-                        >
-                            {isSsoLoading ? (
-                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
-                            ) : (
+                        <Button asChild className="w-full">
+                            <a href='/api/v1/auth/sso/start'>
                                 <LogIn />
-                            )}
-                            <span className="ml-2">{t('signInButton')}</span>
+                                <span className="ml-2">{t('signInButton')}</span>
+                            </a>
                         </Button>
 
                         {process.env.NODE_ENV === 'development' && (
                              <Button
                                 onClick={handleAdminLogin}
-                                disabled={isSsoLoading || isAdminPending}
+                                disabled={isAdminPending}
                                 className="w-full"
                                 variant="secondary"
                             >
