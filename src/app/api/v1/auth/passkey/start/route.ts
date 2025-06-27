@@ -14,7 +14,6 @@ export async function GET(request: NextRequest) {
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
     const passkeyCallbackUrl = process.env.NEXT_PUBLIC_PASSKEY_CALLBACK_URL;
-    const scope = 'openid email profile aws.cognito.signin.user.admin';
 
     if (!wellknownUrl || !clientId) {
       throw new Error('Passkey client configuration is missing.');
@@ -35,12 +34,11 @@ export async function GET(request: NextRequest) {
     const state = Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('hex');
     
     // The access_token is crucial for Cognito to know which user is adding the passkey.
-    // Some providers are sensitive to parameter order, so we construct the URL carefully.
+    // The 'scope' parameter is not needed here as the access_token already contains the granted scopes from login.
     const params = new URLSearchParams({
         access_token: session.access_token,
         client_id: clientId,
         response_type: 'code',
-        scope: scope,
         state: state,
     });
 
