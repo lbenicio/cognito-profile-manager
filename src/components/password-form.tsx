@@ -18,6 +18,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import { KeyRound } from 'lucide-react';
 import React from 'react';
+import { changePassword } from '@/lib/password-actions';
 
 const passwordFormSchema = (t: (key: string) => string) => z.object({
     currentPassword: z.string().min(1, { message: "Current password is required." }),
@@ -47,9 +48,10 @@ export function PasswordForm() {
 
   async function onSubmit(data: PasswordFormValues) {
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const result = await changePassword(data.currentPassword, data.newPassword);
 
-    if (data.currentPassword === 'password123') { 
+    if (result.success) {
         toast({
             title: t('successTitle'),
             description: t('successDescription'),
@@ -59,9 +61,13 @@ export function PasswordForm() {
         toast({
             variant: 'destructive',
             title: t('errorTitle'),
-            description: t('errorDescription'),
+            description: result.message,
         });
-        form.setError("currentPassword", { type: "manual", message: t('incorrectPassword') });
+        if (result.errorType === 'currentPassword') {
+            form.setError("currentPassword", { type: "manual", message: result.message });
+        } else if (result.errorType === 'newPassword') {
+            form.setError("newPassword", { type: "manual", message: result.message });
+        }
     }
     
     setIsSubmitting(false);

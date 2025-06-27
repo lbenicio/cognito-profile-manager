@@ -1,0 +1,48 @@
+'use server';
+
+import {
+  ChangePasswordCommand,
+  InvalidPasswordException,
+  NotAuthorizedException,
+} from '@aws-sdk/client-cognito-identity-provider';
+import { cognitoClient } from './cognito';
+import { getSession } from './auth';
+
+export async function changePassword(
+  currentPassword: string,
+  newPassword: string
+): Promise<{ success: boolean; errorType?: 'currentPassword' | 'newPassword'; message: string }> {
+  const session = await getSession();
+  if (!session?.access_token) {
+    return { success: false, message: 'Not authenticated' };
+  }
+
+  try {
+    const command = new ChangePasswordCommand({
+      AccessToken: session.access_token,
+      PreviousPassword: currentPassword,
+      ProposedPassword: newPassword,
+    });
+    await cognitoClient.send(command);
+    return { success: true, message: 'Password changed successfully.' };
+  } catch (error: any) {
+    console.error('Change Password Error:', error);
+    if (error instanceof NotAuthorizedException) {
+      return {
+        success: false,
+        errorType: 'currentPassword',
+        message:
+          'Incorrect current password. Please try again.',
+      };
+    }
+    if (error instanceof InvalidPasswordException) {
+      // The error message from Cognito is user-friendly, e.g., "Password not long enough"
+      return {
+        success: false,
+        errorType: 'newPassword',
+        message: error.message || 'New password does not meet the security requirements.',
+      };
+    }
+    return { success: false, message: 'An unexpected error occurred while changing the password.' };
+  }
+}
