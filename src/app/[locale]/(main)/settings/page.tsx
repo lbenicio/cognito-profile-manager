@@ -1,11 +1,12 @@
 
 import { AppearanceSettings } from '@/components/appearance-settings';
 import { NotificationSettings } from '@/components/notification-settings';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { getUser } from '@/lib/auth';
 import { redirect } from '@/navigation';
 
 export default async function SettingsPage({params: {locale}}: {params: {locale: string}}) {
+  unstable_setRequestLocale(locale);
   const user = await getUser();
 
   if (!user) {
