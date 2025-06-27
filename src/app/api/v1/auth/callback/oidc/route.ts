@@ -12,11 +12,6 @@ export async function GET(request: NextRequest) {
 
   const loginUrl = new URL('/login', origin);
 
-  const clearStateCookie = (response: NextResponse) => {
-      response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
-      return response;
-  };
-
   // --- CSRF check ---
   if (!state || !storedState || state !== storedState) {
     console.error('OIDC callback state mismatch or state missing.', {
@@ -24,19 +19,25 @@ export async function GET(request: NextRequest) {
         cookieState: storedState
     });
     loginUrl.searchParams.set('error', 'invalid_state');
-    return clearStateCookie(NextResponse.redirect(loginUrl));
+    const response = NextResponse.redirect(loginUrl);
+    response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
+    return response;
   }
   
   if (error) {
     console.error(`OIDC callback error: ${error} - ${errorDescription}`);
     loginUrl.searchParams.set('error', errorDescription || error);
-    return clearStateCookie(NextResponse.redirect(loginUrl));
+    const response = NextResponse.redirect(loginUrl);
+    response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
+    return response;
   }
 
   if (!code) {
     console.error('Authorization code missing from callback.');
     loginUrl.searchParams.set('error', 'auth_code_missing');
-    return clearStateCookie(NextResponse.redirect(loginUrl));
+    const response = NextResponse.redirect(loginUrl);
+    response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
+    return response;
   }
 
   try {
@@ -86,7 +87,9 @@ export async function GET(request: NextRequest) {
       console.error("Failed to exchange code for tokens. Response:", tokens);
       const errorDetails = tokens.error_description || tokens.error || "Token exchange failed.";
       loginUrl.searchParams.set('error', errorDetails);
-      return clearStateCookie(NextResponse.redirect(loginUrl));
+      const response = NextResponse.redirect(loginUrl);
+      response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
+      return response;
     }
 
     // --- Update user fingerprint ---
@@ -137,7 +140,6 @@ export async function GET(request: NextRequest) {
     }
     // --- End fingerprint update ---
 
-    // The session will contain the tokens received from Cognito.
     const sessionData = {
         id_token: tokens.id_token,
         access_token: tokens.access_token,
@@ -145,24 +147,31 @@ export async function GET(request: NextRequest) {
     };
 
     const dashboardUrl = new URL('/', origin);
-    
     const response = NextResponse.redirect(dashboardUrl);
 
+    // Set auth cookie AND clear state cookie on the SAME response object before returning.
     response.cookies.set('auth_session', JSON.stringify(sessionData), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 30 * 24 * 60 * 60, // 30 days; session lifetime is managed by token expiration
+      maxAge: 30 * 24 * 60 * 60, // 30 days
       path: '/',
       sameSite: 'lax',
     });
     
-    return clearStateCookie(response);
+    response.cookies.set('oauth_state', '', { 
+        expires: new Date(0), 
+        path: '/' 
+    });
+
+    return response;
 
   } catch (e) {
     console.error('Callback handler error:', e);
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
     
     loginUrl.searchParams.set('error', errorMessage);
-    return clearStateCookie(NextResponse.redirect(loginUrl));
+    const response = NextResponse.redirect(loginUrl);
+    response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
+    return response;
   }
 }
