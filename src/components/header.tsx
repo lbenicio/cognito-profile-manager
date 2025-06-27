@@ -1,6 +1,5 @@
 'use client';
 
-import { useTransition } from 'react';
 import { Link } from '@/navigation';
 import { LogOut, Settings, LayoutDashboard, Menu, Shield, Contact, CircleUserRound } from 'lucide-react';
 import {
@@ -23,7 +22,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from './theme-toggle';
 import { LanguageSwitcher } from './language-switcher';
-import { logout } from '@/lib/auth-actions';
 import type { User as UserType } from '@/lib/auth';
 import { Separator } from '@/components/ui/separator';
 
@@ -42,14 +40,6 @@ type HeaderTranslations = {
 };
 
 export function Header({ user, translations: t }: { user: UserType | null, translations: HeaderTranslations }) {
-  const [isPending, startTransition] = useTransition();
-
-  const handleLogout = () => {
-    startTransition(() => {
-      logout();
-    });
-  };
-
   const adminDashboardUrl = process.env.NEXT_PUBLIC_ADMIN_DASHBOARD_URL || '#';
   const currentLanguage = user?.preferences?.language || 'en';
 
@@ -119,9 +109,11 @@ export function Header({ user, translations: t }: { user: UserType | null, trans
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onSelect={handleLogout} disabled={isPending} className="cursor-pointer">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>{t.userMenu.logout}</span>
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <a href="/api/v1/auth/logout">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>{t.userMenu.logout}</span>
+                      </a>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -191,9 +183,11 @@ export function Header({ user, translations: t }: { user: UserType | null, trans
                     </nav>
                     <div className="mt-auto p-4 border-t">
                       <SheetClose asChild>
-                        <Button onClick={handleLogout} disabled={isPending} variant="outline" className="w-full justify-start cursor-pointer">
-                          <LogOut className="mr-3 h-4 w-4" />
-                          <span>{t.userMenu.logout}</span>
+                        <Button variant="outline" className="w-full justify-start cursor-pointer" asChild>
+                          <a href="/api/v1/auth/logout">
+                            <LogOut className="mr-3 h-4 w-4" />
+                            <span>{t.userMenu.logout}</span>
+                          </a>
                         </Button>
                       </SheetClose>
                     </div>
