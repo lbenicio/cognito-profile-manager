@@ -178,14 +178,9 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
             // The new callback URL specific to this action
             const passkeyCallbackUrl = new URL('/api/v1/auth/callback/passkey', window.location.origin).toString();
 
-            // CSRF protection: generate and store state
-            const state = crypto.randomUUID();
-            document.cookie = `oauth_state=${state};path=/;max-age=300;samesite=lax`; // 5 min expiry
-
             passkeyUrl.searchParams.set('client_id', clientId);
             passkeyUrl.searchParams.set('response_type', 'code');
             passkeyUrl.searchParams.set('scope', scope);
-            passkeyUrl.searchParams.set('state', state);
             passkeyUrl.searchParams.set('redirect_uri', passkeyCallbackUrl);
 
             window.location.href = passkeyUrl.toString();
