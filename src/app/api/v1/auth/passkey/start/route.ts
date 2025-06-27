@@ -30,20 +30,24 @@ export async function GET(request: NextRequest) {
     const authorizationEndpoint = wellknown.authorization_endpoint;
 
     const cognitoDomain = new URL(authorizationEndpoint).origin;
-    const passkeyUrl = new URL(`${cognitoDomain}/passkeys/add`);
     
     // --- CSRF protection ---
     const state = Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('hex');
     
     // The access_token is crucial for Cognito to know which user is adding the passkey.
-    passkeyUrl.searchParams.set('access_token', session.access_token);
-    passkeyUrl.searchParams.set('client_id', clientId);
-    passkeyUrl.searchParams.set('response_type', 'code');
-    passkeyUrl.searchParams.set('scope', scope);
-    passkeyUrl.searchParams.set('state', state);
-    passkeyUrl.searchParams.set('redirect_uri', passkeyCallbackUrl);
+    // Some providers are sensitive to parameter order, so we construct the URL carefully.
+    const params = new URLSearchParams({
+        access_token: session.access_token,
+        client_id: clientId,
+        response_type: 'code',
+        scope: scope,
+        state: state,
+    });
 
-    const response = NextResponse.redirect(passkeyUrl.toString());
+    // Manually append redirect_uri to ensure it is the last parameter.
+    const passkeyUrlString = `${cognitoDomain}/passkeys/add?${params.toString()}&redirect_uri=${encodeURIComponent(passkeyCallbackUrl)}`;
+
+    const response = NextResponse.redirect(passkeyUrlString);
 
     // Set the cookie on the response that redirects the user
     response.cookies.set('oauth_state', state, {
