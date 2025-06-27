@@ -49,13 +49,15 @@ export async function GET(request: NextRequest) {
 
     const response = NextResponse.redirect(passkeyUrlString);
 
+    const isProd = process.env.NODE_ENV === 'production';
+
     // Set the cookie on the response that redirects the user
     response.cookies.set('oauth_state', state, {
       path: '/',
       maxAge: 600, // 10 minutes
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
     });
 
     return response;
