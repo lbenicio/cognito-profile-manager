@@ -7,7 +7,7 @@ import { format, parseISO } from 'date-fns';
 import { useTranslations } from 'next-intl';
 import type { User } from '@/lib/auth';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AvatarEditor } from './avatar-editor';
 import { Button } from './ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -17,11 +17,20 @@ export function ProfileDisplay({ user, onUpdate }: { user: User, onUpdate: (data
   const tProfile = useTranslations('Profile');
   const tDashboard = useTranslations('Dashboard.profileCard');
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [memberSince, setMemberSince] = useState<string | null>(null);
 
   // Logic for verification actions
   const { toast } = useToast();
   const [emailLoading, setEmailLoading] = useState(false);
   const [phoneLoading, setPhoneLoading] = useState(false);
+
+  useEffect(() => {
+    // This code runs only on the client, after the component has mounted,
+    // ensuring the date is formatted using the client's locale and preventing a mismatch.
+    if (user.creationDate) {
+        setMemberSince(format(parseISO(user.creationDate), "MMMM d, yyyy"));
+    }
+  }, [user.creationDate]);
 
   const handleSendVerificationEmail = async () => {
     setEmailLoading(true);
@@ -148,9 +157,11 @@ export function ProfileDisplay({ user, onUpdate }: { user: User, onUpdate: (data
               <BadgeCheck className="w-4 h-4" />
               <span>{tProfile('display.status', {status: user.userStatus})}</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" style={{minHeight: '20px'}}>
               <CalendarDays className="w-4 h-4" />
-              <span>{tProfile('display.memberSince', {date: format(parseISO(user.creationDate), "MMMM d, yyyy")})}</span>
+              {memberSince && (
+                <span>{tProfile('display.memberSince', {date: memberSince})}</span>
+              )}
           </div>
         </CardFooter>
       </Card>
