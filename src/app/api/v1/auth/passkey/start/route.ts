@@ -7,7 +7,7 @@ import { getSession } from '@/lib/auth';
 export async function GET(request: NextRequest) {
   try {
     const session = await getSession();
-    if (!session?.access_token) {
+    if (!session) {
         throw new Error('User is not authenticated. Cannot start passkey registration.');
     }
 

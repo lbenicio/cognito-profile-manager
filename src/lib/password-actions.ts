@@ -13,7 +13,7 @@ export async function changePassword(
   newPassword: string
 ): Promise<{ success: boolean; errorType?: 'currentPassword' | 'newPassword'; message: string }> {
   const session = await getSession();
-  if (!session?.access_token) {
+  if (!session) {
     return { success: false, message: 'Not authenticated' };
   }
 

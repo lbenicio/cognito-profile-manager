@@ -54,7 +54,7 @@ export async function getPresignedUploadUrl({ type, size }: GetPresignedUrlParam
 
 export async function updateUserAvatar(pictureUrl: string) {
     const session = await getSession();
-    if (!session?.access_token) {
+    if (!session) {
         throw new Error('Not authenticated');
     }
 

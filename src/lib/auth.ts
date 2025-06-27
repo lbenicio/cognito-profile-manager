@@ -79,6 +79,13 @@ export type User = {
   devices: Device[];
 };
 
+export type Session = {
+  id_token: string;
+  access_token: string;
+  refresh_token: string;
+  username?: string; // for dev mode
+} | null;
+
 const defaultPreferences: UserPreferences = {
   theme: 'system',
   language: 'en',
@@ -162,21 +169,65 @@ const mockAdminUser: User = {
 };
 
 
-// This function safely parses the session cookie.
-export const getSession = cache(async () => {
+const getRawSession = cache(async (): Promise<Session> => {
     const sessionCookie = cookies().get('auth_session')?.value;
     if (!sessionCookie) return null;
     try {
         return JSON.parse(sessionCookie);
     } catch {
-        // If the cookie is malformed, treat it as no session.
         return null;
     }
 });
 
+export const getSession = cache(async (): Promise<Session> => {
+    let session = await getRawSession();
+    if (!session) return null;
+
+    // Dev mode mock session doesn't need validation/refresh
+    if (session.username && !session.id_token) {
+        return session;
+    }
+
+    if (!session.id_token) {
+        return null;
+    }
+
+    const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
+    if (!wellknownUrl) {
+      console.error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
+      return null;
+    }
+
+    try {
+        const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
+        if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
+        const wellknown = await wellknownResponse.json();
+        const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
+
+        await jwtVerify(session.id_token, JWKS, {
+            issuer: wellknown.issuer,
+            audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
+        });
+
+        // Token is valid, return current session
+        return session;
+
+    } catch (error: any) {
+        if (error.code === 'ERR_JWT_EXPIRED' && session.refresh_token) {
+            const newSession = await refreshAuthTokens(session.refresh_token);
+            return newSession; // Returns new session on success, or null on failure
+        } else {
+            console.error('JWT validation error, clearing session:', error.message);
+            cookies().set('auth_session', '', { expires: new Date(0), path: '/' });
+            return null;
+        }
+    }
+});
+
+
 // This function is cached per request and retrieves the authenticated user's data.
 export const getUser = cache(async (): Promise<User | null> => {
-  let session = await getSession();
+  const session = await getSession();
 
   // Handle mock development session (which doesn't have an id_token)
   if (process.env.NODE_ENV === 'development' && session?.username && !session?.id_token) {
@@ -185,7 +236,7 @@ export const getUser = cache(async (): Promise<User | null> => {
     return { ...baseUser, email: session.email, username: session.username };
   }
 
-  // If there's no session or no id_token, there's no real user.
+  // If there's no session or no id_token after validation/refresh, there's no real user.
   if (!session?.id_token) {
     return null;
   }
@@ -201,32 +252,8 @@ export const getUser = cache(async (): Promise<User | null> => {
     if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
     const wellknown = await wellknownResponse.json();
     const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
-
-    try {
-        await jwtVerify(session.id_token, JWKS, {
-            issuer: wellknown.issuer,
-            audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
-        });
-    } catch (error: any) {
-        if (error.code === 'ERR_JWT_EXPIRED' && session.refresh_token) {
-            console.log('Access token expired. Attempting refresh...');
-            const newSession = await refreshAuthTokens(session.refresh_token);
-            if (newSession) {
-                console.log('Token refresh successful.');
-                session = newSession; // Continue with the new session
-            } else {
-                console.error('Token refresh failed. Clearing session.');
-                cookies().set('auth_session', '', { expires: new Date(0), path: '/' });
-                return null;
-            }
-        } else {
-            console.error('JWT validation error:', error.message);
-            cookies().set('auth_session', '', { expires: new Date(0), path: '/' });
-            return null;
-        }
-    }
     
-    // If we've reached here, the session is valid (either originally or after a refresh).
+    // We trust the token is valid because getSession() handled it.
     // Now, fetch the most up-to-date user attributes from Cognito.
     const { payload } = await jwtVerify(session.id_token, JWKS);
     const getUserCommand = new GetUserCommand({ AccessToken: session.access_token });

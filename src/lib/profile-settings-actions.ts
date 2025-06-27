@@ -9,7 +9,7 @@ export async function updatePublicProfilePreferences(
 ): Promise<{ success: boolean; message: string }> {
   const session = await getSession();
 
-  if (!session?.access_token) {
+  if (!session) {
     return { success: false, message: 'Not authenticated' };
   }
 

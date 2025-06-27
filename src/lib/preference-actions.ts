@@ -12,7 +12,7 @@ export async function updateUserPreferences(
   const session = await getSession();
   const user = await getUser();
 
-  if (!session?.access_token || !user) {
+  if (!session || !user) {
     return { success: false, message: 'Not authenticated' };
   }
 

@@ -54,7 +54,7 @@ export async function getBannerPresignedUploadUrl({ type, size }: GetPresignedUr
 
 export async function updateUserBanner(bannerUrl: string) {
     const session = await getSession();
-    if (!session?.access_token) {
+    if (!session) {
         throw new Error('Not authenticated');
     }
 

@@ -15,7 +15,7 @@ import { getUser, getSession } from './auth';
 export async function generateMfaSetup() {
   const user = await getUser();
   const session = await getSession();
-  if (!user || !session?.access_token) {
+  if (!user || !session) {
     throw new Error('Not authenticated');
   }
 
@@ -45,7 +45,7 @@ export async function verifyAndEnableMfa(
   code: string
 ): Promise<{ success: boolean; message: string }> {
   const session = await getSession();
-  if (!session?.access_token) {
+  if (!session) {
     throw new Error('Not authenticated');
   }
 
@@ -92,7 +92,7 @@ export async function verifyAndEnableMfa(
 
 export async function disableMfa(): Promise<{ success: boolean; message: string }> {
   const session = await getSession();
-  if (!session?.access_token) {
+  if (!session) {
     throw new Error('Not authenticated');
   }
 
