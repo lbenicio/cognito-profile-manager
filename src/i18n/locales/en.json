@@ -38,7 +38,33 @@
       "userBadge": "User",
       "noGroups": "No groups assigned."
     },
-    "manageAccount": "Manage Account",
+    "editProfileButton": "Edit Profile",
+    "securityHealth": {
+      "title": "Security Health",
+      "description": "Review your account's security status.",
+      "score": "{score}% secure",
+      "manageButton": "Manage Security",
+      "checks": {
+        "email": "Email Verified",
+        "phone": "Phone Verified",
+        "twoFactor": "Authenticator App (2FA)",
+        "passkeys": "Passkeys Enabled"
+      }
+    },
+    "profileCompletion": {
+      "title": "Profile Completion",
+      "description": "Complete your profile to get the most out of Outpost.",
+      "percentage": "{percentage}% complete",
+      "completeProfileButton": "Complete Your Profile",
+      "tasks": {
+        "picture": "Add a profile picture",
+        "banner": "Add a banner image",
+        "aboutMe": "Write 'About Me' bio",
+        "address": "Set your address",
+        "phone": "Add a phone number",
+        "website": "Add your website"
+      }
+    },
     "quickActions": {
       "title": "Quick Actions",
       "description": "Commonly used settings and actions.",

@@ -38,7 +38,33 @@
       "userBadge": "Usuario",
       "noGroups": "No hay grupos asignados."
     },
-    "manageAccount": "Gestionar Cuenta",
+    "editProfileButton": "Editar Perfil",
+    "securityHealth": {
+      "title": "Salud de la Seguridad",
+      "description": "Revisa el estado de seguridad de tu cuenta.",
+      "score": "{score}% seguro",
+      "manageButton": "Gestionar Seguridad",
+      "checks": {
+        "email": "Correo Verificado",
+        "phone": "Teléfono Verificado",
+        "twoFactor": "App de Autenticación (2FA)",
+        "passkeys": "Passkeys Habilitadas"
+      }
+    },
+    "profileCompletion": {
+      "title": "Completitud del Perfil",
+      "description": "Completa tu perfil para aprovechar al máximo Outpost.",
+      "percentage": "{percentage}% completo",
+      "completeProfileButton": "Completa Tu Perfil",
+      "tasks": {
+        "picture": "Añadir foto de perfil",
+        "banner": "Añadir imagen de banner",
+        "aboutMe": "Escribir biografía 'Sobre mí'",
+        "address": "Establecer tu dirección",
+        "phone": "Añadir un número de teléfono",
+        "website": "Añadir tu sitio web"
+      }
+    },
     "quickActions": {
       "title": "Acciones rápidas",
       "description": "Ajustes y acciones de uso común.",

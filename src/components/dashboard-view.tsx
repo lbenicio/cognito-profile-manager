@@ -3,15 +3,16 @@
 import { useState, useEffect } from 'react';
 import { Link } from '@/navigation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, KeyRound, Palette, ShieldCheck, User, Calendar, Server, Smartphone } from 'lucide-react';
+import { ArrowRight, KeyRound, User, Calendar, Server, Smartphone, ShieldCheck, Target, CheckCircle2, XCircle, Users, Mail } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { User as UserType } from '@/lib/auth';
 import { useTranslations } from 'next-intl';
 import { format } from 'date-fns';
 import UAParser from 'ua-parser-js';
+import { Progress } from '@/components/ui/progress';
 
 interface DashboardViewProps {
   user: UserType;
@@ -57,6 +58,28 @@ export function DashboardView({ user }: DashboardViewProps) {
     setIsMounted(true);
   }, []);
 
+  const securityChecklist = {
+    email: user.email_verified,
+    phone: user.phone_number_verified,
+    twoFactor: user.twoFactorEnabled,
+    passkeys: user.passkeysEnabled,
+  };
+  const totalSecurityTasks = Object.keys(securityChecklist).length;
+  const completedSecurityTasks = Object.values(securityChecklist).filter(Boolean).length;
+  const securityScore = Math.round((completedSecurityTasks / totalSecurityTasks) * 100);
+
+  const profileChecklist = {
+    picture: !!user.picture && !user.picture.includes('placehold.co'),
+    banner: !!user.banner && !user.banner.includes('placehold.co'),
+    aboutMe: !!user.aboutMe,
+    address: !!user.address,
+    phone: !!user.phone_number,
+    website: !!user.website,
+  };
+  const totalProfileTasks = Object.keys(profileChecklist).length;
+  const completedProfileTasks = Object.values(profileChecklist).filter(Boolean).length;
+  const profileCompletion = Math.round((completedProfileTasks / totalProfileTasks) * 100);
+
   return (
     <div className="container mx-auto p-4 md:p-8 space-y-8">
       <header className="space-y-2">
@@ -66,11 +89,11 @@ export function DashboardView({ user }: DashboardViewProps) {
         </p>
       </header>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Card */}
         <Card className="lg:col-span-2">
           <CardHeader className="flex flex-row items-center gap-4">
-             <Avatar className="h-12 w-12 sm:h-16 sm:w-16">
+             <Avatar className="h-16 w-16">
                 <AvatarImage src={user.picture || ''} alt={user.name} data-ai-hint="profile picture" />
                 <AvatarFallback>{user.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
              </Avatar>
@@ -79,108 +102,141 @@ export function DashboardView({ user }: DashboardViewProps) {
                 <CardDescription>@{user.username}</CardDescription>
              </div>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-muted-foreground flex items-center gap-2"><User className="h-4 w-4" /> {t('profileCard.email')}</span>
-                    <div className="flex items-center gap-2">
-                        <span className="truncate">{user.email}</span>
-                        {user.email_verified ? (
-                            <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">{t('verified')}</Badge>
-                        ) : (
-                            <Badge variant="destructive">{t('unverified')}</Badge>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-3">
+                <Mail className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                <span className="truncate">{user.email}</span>
+            </div>
+            <div className="flex items-start gap-3">
+                <Users className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
+                <div className="flex-1">
+                    <span className="font-semibold">{t('profileCard.groups')}</span>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                        {user.groups.length > 0 ? user.groups.map(group => (
+                            <Badge key={group} variant="outline">{group}</Badge>
+                        )) : (
+                            <span className="text-muted-foreground">{t('profileCard.noGroups')}</span>
                         )}
                     </div>
                 </div>
-                 <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground flex items-center gap-2"><ShieldCheck className="h-4 w-4" /> {t('profileCard.twoFactorStatus')}</span>
-                    {user.twoFactorEnabled ? (
-                        <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">{t('enabled')}</Badge>
-                    ) : (
-                        <Badge variant="destructive">{t('disabled')}</Badge>
-                    )}
-                </div>
-                <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground flex items-center gap-2"><KeyRound className="h-4 w-4" /> {t('profileCard.passkeyStatus')}</span>
-                    {user.passkeysEnabled ? (
-                        <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">{t('enabled')}</Badge>
-                    ) : (
-                        <Badge variant="destructive">{t('disabled')}</Badge>
-                    )}
-                </div>
             </div>
           </CardContent>
-           <div className="p-6 pt-0">
+           <CardFooter>
              <Button asChild>
-                <Link href="/account">{t('manageAccount')} <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                <Link href="/account">{t('editProfileButton')} <ArrowRight className="ml-2 h-4 w-4" /></Link>
              </Button>
-           </div>
+           </CardFooter>
         </Card>
 
-        {/* Quick Actions Card */}
-        <Card>
+        {/* Security Health Card */}
+        <Card className="flex flex-col">
             <CardHeader>
-                <CardTitle>{t('quickActions.title')}</CardTitle>
-                <CardDescription>{t('quickActions.description')}</CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <ShieldCheck className="text-primary"/>
+                  {t('securityHealth.title')}
+                </CardTitle>
+                <CardDescription>{t('securityHealth.description')}</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col gap-4">
-                <Button variant="outline" className="justify-start" asChild>
-                    <Link href="/account">
-                        <KeyRound /> {t('quickActions.changePassword')}
-                    </Link>
-                </Button>
-                 <Button variant="outline" className="justify-start" asChild>
-                    <Link href="/account">
-                        <ShieldCheck /> {t('quickActions.manageSecurity')}
-                    </Link>
-                </Button>
-                <Button variant="outline" className="justify-start" asChild>
-                    <Link href="/settings">
-                        <Palette /> {t('quickActions.appearanceSettings')}
-                    </Link>
-                </Button>
+            <CardContent className="flex-grow space-y-3">
+                {Object.entries(securityChecklist).map(([key, isComplete]) => (
+                     <div key={key} className="flex items-center text-sm">
+                        {isComplete ? (
+                            <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                        ) : (
+                            <XCircle className="h-4 w-4 mr-2 text-muted-foreground" />
+                        )}
+                        <span className={isComplete ? 'text-foreground' : 'text-muted-foreground'}>
+                            {t(`securityHealth.checks.${key}`)}
+                        </span>
+                    </div>
+                ))}
             </CardContent>
+           <CardFooter className="flex-col items-start gap-4">
+              <div className="text-center w-full">
+                <p className="text-2xl font-bold">{t('securityHealth.score', {score: securityScore})}</p>
+              </div>
+              <Button asChild className="w-full">
+                <Link href="/security">{t('securityHealth.manageButton')}</Link>
+              </Button>
+           </CardFooter>
         </Card>
       </div>
 
-      {/* Login History Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('loginHistory.title')}</CardTitle>
-          <CardDescription>{t('loginHistory.description')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead><Calendar className="inline-block mr-2 h-4 w-4" />{t('loginHistory.date')}</TableHead>
-                <TableHead><Smartphone className="inline-block mr-2 h-4 w-4" />{t('loginHistory.device')}</TableHead>
-                <TableHead><Server className="inline-block mr-2 h-4 w-4" />{t('loginHistory.ipAddress')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {user.fingerprint && user.fingerprint.length > 0 ? (
-                user.fingerprint.slice(0, 5).map((entry, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      {isMounted ? format(new Date(entry.date), "PPP p") : '...'}
-                    </TableCell>
-                    <TableCell className="max-w-xs truncate">{isMounted ? formatUserAgent(entry.device) : '...'}</TableCell>
-                    <TableCell>{entry.ip}</TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={3} className="text-center text-muted-foreground">
-                    {t('loginHistory.noHistory')}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Profile Completion Card */}
+        <Card className="flex flex-col">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="text-primary"/>
+                  {t('profileCompletion.title')}
+                </CardTitle>
+                <CardDescription>{t('profileCompletion.description')}</CardDescription>
+            </CardHeader>
+            <CardContent className="flex-grow space-y-4">
+                <div className="flex items-center gap-4">
+                  <Progress value={profileCompletion} className="w-full" />
+                  <span className="font-bold">{t('profileCompletion.percentage', {percentage: profileCompletion})}</span>
+                </div>
+                <div className="space-y-2">
+                  {Object.entries(profileChecklist).map(([key, isComplete]) => (
+                     <div key={key} className="flex items-center text-sm">
+                        {isComplete ? (
+                            <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />
+                        ) : (
+                            <XCircle className="h-4 w-4 mr-2 text-muted-foreground" />
+                        )}
+                        <span className={isComplete ? 'text-foreground' : 'text-muted-foreground'}>
+                            {t(`profileCompletion.tasks.${key}`)}
+                        </span>
+                    </div>
+                  ))}
+                </div>
+            </CardContent>
+           <CardFooter>
+              <Button asChild className="w-full" variant="outline">
+                <Link href="/account">{t('profileCompletion.completeProfileButton')}</Link>
+              </Button>
+           </CardFooter>
+        </Card>
 
+        {/* Login History Card */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>{t('loginHistory.title')}</CardTitle>
+            <CardDescription>{t('loginHistory.description')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead><Calendar className="inline-block mr-2 h-4 w-4" />{t('loginHistory.date')}</TableHead>
+                  <TableHead><Smartphone className="inline-block mr-2 h-4 w-4" />{t('loginHistory.device')}</TableHead>
+                  <TableHead><Server className="inline-block mr-2 h-4 w-4" />{t('loginHistory.ipAddress')}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {user.fingerprint && user.fingerprint.length > 0 ? (
+                  user.fingerprint.slice(0, 5).map((entry, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        {isMounted ? format(new Date(entry.date), "PPP p") : '...'}
+                      </TableCell>
+                      <TableCell className="max-w-xs truncate">{isMounted ? formatUserAgent(entry.device) : '...'}</TableCell>
+                      <TableCell>{entry.ip}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center text-muted-foreground">
+                      {t('loginHistory.noHistory')}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
