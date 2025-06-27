@@ -89,6 +89,15 @@
       "ipAddress": "IP Address",
       "noHistory": "No login history available."
     },
+    "sessionInfo": {
+      "title": "Session Information",
+      "description": "Details about your current login session.",
+      "startedAt": "Session Started",
+      "expiresIn": "Time until refresh",
+      "currentDevice": "Current Device",
+      "ipAddress": "IP Address",
+      "expired": "Expired"
+    },
     "verified": "Verified",
     "unverified": "Unverified",
     "enabled": "Enabled",

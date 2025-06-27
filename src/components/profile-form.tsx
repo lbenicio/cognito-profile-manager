@@ -25,6 +25,8 @@ import { TimezoneSelect } from './timezone-select';
 import { PhoneInput } from './phone-input';
 import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { DatePicker } from './ui/date-picker';
+import { format } from 'date-fns';
 
 const profileFormSchema = (t: (key: string) => string) => z.object({
   given_name: z.string().min(1, { message: t('givenNameRequired') }).max(50),
@@ -33,6 +35,7 @@ const profileFormSchema = (t: (key: string) => string) => z.object({
   phone_number: z.string().refine((phone) => /^\+[1-9]\d{7,14}$/.test(phone), {
     message: t('phoneInvalid'),
   }),
+  birthdate: z.date().optional(),
   website: z.string().url({ message: 'Please enter a valid URL.' }).or(z.literal('')).optional(),
   zoneinfo: z.string().max(50).optional(),
   gender: z.string().optional(),
@@ -58,6 +61,7 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
       family_name: '',
       address: user.address || '',
       phone_number: user.phone_number || '',
+      birthdate: user.birthdate ? new Date(user.birthdate) : undefined,
       website: user.website || '',
       zoneinfo: user.zoneinfo || '',
       gender: user.gender || '',
@@ -76,6 +80,7 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
         family_name,
         address: user.address,
         phone_number: user.phone_number,
+        birthdate: user.birthdate ? new Date(user.birthdate) : undefined,
         website: user.website,
         zoneinfo: user.zoneinfo,
         gender: user.gender,
@@ -89,6 +94,7 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
     try {
         const result = await updateUserProfile({
             ...data,
+            birthdate: data.birthdate ? format(data.birthdate, 'yyyy-MM-dd') : '',
             website: data.website || '',
             zoneinfo: data.zoneinfo || '',
             gender: data.gender || '',
@@ -100,6 +106,7 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
                 name: `${data.given_name} ${data.family_name}`.trim(),
                 address: data.address,
                 phone_number: data.phone_number,
+                birthdate: data.birthdate ? format(data.birthdate, 'yyyy-MM-dd') : undefined,
                 website: data.website,
                 zoneinfo: data.zoneinfo,
                 gender: data.gender,
@@ -234,6 +241,23 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
                   )}
                 />
             </div>
+             <FormField
+              control={form.control}
+              name="birthdate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>{t('birthdateLabel')}</FormLabel>
+                  <FormControl>
+                    <DatePicker
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder={t('birthdatePlaceholder')}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="website"

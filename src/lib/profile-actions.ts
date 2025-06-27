@@ -7,8 +7,9 @@ import { getSession } from './auth';
 type UserProfileAttributes = {
     given_name: string;
     family_name: string;
+    address: string;
     phone_number: string;
-    birthdate: string;
+    birthdate?: string;
     website: string;
     zoneinfo: string;
     gender: string;
@@ -22,20 +23,28 @@ export async function updateUserProfile(data: UserProfileAttributes): Promise<{ 
     }
 
     try {
+        const attributesToUpdate = [
+            { Name: 'given_name', Value: data.given_name },
+            { Name: 'family_name', Value: data.family_name },
+            { Name: 'phone_number', Value: data.phone_number },
+            { Name: 'website', Value: data.website },
+            { Name: 'zoneinfo', Value: data.zoneinfo },
+            { Name: 'gender', Value: data.gender },
+            { Name: 'custom:aboutme', Value: data.aboutMe },
+            { Name: 'name', Value: `${data.given_name} ${data.family_name}`.trim() },
+        ];
+
+        if (data.birthdate) {
+            attributesToUpdate.push({ Name: 'birthdate', Value: data.birthdate });
+        }
+        if (data.address) {
+            attributesToUpdate.push({ Name: 'address', Value: data.address });
+        }
+
+
         const command = new UpdateUserAttributesCommand({
             AccessToken: session.access_token,
-            UserAttributes: [
-                { Name: 'given_name', Value: data.given_name },
-                { Name: 'family_name', Value: data.family_name },
-                { Name: 'phone_number', Value: data.phone_number },
-                { Name: 'birthdate', Value: data.birthdate },
-                { Name: 'website', Value: data.website },
-                { Name: 'zoneinfo', Value: data.zoneinfo },
-                { Name: 'gender', Value: data.gender },
-                { Name: 'custom:aboutme', Value: data.aboutMe },
-                // We combine given and family name for the 'name' attribute which is often used for display
-                { Name: 'name', Value: `${data.given_name} ${data.family_name}`.trim() },
-            ],
+            UserAttributes: attributesToUpdate,
         });
         await cognitoClient.send(command);
 

@@ -13,6 +13,7 @@ import { useTranslations } from 'next-intl';
 import { format } from 'date-fns';
 import UAParser from 'ua-parser-js';
 import { Progress } from '@/components/ui/progress';
+import { SessionInfoCard } from './session-info-card';
 
 interface DashboardViewProps {
   user: UserType;
@@ -176,6 +177,8 @@ export function DashboardView({ user }: DashboardViewProps) {
         </div>
         
         <div className="lg:col-span-1 space-y-8">
+            <SessionInfoCard user={user} />
+
             {/* Security Health Card */}
             <Card className="flex flex-col">
                 <CardHeader>

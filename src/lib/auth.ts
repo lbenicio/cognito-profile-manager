@@ -81,6 +81,8 @@ export type User = {
   publicProfilePreferences: PublicProfilePreferences;
   fingerprint: Fingerprint[];
   devices: Device[];
+  sessionStartedAt: number; // Unix timestamp (seconds)
+  sessionExpiresAt: number; // Unix timestamp (seconds)
 };
 
 export type Session = {
@@ -123,6 +125,8 @@ const defaultPublicProfilePreferences: PublicProfilePreferences = {
   },
 };
 
+const nowInSeconds = Math.floor(Date.now() / 1000);
+
 // Mock user data for development environment
 const mockUser: User = {
   sub: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
@@ -162,6 +166,8 @@ const mockUser: User = {
         lastAuthDate: new Date(Date.now() - 86400000 * 2),
     }
   ],
+  sessionStartedAt: nowInSeconds,
+  sessionExpiresAt: nowInSeconds + 3600, // Expires in 1 hour
 };
 
 const mockAdminUser: User = {
@@ -400,6 +406,8 @@ export const getUser = cache(async (): Promise<User | null> => {
       publicProfilePreferences: publicProfilePreferences,
       fingerprint: fingerprintData,
       devices: devices,
+      sessionStartedAt: (payload.auth_time as number),
+      sessionExpiresAt: (payload.exp as number),
     };
 
   } catch (error: any) {

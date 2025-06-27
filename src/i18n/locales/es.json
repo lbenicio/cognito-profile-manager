@@ -89,6 +89,15 @@
       "ipAddress": "Dirección IP",
       "noHistory": "No hay historial de inicio de sesión disponible."
     },
+    "sessionInfo": {
+      "title": "Información de la Sesión",
+      "description": "Detalles sobre tu sesión de inicio de sesión actual.",
+      "startedAt": "Sesión Iniciada",
+      "expiresIn": "Tiempo hasta refrescar",
+      "currentDevice": "Dispositivo Actual",
+      "ipAddress": "Dirección IP",
+      "expired": "Expirada"
+    },
     "verified": "Verificado",
     "unverified": "No verificado",
     "enabled": "Habilitado",
