@@ -1,13 +1,14 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
-import { UpdateUserAttributesCommand } from '@aws-sdk/client-cognito-identity-provider';
+import { GetUserCommand, UpdateUserAttributesCommand } from '@aws-sdk/client-cognito-identity-provider';
 import { cognitoClient } from '@/lib/cognito';
 import { pathnames } from '@/navigation';
 import { getSession } from '@/lib/auth';
+import UAParser from 'ua-parser-js';
 
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = request;
+  const { searchParams, origin } = request.nextUrl;
   const code = searchParams.get('code');
   const error = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
@@ -55,10 +56,49 @@ export async function GET(request: NextRequest) {
         throw new Error('User session not found or access token missing.');
     }
 
-    // Use the existing access token to update the user attribute
+    // Get current user attributes to append to the passkeys list
+    const getUserCommand = new GetUserCommand({ AccessToken: session.access_token });
+    const cognitoUser = await cognitoClient.send(getUserCommand);
+    const attributes = cognitoUser.UserAttributes?.reduce((acc, attr) => {
+        if (attr.Name && attr.Value) {
+            acc[attr.Name] = attr.Value;
+        }
+        return acc;
+    }, {} as Record<string, string>);
+
+    // Prepare new passkey info
+    const uaString = request.headers.get('user-agent') ?? 'Unknown';
+    const parser = new UAParser(uaString);
+    const browser = parser.getBrowser();
+    const os = parser.getOS();
+    const passkeyName = (browser.name && os.name) ? `${browser.name} on ${os.name}` : 'New Passkey';
+
+    const newPasskeyInfo = {
+        name: passkeyName,
+        date: new Date().toISOString(),
+        ip: request.ip ?? 'Unknown',
+        userAgent: uaString,
+    };
+
+    // Get existing passkeys and add the new one
+    let passkeys = [];
+    const existingPasskeysRaw = attributes?.['custom:passkeys'];
+    if (existingPasskeysRaw) {
+        try {
+            passkeys = JSON.parse(existingPasskeysRaw);
+        } catch {
+            // Ignore if parsing fails, start fresh
+        }
+    }
+    passkeys.unshift(newPasskeyInfo); // Add to the beginning of the array
+
+    // Use the existing access token to update the user attributes
     const updateCommand = new UpdateUserAttributesCommand({
       AccessToken: session.access_token,
-      UserAttributes: [{ Name: 'custom:pless', Value: 'true' }],
+      UserAttributes: [
+        { Name: 'custom:pless', Value: 'true' },
+        { Name: 'custom:passkeys', Value: JSON.stringify(passkeys) },
+      ],
     });
     await cognitoClient.send(updateCommand);
     

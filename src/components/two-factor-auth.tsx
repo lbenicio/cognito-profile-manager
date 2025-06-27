@@ -13,6 +13,9 @@ import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from 'next-intl';
 import type { User } from '@/lib/auth';
 import { generateMfaSetup, verifyAndEnableMfa, disableMfa } from '@/lib/mfa-actions';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { format } from 'date-fns';
+
 
 interface TwoFactorAuthProps {
     user: User;
@@ -276,14 +279,43 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
                         <KeyRound className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
                         <div className="w-full space-y-4">
                             <h4 className="font-medium text-sm">{t('passkeysTitle')}</h4>
-                             {user.passkeysEnabled ? (
-                                <p className="text-sm text-green-700 dark:text-green-400">{t('passkeysEnabled')}</p>
-                            ) : (
-                                <p className="text-sm text-muted-foreground">{t('passkeysDisabled')}</p>
-                            )}
                             <p className="text-sm text-muted-foreground">
                                 {t('passkeysDescription')}
                             </p>
+
+                             {user.passkeys && user.passkeys.length > 0 ? (
+                                <div className="space-y-4">
+                                    <p className="text-sm text-green-700 dark:text-green-400">{t('passkeysEnabled')}</p>
+                                    <div className="rounded-md border">
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead>{t('passkeyTable.name')}</TableHead>
+                                                    <TableHead>{t('passkeyTable.addedOn')}</TableHead>
+                                                    <TableHead className="hidden md:table-cell">{t('passkeyTable.ipAddress')}</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {user.passkeys.map((passkey, index) => (
+                                                    <TableRow key={index}>
+                                                        <TableCell className="font-medium">
+                                                            <div className="flex items-center gap-2">
+                                                                <KeyRound className="h-4 w-4 text-muted-foreground" />
+                                                                <span>{passkey.name}</span>
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell>{format(new Date(passkey.date), "PPP")}</TableCell>
+                                                        <TableCell className="hidden md:table-cell">{passkey.ip}</TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                </div>
+                            ) : (
+                                <p className="text-sm text-muted-foreground">{t('passkeysDisabled')}</p>
+                            )}
+
                             <Button variant="outline" size="sm" onClick={handleAddPasskey} disabled={isManagingPasskeys}>
                                 {isManagingPasskeys && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 {t('addPasskeyButton')}

@@ -44,6 +44,13 @@ export type Fingerprint = {
   device: string;
 };
 
+export type PasskeyInfo = {
+  name: string;
+  date: string; // ISO string
+  ip: string;
+  userAgent: string;
+};
+
 export type User = {
   username: string;
   email: string;
@@ -69,6 +76,7 @@ export type User = {
   notificationPreferences: NotificationPreferences;
   publicProfilePreferences: PublicProfilePreferences;
   fingerprint: Fingerprint[];
+  passkeys: PasskeyInfo[];
 };
 
 const defaultPreferences: UserPreferences = {
@@ -131,6 +139,14 @@ const mockUser: User = {
   fingerprint: [
     { date: new Date().toISOString(), ip: '127.0.0.1', device: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36' },
     { date: new Date(Date.now() - 86400000).toISOString(), ip: '192.168.1.1', device: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1' },
+  ],
+  passkeys: [
+    {
+        name: 'Chrome on macOS',
+        date: new Date(Date.now() - 86400000 * 2).toISOString(),
+        ip: '127.0.0.1',
+        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    }
   ],
 };
 
@@ -236,6 +252,7 @@ export const getUser = cache(async (): Promise<User | null> => {
       notificationPreferences: { ...defaultNotificationPreferences },
       publicProfilePreferences: { ...defaultPublicProfilePreferences },
       fingerprint: [],
+      passkeys: [],
     };
     
     // Now, use the access token to fetch the most up-to-date user attributes from Cognito.
@@ -304,6 +321,16 @@ export const getUser = cache(async (): Promise<User | null> => {
                      console.error('Failed to parse user fingerprint from GetUser API call', e);
                  }
              }
+             
+             let passkeysData: PasskeyInfo[] = [];
+             const passkeysClaim = attributes['custom:passkeys'];
+             if (passkeysClaim) {
+                 try {
+                     passkeysData = JSON.parse(passkeysClaim);
+                 } catch (e) {
+                     console.error('Failed to parse user passkeys from GetUser API call', e);
+                 }
+             }
 
              user = {
                 ...user,
@@ -326,6 +353,7 @@ export const getUser = cache(async (): Promise<User | null> => {
                 notificationPreferences: notificationPreferences,
                 publicProfilePreferences: publicProfilePreferences,
                 fingerprint: fingerprintData,
+                passkeys: passkeysData,
                 // Crucially, update the custom attributes from the fresh data
                 twoFactorEnabled: attributes['custom:mfa'] === 'true',
                 passkeysEnabled: attributes['custom:pless'] === 'true',

@@ -207,6 +207,11 @@
         "title": "Action Failed",
         "generic": "Something went wrong. Please try again.",
         "configMissing": "Passkey client configuration is missing. Please contact support."
+      },
+      "passkeyTable": {
+        "name": "Name",
+        "addedOn": "Added On",
+        "ipAddress": "IP Address"
       }
     }
   },

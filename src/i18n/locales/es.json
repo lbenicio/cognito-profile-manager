@@ -207,6 +207,11 @@
         "title": "Acción Fallida",
         "generic": "Algo salió mal. Por favor, inténtalo de nuevo.",
         "configMissing": "Falta la configuración del cliente de Passkey. Por favor, contacta a soporte."
+      },
+      "passkeyTable": {
+        "name": "Nombre",
+        "addedOn": "Añadido el",
+        "ipAddress": "Dirección IP"
       }
     }
   },
