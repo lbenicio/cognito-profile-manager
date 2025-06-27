@@ -350,7 +350,7 @@ export const getUser = cache(async (): Promise<User | null> => {
       creationDate: new Date((payload.auth_time as number) * 1000).toISOString(),
       userStatus: cognitoUser.UserStatus || 'CONFIRMED',
       twoFactorEnabled: attributes['custom:mfa'] === 'true',
-      passkeysEnabled: devices.length > 0,
+      passkeysEnabled: attributes['custom:pless'] === 'true',
       groups: groups,
       isAdmin: isAdmin,
       picture: attributes.picture || (payload.picture as string) || '',

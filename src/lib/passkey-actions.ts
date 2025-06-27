@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { cognitoClient, ForgetDeviceCommand } from './cognito';
+import { cognitoClient, ForgetDeviceCommand, ListDevicesCommand, UpdateUserAttributesCommand } from './cognito';
 import { getSession } from './auth';
 
 export async function deletePasskey(
@@ -17,11 +17,30 @@ export async function deletePasskey(
   }
 
   try {
-    const command = new ForgetDeviceCommand({
+    const forgetCommand = new ForgetDeviceCommand({
       AccessToken: session.access_token,
       DeviceKey: deviceKey,
     });
-    await cognitoClient.send(command);
+    await cognitoClient.send(forgetCommand);
+
+    // After deleting, check if any devices remain.
+    const listDevicesCommand = new ListDevicesCommand({
+        AccessToken: session.access_token,
+        Limit: 1, // We just need to know if the list is empty or not
+    });
+    const devicesResponse = await cognitoClient.send(listDevicesCommand);
+
+    if (!devicesResponse.Devices || devicesResponse.Devices.length === 0) {
+        // If no devices are left, update the custom attribute.
+        const updateUserAttrCommand = new UpdateUserAttributesCommand({
+            AccessToken: session.access_token,
+            UserAttributes: [{
+                Name: 'custom:pless',
+                Value: 'false',
+            }],
+        });
+        await cognitoClient.send(updateUserAttrCommand);
+    }
 
     // Revalidate the security page to force a refetch of the device list.
     revalidatePath('/security');
