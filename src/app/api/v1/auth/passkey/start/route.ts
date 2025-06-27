@@ -1,14 +1,15 @@
 
+'use server';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { pathnames } from '@/navigation';
 
 export async function GET(request: NextRequest) {
   try {
-    // 1. Check for active session
+    // 1. Check for active session with a valid ID token
     const session = await getSession();
-    if (!session) {
-      // Redirect to login if not authenticated
+    if (!session?.id_token) {
       const loginUrl = new URL(pathnames['/login'], request.url);
       loginUrl.searchParams.set('error', 'authentication_required');
       loginUrl.searchParams.set('error_description', 'You must be logged in to add a passkey.');
@@ -18,7 +19,7 @@ export async function GET(request: NextRequest) {
     // 2. Get Cognito configuration
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
-    const callbackUrl = process.env.NEXT_PUBLIC_PASSKEY_CALLBACK_URL; // Use the specific passkey callback
+    const callbackUrl = process.env.NEXT_PUBLIC_PASSKEY_CALLBACK_URL;
     const scope = 'openid email profile aws.cognito.signin.user.admin';
 
     if (!wellknownUrl || !clientId) {
@@ -43,15 +44,16 @@ export async function GET(request: NextRequest) {
       scope: scope,
       redirect_uri: callbackUrl,
       state: state,
+      id_token_hint: session.id_token, // Provide user context to Cognito
     });
   
-    // 4. Redirect to Cognito
+    // 4. Redirect to Cognito's authorization endpoint
     const passkeySetupUrl = `${authorizationEndpoint}?${params.toString()}`;
     const response = NextResponse.redirect(passkeySetupUrl);
     
     const isProd = process.env.NODE_ENV === 'production';
 
-    // Set the state cookie on the response
+    // Set the state cookie for CSRF protection
     response.cookies.set('oauth_state', state, {
       path: '/',
       maxAge: 600, // 10 minutes
