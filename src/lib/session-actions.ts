@@ -3,7 +3,7 @@
 
 import { cookies } from 'next/headers';
 
-type NewSessionData = {
+export type NewSessionData = {
   id_token: string;
   access_token: string;
   refresh_token: string;
@@ -54,7 +54,7 @@ export async function refreshAuthTokens(refreshToken: string): Promise<NewSessio
 
     // Cognito refresh tokens can be long-lived. The response might not include a new refresh token.
     // If it doesn't, we must reuse the old one.
-    const newSessionData = {
+    const newSessionData: NewSessionData = {
       id_token: tokens.id_token,
       access_token: tokens.access_token,
       refresh_token: tokens.refresh_token || refreshToken,
