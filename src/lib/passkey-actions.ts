@@ -5,15 +5,22 @@ import { revalidatePath } from 'next/cache';
 import { cognitoClient } from './cognito';
 import { getSession } from './auth';
 
-export async function enablePasskey(): Promise<{ success: boolean; message: string }> {
-    const session = await getSession();
-    if (!session?.access_token) {
-        return { success: false, message: 'Not authenticated' };
+export async function enablePasskey(accessToken?: string): Promise<{ success: boolean; message: string }> {
+    let tokenToUse = accessToken;
+
+    // If no token is passed directly, try to get it from the session cookie.
+    if (!tokenToUse) {
+        const session = await getSession();
+        tokenToUse = session?.access_token;
+    }
+    
+    if (!tokenToUse) {
+        return { success: false, message: 'Not authenticated or access token missing.' };
     }
 
     try {
         const command = new UpdateUserAttributesCommand({
-            AccessToken: session.access_token,
+            AccessToken: tokenToUse,
             UserAttributes: [
                 { Name: 'custom:pless', Value: 'true' },
             ],

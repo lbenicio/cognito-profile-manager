@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { ProfileDisplay } from '@/components/profile-display';
 import { ProfileForm } from '@/components/profile-form';
@@ -14,6 +14,12 @@ interface ProfileViewProps {
 export function ProfileView({ initialUser }: ProfileViewProps) {
   const [user, setUser] = useState(initialUser);
   const t = useTranslations('Profile');
+
+  // Syncs the component's internal state when the `initialUser` prop changes.
+  // This is crucial for reflecting updates after a server data refresh (e.g., via router.refresh()).
+  useEffect(() => {
+    setUser(initialUser);
+  }, [initialUser]);
 
   const handleProfileUpdate = (updatedData: Partial<UserType>) => {
     setUser((prevUser) => ({ ...prevUser, ...updatedData }));
