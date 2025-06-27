@@ -16,6 +16,7 @@
   "Footer": {
     "copyright": "© {year} Outpost. All rights reserved.",
     "sitemap": {
+      "title": "Sitemap",
       "dashboard": "Dashboard",
       "account": "Account",
       "profile": "Profile",
