@@ -24,6 +24,10 @@ export type NotificationPreferences = {
 export type PublicProfilePreferences = {
   isPublic: boolean;
   publicFields: {
+    picture: boolean;
+    banner: boolean;
+    name: boolean;
+    groups: boolean;
     email: boolean;
     website: boolean;
     aboutMe: boolean;
@@ -78,6 +82,10 @@ const defaultNotificationPreferences: NotificationPreferences = {
 const defaultPublicProfilePreferences: PublicProfilePreferences = {
   isPublic: false,
   publicFields: {
+    picture: true,
+    banner: true,
+    name: true,
+    groups: true,
     email: false,
     website: false,
     aboutMe: true,

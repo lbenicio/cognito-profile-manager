@@ -80,6 +80,51 @@ export function ProfileSettingsForm({ initialPreferences, onUpdate }: ProfileSet
             <Separator />
             <h4 className="font-semibold">{t('visibleFieldsTitle')}</h4>
             <div className="flex items-center justify-between">
+                <Label htmlFor="show-picture">{t('showPictureLabel')}</Label>
+                <Switch
+                    id="show-picture"
+                    checked={prefs.publicFields.picture}
+                    onCheckedChange={(value) => handleFieldChange('picture', value)}
+                    disabled={isPending || !prefs.isPublic}
+                />
+            </div>
+            <div className="flex items-center justify-between">
+                <Label htmlFor="show-banner">{t('showBannerLabel')}</Label>
+                <Switch
+                    id="show-banner"
+                    checked={prefs.publicFields.banner}
+                    onCheckedChange={(value) => handleFieldChange('banner', value)}
+                    disabled={isPending || !prefs.isPublic}
+                />
+            </div>
+            <div className="flex items-center justify-between">
+                <Label htmlFor="show-name">{t('showNameLabel')}</Label>
+                <Switch
+                    id="show-name"
+                    checked={prefs.publicFields.name}
+                    onCheckedChange={(value) => handleFieldChange('name', value)}
+                    disabled={isPending || !prefs.isPublic}
+                />
+            </div>
+             <div className="flex items-center justify-between">
+                <Label htmlFor="show-groups">{t('showGroupsLabel')}</Label>
+                <Switch
+                    id="show-groups"
+                    checked={prefs.publicFields.groups}
+                    onCheckedChange={(value) => handleFieldChange('groups', value)}
+                    disabled={isPending || !prefs.isPublic}
+                />
+            </div>
+            <div className="flex items-center justify-between">
+                <Label htmlFor="show-aboutme">{t('showAboutMeLabel')}</Label>
+                <Switch
+                    id="show-aboutme"
+                    checked={prefs.publicFields.aboutMe}
+                    onCheckedChange={(value) => handleFieldChange('aboutMe', value)}
+                    disabled={isPending || !prefs.isPublic}
+                />
+            </div>
+            <div className="flex items-center justify-between">
                 <Label htmlFor="show-email">{t('showEmailLabel')}</Label>
                 <Switch
                     id="show-email"
@@ -94,15 +139,6 @@ export function ProfileSettingsForm({ initialPreferences, onUpdate }: ProfileSet
                     id="show-website"
                     checked={prefs.publicFields.website}
                     onCheckedChange={(value) => handleFieldChange('website', value)}
-                    disabled={isPending || !prefs.isPublic}
-                />
-            </div>
-            <div className="flex items-center justify-between">
-                <Label htmlFor="show-aboutme">{t('showAboutMeLabel')}</Label>
-                <Switch
-                    id="show-aboutme"
-                    checked={prefs.publicFields.aboutMe}
-                    onCheckedChange={(value) => handleFieldChange('aboutMe', value)}
                     disabled={isPending || !prefs.isPublic}
                 />
             </div>
