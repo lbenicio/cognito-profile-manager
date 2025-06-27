@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { Smartphone, KeyRound, Loader2, ExternalLink } from 'lucide-react';
+import { Smartphone, KeyRound, Loader2, ExternalLink, Copy } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from 'next-intl';
@@ -20,6 +20,7 @@ export function TwoFactorAuth({ user }: { user: User }) {
     // MFA/TOTP State
     const [showSetup, setShowSetup] = useState(false);
     const [qrCode, setQrCode] = useState('');
+    const [secret, setSecret] = useState('');
     const [otpCode, setOtpCode] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
     const [isVerifying, setIsVerifying] = useState(false);
@@ -30,8 +31,11 @@ export function TwoFactorAuth({ user }: { user: User }) {
     const handleStartSetup = async () => {
         setIsGenerating(true);
         try {
-            const { qrCodeDataUrl } = await generateMfaSetup();
+            const { qrCodeDataUrl, secretCode } = await generateMfaSetup();
             setQrCode(qrCodeDataUrl);
+            if (secretCode) {
+                setSecret(secretCode);
+            }
             setShowSetup(true);
         } catch (error) {
             toast({
@@ -48,7 +52,18 @@ export function TwoFactorAuth({ user }: { user: User }) {
         setShowSetup(false);
         setQrCode('');
         setOtpCode('');
+        setSecret('');
     }
+
+    const handleCopySecret = () => {
+        if (!secret) return;
+        navigator.clipboard.writeText(secret).then(() => {
+            toast({
+                title: t('secretCopiedTitle'),
+                description: t('secretCopiedDescription'),
+            });
+        });
+    };
 
     const handleVerifyOtp = async () => {
         setIsVerifying(true);
@@ -62,6 +77,7 @@ export function TwoFactorAuth({ user }: { user: User }) {
                 setShowSetup(false);
                 setQrCode('');
                 setOtpCode('');
+                setSecret('');
                 // In a real app, you'd likely want to refresh the user session here
             } else {
                 toast({
@@ -156,18 +172,48 @@ export function TwoFactorAuth({ user }: { user: User }) {
                                                     </div>
                                                 )}
                                             </div>
-                                            <div className="flex gap-2 max-w-xs">
-                                                <Input 
-                                                    placeholder={t('codeInputPlaceholder')}
-                                                    value={otpCode}
-                                                    onChange={(e) => setOtpCode(e.target.value)}
-                                                    maxLength={6}
-                                                />
-                                                <Button onClick={handleVerifyOtp} disabled={isVerifying || otpCode.length < 6}>
-                                                    {isVerifying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                                    {t('verify')}
-                                                </Button>
+
+                                            <Separator />
+
+                                            <div className="space-y-2">
+                                                <p className="text-sm text-muted-foreground">{t('manualEntryInstructions')}</p>
+                                                <div className="flex items-center gap-2 max-w-xs">
+                                                    <Input 
+                                                        readOnly 
+                                                        value={secret} 
+                                                        className="font-mono text-sm bg-muted/50" 
+                                                        aria-label={t('copyKeyLabel')}
+                                                    />
+                                                    <Button 
+                                                        type="button"
+                                                        variant="outline" 
+                                                        size="icon" 
+                                                        onClick={handleCopySecret}
+                                                        aria-label={t('copyKeyLabel')}
+                                                    >
+                                                        <Copy className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
                                             </div>
+
+                                            <Separator />
+
+                                            <div className="space-y-2">
+                                                <p className="text-sm font-medium">{t('verifyTitle')}</p>
+                                                <div className="flex gap-2 max-w-xs">
+                                                    <Input 
+                                                        placeholder={t('codeInputPlaceholder')}
+                                                        value={otpCode}
+                                                        onChange={(e) => setOtpCode(e.target.value)}
+                                                        maxLength={6}
+                                                    />
+                                                    <Button onClick={handleVerifyOtp} disabled={isVerifying || otpCode.length < 6}>
+                                                        {isVerifying && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                                        {t('verify')}
+                                                    </Button>
+                                                </div>
+                                            </div>
+
                                             <Button variant="link" className="p-0 h-auto" onClick={handleCancelSetup}>{t('cancelButton')}</Button>
                                         </div>
                                     )}

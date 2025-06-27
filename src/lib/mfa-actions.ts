@@ -24,8 +24,9 @@ export async function generateMfaSetup() {
   });
 
   const response = await cognitoClient.send(command);
+  const secretCode = response.SecretCode;
 
-  if (!response.SecretCode) {
+  if (!secretCode) {
     throw new Error('Failed to get secret code from Cognito.');
   }
 
@@ -33,11 +34,11 @@ export async function generateMfaSetup() {
   const otpauth = authenticator.keyuri(
     user.email,
     serviceName,
-    response.SecretCode
+    secretCode
   );
   const qrCodeDataUrl = await QRCode.toDataURL(otpauth);
 
-  return { qrCodeDataUrl };
+  return { qrCodeDataUrl, secretCode };
 }
 
 export async function verifyAndEnableMfa(
