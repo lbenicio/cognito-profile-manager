@@ -2,6 +2,8 @@ import 'server-only';
 import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
+import { GetUserCommand } from '@aws-sdk/client-cognito-identity-provider';
+import { cognitoClient } from '@/lib/cognito';
 
 // Define the User type, which should match what the components expect.
 export type User = {
@@ -87,7 +89,7 @@ export const getUser = cache(async (): Promise<User | null> => {
   }
 
   try {
-    // In production, verify the JWT and extract claims.
+    // In production, first verify the JWT to confirm the session is valid.
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     if (!wellknownUrl) throw new Error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
     
@@ -103,17 +105,16 @@ export const getUser = cache(async (): Promise<User | null> => {
       audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
     });
 
+    // Initialize a base user object with claims from the (potentially stale) ID token.
     const adminGroupName = process.env.COGNITO_ADMIN_GROUP_NAME || 'admins';
     const groupsClaimKey = process.env.COGNITO_GROUPS_CLAIM_KEY || 'cognito:groups';
     const groups = (payload[groupsClaimKey] as string[]) || [];
     const isAdmin = groups.includes(adminGroupName);
-    
-    // OIDC address claim is an object, we get the formatted version.
     const addressClaim = payload.address as { formatted?: string } | undefined;
     const givenName = (payload.given_name as string) || '';
     const familyName = (payload.family_name as string) || '';
 
-    const user: User = {
+    let user: User = {
       username: (payload['cognito:username'] as string) || '',
       email: (payload.email as string) || '',
       email_verified: (payload.email_verified as boolean) || false,
@@ -121,11 +122,10 @@ export const getUser = cache(async (): Promise<User | null> => {
       address: addressClaim?.formatted ?? '',
       phone_number: (payload.phone_number as string) || '',
       phone_number_verified: (payload.phone_number_verified as boolean) || false,
-      // auth_time is in seconds, convert to ISO string
       creationDate: new Date((payload.auth_time as number) * 1000).toISOString(),
-      userStatus: 'CONFIRMED', // OIDC tokens don't have a user status, assume CONFIRMED
-      twoFactorEnabled: (payload['custom:mfa'] as string) === 'true',
-      passkeysEnabled: (payload['custom:pless'] as string) === 'true',
+      userStatus: 'CONFIRMED', // Placeholder, will be updated
+      twoFactorEnabled: false, // Placeholder, will be updated
+      passkeysEnabled: false, // Placeholder, will be updated
       groups: groups,
       isAdmin: isAdmin,
       picture: (payload.picture as string) || '',
@@ -133,13 +133,52 @@ export const getUser = cache(async (): Promise<User | null> => {
       zoneinfo: (payload.zoneinfo as string) || '',
       website: (payload.website as string) || '',
     };
+    
+    // Now, use the access token to fetch the most up-to-date user attributes from Cognito.
+    if (session.access_token) {
+        const getUserCommand = new GetUserCommand({ AccessToken: session.access_token });
+        const cognitoUser = await cognitoClient.send(getUserCommand);
+
+        const attributes = cognitoUser.UserAttributes?.reduce((acc, attr) => {
+            if (attr.Name && attr.Value) {
+                acc[attr.Name] = attr.Value;
+            }
+            return acc;
+        }, {} as Record<string, string>);
+
+        // Overwrite the initial user data with fresh attributes from the API call.
+        if (attributes) {
+             const freshGivenName = attributes.given_name || '';
+             const freshFamilyName = attributes.family_name || '';
+             user = {
+                ...user,
+                username: cognitoUser.Username || user.username,
+                userStatus: cognitoUser.UserStatus || user.userStatus,
+                email: attributes.email || user.email,
+                email_verified: attributes.email_verified === 'true',
+                name: [freshGivenName, freshFamilyName].filter(Boolean).join(' ') || user.name,
+                address: attributes.address || user.address,
+                phone_number: attributes.phone_number || user.phone_number,
+                phone_number_verified: attributes.phone_number_verified === 'true',
+                picture: attributes.picture || user.picture,
+                locale: attributes.locale || user.locale,
+                zoneinfo: attributes.zoneinfo || user.zoneinfo,
+                website: attributes.website || user.website,
+                // Crucially, update the custom attributes from the fresh data
+                twoFactorEnabled: attributes['custom:mfa'] === 'true',
+                passkeysEnabled: attributes['custom:pless'] === 'true',
+             };
+        }
+    }
 
     return user;
 
-  } catch (error) {
-    console.error("JWT Verification failed or user data processing error:", error);
-    // If the token is invalid for any reason, clear the session cookie.
-    cookies().set('auth_session', '', { expires: new Date(0) });
+  } catch (error: any) {
+    console.error("Authentication or user data fetch error:", error);
+    // If token is expired or invalid for any reason, kill the session
+    if (error.name === 'NotAuthorizedException' || error.name === 'JOSEError') {
+      cookies().set('auth_session', '', { expires: new Date(0) });
+    }
     return null;
   }
 });
