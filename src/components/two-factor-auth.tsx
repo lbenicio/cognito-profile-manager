@@ -42,8 +42,10 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
     // Passkey State
     const [isManagingPasskeys, setIsManagingPasskeys] = useState(false);
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
+    const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
+        setIsMounted(true);
         const result = searchParams.get('result');
         const error = searchParams.get('error');
         const errorDescription = searchParams.get('error_description');
@@ -324,7 +326,9 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
                                                                 <span>{device.name}</span>
                                                             </div>
                                                         </TableCell>
-                                                        <TableCell>{device.createDate ? format(new Date(device.createDate), "PPP") : 'N/A'}</TableCell>
+                                                        <TableCell>
+                                                            {isMounted && device.createDate ? format(new Date(device.createDate), "PPP") : '...'}
+                                                        </TableCell>
                                                         <TableCell className="text-right">
                                                             <Button
                                                                 variant="ghost"
