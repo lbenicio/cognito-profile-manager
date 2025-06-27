@@ -1,3 +1,4 @@
+
 {
   "Header": {
     "title": "Outpost",
@@ -66,7 +67,9 @@
       "nameLabel": "Nombre completo",
       "addressLabel": "Dirección",
       "phoneLabel": "Número de teléfono",
-      "phoneDescription": "Debe estar en formato E.164 (ej. +12223334444).",
+      "phonePlaceholder": "555 123 4567",
+      "phoneDescription": "Selecciona tu país e introduce tu número de teléfono.",
+      "phoneInvalid": "Por favor, introduce un número de teléfono válido.",
       "websiteLabel": "Sitio web",
       "zoneinfoLabel": "Zona horaria",
       "zoneinfoDescription": "Selecciona la zona horaria en la que te encuentras.",

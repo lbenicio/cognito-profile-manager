@@ -21,18 +21,19 @@ import { Save } from 'lucide-react';
 import React from 'react';
 import type { User as UserType } from '@/lib/auth';
 import { TimezoneSelect } from './timezone-select';
+import { PhoneInput } from './phone-input';
 
-const profileFormSchema = z.object({
+const profileFormSchema = (t: (key: string) => string) => z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }).max(50),
   address: z.string().min(10, { message: 'Please enter a full address.' }).max(100),
-  phone_number: z.string().refine((phone) => /^\+[1-9]\d{1,14}$/.test(phone), {
-    message: 'Phone number must be in E.164 format (e.g., +12223334444).',
+  phone_number: z.string().refine((phone) => /^\+[1-9]\d{7,14}$/.test(phone), {
+    message: t('phoneInvalid'),
   }),
   website: z.string().url({ message: 'Please enter a valid URL.' }).or(z.literal('')).optional(),
   zoneinfo: z.string().max(50).optional(),
 });
 
-type ProfileFormValues = z.infer<typeof profileFormSchema>;
+type ProfileFormValues = z.infer<ReturnType<typeof profileFormSchema>>;
 
 interface ProfileFormProps {
     user: UserType;
@@ -45,7 +46,7 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   
   const form = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileFormSchema),
+    resolver: zodResolver(profileFormSchema(t)),
     defaultValues: {
       name: user.name || '',
       address: user.address || '',
@@ -128,7 +129,7 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
                 <FormItem>
                   <FormLabel>{t('phoneLabel')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="+15551234567" {...field} />
+                    <PhoneInput {...field} />
                   </FormControl>
                   <FormDescription>
                     {t('phoneDescription')}
