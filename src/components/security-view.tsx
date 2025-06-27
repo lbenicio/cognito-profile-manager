@@ -32,10 +32,12 @@ export function SecurityView({ initialUser, translations }: SecurityViewProps) {
               {translations.description}
           </p>
       </header>
-      <div className="max-w-2xl mx-auto flex flex-col gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           <PasswordForm />
-          <TwoFactorAuth user={user} onUpdate={handleProfileUpdate} />
-          <PasskeyManagement user={user} />
+          <div className="flex flex-col gap-8">
+            <TwoFactorAuth user={user} onUpdate={handleProfileUpdate} />
+            <PasskeyManagement user={user} />
+          </div>
       </div>
     </div>
   );
