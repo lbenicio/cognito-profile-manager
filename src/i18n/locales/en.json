@@ -14,7 +14,13 @@
     "language": "Language"
   },
   "Footer": {
-    "copyright": "© {year} Outpost. All rights reserved."
+    "copyright": "© {year} Outpost. All rights reserved.",
+    "sitemap": {
+      "dashboard": "Dashboard",
+      "account": "Account",
+      "profile": "Profile",
+      "settings": "Settings"
+    }
   },
   "Dashboard": {
     "welcome": "Welcome back, {name}!",
