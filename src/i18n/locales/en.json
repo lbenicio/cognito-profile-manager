@@ -29,7 +29,7 @@
       "userBadge": "User",
       "noGroups": "No groups assigned."
     },
-    "manageProfile": "Manage Profile",
+    "manageProfile": "Manage Account",
     "quickActions": {
       "title": "Quick Actions",
       "description": "Commonly used settings and actions.",
@@ -43,8 +43,8 @@
     "disabled": "Disabled"
   },
   "Profile": {
-    "title": "Profile",
-    "description": "Manage your personal information and account security.",
+    "title": "Account",
+    "description": "Manage your personal information, settings, and account security.",
     "editAvatarTitle": "Edit Avatar",
     "editAvatarDescription": "Upload a new profile picture. Recommended size is 200x200px.",
     "avatar": {
