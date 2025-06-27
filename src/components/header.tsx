@@ -2,7 +2,7 @@
 
 import { useTransition } from 'react';
 import { Link } from '@/navigation';
-import { User, LogOut, Settings, LayoutDashboard, Menu, Shield } from 'lucide-react';
+import { LogOut, Settings, LayoutDashboard, Menu, Shield, Contact, CircleUserRound } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,6 +33,7 @@ type HeaderTranslations = {
     settings: string;
     logout: string;
     adminDashboard: string;
+    account: string;
   };
   mobileMenuTitle: string;
   mobileMenuTrigger: string;
@@ -88,6 +89,11 @@ export function Header({ user, translations: t }: { user: UserType | null, trans
                         </Link>
                     </SheetClose>
                     <SheetClose asChild>
+                        <Link href="/profile" className="text-muted-foreground transition-colors hover:text-primary">
+                        {t.userMenu.account}
+                        </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
                         <Link href="/settings" className="text-muted-foreground transition-colors hover:text-primary">
                         {t.userMenu.settings}
                         </Link>
@@ -138,8 +144,14 @@ export function Header({ user, translations: t }: { user: UserType | null, trans
                 )}
                 <DropdownMenuItem asChild>
                   <Link href="/profile">
-                    <User className="mr-2 h-4 w-4" />
+                    <Contact className="mr-2 h-4 w-4" />
                     <span>{t.userMenu.profile}</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/profile">
+                    <CircleUserRound className="mr-2 h-4 w-4" />
+                    <span>{t.userMenu.account}</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>

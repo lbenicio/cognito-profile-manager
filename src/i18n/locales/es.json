@@ -6,7 +6,8 @@
       "profile": "Perfil",
       "settings": "Ajustes",
       "logout": "Cerrar sesión",
-      "adminDashboard": "Panel de Administrador"
+      "adminDashboard": "Panel de Administrador",
+      "account": "Cuenta"
     },
     "mobileMenuTitle": "Menú Principal",
     "mobileMenuTrigger": "Abrir menú principal",
