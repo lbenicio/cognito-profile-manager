@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { UpdateUserAttributesCommand } from '@aws-sdk/client-cognito-identity-provider';
 import { cognitoClient } from '@/lib/cognito';
 import { pathnames } from '@/navigation';
+import { getSession } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
@@ -40,90 +41,36 @@ export async function GET(request: NextRequest) {
     return clearStateCookie(NextResponse.redirect(accountUrl));
   }
 
+  // The presence of a "code" from Cognito indicates the passkey was added successfully.
+  // We can now use the user's existing session to update their attributes.
   if (!code) {
     console.error('Authorization code missing from passkey callback.');
     accountUrl.searchParams.set('error', 'auth_code_missing');
     return clearStateCookie(NextResponse.redirect(accountUrl));
   }
 
-  // If we got a code, it means the passkey was added successfully.
-  // Now we exchange the code for a new session and update the user attribute.
   try {
-    const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
-    if (!wellknownUrl) throw new Error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
-
-    const passkeyCallbackUrl = process.env.NEXT_PUBLIC_PASSKEY_CALLBACK_URL;
-    if (!passkeyCallbackUrl) {
-      throw new Error('Missing NEXT_PUBLIC_PASSKEY_CALLBACK_URL env var.');
+    const session = await getSession();
+    if (!session?.access_token) {
+        throw new Error('User session not found or access token missing.');
     }
 
-    const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
-    if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
-    const wellknown = await wellknownResponse.json();
-    
-    const tokenEndpoint = wellknown.token_endpoint;
-
-    const params = new URLSearchParams({
-      grant_type: 'authorization_code',
-      code: code,
-      redirect_uri: passkeyCallbackUrl,
-      client_id: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
-    });
-
-    const headers: HeadersInit = {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    };
-    
-    const clientSecret = process.env.COGNITO_CLIENT_SECRET;
-    
-    if (clientSecret) {
-      headers['Authorization'] = `Basic ${Buffer.from(
-        `${process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!}:${clientSecret}`
-      ).toString('base64')}`;
-    }
-
-    const tokenResponse = await fetch(tokenEndpoint, {
-      method: 'POST',
-      headers: headers,
-      body: params.toString(),
-      cache: 'no-store',
-    });
-
-    const tokens = await tokenResponse.json();
-
-    if (!tokenResponse.ok) {
-      console.error("Passkey flow: Failed to exchange code for tokens. Response:", tokens);
-      const errorDetails = tokens.error_description || tokens.error || "Unknown token exchange error";
-      throw new Error(`Token exchange failed: ${errorDetails}`);
-    }
-
-    // Now we have a fresh access token, use it to update the attribute
+    // Use the existing access token to update the user attribute
     const updateCommand = new UpdateUserAttributesCommand({
-      AccessToken: tokens.access_token,
+      AccessToken: session.access_token,
       UserAttributes: [{ Name: 'custom:pless', Value: 'true' }],
     });
     await cognitoClient.send(updateCommand);
     
-    // Set the new session cookie with the refreshed tokens
-    const sessionData = {
-        id_token: tokens.id_token,
-        access_token: tokens.access_token,
-        expires_in: tokens.expires_in,
-    };
-    
+    // Redirect to the account page with a success message.
     accountUrl.searchParams.set('result', 'success');
     const response = NextResponse.redirect(accountUrl);
-
-    response.cookies.set('auth_session', JSON.stringify(sessionData), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: sessionData.expires_in || 3600,
-      path: '/',
-      sameSite: 'lax',
-    });
     
+    // Revalidate paths to ensure fresh data is shown.
     revalidatePath(pathnames['/account']);
-    revalidatePath('/'); // Revalidate dashboard as well
+    revalidatePath('/');
+    
+    // Clean up the state cookie and return the redirect response.
     return clearStateCookie(response);
 
   } catch (e) {
