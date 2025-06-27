@@ -1,8 +1,16 @@
+'use server';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { pathnames } from '@/navigation';
+import { getSession } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
+    const session = await getSession();
+    if (!session?.access_token) {
+        throw new Error('User is not authenticated. Cannot start passkey registration.');
+    }
+
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
     const scope = process.env.NEXT_PUBLIC_OAUTH2_SCOPE;
@@ -27,6 +35,8 @@ export async function GET(request: NextRequest) {
     // --- CSRF protection ---
     const state = Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('hex');
     
+    // The access_token is crucial for Cognito to know which user is adding the passkey.
+    passkeyUrl.searchParams.set('access_token', session.access_token);
     passkeyUrl.searchParams.set('client_id', clientId);
     passkeyUrl.searchParams.set('response_type', 'code');
     passkeyUrl.searchParams.set('scope', scope);
@@ -41,7 +51,7 @@ export async function GET(request: NextRequest) {
       maxAge: 600, // 10 minutes
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax', // Use 'lax' for better compatibility with OIDC redirects.
+      sameSite: 'lax',
     });
 
     return response;
