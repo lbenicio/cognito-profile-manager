@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
       if (!updateResult.success) {
           throw new Error(updateResult.message);
       } else {
-          profileUrl.searchParams.set('passkey_status', 'success');
+          profileUrl.searchParams.set('result', 'success');
       }
 
     } catch (e) {

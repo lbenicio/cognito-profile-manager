@@ -40,7 +40,7 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
     useEffect(() => {
         const error = searchParams.get('error');
         const errorDescription = searchParams.get('error_description');
-        const status = searchParams.get('passkey_status');
+        const result = searchParams.get('result');
         const currentPath = window.location.pathname;
 
         if (error) {
@@ -53,7 +53,7 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
             window.history.replaceState(null, '', currentPath);
         }
 
-        if (status === 'success') {
+        if (result === 'success') {
             toast({
                 title: t('passkeySuccess.title'),
                 description: t('passkeySuccess.description'),
@@ -183,8 +183,6 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
             document.cookie = `oauth_state=${state}; path=/; max-age=600; secure=${window.location.protocol === 'https:'}; samesite=lax`;
 
             passkeyUrl.searchParams.set('client_id', clientId);
-            passkeyUrl.searchParams.set('response_type', 'code');
-            passkeyUrl.searchParams.set('scope', scope);
             passkeyUrl.searchParams.set('state', state);
             passkeyUrl.searchParams.set('redirect_uri', passkeyCallbackUrl);
 
