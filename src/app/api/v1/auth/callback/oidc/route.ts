@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from 'next/server';
 import { cognitoClient } from '@/lib/cognito';
 import { GetUserCommand, UpdateUserAttributesCommand } from '@aws-sdk/client-cognito-identity-provider';
@@ -23,22 +24,22 @@ export async function GET(request: NextRequest) {
   const state = searchParams.get('state');
   const storedState = request.cookies.get('oauth_state')?.value;
 
-  try {
-    // --- Handle explicit errors from OIDC provider ---
-    if (errorParam) {
-      throw new Error(errorDescription || errorParam);
-    }
-    
-    // --- CSRF check ---
-    if (!state || !storedState || state !== storedState) {
-        throw new Error('invalid_state');
-    }
-    
-    // --- Authorization code check ---
-    if (!code) {
-        throw new Error('auth_code_missing');
-    }
+  // --- Handle explicit errors from OIDC provider first ---
+  if (errorParam) {
+    return createErrorResponse(origin, errorParam, errorDescription || 'An error occurred during authentication.');
+  }
+  
+  // --- Perform pre-flight checks before the try...catch block ---
+  if (!state || !storedState || state !== storedState) {
+    return createErrorResponse(origin, 'invalid_state', 'Your session has expired or is invalid. Please try signing in again.');
+  }
+  
+  if (!code) {
+    return createErrorResponse(origin, 'auth_code_missing', 'The authorization code was not found in the callback. Please try again.');
+  }
 
+  // --- Main token exchange logic ---
+  try {
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     if (!wellknownUrl) throw new Error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
 
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
     }
 
     const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
-    if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
+    if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration from provider.');
     const wellknown = await wellknownResponse.json();
     
     const tokenEndpoint = wellknown.token_endpoint;
@@ -160,7 +161,7 @@ export async function GET(request: NextRequest) {
     return response;
 
   } catch (e) {
-    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred during the login process.';
     return createErrorResponse(origin, 'callback_error', errorMessage);
   }
 }
