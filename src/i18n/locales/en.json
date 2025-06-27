@@ -129,7 +129,7 @@
       "passkeysDescription": "Use a passkey for secure, passwordless sign-in. This is the most secure way to protect your account.",
       "passkeysEnabled": "Passkeys are enabled on your account.",
       "passkeysDisabled": "Passkeys are not yet enabled on your account.",
-      "managePasskeysButton": "Manage Passkeys",
+      "addPasskeyButton": "Add Passkey",
       "passkeyError": {
         "title": "Action Failed",
         "generic": "Something went wrong. Please try again.",

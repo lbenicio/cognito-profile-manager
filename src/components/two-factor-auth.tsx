@@ -124,7 +124,7 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
         }
     };
 
-    const handleManagePasskeys = async () => {
+    const handleAddPasskey = async () => {
         setIsManagingPasskeys(true);
         try {
             const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
@@ -142,13 +142,13 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
             const authorizationEndpoint = wellknown.authorization_endpoint;
 
             const cognitoDomain = new URL(authorizationEndpoint).origin;
-            const profileUrl = new URL(`${cognitoDomain}/profile`);
-            profileUrl.searchParams.set('client_id', clientId);
-            profileUrl.searchParams.set('redirect_uri', callbackUrl);
-            profileUrl.searchParams.set('response_type', 'code');
-            profileUrl.searchParams.set('scope', scope);
+            const passkeyUrl = new URL(`${cognitoDomain}/passkeys/add`);
+            passkeyUrl.searchParams.set('client_id', clientId);
+            passkeyUrl.searchParams.set('redirect_uri', callbackUrl);
+            passkeyUrl.searchParams.set('response_type', 'code');
+            passkeyUrl.searchParams.set('scope', scope);
 
-            window.location.href = profileUrl.toString();
+            window.location.href = passkeyUrl.toString();
 
         } catch (error: any) {
             toast({
@@ -279,9 +279,9 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
                             <p className="text-sm text-muted-foreground">
                                 {t('passkeysDescription')}
                             </p>
-                            <Button variant="outline" size="sm" onClick={handleManagePasskeys} disabled={isManagingPasskeys}>
+                            <Button variant="outline" size="sm" onClick={handleAddPasskey} disabled={isManagingPasskeys}>
                                 {isManagingPasskeys && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                {t('managePasskeysButton')}
+                                {t('addPasskeyButton')}
                             </Button>
                         </div>
                     </div>

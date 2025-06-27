@@ -129,7 +129,7 @@
       "passkeysDescription": "Usa una passkey para un inicio de sesión seguro y sin contraseña. Esta es la forma más segura de proteger tu cuenta.",
       "passkeysEnabled": "Las passkeys están habilitadas en tu cuenta.",
       "passkeysDisabled": "Las passkeys aún no están habilitadas en tu cuenta.",
-      "managePasskeysButton": "Gestionar Passkeys",
+      "addPasskeyButton": "Añadir Passkey",
       "passkeyError": {
         "title": "Acción Fallida",
         "generic": "Algo salió mal. Por favor, inténtalo de nuevo.",
