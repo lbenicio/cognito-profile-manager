@@ -3,7 +3,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { pathnames, locales } from '@/navigation';
 
 // All pages that are public and don't require authentication
-const publicPages = [pathnames['/login']]; 
+const publicPages = [
+    pathnames['/login'],
+    pathnames['/terms'],
+    pathnames['/privacy']
+]; 
 const publicPathnameRegex = new RegExp(
   `^(/(${locales.join('|')}))?(${publicPages.join('|')})/?$`,
   'i'

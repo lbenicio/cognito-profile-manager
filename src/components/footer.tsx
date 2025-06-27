@@ -2,38 +2,52 @@
 import { useTranslations } from 'next-intl';
 import { useState, useEffect } from 'react';
 import { Link } from '@/navigation';
-import { LayoutDashboard } from 'lucide-react';
+import { LayoutDashboard, Calendar, Clock } from 'lucide-react';
+import { format } from 'date-fns';
 
 export function Footer() {
   const t = useTranslations('Footer');
   const tSitemap = useTranslations('Footer.sitemap');
-  const [year, setYear] = useState<number | null>(null);
+  const tLegal = useTranslations('Footer.legal');
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   useEffect(() => {
     // This code runs only on the client, after the component has mounted,
     // ensuring the year is based on the client's clock and preventing a mismatch.
-    setYear(new Date().getFullYear());
+    const timer = setInterval(() => setCurrentDate(new Date()), 1000);
+    return () => {
+      clearInterval(timer);
+    };
   }, []);
 
   return (
     <footer className="bg-card border-t">
       <div className="container mx-auto py-8 px-4 md:px-8">
-        <div className="flex flex-col md:flex-row justify-between items-start gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           
-          {/* Left side: Logo and Copyright */}
-          <div className="flex flex-col gap-4 items-start">
+          {/* Left side: Logo, Copyright, and Clock */}
+          <div className="md:col-span-2 flex flex-col gap-4 items-start">
              <Link href="/" className="flex items-center gap-2 text-xl font-bold">
                 <LayoutDashboard className="h-6 w-6 text-primary" />
                 <span>Outpost</span>
             </Link>
-            <div className="text-sm text-muted-foreground" style={{minHeight: '21px'}}>
-              {/* We only render the content once the year has been determined on the client */}
-              {year !== null && <p>{t('copyright', { year })}</p>}
+            <div className="text-sm text-muted-foreground">
+              <p>{t('copyright', { year: currentDate.getFullYear() })}</p>
+            </div>
+             <div className="text-sm text-muted-foreground space-y-1 pt-2">
+                <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    <span>{format(currentDate, 'PPP')}</span>
+                </div>
+                 <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    <span>{format(currentDate, 'p')}</span>
+                </div>
             </div>
           </div>
           
-          {/* Right side: Sitemap */}
-          <div className="grid grid-cols-1 gap-8">
+          {/* Right side: Sitemap Columns */}
+          <div className="md:col-span-2 grid grid-cols-2 gap-8">
             <div>
               <h3 className="font-semibold mb-4">{tSitemap('title')}</h3>
               <nav className="flex flex-col gap-2">
@@ -45,7 +59,13 @@ export function Footer() {
                 <Link href="/contact" className="text-sm text-muted-foreground hover:text-primary transition-colors">{tSitemap('contact')}</Link>
               </nav>
             </div>
-            {/* Future columns can be added here */}
+            <div>
+              <h3 className="font-semibold mb-4">{tLegal('title')}</h3>
+              <nav className="flex flex-col gap-2">
+                <Link href="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors">{tLegal('terms')}</Link>
+                <Link href="/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors">{tLegal('privacy')}</Link>
+              </nav>
+            </div>
           </div>
 
         </div>

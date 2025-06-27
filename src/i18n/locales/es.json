@@ -24,6 +24,11 @@
       "settings": "Ajustes",
       "security": "Seguridad",
       "contact": "Contáctanos"
+    },
+    "legal": {
+      "title": "Legal",
+      "terms": "Términos de Servicio",
+      "privacy": "Política de Privacidad"
     }
   },
   "Dashboard": {
@@ -361,5 +366,11 @@
     "errorTitle": "Fallo al Iniciar Sesión",
     "errorDescription": "No se pudo iniciar sesión. Por favor, inténtalo de nuevo o contacta a soporte.",
     "invalid_state": "La sesión ha caducado o no es válida. Por favor, intenta iniciar sesión de nuevo."
+  },
+  "Terms": {
+    "title": "Términos de Servicio"
+  },
+  "Privacy": {
+    "title": "Política de Privacidad"
   }
 }

@@ -24,6 +24,11 @@
       "settings": "Settings",
       "security": "Security",
       "contact": "Contact Us"
+    },
+    "legal": {
+      "title": "Legal",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy"
     }
   },
   "Dashboard": {
@@ -361,5 +366,11 @@
     "errorTitle": "Sign In Failed",
     "errorDescription": "Could not sign in. Please try again or contact support.",
     "invalid_state": "The session has expired or is invalid. Please try signing in again."
+  },
+  "Terms": {
+    "title": "Terms of Service"
+  },
+  "Privacy": {
+    "title": "Privacy Policy"
   }
 }
