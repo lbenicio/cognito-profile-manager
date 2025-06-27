@@ -2,8 +2,8 @@ import { NextRequest } from 'next/server';
 import { authMiddleware } from './middlewares/auth';
 import { i18nMiddleware } from './middlewares/i18n';
 
-export function middleware(request: NextRequest) {
-  const authResponse = authMiddleware(request);
+export async function middleware(request: NextRequest) {
+  const authResponse = await authMiddleware(request);
   if (authResponse) {
     return authResponse;
   }

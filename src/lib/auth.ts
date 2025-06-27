@@ -306,10 +306,7 @@ export const getUser = cache(async (): Promise<User | null> => {
 
   } catch (error: any) {
     console.error("Authentication or user data fetch error:", error);
-    // If token is expired or invalid for any reason, kill the session
-    if (error.name === 'NotAuthorizedException' || error.name === 'JOSEError') {
-      cookies().set('auth_session', '', { expires: new Date(0) });
-    }
+    // The invalid cookie is now handled by the middleware, so we just return null.
     return null;
   }
 });
