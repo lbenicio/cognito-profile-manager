@@ -252,7 +252,10 @@
         "addedOn": "Added On",
         "ipAddress": "IP Address",
         "actions": "Actions"
-      }
+      },
+      "smsMessagingTitle": "SMS Messaging",
+      "smsMessagingDescription": "Receive verification codes via text message. This method is less secure than an authenticator app or passkeys.",
+      "smsMessagingDisabled": "This feature is currently unavailable."
     }
   },
   "Profile": {
@@ -376,3 +379,5 @@
     "title": "Privacy Policy"
   }
 }
+
+    

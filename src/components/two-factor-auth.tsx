@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { Smartphone, KeyRound, Loader2, Copy, Trash2 } from 'lucide-react';
+import { Smartphone, KeyRound, Loader2, Copy, Trash2, MessageSquareText } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from 'next-intl';
@@ -16,6 +16,8 @@ import { generateMfaSetup, verifyAndEnableMfa, disableMfa } from '@/lib/mfa-acti
 import { deletePasskey } from '@/lib/passkey-actions';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { format } from 'date-fns';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 
 interface TwoFactorAuthProps {
@@ -293,6 +295,25 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
 
                 <Separator />
 
+                {/* SMS Messaging Section */}
+                <div className="space-y-2">
+                    <div className="flex items-start gap-3">
+                        <MessageSquareText className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
+                        <div className='w-full'>
+                            <h4 className="font-medium text-sm">{t('smsMessagingTitle')}</h4>
+                            <div className="pt-2 space-y-2">
+                                <p className="text-sm text-muted-foreground">{t('smsMessagingDescription')}</p>
+                                <div className="flex items-center space-x-2 pt-2">
+                                    <Switch id="sms-switch" disabled={true} />
+                                    <Label htmlFor="sms-switch" className="text-sm font-normal text-muted-foreground">{t('smsMessagingDisabled')}</Label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <Separator />
+
                 {/* Passkeys Section */}
                  <div className="space-y-4">
                     <div className="flex items-start gap-3">
@@ -361,3 +382,5 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
         </Card>
     )
 }
+
+    

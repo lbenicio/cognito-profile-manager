@@ -252,7 +252,10 @@
         "addedOn": "Añadido el",
         "ipAddress": "Dirección IP",
         "actions": "Acciones"
-      }
+      },
+      "smsMessagingTitle": "Mensajería SMS",
+      "smsMessagingDescription": "Recibe códigos de verificación por mensaje de texto. Este método es menos seguro que una aplicación de autenticación o passkeys.",
+      "smsMessagingDisabled": "Esta función no está disponible actualmente."
     }
   },
   "Profile": {
@@ -376,3 +379,5 @@
     "title": "Política de Privacidad"
   }
 }
+
+    
