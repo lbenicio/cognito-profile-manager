@@ -2,8 +2,7 @@ import 'server-only';
 import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
-import { cognitoClient, GetUserCommand, ListWebAuthnCredentialsCommand } from '@/lib/cognito';
-import UAParser from 'ua-parser-js';
+import { cognitoClient, GetUserCommand, ListDevicesCommand } from '@/lib/cognito';
 
 
 // Define the User type, which should match what the components expect.
@@ -330,54 +329,28 @@ export const getUser = cache(async (): Promise<User | null> => {
         }
     }
     
-    // Fetch user's registered passkeys/devices using ListWebAuthnCredentials.
+    // Fetch user's registered devices (including passkeys).
     let devices: Device[] = [];
     try {
-        const userPoolId = wellknown.issuer.split('/').pop();
-        const usernameForApi = payload.sub as string;
-
-        if (usernameForApi && userPoolId) {
-            const listCredentialsCommand = new ListWebAuthnCredentialsCommand({
-                UserPoolId: userPoolId,
-                Username: usernameForApi,
-            });
-
-            // This is an admin-level API call and requires appropriate IAM permissions
-            // for the server's execution role.
-            const credentialsResponse = await cognitoClient.send(listCredentialsCommand);
-
-            devices = (credentialsResponse.Credentials || []).map((cred) => {
-                let name = 'Unnamed Device';
-                if (cred.UserAgent) {
-                    try {
-                        const ua = new UAParser(cred.UserAgent);
-                        const browser = ua.getBrowser();
-                        const os = ua.getOS();
-                        if (browser.name && os.name) {
-                            name = `${browser.name} on ${os.name}`;
-                        } else if (browser.name) {
-                            name = browser.name;
-                        } else if (os.name) {
-                            name = os.name;
-                        }
-                    } catch (uaError) {
-                        console.error("Could not parse user agent string:", cred.UserAgent);
-                    }
-                }
-                
-                return {
-                    key: cred.CredentialId || '',
-                    name: name,
-                    createDate: cred.CreatedAt,
-                    lastAuthDate: cred.LastUsedAt,
-                };
-            }).filter(d => d.key);
-        }
+        const listDevicesCommand = new ListDevicesCommand({
+            AccessToken: session.access_token,
+        });
+        const devicesResponse = await cognitoClient.send(listDevicesCommand);
+        
+        devices = (devicesResponse.Devices || []).map((device) => {
+            const deviceNameAttr = device.DeviceAttributes?.find(attr => attr.Name === 'device_name');
+            // Provide a sensible fallback name. The device key is too long and not user-friendly.
+            const name = deviceNameAttr?.Value || `Security Key`; 
+            
+            return {
+                key: device.DeviceKey || '',
+                name: name,
+                createDate: device.DeviceCreateDate,
+                lastAuthDate: device.DeviceLastAuthenticatedDate,
+            };
+        }).filter(d => d.key);
     } catch(e: any) {
-        // This can fail due to missing IAM permissions or invalid parameters.
-        // It's better to log the error and continue with an empty device list
-        // than to crash the entire user session.
-        console.error("Could not fetch WebAuthn credentials for user. This may be due to missing IAM permissions (cognito-idp:ListWebAuthnCredentials) or an issue with the request. Error:", e);
+        console.error("Could not fetch devices for user:", e);
     }
 
     return {

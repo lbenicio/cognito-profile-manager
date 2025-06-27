@@ -121,23 +121,19 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
                                                         {isMounted && device.createDate ? format(new Date(device.createDate), "PPP") : '...'}
                                                     </TableCell>
                                                     <TableCell className="text-right">
-                                                        <TooltipProvider>
-                                                            <Tooltip>
-                                                                <TooltipTrigger asChild>
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="icon"
-                                                                        disabled={true}
-                                                                        aria-label={`Delete passkey ${device.name}`}
-                                                                    >
-                                                                        <Trash2 className="h-4 w-4 text-muted-foreground" />
-                                                                    </Button>
-                                                                </TooltipTrigger>
-                                                                <TooltipContent>
-                                                                    <p>{t('deleteNotSupported')}</p>
-                                                                </TooltipContent>
-                                                            </Tooltip>
-                                                        </TooltipProvider>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => handleDeletePasskey(device.key)}
+                                                            disabled={isDeleting === device.key || isPending}
+                                                            aria-label={`Delete passkey ${device.name}`}
+                                                        >
+                                                            {isDeleting === device.key ? (
+                                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                                            ) : (
+                                                                <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+                                                            )}
+                                                        </Button>
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
