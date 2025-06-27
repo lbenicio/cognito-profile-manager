@@ -77,7 +77,7 @@ export function AccountDisplay({ user, onUpdate }: { user: User, onUpdate: (data
                     </div>
                 </DialogTrigger>
             </div>
-            <CardHeader className="pt-0 -mt-12 sm:-mt-14">
+            <CardHeader className="pt-2 -mt-10 sm:-mt-12">
             <div className="flex items-end gap-4">
                 <Dialog open={isAvatarEditorOpen} onOpenChange={setIsAvatarEditorOpen}>
                     <DialogTrigger asChild>
