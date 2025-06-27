@@ -30,8 +30,8 @@ export async function GET(request: NextRequest) {
     passkeyUrl.searchParams.set('client_id', clientId);
     passkeyUrl.searchParams.set('response_type', 'code');
     passkeyUrl.searchParams.set('scope', scope);
-    passkeyUrl.searchParams.set('redirect_uri', passkeyCallbackUrl);
     passkeyUrl.searchParams.set('state', state);
+    passkeyUrl.searchParams.set('redirect_uri', passkeyCallbackUrl);
 
     const response = NextResponse.redirect(passkeyUrl.toString());
 
