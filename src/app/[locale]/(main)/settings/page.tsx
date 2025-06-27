@@ -3,14 +3,20 @@ import { AppearanceSettings } from '@/components/appearance-settings';
 import { NotificationSettings } from '@/components/notification-settings';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { getUser } from '@/lib/auth';
-import { redirect } from '@/navigation';
 
 export default async function SettingsPage({params: {locale}}: {params: {locale: string}}) {
   unstable_setRequestLocale(locale);
   const user = await getUser();
 
   if (!user) {
-    redirect('/login');
+    return (
+        <div className="flex items-center justify-center h-screen">
+            <div className="text-center">
+                <h1 className="text-2xl font-bold">Authentication Error</h1>
+                <p className="text-muted-foreground">Could not load user data. Please try logging out and signing in again.</p>
+            </div>
+        </div>
+    );
   }
   
   const t = await getTranslations('Settings');
