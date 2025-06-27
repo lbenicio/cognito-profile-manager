@@ -333,11 +333,13 @@ export const getUser = cache(async (): Promise<User | null> => {
     // Fetch user's registered passkeys/devices using ListWebAuthnCredentials.
     let devices: Device[] = [];
     try {
-        if (cognitoUser.Username) {
-            const userPoolId = wellknown.issuer.split('/').pop();
+        const userPoolId = wellknown.issuer.split('/').pop();
+        const usernameForApi = payload.sub as string;
+
+        if (usernameForApi && userPoolId) {
             const listCredentialsCommand = new ListWebAuthnCredentialsCommand({
                 UserPoolId: userPoolId,
-                Username: cognitoUser.Username,
+                Username: usernameForApi,
             });
 
             // This is an admin-level API call and requires appropriate IAM permissions
@@ -372,10 +374,10 @@ export const getUser = cache(async (): Promise<User | null> => {
             }).filter(d => d.key);
         }
     } catch(e: any) {
-        // This can fail if the IAM role for the backend doesn't have permissions.
-        // Log the error but don't block the entire user fetch for this.
-        // An empty device list will be shown, which is better than a full crash.
-        console.error("Could not fetch WebAuthn credentials, you may need to grant 'cognito-idp:ListWebAuthnCredentials' IAM permission to the server role.", e.name);
+        // This can fail due to missing IAM permissions or invalid parameters.
+        // It's better to log the error and continue with an empty device list
+        // than to crash the entire user session.
+        console.error("Could not fetch WebAuthn credentials for user. This may be due to missing IAM permissions (cognito-idp:ListWebAuthnCredentials) or an issue with the request. Error:", e);
     }
 
     return {
