@@ -317,29 +317,27 @@ export const getUser = cache(async (): Promise<User | null> => {
         }
     }
     
-    let devices: Device[] = [];
-    try {
-        const listDevicesCommand = new ListDevicesCommand({
-            AccessToken: session.access_token,
-            Limit: 60,
-        });
-        const devicesResponse = await cognitoClient.send(listDevicesCommand);
-        if (devicesResponse.Devices) {
-            devices = devicesResponse.Devices.map((d) => {
-                const nameAttribute = d.DeviceAttributes?.find(
-                    (attr) => attr.Name === 'device_name'
-                );
-                return {
-                    key: d.DeviceKey || '',
-                    name: nameAttribute?.Value || 'Unnamed Device',
-                    createDate: d.DeviceCreateDate,
-                    lastAuthDate: d.DeviceLastAuthenticatedDate,
-                };
-            }).filter(d => d.key); // Ensure device key exists
-        }
-    } catch (e) {
-        console.error('Failed to list user devices:', e);
-    }
+    // Fetch user's registered passkeys/devices.
+    // This requires the `aws.cognito.signin.user.admin` scope. If the token lacks this,
+    // this call will throw, the entire getUser function will fail, and the user will
+    // be logged out, forcing a new login to get a token with the correct scopes.
+    // This is the desired behavior to prevent inconsistent states.
+    const listDevicesCommand = new ListDevicesCommand({
+        AccessToken: session.access_token,
+        Limit: 60,
+    });
+    const devicesResponse = await cognitoClient.send(listDevicesCommand);
+    const devices: Device[] = (devicesResponse.Devices || []).map((d) => {
+        const nameAttribute = d.DeviceAttributes?.find(
+            (attr) => attr.Name === 'device_name'
+        );
+        return {
+            key: d.DeviceKey || '',
+            name: nameAttribute?.Value || 'Unnamed Device',
+            createDate: d.DeviceCreateDate,
+            lastAuthDate: d.DeviceLastAuthenticatedDate,
+        };
+    }).filter(d => d.key); // Ensure device key exists
 
     return {
       username: cognitoUser.Username || (payload['cognito:username'] as string) || '',
@@ -370,7 +368,7 @@ export const getUser = cache(async (): Promise<User | null> => {
     };
 
   } catch (error: any) {
-    console.error("General error in getUser:", error);
+    console.error("General error in getUser, likely during device list or user attribute fetch:", error);
     // Clearing the cookie here is a safe fallback
     cookies().set('auth_session', '', { expires: new Date(0), path: '/' });
     return null;

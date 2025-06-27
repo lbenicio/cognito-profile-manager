@@ -3,8 +3,8 @@ import { DashboardView } from '@/components/dashboard-view';
 import { unstable_setRequestLocale } from 'next-intl/server';
 
 // This is now a Server Component
-export default async function DashboardPage({params: {locale}}: {params: {locale: string}}) {
-  unstable_setRequestLocale(locale);
+export default async function DashboardPage({params}: {params: {locale: string}}) {
+  unstable_setRequestLocale(params.locale);
   const user = await getUser();
 
   // The middleware should protect this page. If user is null here, it indicates

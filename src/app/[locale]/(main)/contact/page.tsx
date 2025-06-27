@@ -2,8 +2,8 @@ import { getUser } from '@/lib/auth';
 import { ContactForm } from '@/components/contact-form';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 
-export default async function ContactPage({params: {locale}}: {params: {locale: string}}) {
-  unstable_setRequestLocale(locale);
+export default async function ContactPage({params}: {params: {locale: string}}) {
+  unstable_setRequestLocale(params.locale);
   const user = await getUser();
 
   if (!user) {

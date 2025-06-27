@@ -4,8 +4,8 @@ import { NotificationSettings } from '@/components/notification-settings';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { getUser } from '@/lib/auth';
 
-export default async function SettingsPage({params: {locale}}: {params: {locale: string}}) {
-  unstable_setRequestLocale(locale);
+export default async function SettingsPage({params}: {params: {locale: string}}) {
+  unstable_setRequestLocale(params.locale);
   const user = await getUser();
 
   if (!user) {

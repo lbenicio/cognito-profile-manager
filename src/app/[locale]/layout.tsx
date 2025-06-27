@@ -14,12 +14,12 @@ export const metadata: Metadata = {
 // This is the root layout. It now includes the i18n and theme providers.
 export default async function LocaleLayout({
   children,
-  params: { locale },
+  params,
 }: {
   children: React.ReactNode;
   params: { locale: string };
 }) {
-  unstable_setRequestLocale(locale);
+  unstable_setRequestLocale(params.locale);
   const messages = await getMessages();
   const user = await getUser();
 
@@ -27,7 +27,7 @@ export default async function LocaleLayout({
   const fontSize = user?.preferences?.fontSize || 12;
 
   return (
-    <html lang={locale} className="h-full" style={{ fontSize: `${fontSize}pt` }} suppressHydrationWarning>
+    <html lang={params.locale} className="h-full" style={{ fontSize: `${fontSize}pt` }} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon/favicon.svg" sizes="any" type="image/svg+xml" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -35,7 +35,7 @@ export default async function LocaleLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></link>
       </head>
       <body className="font-body antialiased flex flex-col min-h-screen">
-        <NextIntlClientProvider locale={locale} messages={messages}>
+        <NextIntlClientProvider locale={params.locale} messages={messages}>
           <ThemeProvider
             attribute="class"
             defaultTheme={theme}

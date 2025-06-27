@@ -2,8 +2,8 @@ import { getUser } from '@/lib/auth';
 import { ProfileView } from '@/components/profile-view';
 import { unstable_setRequestLocale } from 'next-intl/server';
 
-export default async function ProfilePage({params: {locale}}: {params: {locale: string}}) {
-  unstable_setRequestLocale(locale);
+export default async function ProfilePage({params}: {params: {locale: string}}) {
+  unstable_setRequestLocale(params.locale);
   const user = await getUser();
 
   if (!user) {

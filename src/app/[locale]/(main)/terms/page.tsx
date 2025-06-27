@@ -2,8 +2,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 
-export default async function TermsOfServicePage({params: {locale}}: {params: {locale: string}}) {
-  unstable_setRequestLocale(locale);
+export default async function TermsOfServicePage({params}: {params: {locale: string}}) {
+  unstable_setRequestLocale(params.locale);
   const t = await getTranslations('Terms');
 
   return (
