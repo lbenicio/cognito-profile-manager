@@ -3,14 +3,19 @@ import { cognitoClient } from '@/lib/cognito';
 import { GetUserCommand, UpdateUserAttributesCommand } from '@aws-sdk/client-cognito-identity-provider';
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
+  const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
   const error = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
   const state = searchParams.get('state');
   const storedState = request.cookies.get('oauth_state')?.value;
 
-  const requestUrl = new URL(request.url);
+  const loginUrl = new URL('/login', origin);
+
+  const clearStateCookie = (response: NextResponse) => {
+      response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
+      return response;
+  };
 
   // --- CSRF check ---
   if (!state || !storedState || state !== storedState) {
@@ -18,28 +23,18 @@ export async function GET(request: NextRequest) {
         queryState: state,
         cookieState: storedState
     });
-    const loginUrl = new URL('/login', requestUrl.origin);
     loginUrl.searchParams.set('error', 'invalid_state');
-    const response = NextResponse.redirect(loginUrl);
-    response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
-    return response;
+    return clearStateCookie(NextResponse.redirect(loginUrl));
   }
   
-  const clearStateCookie = (response: NextResponse) => {
-      response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
-      return response;
-  };
-
   if (error) {
     console.error(`OIDC callback error: ${error} - ${errorDescription}`);
-    const loginUrl = new URL('/login', requestUrl.origin);
     loginUrl.searchParams.set('error', errorDescription || error);
     return clearStateCookie(NextResponse.redirect(loginUrl));
   }
 
   if (!code) {
     console.error('Authorization code missing from callback.');
-    const loginUrl = new URL('/login', requestUrl.origin);
     loginUrl.searchParams.set('error', 'auth_code_missing');
     return clearStateCookie(NextResponse.redirect(loginUrl));
   }
@@ -89,8 +84,9 @@ export async function GET(request: NextRequest) {
 
     if (!tokenResponse.ok) {
       console.error("Failed to exchange code for tokens. Response:", tokens);
-      const errorDetails = tokens.error_description || tokens.error || "Unknown token exchange error";
-      throw new Error(`Token exchange failed: ${errorDetails}`);
+      const errorDetails = tokens.error_description || tokens.error || "Token exchange failed.";
+      loginUrl.searchParams.set('error', errorDetails);
+      return clearStateCookie(NextResponse.redirect(loginUrl));
     }
 
     // --- Update user fingerprint ---
@@ -148,7 +144,7 @@ export async function GET(request: NextRequest) {
         refresh_token: tokens.refresh_token,
     };
 
-    const dashboardUrl = new URL('/', requestUrl.origin);
+    const dashboardUrl = new URL('/', origin);
     
     const response = NextResponse.redirect(dashboardUrl);
 
@@ -166,7 +162,6 @@ export async function GET(request: NextRequest) {
     console.error('Callback handler error:', e);
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
     
-    const loginUrl = new URL('/login', requestUrl.origin);
     loginUrl.searchParams.set('error', errorMessage);
     return clearStateCookie(NextResponse.redirect(loginUrl));
   }
