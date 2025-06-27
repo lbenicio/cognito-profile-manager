@@ -386,5 +386,17 @@
   },
   "Privacy": {
     "title": "Privacy Policy"
+  },
+  "Errors": {
+    "notFound": {
+      "title": "404 - Page Not Found",
+      "description": "Sorry, the page you are looking for does not exist or has been moved.",
+      "goHome": "Go to Homepage"
+    },
+    "generic": {
+      "title": "Oops! Something Went Wrong",
+      "description": "We encountered an unexpected error. Please try again. If the problem persists, contact support.",
+      "tryAgain": "Try Again"
+    }
   }
 }

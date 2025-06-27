@@ -386,5 +386,17 @@
   },
   "Privacy": {
     "title": "Política de Privacidad"
+  },
+  "Errors": {
+    "notFound": {
+      "title": "404 - Página no Encontrada",
+      "description": "Lo sentimos, la página que estás buscando no existe o ha sido movida.",
+      "goHome": "Ir a la Página Principal"
+    },
+    "generic": {
+      "title": "¡Vaya! Algo salió mal",
+      "description": "Encontramos un error inesperado. Por favor, inténtalo de nuevo. Si el problema persiste, contacta a soporte.",
+      "tryAgain": "Intentar de Nuevo"
+    }
   }
 }
