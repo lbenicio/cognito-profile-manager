@@ -2,45 +2,43 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cognitoClient } from '@/lib/cognito';
 import { GetUserCommand, UpdateUserAttributesCommand } from '@aws-sdk/client-cognito-identity-provider';
 
+function createErrorResponse(origin: string, error: string, description?: string): NextResponse {
+  const loginUrl = new URL('/login', origin);
+  const errorMessage = description || error;
+  loginUrl.searchParams.set('error', errorMessage);
+  
+  console.error(`OIDC Callback Error: Redirecting to login. Reason: ${errorMessage}`);
+
+  const response = NextResponse.redirect(loginUrl);
+  // Ensure state cookie is always cleared on error
+  response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
+  return response;
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const error = searchParams.get('error');
+  const errorParam = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
   const state = searchParams.get('state');
   const storedState = request.cookies.get('oauth_state')?.value;
 
-  const loginUrl = new URL('/login', origin);
-
-  // --- CSRF check ---
-  if (!state || !storedState || state !== storedState) {
-    console.error('OIDC callback state mismatch or state missing.', {
-        queryState: state,
-        cookieState: storedState
-    });
-    loginUrl.searchParams.set('error', 'invalid_state');
-    const response = NextResponse.redirect(loginUrl);
-    response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
-    return response;
-  }
-  
-  if (error) {
-    console.error(`OIDC callback error: ${error} - ${errorDescription}`);
-    loginUrl.searchParams.set('error', errorDescription || error);
-    const response = NextResponse.redirect(loginUrl);
-    response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
-    return response;
-  }
-
-  if (!code) {
-    console.error('Authorization code missing from callback.');
-    loginUrl.searchParams.set('error', 'auth_code_missing');
-    const response = NextResponse.redirect(loginUrl);
-    response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
-    return response;
-  }
-
   try {
+    // --- Handle explicit errors from OIDC provider ---
+    if (errorParam) {
+      throw new Error(errorDescription || errorParam);
+    }
+    
+    // --- CSRF check ---
+    if (!state || !storedState || state !== storedState) {
+        throw new Error('invalid_state');
+    }
+    
+    // --- Authorization code check ---
+    if (!code) {
+        throw new Error('auth_code_missing');
+    }
+
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     if (!wellknownUrl) throw new Error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
 
@@ -84,12 +82,8 @@ export async function GET(request: NextRequest) {
     const tokens = await tokenResponse.json();
 
     if (!tokenResponse.ok) {
-      console.error("Failed to exchange code for tokens. Response:", tokens);
       const errorDetails = tokens.error_description || tokens.error || "Token exchange failed.";
-      loginUrl.searchParams.set('error', errorDetails);
-      const response = NextResponse.redirect(loginUrl);
-      response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
-      return response;
+      throw new Error(errorDetails);
     }
 
     // --- Update user fingerprint ---
@@ -166,12 +160,7 @@ export async function GET(request: NextRequest) {
     return response;
 
   } catch (e) {
-    console.error('Callback handler error:', e);
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-    
-    loginUrl.searchParams.set('error', errorMessage);
-    const response = NextResponse.redirect(loginUrl);
-    response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
-    return response;
+    return createErrorResponse(origin, 'callback_error', errorMessage);
   }
 }
