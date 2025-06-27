@@ -3,8 +3,6 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { AccountDisplay } from '@/components/account-display';
 import { AccountForm } from '@/components/account-form';
-import { PasswordForm } from '@/components/password-form';
-import { TwoFactorAuth } from '@/components/two-factor-auth';
 import type { User as UserType } from '@/lib/auth';
 import { AddressForm } from './address-form';
 
@@ -39,8 +37,6 @@ export function AccountView({ initialUser }: AccountViewProps) {
         <div className="flex flex-col gap-8">
           <AccountForm user={user} onUpdate={handleProfileUpdate} />
           <AddressForm user={user} onUpdate={handleProfileUpdate} />
-          <PasswordForm />
-          <TwoFactorAuth user={user} onUpdate={handleProfileUpdate} />
         </div>
       </div>
     </div>

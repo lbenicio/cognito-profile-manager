@@ -40,6 +40,7 @@ export function Footer() {
                 <Link href="/" className="text-sm text-muted-foreground hover:text-primary transition-colors">{tSitemap('dashboard')}</Link>
                 <Link href="/account" className="text-sm text-muted-foreground hover:text-primary transition-colors">{tSitemap('account')}</Link>
                 <Link href="/profile" className="text-sm text-muted-foreground hover:text-primary transition-colors">{tSitemap('profile')}</Link>
+                <Link href="/security" className="text-sm text-muted-foreground hover:text-primary transition-colors">{tSitemap('security')}</Link>
                 <Link href="/settings" className="text-sm text-muted-foreground hover:text-primary transition-colors">{tSitemap('settings')}</Link>
               </nav>
             </div>

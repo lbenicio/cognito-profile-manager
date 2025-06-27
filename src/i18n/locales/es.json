@@ -7,7 +7,8 @@
       "settings": "Ajustes",
       "logout": "Cerrar sesión",
       "adminDashboard": "Panel de Administrador",
-      "account": "Cuenta"
+      "account": "Cuenta",
+      "security": "Seguridad"
     },
     "mobileMenuTitle": "Menú Principal",
     "mobileMenuTrigger": "Abrir menú principal",
@@ -20,7 +21,8 @@
       "dashboard": "Panel",
       "account": "Cuenta",
       "profile": "Perfil",
-      "settings": "Ajustes"
+      "settings": "Ajustes",
+      "security": "Seguridad"
     }
   },
   "Dashboard": {
@@ -151,6 +153,18 @@
       "errorTitle": "Fallo al Actualizar",
       "errorDescription": "No se pudo actualizar tu cuenta. Por favor, inténtalo de nuevo."
     },
+    "verification": {
+      "title": "Verificar Atributos",
+      "description": "Verifica tu información de contacto para asegurar tu cuenta.",
+      "resend": "Reenviar",
+      "sentTitle": "Verificación Enviada",
+      "emailSentDescription": "Se ha enviado un correo de verificación a {email}.",
+      "phoneSentDescription": "Se ha enviado un SMS de verificación a {phone}."
+    }
+  },
+  "Security": {
+    "title": "Ajustes de Seguridad",
+    "description": "Gestiona tu contraseña, autenticación de dos factores y otros ajustes de seguridad.",
     "passwordForm": {
       "title": "Cambiar Contraseña",
       "description": "Elige una nueva contraseña fuerte para mantener tu cuenta segura.",
@@ -163,14 +177,6 @@
       "errorTitle": "Error",
       "errorDescription": "Tu contraseña actual es incorrecta.",
       "incorrectPassword": "Contraseña incorrecta"
-    },
-    "verification": {
-      "title": "Verificar Atributos",
-      "description": "Verifica tu información de contacto para asegurar tu cuenta.",
-      "resend": "Reenviar",
-      "sentTitle": "Verificación Enviada",
-      "emailSentDescription": "Se ha enviado un correo de verificación a {email}.",
-      "phoneSentDescription": "Se ha enviado un SMS de verificación a {phone}."
     },
     "twoFactor": {
       "title": "Autenticación de Dos Factores",

@@ -1,7 +1,7 @@
 'use client';
 
 import { Link } from '@/navigation';
-import { LogOut, Settings, LayoutDashboard, Menu, Shield, Contact, CircleUserRound } from 'lucide-react';
+import { LogOut, Settings, LayoutDashboard, Menu, Shield, Contact, CircleUserRound, ShieldCheck } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,6 +33,7 @@ type HeaderTranslations = {
     logout: string;
     adminDashboard: string;
     account: string;
+    security: string;
   };
   mobileMenuTitle: string;
   mobileMenuTrigger: string;
@@ -100,6 +101,12 @@ export function Header({ user, translations: t }: { user: UserType | null, trans
                       <Link href="/account">
                         <CircleUserRound className="mr-2 h-4 w-4" />
                         <span>{t.userMenu.account}</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/security">
+                        <ShieldCheck className="mr-2 h-4 w-4" />
+                        <span>{t.userMenu.security}</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
@@ -173,6 +180,11 @@ export function Header({ user, translations: t }: { user: UserType | null, trans
                       <SheetClose asChild>
                           <Link href="/account" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
                             <CircleUserRound className="h-5 w-5" />{t.userMenu.account}
+                          </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                          <Link href="/security" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
+                            <ShieldCheck className="h-5 w-5" />{t.userMenu.security}
                           </Link>
                       </SheetClose>
                       <SheetClose asChild>

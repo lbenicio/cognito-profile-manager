@@ -19,7 +19,8 @@ export default async function MainAppLayout({
       settings: t('userMenu.settings'),
       logout: t('userMenu.logout'),
       adminDashboard: t('userMenu.adminDashboard'),
-      account: t('userMenu.account')
+      account: t('userMenu.account'),
+      security: t('userMenu.security')
     },
     mobileMenuTrigger: t('mobileMenuTrigger'),
     mobileMenuTitle: t('mobileMenuTitle'),

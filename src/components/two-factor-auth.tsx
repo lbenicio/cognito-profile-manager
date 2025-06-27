@@ -24,7 +24,7 @@ interface TwoFactorAuthProps {
 
 export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
     const { toast } = useToast();
-    const t = useTranslations('Account.twoFactor');
+    const t = useTranslations('Security.twoFactor');
     const router = useRouter();
     const searchParams = useSearchParams();
 

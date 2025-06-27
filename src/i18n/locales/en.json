@@ -7,7 +7,8 @@
       "settings": "Settings",
       "logout": "Log out",
       "adminDashboard": "Admin Dashboard",
-      "account": "Account"
+      "account": "Account",
+      "security": "Security"
     },
     "mobileMenuTitle": "Main Menu",
     "mobileMenuTrigger": "Open main menu",
@@ -20,7 +21,8 @@
       "dashboard": "Dashboard",
       "account": "Account",
       "profile": "Profile",
-      "settings": "Settings"
+      "settings": "Settings",
+      "security": "Security"
     }
   },
   "Dashboard": {
@@ -151,6 +153,18 @@
       "errorTitle": "Update Failed",
       "errorDescription": "Could not update your account. Please try again."
     },
+    "verification": {
+      "title": "Verify Attributes",
+      "description": "Verify your contact information to secure your account.",
+      "resend": "Resend",
+      "sentTitle": "Verification Sent",
+      "emailSentDescription": "A verification email has been sent to {email}.",
+      "phoneSentDescription": "A verification SMS has been sent to {phone}."
+    }
+  },
+  "Security": {
+    "title": "Security Settings",
+    "description": "Manage your password, two-factor authentication, and other security settings.",
     "passwordForm": {
       "title": "Change Password",
       "description": "Choose a strong new password to keep your account secure.",
@@ -163,14 +177,6 @@
       "errorTitle": "Error",
       "errorDescription": "Your current password is incorrect.",
       "incorrectPassword": "Incorrect password"
-    },
-    "verification": {
-      "title": "Verify Attributes",
-      "description": "Verify your contact information to secure your account.",
-      "resend": "Resend",
-      "sentTitle": "Verification Sent",
-      "emailSentDescription": "A verification email has been sent to {email}.",
-      "phoneSentDescription": "A verification SMS has been sent to {phone}."
     },
     "twoFactor": {
       "title": "Two-Factor Authentication",

@@ -33,7 +33,7 @@ type PasswordFormValues = z.infer<ReturnType<typeof passwordFormSchema>>;
 
 export function PasswordForm() {
   const { toast } = useToast();
-  const t = useTranslations('Account.passwordForm');
+  const t = useTranslations('Security.passwordForm');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   
   const form = useForm<PasswordFormValues>({
