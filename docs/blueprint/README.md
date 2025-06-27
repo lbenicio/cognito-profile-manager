@@ -1,6 +1,6 @@
 # **App Name**: Cognito Profile Manager
 
-## Core Features:
+## Core Features
 
 - View Profile: Enable users to view their profile information (e.g., username, email, attributes).
 - Edit Profile: Enable users to modify their profile attributes (e.g., name, address, phone number).
@@ -9,7 +9,7 @@
 - Verification: Verify email addresses or phone numbers, when requested by user.
 - AI Form Hints: When a user is having issues determining how to fill in a form, use a tool to provide helpful, AI-generated hints about the form's expectations.
 
-## Style Guidelines:
+## Style Guidelines
 
 - Primary color: Deep sky blue (#00BFFF) to convey trustworthiness and security, relating to identity management.
 - Background color: Very light blue (#E0FFFF) to provide a clean, calm interface.
