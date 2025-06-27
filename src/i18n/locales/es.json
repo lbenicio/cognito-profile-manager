@@ -86,13 +86,16 @@
       "familyNameRequired": "El apellido es obligatorio.",
       "address": {
         "label": "Dirección",
-        "streetPlaceholder": "Calle y Número",
+        "streetPlaceholder": "Nombre de la calle",
+        "numberPlaceholder": "Número",
+        "complementPlaceholder": "Depto, casa, etc. (opcional)",
         "cityPlaceholder": "Ciudad",
         "statePlaceholder": "Estado / Provincia",
         "zipCodePlaceholder": "Código Postal",
-        "countryPlaceholder": "País"
+        "countryPlaceholder": "País",
+        "streetRequired": "El nombre de la calle es obligatorio.",
+        "numberRequired": "El número es obligatorio."
       },
-      "streetAddressRequired": "La calle y número son obligatorios.",
       "cityRequired": "La ciudad es obligatoria.",
       "stateRequired": "El estado o provincia es obligatorio.",
       "zipCodeRequired": "El código postal es obligatorio.",

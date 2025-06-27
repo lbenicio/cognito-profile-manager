@@ -86,13 +86,16 @@
       "familyNameRequired": "Family name is required.",
       "address": {
         "label": "Address",
-        "streetPlaceholder": "Street Address",
+        "streetPlaceholder": "Street Name",
+        "numberPlaceholder": "Number",
+        "complementPlaceholder": "Apt, suite, etc. (optional)",
         "cityPlaceholder": "City",
         "statePlaceholder": "State / Province",
         "zipCodePlaceholder": "Zip / Postal Code",
-        "countryPlaceholder": "Country"
+        "countryPlaceholder": "Country",
+        "streetRequired": "Street name is required.",
+        "numberRequired": "Street number is required."
       },
-      "streetAddressRequired": "Street address is required.",
       "cityRequired": "City is required.",
       "stateRequired": "State or province is required.",
       "zipCodeRequired": "Zip or postal code is required.",

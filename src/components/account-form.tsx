@@ -29,7 +29,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 const accountFormSchema = (t: (key: string) => string) => z.object({
   given_name: z.string().min(1, { message: t('givenNameRequired') }).max(50),
   family_name: z.string().min(1, { message: t('familyNameRequired') }).max(50),
-  streetAddress: z.string().min(1, { message: t('streetAddressRequired') }),
+  street: z.string().min(1, { message: t('address.streetRequired') }),
+  number: z.string().min(1, { message: t('address.numberRequired') }),
+  complement: z.string().optional(),
   city: z.string().min(1, { message: t('cityRequired') }),
   state: z.string().min(1, { message: t('stateRequired') }),
   zipCode: z.string().min(1, { message: t('zipCodeRequired') }),
@@ -60,7 +62,9 @@ export function AccountForm({ user, onUpdate }: AccountFormProps) {
     defaultValues: {
       given_name: '',
       family_name: '',
-      streetAddress: '',
+      street: '',
+      number: '',
+      complement: '',
       city: '',
       state: '',
       zipCode: '',
@@ -82,7 +86,9 @@ export function AccountForm({ user, onUpdate }: AccountFormProps) {
     form.reset({
         given_name,
         family_name,
-        streetAddress: '', // Keep address fields blank for new entry
+        street: '', // Keep address fields blank for new entry
+        number: '',
+        complement: '',
         city: '',
         state: '',
         zipCode: '',
@@ -99,7 +105,9 @@ export function AccountForm({ user, onUpdate }: AccountFormProps) {
     setIsSubmitting(true);
     
     try {
-        const fullAddress = `${data.streetAddress}, ${data.city}, ${data.state} ${data.zipCode}, ${data.country}`;
+        const complementPart = data.complement ? `, ${data.complement}` : '';
+        const fullAddress = `${data.street} ${data.number}${complementPart}, ${data.city}, ${data.state} ${data.zipCode}, ${data.country}`;
+        
         const result = await updateUserProfile({
             ...data,
             address: fullAddress,
@@ -202,9 +210,9 @@ export function AccountForm({ user, onUpdate }: AccountFormProps) {
             <div className="space-y-2">
                 <FormLabel>{t('address.label')}</FormLabel>
                 <div className="space-y-4">
-                    <FormField
+                     <FormField
                       control={form.control}
-                      name="streetAddress"
+                      name="street"
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
@@ -214,6 +222,32 @@ export function AccountForm({ user, onUpdate }: AccountFormProps) {
                         </FormItem>
                       )}
                     />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                       <FormField
+                          control={form.control}
+                          name="number"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input placeholder={t('address.numberPlaceholder')} {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                         <FormField
+                          control={form.control}
+                          name="complement"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input placeholder={t('address.complementPlaceholder')} {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                    </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <FormField
                           control={form.control}
