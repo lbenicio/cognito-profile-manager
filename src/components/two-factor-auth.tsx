@@ -129,10 +129,9 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
         try {
             const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
             const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
-            const callbackUrl = process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL;
             const scope = process.env.NEXT_PUBLIC_OAUTH2_SCOPE;
 
-            if (!wellknownUrl || !clientId || !callbackUrl || !scope) {
+            if (!wellknownUrl || !clientId || !scope) {
                 throw new Error(t('passkeyError.configMissing'));
             }
             
@@ -144,12 +143,15 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
             const cognitoDomain = new URL(authorizationEndpoint).origin;
             const passkeyUrl = new URL(`${cognitoDomain}/passkeys/add`);
             
+            // The new callback URL specific to this action
+            const passkeyCallbackUrl = new URL('/api/v1/auth/callback/passkey', window.location.origin).toString();
+
             // CSRF protection: generate and store state
             const state = crypto.randomUUID();
             document.cookie = `oauth_state=${state};path=/;max-age=300;samesite=lax`; // 5 min expiry
 
             passkeyUrl.searchParams.set('client_id', clientId);
-            passkeyUrl.searchParams.set('redirect_uri', callbackUrl);
+            passkeyUrl.searchParams.set('redirect_uri', passkeyCallbackUrl);
             passkeyUrl.searchParams.set('response_type', 'code');
             passkeyUrl.searchParams.set('scope', scope);
             passkeyUrl.searchParams.set('state', state);
