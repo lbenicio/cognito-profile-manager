@@ -1,9 +1,15 @@
+
 import { NextRequest, NextResponse } from 'next/server';
-import { pathnames } from '@/navigation';
+import { pathnames, locales } from '@/navigation';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
 
 // All pages that are public and don't require authentication
 const publicPages = [pathnames['/login']]; 
+const publicPathnameRegex = new RegExp(
+  `^(/(${locales.join('|')}))?(${publicPages.join('|')})/?$`,
+  'i'
+);
+
 
 // This function is for verifying the JWT
 async function verifyToken(token: string): Promise<boolean> {
@@ -92,21 +98,22 @@ async function refreshAccessToken(refreshToken: string) {
 }
 
 // Helper function to avoid repetition
-function redirectToLogin(request: NextRequest, sessionCookie?: any): NextResponse {
+function redirectToLogin(request: NextRequest): NextResponse {
     const loginUrl = new URL(pathnames['/login'], request.url);
     const response = NextResponse.redirect(loginUrl);
     
-    if (sessionCookie) {
-      const hostname = request.nextUrl.hostname;
-      const domain = hostname === 'localhost' ? undefined : hostname;
-      response.cookies.set('auth_session', '', { expires: new Date(0), path: '/', domain });
-    }
+    const hostname = request.nextUrl.hostname;
+    const domain = hostname === 'localhost' ? undefined : hostname;
+    
+    // Clear both session and state cookies on redirect.
+    response.cookies.set('auth_session', '', { expires: new Date(0), path: '/', domain });
+    response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/', domain });
+
     return response;
 }
 
 export async function authMiddleware(request: NextRequest): Promise<NextResponse | null> {
   const sessionCookie = request.cookies.get('auth_session');
-  const pathname = request.nextUrl.pathname;
   let session;
 
   try {
@@ -115,7 +122,7 @@ export async function authMiddleware(request: NextRequest): Promise<NextResponse
     session = null;
   }
 
-  const isPublicPage = publicPages.includes(pathname as (typeof publicPages)[number]);
+  const isPublicPage = publicPathnameRegex.test(request.nextUrl.pathname);
   
   const hostname = request.nextUrl.hostname;
   const domain = hostname === 'localhost' ? undefined : hostname;
@@ -130,7 +137,7 @@ export async function authMiddleware(request: NextRequest): Promise<NextResponse
   
   // If no session and trying to access a protected page, redirect to login
   if (!session && !isPublicPage) {
-    return redirectToLogin(request, sessionCookie);
+    return redirectToLogin(request);
   }
   
   // If there is a session, check its validity
@@ -157,18 +164,18 @@ export async function authMiddleware(request: NextRequest): Promise<NextResponse
           return response;
         } else {
           // Refresh failed, log the user out
-          return redirectToLogin(request, sessionCookie);
+          return redirectToLogin(request);
         }
       } else {
         // Expired and no refresh token, log out
-        return redirectToLogin(request, sessionCookie);
+        return redirectToLogin(request);
       }
     } else {
       // Session is not expired.
       // We still do a quick verification of the token to ensure it wasn't revoked.
       const isTokenValid = await verifyToken(session.id_token);
       if (!isTokenValid) {
-        return redirectToLogin(request, sessionCookie);
+        return redirectToLogin(request);
       }
 
       // Valid session, if on a public page, redirect to dashboard.
