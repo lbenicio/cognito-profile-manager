@@ -3,7 +3,6 @@ import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
 import { cognitoClient, GetUserCommand, ListDevicesCommand } from '@/lib/cognito';
-import { refreshAuthTokens } from './session-actions';
 
 // Define the User type, which should match what the components expect.
 export type UserPreferences = {
@@ -180,7 +179,7 @@ const getRawSession = cache(async (): Promise<Session> => {
 });
 
 export const getSession = cache(async (): Promise<Session> => {
-    let session = await getRawSession();
+    const session = await getRawSession();
     if (!session) return null;
 
     // Dev mode mock session doesn't need validation/refresh
@@ -191,11 +190,11 @@ export const getSession = cache(async (): Promise<Session> => {
     if (!session.id_token) {
         return null;
     }
-
+    
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     if (!wellknownUrl) {
-      console.error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
-      return null;
+        console.error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
+        return null;
     }
 
     try {
@@ -203,24 +202,24 @@ export const getSession = cache(async (): Promise<Session> => {
         if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
         const wellknown = await wellknownResponse.json();
         const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
-
+        
+        // This will throw if the token is invalid or expired
         await jwtVerify(session.id_token, JWKS, {
             issuer: wellknown.issuer,
             audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
         });
 
-        // Token is valid, return current session
+        // If we get here, the token is valid (not expired, signature is good)
         return session;
 
     } catch (error: any) {
-        if (error.code === 'ERR_JWT_EXPIRED' && session.refresh_token) {
-            const newSession = await refreshAuthTokens(session.refresh_token);
-            return newSession; // Returns new session on success, or null on failure
-        } else {
-            console.error('JWT validation error, clearing session:', error.message);
-            cookies().set('auth_session', '', { expires: new Date(0), path: '/' });
-            return null;
+        // If validation fails (e.g., expired, invalid signature), treat session as invalid.
+        // Middleware is responsible for handling the refresh. If we get an expired
+        // token here, it means the refresh likely failed.
+        if (error.code !== 'ERR_JWT_EXPIRED') {
+          console.error("JWT validation error in getSession:", error.message);
         }
+        return null;
     }
 });
 
