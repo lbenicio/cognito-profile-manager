@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Mail, Home, Phone, CalendarDays, BadgeCheck, Shield, Users, Globe, Clock, Languages, Edit, PersonStanding, BookUser, Image as ImageIcon } from 'lucide-react';
+import { Mail, Home, Phone, CalendarDays, BadgeCheck, Shield, Users, Globe, Clock, Languages, Edit, PersonStanding, BookUser, Image as ImageIcon, Cake } from 'lucide-react';
 import Image from 'next/image';
 import { format, parseISO } from 'date-fns';
 import { useTranslations } from 'next-intl';
@@ -157,6 +157,12 @@ export function AccountDisplay({ user, onUpdate }: { user: User, onUpdate: (data
             <div className="flex items-start gap-3">
                 <PersonStanding className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
                 <span className="flex-1">{user.gender || tAccount('display.notSet')}</span>
+            </div>
+            <div className="flex items-start gap-3">
+                <Cake className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
+                <span className="flex-1">
+                    {user.birthdate ? format(parseISO(user.birthdate), 'PPP') : tAccount('display.notSet')}
+                </span>
             </div>
             {user.website && (
                 <div className="flex items-center gap-3">

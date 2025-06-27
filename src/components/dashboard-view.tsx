@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, KeyRound, User, Calendar, Server, Smartphone, ShieldCheck, Target, CheckCircle2, XCircle, Users, Mail, Palette } from 'lucide-react';
+import { ArrowRight, KeyRound, User as UserIcon, Calendar, Server, Smartphone, ShieldCheck, Target, CheckCircle2, XCircle, Users, Mail, Palette } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { User as UserType } from '@/lib/auth';
 import { useTranslations } from 'next-intl';
@@ -101,6 +101,10 @@ export function DashboardView({ user }: DashboardViewProps) {
                 <div>
                     <CardTitle>{user.name}</CardTitle>
                     <CardDescription>@{user.username}</CardDescription>
+                     <div className="flex items-center text-xs text-muted-foreground pt-1">
+                        <UserIcon className="w-3 h-3 mr-1.5" />
+                        <span>{t('id')}: {user.sub}</span>
+                    </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -133,7 +137,10 @@ export function DashboardView({ user }: DashboardViewProps) {
             <Card>
               <CardHeader>
                 <CardTitle>{t('loginHistory.title')}</CardTitle>
-                <CardDescription>{t('loginHistory.description')}</CardDescription>
+                <CardDescription>
+                    {t('loginHistory.description')}{' '}
+                    {user.fingerprint?.[0]?.date && `(${t('lastLogin')}: ${isMounted ? format(new Date(user.fingerprint[0].date), "PPP p") : '...'})`}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <Table>

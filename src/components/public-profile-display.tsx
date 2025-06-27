@@ -5,8 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Globe, Mail, EyeOff, Phone, PersonStanding, Clock, Languages } from 'lucide-react';
+import { Globe, Mail, EyeOff, Phone, PersonStanding, Clock, Languages, Cake } from 'lucide-react';
 import type { User } from '@/lib/auth';
+import { format, parseISO } from 'date-fns';
 
 interface PublicProfileDisplayProps {
   user: User;
@@ -15,7 +16,7 @@ interface PublicProfileDisplayProps {
 export function PublicProfileDisplay({ user }: PublicProfileDisplayProps) {
   const t = useTranslations('Profile.preview');
   const { isPublic, publicFields } = user.publicProfilePreferences;
-  const hasContactFields = publicFields.email || publicFields.website || publicFields.phone_number || publicFields.gender || publicFields.zoneinfo || publicFields.locale;
+  const hasContactFields = publicFields.email || publicFields.website || publicFields.phone_number || publicFields.gender || publicFields.zoneinfo || publicFields.locale || publicFields.birthdate;
 
   return (
     <Card>
@@ -104,6 +105,12 @@ export function PublicProfileDisplay({ user }: PublicProfileDisplayProps) {
                             <div className="flex items-center gap-2 text-sm">
                                 <PersonStanding className="w-4 h-4 text-muted-foreground" />
                                 <span>{user.gender}</span>
+                            </div>
+                        )}
+                        {publicFields.birthdate && user.birthdate && (
+                            <div className="flex items-center gap-2 text-sm">
+                                <Cake className="w-4 h-4 text-muted-foreground" />
+                                <span>{format(parseISO(user.birthdate), 'PPP')}</span>
                             </div>
                         )}
                         {publicFields.zoneinfo && user.zoneinfo && (

@@ -8,6 +8,7 @@ type UserProfileAttributes = {
     given_name: string;
     family_name: string;
     phone_number: string;
+    birthdate: string;
     website: string;
     zoneinfo: string;
     gender: string;
@@ -27,6 +28,7 @@ export async function updateUserProfile(data: UserProfileAttributes): Promise<{ 
                 { Name: 'given_name', Value: data.given_name },
                 { Name: 'family_name', Value: data.family_name },
                 { Name: 'phone_number', Value: data.phone_number },
+                { Name: 'birthdate', Value: data.birthdate },
                 { Name: 'website', Value: data.website },
                 { Name: 'zoneinfo', Value: data.zoneinfo },
                 { Name: 'gender', Value: data.gender },

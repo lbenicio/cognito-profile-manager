@@ -32,6 +32,7 @@ export type PublicProfilePreferences = {
     aboutMe: boolean;
     phone_number: boolean;
     gender: boolean;
+    birthdate: boolean;
     zoneinfo: boolean;
     locale: boolean;
   };
@@ -51,6 +52,7 @@ export type Device = {
 };
 
 export type User = {
+  sub: string;
   username: string;
   email: string;
   email_verified: boolean;
@@ -58,6 +60,7 @@ export type User = {
   address: string;
   phone_number: string;
   phone_number_verified: boolean;
+  birthdate: string;
   creationDate: string; // ISO string
   userStatus: string;
   twoFactorEnabled: boolean;
@@ -112,6 +115,7 @@ const defaultPublicProfilePreferences: PublicProfilePreferences = {
     aboutMe: true,
     phone_number: false,
     gender: false,
+    birthdate: false,
     zoneinfo: false,
     locale: false,
   },
@@ -119,6 +123,7 @@ const defaultPublicProfilePreferences: PublicProfilePreferences = {
 
 // Mock user data for development environment
 const mockUser: User = {
+  sub: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
   username: 'testuser_dev',
   email: 'dev@example.com',
   email_verified: true,
@@ -126,6 +131,7 @@ const mockUser: User = {
   address: '123 Dev Lane, Developer City, DS',
   phone_number: '+10000000000',
   phone_number_verified: true,
+  birthdate: '1990-01-15',
   creationDate: new Date().toISOString(),
   userStatus: 'CONFIRMED',
   twoFactorEnabled: false,
@@ -317,10 +323,6 @@ export const getUser = cache(async (): Promise<User | null> => {
     }
     
     // Fetch user's registered passkeys/devices.
-    // This requires the `aws.cognito.signin.user.admin` scope. If the token lacks this,
-    // this call will throw, the entire getUser function will fail, and the user will
-    // be logged out, forcing a new login to get a token with the correct scopes.
-    // This is the desired behavior to prevent inconsistent states.
     const listDevicesCommand = new ListDevicesCommand({
         AccessToken: session.access_token,
         Limit: 60,
@@ -339,6 +341,7 @@ export const getUser = cache(async (): Promise<User | null> => {
     }).filter(d => d.key); // Ensure device key exists
 
     return {
+      sub: payload.sub as string,
       username: cognitoUser.Username || (payload['cognito:username'] as string) || '',
       email: attributes.email || (payload.email as string) || '',
       email_verified: attributes.email_verified === 'true',
@@ -346,6 +349,7 @@ export const getUser = cache(async (): Promise<User | null> => {
       address: attributes.address || '',
       phone_number: attributes.phone_number || (payload.phone_number as string) || '',
       phone_number_verified: attributes.phone_number_verified === 'true',
+      birthdate: attributes.birthdate || '',
       creationDate: new Date((payload.auth_time as number) * 1000).toISOString(),
       userStatus: cognitoUser.UserStatus || 'CONFIRMED',
       twoFactorEnabled: attributes['custom:mfa'] === 'true',

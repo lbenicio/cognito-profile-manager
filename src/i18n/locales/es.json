@@ -35,6 +35,8 @@
   "Dashboard": {
     "welcome": "¡Bienvenido de nuevo, {name}!",
     "description": "Aquí hay un resumen rápido de tu cuenta de Outpost.",
+    "id": "ID",
+    "lastLogin": "Último acceso",
     "profileCard": {
       "title": "Perfil",
       "email": "Correo electrónico",
@@ -168,6 +170,8 @@
       "phonePlaceholder": "555 123 4567",
       "phoneDescription": "Selecciona tu país e introduce tu número de teléfono.",
       "phoneInvalid": "Por favor, introduce un número de teléfono válido.",
+      "birthdateLabel": "Fecha de nacimiento",
+      "birthdatePlaceholder": "Selecciona una fecha",
       "websiteLabel": "Sitio web",
       "zoneinfoLabel": "Zona horaria",
       "zoneinfoDescription": "Selecciona la zona horaria en la que te encuentras.",
@@ -285,6 +289,7 @@
       "showAboutMeLabel": "Mostrar 'Sobre mí'",
       "showPhoneLabel": "Mostrar número de teléfono",
       "showGenderLabel": "Mostrar género",
+      "showBirthdateLabel": "Mostrar fecha de nacimiento",
       "showZoneinfoLabel": "Mostrar zona horaria",
       "showLocaleLabel": "Mostrar idioma/localidad",
       "saveButton": "Guardar Ajustes",

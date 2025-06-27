@@ -160,6 +160,15 @@ export function ProfileSettingsForm({ initialPreferences, onUpdate }: ProfileSet
                     disabled={isPending || !prefs.isPublic}
                 />
             </div>
+             <div className="flex items-center justify-between">
+                <Label htmlFor="show-birthdate">{t('showBirthdateLabel')}</Label>
+                <Switch
+                    id="show-birthdate"
+                    checked={prefs.publicFields.birthdate}
+                    onCheckedChange={(value) => handleFieldChange('birthdate', value)}
+                    disabled={isPending || !prefs.isPublic}
+                />
+            </div>
             <div className="flex items-center justify-between">
                 <Label htmlFor="show-zoneinfo">{t('showZoneinfoLabel')}</Label>
                 <Switch
