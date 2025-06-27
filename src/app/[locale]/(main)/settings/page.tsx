@@ -1,5 +1,6 @@
 
 import { AppearanceSettings } from '@/components/appearance-settings';
+import { NotificationSettings } from '@/components/notification-settings';
 import { getTranslations } from 'next-intl/server';
 import { getUser } from '@/lib/auth';
 import { redirect } from '@/navigation';
@@ -21,8 +22,9 @@ export default async function SettingsPage({params: {locale}}: {params: {locale:
                 {t('description')}
             </p>
         </header>
-        <div className="max-w-3xl">
+        <div className="max-w-3xl space-y-8">
             <AppearanceSettings user={user} />
+            <NotificationSettings user={user} />
         </div>
     </div>
   );

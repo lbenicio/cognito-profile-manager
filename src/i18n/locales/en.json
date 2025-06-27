@@ -157,6 +157,35 @@
       "spanish": "Spanish",
       "updateErrorTitle": "Update Failed",
       "updateErrorDescription": "Could not save your preferences. Please try again."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Choose how you want to be notified.",
+      "save": "Save Preferences",
+      "successTitle": "Preferences Saved",
+      "successDescription": "Your notification settings have been updated.",
+      "errorTitle": "Update Failed",
+      "channels": {
+        "title": "Channels",
+        "email": "Email",
+        "app": "In-App Notifications",
+        "telegram": "Telegram"
+      },
+      "types": {
+        "title": "Notification Types",
+        "user": {
+          "label": "User Interactions",
+          "description": "Notifications about mentions, replies, and direct messages."
+        },
+        "system": {
+          "label": "System & Security",
+          "description": "Notifications about security alerts and account changes."
+        },
+        "marketing": {
+          "label": "Marketing & Offers",
+          "description": "Receive news, updates, and special offers."
+        }
+      }
     }
   },
   "Login": {

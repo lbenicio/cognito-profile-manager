@@ -157,6 +157,35 @@
       "spanish": "Español",
       "updateErrorTitle": "Error al Actualizar",
       "updateErrorDescription": "No se pudieron guardar tus preferencias. Inténtalo de nuevo."
+    },
+    "notifications": {
+      "title": "Notificaciones",
+      "description": "Elige cómo quieres ser notificado.",
+      "save": "Guardar Preferencias",
+      "successTitle": "Preferencias Guardadas",
+      "successDescription": "Tus ajustes de notificación han sido actualizados.",
+      "errorTitle": "Error al Actualizar",
+      "channels": {
+        "title": "Canales",
+        "email": "Correo Electrónico",
+        "app": "Notificaciones en la App",
+        "telegram": "Telegram"
+      },
+      "types": {
+        "title": "Tipos de Notificación",
+        "user": {
+          "label": "Interacciones de Usuario",
+          "description": "Notificaciones sobre menciones, respuestas y mensajes directos."
+        },
+        "system": {
+          "label": "Sistema y Seguridad",
+          "description": "Notificaciones sobre alertas de seguridad y cambios en la cuenta."
+        },
+        "marketing": {
+          "label": "Marketing y Ofertas",
+          "description": "Recibe noticias, actualizaciones y ofertas especiales."
+        }
+      }
     }
   },
   "Login": {

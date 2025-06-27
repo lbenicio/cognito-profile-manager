@@ -12,6 +12,15 @@ export type UserPreferences = {
   fontSize: number;
 };
 
+export type NotificationPreferences = {
+  email: boolean;
+  app: boolean;
+  telegram: boolean;
+  user: boolean;
+  system: boolean;
+  marketing: boolean;
+};
+
 export type User = {
   username: string;
   email: string;
@@ -31,12 +40,22 @@ export type User = {
   zoneinfo: string;
   website: string;
   preferences: UserPreferences;
+  notificationPreferences: NotificationPreferences;
 };
 
 const defaultPreferences: UserPreferences = {
   theme: 'system',
   language: 'en',
   fontSize: 12,
+};
+
+const defaultNotificationPreferences: NotificationPreferences = {
+    email: true,
+    app: true,
+    telegram: false,
+    user: true,
+    system: true,
+    marketing: false,
 };
 
 // Mock user data for development environment
@@ -59,6 +78,7 @@ const mockUser: User = {
   zoneinfo: 'America/New_York',
   website: 'https://example.com',
   preferences: defaultPreferences,
+  notificationPreferences: defaultNotificationPreferences,
 };
 
 const mockAdminUser: User = {
@@ -156,7 +176,8 @@ export const getUser = cache(async (): Promise<User | null> => {
       locale: (payload.locale as string) || '',
       zoneinfo: (payload.zoneinfo as string) || '',
       website: (payload.website as string) || '',
-      preferences: preferences
+      preferences: preferences,
+      notificationPreferences: { ...defaultNotificationPreferences },
     };
     
     // Now, use the access token to fetch the most up-to-date user attributes from Cognito.
@@ -175,6 +196,7 @@ export const getUser = cache(async (): Promise<User | null> => {
         if (attributes) {
              const freshGivenName = attributes.given_name || '';
              const freshFamilyName = attributes.family_name || '';
+             let notificationPreferences: NotificationPreferences = { ...defaultNotificationPreferences };
 
              // Re-parse preferences from the absolute latest data
              if (attributes['custom:session']) {
@@ -185,6 +207,16 @@ export const getUser = cache(async (): Promise<User | null> => {
                      console.error('Failed to parse user preferences from GetUser API call', e);
                  }
              }
+
+             // Parse notification preferences
+             notificationPreferences = {
+                email: attributes['custom:email-notification'] === 'true',
+                app: attributes['custom:app-notification'] === 'true',
+                telegram: attributes['custom:tlgm-notification'] === 'true',
+                user: attributes['custom:user-notifications'] === 'true',
+                system: attributes['custom:system-notifications'] === 'true',
+                marketing: attributes['custom:mkt-notifications'] === 'true',
+             };
 
              user = {
                 ...user,
@@ -201,6 +233,7 @@ export const getUser = cache(async (): Promise<User | null> => {
                 zoneinfo: attributes.zoneinfo || user.zoneinfo,
                 website: attributes.website || user.website,
                 preferences: preferences,
+                notificationPreferences: notificationPreferences,
                 // Crucially, update the custom attributes from the fresh data
                 twoFactorEnabled: attributes['custom:mfa'] === 'true',
                 passkeysEnabled: attributes['custom:pless'] === 'true',
