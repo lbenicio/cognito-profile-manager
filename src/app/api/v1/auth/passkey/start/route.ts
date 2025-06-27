@@ -13,10 +13,10 @@ export async function GET(request: NextRequest) {
 
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
-    const scope = process.env.NEXT_PUBLIC_OAUTH2_SCOPE;
     const passkeyCallbackUrl = process.env.NEXT_PUBLIC_PASSKEY_CALLBACK_URL;
+    const scope = 'openid email profile aws.cognito.signin.user.admin';
 
-    if (!wellknownUrl || !clientId || !scope) {
+    if (!wellknownUrl || !clientId) {
       throw new Error('Passkey client configuration is missing.');
     }
     
