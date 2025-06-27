@@ -6,12 +6,12 @@ import { Mail, Home, Phone, CalendarDays, BadgeCheck, Shield, Users, Globe, Cloc
 import { format, parseISO } from 'date-fns';
 import { useTranslations } from 'next-intl';
 import type { User } from '@/lib/auth';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useState, useEffect } from 'react';
 import { AvatarEditor } from './avatar-editor';
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Separator } from './ui/separator';
+import { Separator } from '@/components/ui/separator';
 
 export function ProfileDisplay({ user, onUpdate }: { user: User, onUpdate: (data: Partial<User>) => void }) {
   const t = useTranslations('Dashboard');

@@ -27,6 +27,11 @@ export type PublicProfilePreferences = {
     email: boolean;
     website: boolean;
     aboutMe: boolean;
+    address: boolean;
+    phone_number: boolean;
+    gender: boolean;
+    zoneinfo: boolean;
+    locale: boolean;
   };
 };
 
@@ -77,6 +82,11 @@ const defaultPublicProfilePreferences: PublicProfilePreferences = {
     email: false,
     website: false,
     aboutMe: true,
+    address: false,
+    phone_number: false,
+    gender: false,
+    zoneinfo: false,
+    locale: false,
   },
 };
 

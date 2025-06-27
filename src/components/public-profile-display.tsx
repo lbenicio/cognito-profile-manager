@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Globe, Mail, EyeOff } from 'lucide-react';
+import { Globe, Mail, EyeOff, Home, Phone, PersonStanding, Clock, Languages } from 'lucide-react';
 import type { User } from '@/lib/auth';
 
 interface PublicProfileDisplayProps {
@@ -14,6 +14,7 @@ interface PublicProfileDisplayProps {
 export function PublicProfileDisplay({ user }: PublicProfileDisplayProps) {
   const t = useTranslations('Profile.preview');
   const { isPublic, publicFields } = user.publicProfilePreferences;
+  const hasAnyPublicField = Object.values(publicFields).some(Boolean);
 
   return (
     <Card>
@@ -58,8 +59,18 @@ export function PublicProfileDisplay({ user }: PublicProfileDisplayProps) {
                         </p>
                       </>
                     )}
-                    {(publicFields.website || publicFields.email) && <Separator />}
-                     <div className='flex flex-col items-center gap-3'>
+                    
+                    {hasAnyPublicField && <Separator />}
+
+                     <div className='flex flex-col items-start text-left gap-3 w-full'>
+                        {publicFields.email && (
+                             <div className="flex items-center gap-2 text-sm">
+                                <Mail className="w-4 h-4 text-muted-foreground" />
+                                <a href={`mailto:${user.email}`} className="text-primary hover:underline">
+                                    {user.email}
+                                </a>
+                            </div>
+                        )}
                         {publicFields.website && user.website && (
                             <div className="flex items-center gap-2 text-sm">
                                 <Globe className="w-4 h-4 text-muted-foreground" />
@@ -68,12 +79,34 @@ export function PublicProfileDisplay({ user }: PublicProfileDisplayProps) {
                                 </a>
                             </div>
                         )}
-                        {publicFields.email && (
-                             <div className="flex items-center gap-2 text-sm">
-                                <Mail className="w-4 h-4 text-muted-foreground" />
-                                <a href={`mailto:${user.email}`} className="text-primary hover:underline">
-                                    {user.email}
-                                </a>
+                         {publicFields.address && user.address && (
+                            <div className="flex items-start gap-2 text-sm">
+                                <Home className="w-4 h-4 text-muted-foreground mt-0.5" />
+                                <span>{user.address}</span>
+                            </div>
+                        )}
+                        {publicFields.phone_number && user.phone_number && (
+                            <div className="flex items-center gap-2 text-sm">
+                                <Phone className="w-4 h-4 text-muted-foreground" />
+                                <span>{user.phone_number}</span>
+                            </div>
+                        )}
+                         {publicFields.gender && user.gender && (
+                            <div className="flex items-center gap-2 text-sm">
+                                <PersonStanding className="w-4 h-4 text-muted-foreground" />
+                                <span>{user.gender}</span>
+                            </div>
+                        )}
+                        {publicFields.zoneinfo && user.zoneinfo && (
+                            <div className="flex items-center gap-2 text-sm">
+                                <Clock className="w-4 h-4 text-muted-foreground" />
+                                <span>{user.zoneinfo}</span>
+                            </div>
+                        )}
+                        {publicFields.locale && user.locale && (
+                            <div className="flex items-center gap-2 text-sm">
+                                <Languages className="w-4 h-4 text-muted-foreground" />
+                                <span>{user.locale}</span>
                             </div>
                         )}
                      </div>

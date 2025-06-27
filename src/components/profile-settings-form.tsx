@@ -106,6 +106,51 @@ export function ProfileSettingsForm({ initialPreferences, onUpdate }: ProfileSet
                     disabled={isPending || !prefs.isPublic}
                 />
             </div>
+            <div className="flex items-center justify-between">
+                <Label htmlFor="show-address">{t('showAddressLabel')}</Label>
+                <Switch
+                    id="show-address"
+                    checked={prefs.publicFields.address}
+                    onCheckedChange={(value) => handleFieldChange('address', value)}
+                    disabled={isPending || !prefs.isPublic}
+                />
+            </div>
+            <div className="flex items-center justify-between">
+                <Label htmlFor="show-phone">{t('showPhoneLabel')}</Label>
+                <Switch
+                    id="show-phone"
+                    checked={prefs.publicFields.phone_number}
+                    onCheckedChange={(value) => handleFieldChange('phone_number', value)}
+                    disabled={isPending || !prefs.isPublic}
+                />
+            </div>
+            <div className="flex items-center justify-between">
+                <Label htmlFor="show-gender">{t('showGenderLabel')}</Label>
+                <Switch
+                    id="show-gender"
+                    checked={prefs.publicFields.gender}
+                    onCheckedChange={(value) => handleFieldChange('gender', value)}
+                    disabled={isPending || !prefs.isPublic}
+                />
+            </div>
+            <div className="flex items-center justify-between">
+                <Label htmlFor="show-zoneinfo">{t('showZoneinfoLabel')}</Label>
+                <Switch
+                    id="show-zoneinfo"
+                    checked={prefs.publicFields.zoneinfo}
+                    onCheckedChange={(value) => handleFieldChange('zoneinfo', value)}
+                    disabled={isPending || !prefs.isPublic}
+                />
+            </div>
+             <div className="flex items-center justify-between">
+                <Label htmlFor="show-locale">{t('showLocaleLabel')}</Label>
+                <Switch
+                    id="show-locale"
+                    checked={prefs.publicFields.locale}
+                    onCheckedChange={(value) => handleFieldChange('locale', value)}
+                    disabled={isPending || !prefs.isPublic}
+                />
+            </div>
         </div>
       </CardContent>
       <CardFooter>

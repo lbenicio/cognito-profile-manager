@@ -7,13 +7,13 @@ import Image from 'next/image';
 import { format, parseISO } from 'date-fns';
 import { useTranslations } from 'next-intl';
 import type { User } from '@/lib/auth';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useState, useEffect } from 'react';
 import { AvatarEditor } from './avatar-editor';
 import { BannerEditor } from './banner-editor';
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Separator } from './ui/separator';
+import { Separator } from '@/components/ui/separator';
 
 export function AccountDisplay({ user, onUpdate }: { user: User, onUpdate: (data: Partial<User>) => void }) {
   const t = useTranslations('Dashboard');
