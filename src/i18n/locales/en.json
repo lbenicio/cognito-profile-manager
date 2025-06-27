@@ -130,6 +130,10 @@
       "passkeysEnabled": "Passkeys are enabled on your account.",
       "passkeysDisabled": "Passkeys are not yet enabled on your account.",
       "addPasskeyButton": "Add Passkey",
+      "passkeySuccess": {
+        "title": "Passkey Updated",
+        "description": "Your passkeys have been successfully managed."
+      },
       "passkeyError": {
         "title": "Action Failed",
         "generic": "Something went wrong. Please try again.",

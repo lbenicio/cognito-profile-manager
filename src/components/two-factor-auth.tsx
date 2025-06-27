@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from '@/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,6 +22,8 @@ interface TwoFactorAuthProps {
 export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
     const { toast } = useToast();
     const t = useTranslations('Profile.twoFactor');
+    const searchParams = useSearchParams();
+    const router = useRouter();
 
     // MFA/TOTP State
     const [showSetup, setShowSetup] = useState(false);
@@ -32,6 +36,33 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
 
     // Passkey State
     const [isManagingPasskeys, setIsManagingPasskeys] = useState(false);
+
+    useEffect(() => {
+        const error = searchParams.get('error');
+        const errorDescription = searchParams.get('error_description');
+        const status = searchParams.get('passkey_status');
+        const currentPath = window.location.pathname;
+
+        if (error) {
+            toast({
+                variant: 'destructive',
+                title: t('passkeyError.title'),
+                description: errorDescription || t('passkeyError.generic'),
+            });
+            // Clear the query params from URL to prevent toast on refresh
+            window.history.replaceState(null, '', currentPath);
+        }
+
+        if (status === 'success') {
+            toast({
+                title: t('passkeySuccess.title'),
+                description: t('passkeySuccess.description'),
+            });
+            // Clear the query params and refresh data from server
+            window.history.replaceState(null, '', currentPath);
+            router.refresh();
+        }
+    }, [searchParams, toast, t, router]);
 
     const handleStartSetup = async () => {
         setIsGenerating(true);
