@@ -23,7 +23,6 @@ interface TwoFactorAuthProps {
 export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
     const { toast } = useToast();
     const t = useTranslations('Profile.twoFactor');
-    const searchParams = useSearchParams();
     const router = useRouter();
 
     // MFA/TOTP State
@@ -39,10 +38,18 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
     const [isManagingPasskeys, setIsManagingPasskeys] = useState(false);
 
     useEffect(() => {
-        const error = searchParams.get('error');
-        const errorDescription = searchParams.get('error_description');
-        const result = searchParams.get('result');
-        const currentPath = window.location.pathname;
+        // This effect runs once on component mount to check for redirect parameters.
+        // It uses window.location directly for robustness after a hard redirect.
+        const params = new URLSearchParams(window.location.search);
+        const result = params.get('result');
+        const error = params.get('error');
+        const errorDescription = params.get('error_description');
+
+        if (error || result) {
+            const currentPath = window.location.pathname;
+            // Remove the query parameters from the URL to prevent them from being processed again on refresh.
+            window.history.replaceState(null, '', currentPath);
+        }
 
         if (error) {
             toast({
@@ -50,8 +57,6 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
                 title: t('passkeyError.title'),
                 description: errorDescription || t('passkeyError.generic'),
             });
-            // Clear the query params from URL to prevent toast on refresh
-            window.history.replaceState(null, '', currentPath);
         }
 
         if (result === 'success') {
@@ -59,12 +64,11 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
                 title: t('passkeySuccess.title'),
                 description: t('passkeySuccess.description'),
             });
-            onUpdate({ passkeysEnabled: true });
-            // Clear the query params and refresh data from server
-            window.history.replaceState(null, '', currentPath);
+            // Refresh server data. The parent component will receive new props
+            // and update the state, causing the UI to show the new status.
             router.refresh();
         }
-    }, [searchParams, toast, t, router, onUpdate]);
+    }, [router, t, toast]);
 
     const handleStartSetup = async () => {
         setIsGenerating(true);
@@ -176,7 +180,6 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
             const cognitoDomain = new URL(authorizationEndpoint).origin;
             const passkeyUrl = new URL(`${cognitoDomain}/passkeys/add`);
             
-            // The new callback URL specific to this action
             const passkeyCallbackUrl = new URL('/api/v1/auth/callback/passkey', window.location.origin).toString();
 
             // --- CSRF protection ---
