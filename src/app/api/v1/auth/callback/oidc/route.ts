@@ -108,10 +108,12 @@ export async function GET(request: NextRequest) {
             // Ignore if parsing fails, start fresh
           }
       }
+      
+      const ip = request.ip ?? request.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'Unknown';
 
       const newFingerprint = {
           date: new Date().toISOString(),
-          ip: request.ip ?? 'Unknown',
+          ip: ip,
           device: request.headers.get('user-agent') ?? 'Unknown',
       };
       fingerprints.unshift(newFingerprint);
