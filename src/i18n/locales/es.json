@@ -129,21 +129,11 @@
       "passkeysDescription": "Usa una passkey para un inicio de sesión seguro y sin contraseña. Esta es la forma más segura de proteger tu cuenta.",
       "passkeysEnabled": "Las passkeys están habilitadas en tu cuenta.",
       "passkeysDisabled": "Las passkeys aún no están habilitadas en tu cuenta.",
-      "addPasskeyButton": "Añadir nueva Passkey",
-      "passkeyDialog": {
-        "title": "Añadir nueva Passkey",
-        "description": "Sigue las instrucciones de tu navegador para registrar tu dispositivo. Dale a tu passkey un nombre memorable para que puedas identificarla más tarde.",
-        "nameLabel": "Nombre de la Passkey",
-        "namePlaceholder": "p. ej., Portátil del Trabajo",
-        "addButton": "Añadir y Registrar"
-      },
-      "passkeySuccess": {
-        "title": "Passkey Registrada",
-        "description": "Tu nueva passkey ha sido añadida a tu cuenta exitosamente."
-      },
+      "managePasskeysButton": "Gestionar Passkeys",
       "passkeyError": {
-        "title": "Registro Fallido",
-        "generic": "Algo salió mal. Por favor, inténtalo de nuevo."
+        "title": "Acción Fallida",
+        "generic": "Algo salió mal. Por favor, inténtalo de nuevo.",
+        "configMissing": "Falta la configuración del cliente de Passkey. Por favor, contacta a soporte."
       }
     }
   },
