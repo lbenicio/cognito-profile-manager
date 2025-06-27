@@ -5,27 +5,44 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get('code');
   const error = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
-  const requestUrl = new URL(request.url); // Use the incoming request URL as the base for redirects
+  const state = searchParams.get('state');
+  const storedState = request.cookies.get('oauth_state')?.value;
+
+  const requestUrl = new URL(request.url);
+
+  // --- CSRF check ---
+  if (!state || !storedState || state !== storedState) {
+    console.error('OIDC callback state mismatch or state missing.');
+    const loginUrl = new URL('/login', requestUrl.origin);
+    loginUrl.searchParams.set('error', 'invalid_state');
+    const response = NextResponse.redirect(loginUrl);
+    response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
+    return response;
+  }
+  
+  const clearStateCookie = (response: NextResponse) => {
+      response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
+      return response;
+  };
 
   if (error) {
     console.error(`OIDC callback error: ${error} - ${errorDescription}`);
     const loginUrl = new URL('/login', requestUrl.origin);
     loginUrl.searchParams.set('error', errorDescription || error);
-    return NextResponse.redirect(loginUrl);
+    return clearStateCookie(NextResponse.redirect(loginUrl));
   }
 
   if (!code) {
     console.error('Authorization code missing from callback.');
     const loginUrl = new URL('/login', requestUrl.origin);
     loginUrl.searchParams.set('error', 'auth_code_missing');
-    return NextResponse.redirect(loginUrl);
+    return clearStateCookie(NextResponse.redirect(loginUrl));
   }
 
   try {
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     if (!wellknownUrl) throw new Error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
 
-    // This URL is for the server-to-server call and MUST match Cognito config.
     const callbackUrl = process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL;
     if (!callbackUrl) {
       throw new Error('Missing NEXT_PUBLIC_OAUTH2_CALLBACK_URL env var');
@@ -40,7 +57,7 @@ export async function GET(request: NextRequest) {
     const params = new URLSearchParams({
       grant_type: 'authorization_code',
       code: code,
-      redirect_uri: callbackUrl, // Use the configured URL for the API call
+      redirect_uri: callbackUrl,
       client_id: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
     });
 
@@ -51,7 +68,6 @@ export async function GET(request: NextRequest) {
     const clientSecret = process.env.COGNITO_CLIENT_SECRET;
     
     if (clientSecret) {
-      // For confidential clients, use Basic Auth.
       headers['Authorization'] = `Basic ${Buffer.from(
         `${process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!}:${clientSecret}`
       ).toString('base64')}`;
@@ -78,7 +94,6 @@ export async function GET(request: NextRequest) {
         expires_in: tokens.expires_in,
     };
 
-    // For the user-facing redirect, use the origin of the request they made.
     const dashboardUrl = new URL('/', requestUrl.origin);
     
     const response = NextResponse.redirect(dashboardUrl);
@@ -91,14 +106,14 @@ export async function GET(request: NextRequest) {
       sameSite: 'lax',
     });
     
-    return response;
+    return clearStateCookie(response);
 
-  } catch (error) {
-    console.error('Callback handler error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+  } catch (e) {
+    console.error('Callback handler error:', e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
     
     const loginUrl = new URL('/login', requestUrl.origin);
     loginUrl.searchParams.set('error', errorMessage);
-    return NextResponse.redirect(loginUrl);
+    return clearStateCookie(NextResponse.redirect(loginUrl));
   }
 }

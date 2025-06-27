@@ -143,10 +143,16 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
 
             const cognitoDomain = new URL(authorizationEndpoint).origin;
             const passkeyUrl = new URL(`${cognitoDomain}/passkeys/add`);
+            
+            // CSRF protection: generate and store state
+            const state = crypto.randomUUID();
+            document.cookie = `oauth_state=${state};path=/;max-age=300;samesite=lax`; // 5 min expiry
+
             passkeyUrl.searchParams.set('client_id', clientId);
             passkeyUrl.searchParams.set('redirect_uri', callbackUrl);
             passkeyUrl.searchParams.set('response_type', 'code');
             passkeyUrl.searchParams.set('scope', scope);
+            passkeyUrl.searchParams.set('state', state);
 
             window.location.href = passkeyUrl.toString();
 
@@ -156,7 +162,6 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
                 title: t('passkeyError.title'),
                 description: error.message || t('passkeyError.generic'),
             });
-            // This might not be reached if the redirect is successful, but it's good practice.
             setIsManagingPasskeys(false);
         }
     };

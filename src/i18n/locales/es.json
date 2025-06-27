@@ -159,6 +159,7 @@
     "signInButton": "Iniciar Sesión con SSO",
     "signInAdminButton": "Iniciar Sesión como Admin (Dev)",
     "errorTitle": "Fallo al Iniciar Sesión",
-    "errorDescription": "No se pudo iniciar sesión. Por favor, inténtalo de nuevo o contacta a soporte."
+    "errorDescription": "No se pudo iniciar sesión. Por favor, inténtalo de nuevo o contacta a soporte.",
+    "invalid_state": "La sesión ha caducado o no es válida. Por favor, intenta iniciar sesión de nuevo."
   }
 }

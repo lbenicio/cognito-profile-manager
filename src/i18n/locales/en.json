@@ -159,6 +159,7 @@
     "signInButton": "Sign In with SSO",
     "signInAdminButton": "Sign In as Admin (Dev)",
     "errorTitle": "Sign In Failed",
-    "errorDescription": "Could not sign in. Please try again or contact support."
+    "errorDescription": "Could not sign in. Please try again or contact support.",
+    "invalid_state": "The session has expired or is invalid. Please try signing in again."
   }
 }
