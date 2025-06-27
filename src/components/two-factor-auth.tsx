@@ -142,7 +142,7 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
             const authorizationEndpoint = wellknown.authorization_endpoint;
 
             const cognitoDomain = new URL(authorizationEndpoint).origin;
-            const passkeyUrl = new URL(`${cognitoDomain}/passkeys/add`);
+            const passkeyUrl = new URL(`${cognitoDomain}/passkeys/manage`);
             passkeyUrl.searchParams.set('client_id', clientId);
             passkeyUrl.searchParams.set('redirect_uri', callbackUrl);
             passkeyUrl.searchParams.set('response_type', 'code');
@@ -156,7 +156,6 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
                 title: t('passkeyError.title'),
                 description: error.message || t('passkeyError.generic'),
             });
-        } finally {
             // This might not be reached if the redirect is successful, but it's good practice.
             setIsManagingPasskeys(false);
         }
