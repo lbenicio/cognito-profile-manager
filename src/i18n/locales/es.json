@@ -123,7 +123,11 @@
       "passkeysEnabled": "Las passkeys están habilitadas y se pueden usar para iniciar sesión.",
       "passkeysDisabled": "Añade una passkey para un método de inicio de sesión más rápido y seguro.",
       "managePasskeys": "Gestionar Passkeys",
-      "managementUrlNotConfigured": "La URL de gestión de cuentas no está configurada."
+      "managementUrlNotConfigured": "La URL de gestión de cuentas no está configurada.",
+      "passkeyError": {
+        "title": "Error de Configuración",
+        "description": "La gestión de passkeys no está configurada correctamente. Por favor, contacta a soporte."
+      }
     }
   },
   "Settings": {

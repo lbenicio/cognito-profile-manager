@@ -123,7 +123,11 @@
       "passkeysEnabled": "Passkeys are enabled and can be used for signing in.",
       "passkeysDisabled": "Add a passkey for a faster and more secure sign-in method.",
       "managePasskeys": "Manage Passkeys",
-      "managementUrlNotConfigured": "Account management URL is not configured."
+      "managementUrlNotConfigured": "Account management URL is not configured.",
+      "passkeyError": {
+        "title": "Configuration Error",
+        "description": "Passkey management is not configured correctly. Please contact support."
+      }
     }
   },
   "Settings": {

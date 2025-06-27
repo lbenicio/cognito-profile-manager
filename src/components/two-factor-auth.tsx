@@ -124,6 +124,32 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
         }
     };
 
+    const handleManagePasskeys = () => {
+        const baseUrl = process.env.NEXT_PUBLIC_COGNITO_ACCOUNT_MANAGEMENT_URL;
+        const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
+        const callbackUrl = process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL;
+        const scope = process.env.NEXT_PUBLIC_OAUTH2_SCOPE;
+
+        if (!baseUrl || !clientId || !callbackUrl || !scope) {
+            toast({
+                variant: 'destructive',
+                title: t('passkeyError.title'),
+                description: t('passkeyError.description'),
+            });
+            return;
+        }
+
+        const params = new URLSearchParams({
+            client_id: clientId,
+            redirect_uri: callbackUrl,
+            response_type: 'code',
+            scope: scope,
+        });
+        
+        const finalUrl = `${baseUrl}/add/passkeys?${params.toString()}`;
+        window.location.href = finalUrl;
+    };
+
     return (
         <Card>
             <CardHeader>
@@ -240,16 +266,13 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
                                 {user.passkeysEnabled ? t('passkeysEnabled') : t('passkeysDisabled')}
                              </p>
                             <div className="pt-4">
-                                 <Button asChild variant="outline" size="sm">
-                                    <a 
-                                        href={cognitoAccountManagementUrl} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        aria-disabled={!cognitoAccountManagementUrl}
-                                        className={cn(!cognitoAccountManagementUrl && "pointer-events-none opacity-50")}
-                                    >
-                                        {t('managePasskeys')} <ExternalLink className="ml-2 h-3 w-3" />
-                                    </a>
+                                 <Button 
+                                     variant="outline" 
+                                     size="sm"
+                                     onClick={handleManagePasskeys}
+                                     disabled={!cognitoAccountManagementUrl}
+                                 >
+                                    {t('managePasskeys')} <ExternalLink className="ml-2 h-3 w-3" />
                                 </Button>
                             </div>
                              {(!cognitoAccountManagementUrl && process.env.NODE_ENV === 'development') && (
