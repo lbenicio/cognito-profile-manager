@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
-  const code = request.nextUrl.searchParams.get('code');
+  const searchParams = request.nextUrl.searchParams;
+  const code = searchParams.get('code');
+  const error = searchParams.get('error');
+  const errorDescription = searchParams.get('error_description');
   const requestUrl = new URL(request.url); // Use the incoming request URL as the base for redirects
+
+  if (error) {
+    console.error(`OIDC callback error: ${error} - ${errorDescription}`);
+    const loginUrl = new URL('/login', requestUrl.origin);
+    loginUrl.searchParams.set('error', errorDescription || error);
+    return NextResponse.redirect(loginUrl);
+  }
 
   if (!code) {
     console.error('Authorization code missing from callback.');
