@@ -2,7 +2,7 @@ import 'server-only';
 import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
-import { cognitoClient, GetUserCommand } from '@/lib/cognito';
+import { cognitoClient, GetUserCommand, ListDevicesCommand } from '@/lib/cognito';
 import { refreshAuthTokens } from './session-actions';
 
 // Define the User type, which should match what the components expect.
@@ -44,11 +44,11 @@ export type Fingerprint = {
   device: string;
 };
 
-export type PasskeyInfo = {
+export type Device = {
+  key: string;
   name: string;
-  date: string; // ISO string
-  ip: string;
-  userAgent: string;
+  createDate?: Date;
+  lastAuthDate?: Date;
 };
 
 export type User = {
@@ -76,7 +76,7 @@ export type User = {
   notificationPreferences: NotificationPreferences;
   publicProfilePreferences: PublicProfilePreferences;
   fingerprint: Fingerprint[];
-  passkeys: PasskeyInfo[];
+  devices: Device[];
 };
 
 const defaultPreferences: UserPreferences = {
@@ -140,12 +140,12 @@ const mockUser: User = {
     { date: new Date().toISOString(), ip: '127.0.0.1', device: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36' },
     { date: new Date(Date.now() - 86400000).toISOString(), ip: '192.168.1.1', device: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1' },
   ],
-  passkeys: [
+  devices: [
     {
+        key: 'mock_device_1',
         name: 'Chrome on macOS',
-        date: new Date(Date.now() - 86400000 * 2).toISOString(),
-        ip: '127.0.0.1',
-        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        createDate: new Date(Date.now() - 86400000 * 2),
+        lastAuthDate: new Date(Date.now() - 86400000 * 2),
     }
   ],
 };
@@ -158,6 +158,7 @@ const mockAdminUser: User = {
   isAdmin: true,
   twoFactorEnabled: true,
   passkeysEnabled: true,
+  devices: mockUser.devices,
 };
 
 
@@ -289,13 +290,28 @@ export const getUser = cache(async (): Promise<User | null> => {
         }
     }
     
-    let passkeysData: PasskeyInfo[] = [];
-    if (attributes['custom:passkeys']) {
-        try {
-            passkeysData = JSON.parse(attributes['custom:passkeys']);
-        } catch (e) {
-            console.error('Failed to parse user passkeys from GetUser API call', e);
+    let devices: Device[] = [];
+    try {
+        const listDevicesCommand = new ListDevicesCommand({
+            AccessToken: session.access_token,
+            Limit: 60,
+        });
+        const devicesResponse = await cognitoClient.send(listDevicesCommand);
+        if (devicesResponse.Devices) {
+            devices = devicesResponse.Devices.map((d) => {
+                const nameAttribute = d.DeviceAttributes?.find(
+                    (attr) => attr.Name === 'device_name'
+                );
+                return {
+                    key: d.DeviceKey || '',
+                    name: nameAttribute?.Value || 'Unnamed Device',
+                    createDate: d.DeviceCreateDate,
+                    lastAuthDate: d.DeviceLastAuthenticatedDate,
+                };
+            }).filter(d => d.key); // Ensure device key exists
         }
+    } catch (e) {
+        console.error('Failed to list user devices:', e);
     }
 
     return {
@@ -309,7 +325,7 @@ export const getUser = cache(async (): Promise<User | null> => {
       creationDate: new Date((payload.auth_time as number) * 1000).toISOString(),
       userStatus: cognitoUser.UserStatus || 'CONFIRMED',
       twoFactorEnabled: attributes['custom:mfa'] === 'true',
-      passkeysEnabled: attributes['custom:pless'] === 'true',
+      passkeysEnabled: devices.length > 0,
       groups: groups,
       isAdmin: isAdmin,
       picture: attributes.picture || (payload.picture as string) || '',
@@ -323,7 +339,7 @@ export const getUser = cache(async (): Promise<User | null> => {
       notificationPreferences: notificationPreferences,
       publicProfilePreferences: publicProfilePreferences,
       fingerprint: fingerprintData,
-      passkeys: passkeysData,
+      devices: devices,
     };
 
   } catch (error: any) {

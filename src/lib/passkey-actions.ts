@@ -1,6 +1,39 @@
 'use server';
 
-// This file is intentionally left blank.
-// The getPasskeyAddUrl action has been moved to an API route (/api/v1/auth/passkey/start)
-// to prevent a CSRF state race condition during the redirect to Cognito.
-// This file is kept for potential future passkey management server actions.
+import { revalidatePath } from 'next/cache';
+import { cognitoClient, DeleteDeviceCommand } from './cognito';
+import { getSession } from './auth';
+
+export async function deletePasskey(
+  deviceKey: string
+): Promise<{ success: boolean; message: string }> {
+  const session = await getSession();
+  if (!session?.access_token) {
+    return { success: false, message: 'Not authenticated' };
+  }
+
+  if (!deviceKey) {
+    return { success: false, message: 'Device key is required.' };
+  }
+
+  try {
+    const command = new DeleteDeviceCommand({
+      AccessToken: session.access_token,
+      DeviceKey: deviceKey,
+    });
+    await cognitoClient.send(command);
+
+    // Revalidate the security page to force a refetch of the device list.
+    revalidatePath('/security');
+    // Also revalidate the main page since it shows security status.
+    revalidatePath('/');
+
+    return { success: true, message: 'Passkey deleted successfully.' };
+  } catch (error: any) {
+    console.error('Delete Passkey Error:', error);
+    return {
+      success: false,
+      message: 'An unexpected error occurred while deleting the passkey.',
+    };
+  }
+}

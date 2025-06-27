@@ -250,7 +250,8 @@
       "passkeyTable": {
         "name": "Name",
         "addedOn": "Added On",
-        "ipAddress": "IP Address"
+        "ipAddress": "IP Address",
+        "actions": "Actions"
       }
     }
   },

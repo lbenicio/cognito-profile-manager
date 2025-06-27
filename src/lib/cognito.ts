@@ -9,6 +9,8 @@ import {
   ChangePasswordCommand,
   InvalidPasswordException,
   NotAuthorizedException,
+  ListDevicesCommand,
+  DeleteDeviceCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
 
 const region = process.env.AWS_REGION;
@@ -30,5 +32,7 @@ export {
   ChangePasswordCommand,
   InvalidPasswordException,
   NotAuthorizedException,
+  ListDevicesCommand,
+  DeleteDeviceCommand,
   CognitoIdentityProviderClient,
 };

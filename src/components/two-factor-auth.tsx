@@ -1,18 +1,19 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { Smartphone, KeyRound, Loader2, Copy } from 'lucide-react';
+import { Smartphone, KeyRound, Loader2, Copy, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from 'next-intl';
 import type { User } from '@/lib/auth';
 import { generateMfaSetup, verifyAndEnableMfa, disableMfa } from '@/lib/mfa-actions';
+import { deletePasskey } from '@/lib/passkey-actions';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { format } from 'date-fns';
 
@@ -27,6 +28,7 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
     const t = useTranslations('Security.twoFactor');
     const router = useRouter();
     const searchParams = useSearchParams();
+    const [isPending, startTransition] = useTransition();
 
     // MFA/TOTP State
     const [showSetup, setShowSetup] = useState(false);
@@ -39,6 +41,7 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
 
     // Passkey State
     const [isManagingPasskeys, setIsManagingPasskeys] = useState(false);
+    const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
     useEffect(() => {
         const result = searchParams.get('result');
@@ -63,13 +66,10 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
                     title: t('passkeySuccess.title'),
                     description: t('passkeySuccess.description'),
                 });
-                // Optimistically update the UI to show passkeys are enabled.
-                onUpdate({ passkeysEnabled: true });
-                // Refresh server data to ensure consistency on next load.
                 router.refresh();
             }
         }
-    }, [searchParams, router, t, toast, onUpdate]);
+    }, [searchParams, router, t, toast]);
 
     const handleStartSetup = async () => {
         setIsGenerating(true);
@@ -164,10 +164,30 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
 
     const handleAddPasskey = () => {
         setIsManagingPasskeys(true);
-        // This will navigate the user to our API route, which then redirects to Cognito.
-        // This server-side redirect flow ensures the CSRF cookie is set correctly.
         window.location.href = '/api/v1/auth/passkey/start';
     };
+
+    const handleDeletePasskey = (key: string) => {
+        startTransition(async () => {
+            setIsDeleting(key);
+            const result = await deletePasskey(key);
+            if (result.success) {
+                toast({
+                    title: 'Passkey Deleted',
+                    description: 'The selected passkey has been removed from your account.',
+                });
+                router.refresh();
+            } else {
+                 toast({
+                    variant: 'destructive',
+                    title: 'Deletion Failed',
+                    description: result.message,
+                });
+            }
+            setIsDeleting(null);
+        });
+    };
+
 
     return (
         <Card>
@@ -283,7 +303,7 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
                                 {t('passkeysDescription')}
                             </p>
 
-                             {user.passkeys && user.passkeys.length > 0 ? (
+                             {user.devices && user.devices.length > 0 ? (
                                 <div className="space-y-4">
                                     <p className="text-sm text-green-700 dark:text-green-400">{t('passkeysEnabled')}</p>
                                     <div className="rounded-md border">
@@ -292,20 +312,34 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
                                                 <TableRow>
                                                     <TableHead>{t('passkeyTable.name')}</TableHead>
                                                     <TableHead>{t('passkeyTable.addedOn')}</TableHead>
-                                                    <TableHead className="hidden md:table-cell">{t('passkeyTable.ipAddress')}</TableHead>
+                                                    <TableHead className="text-right">{t('passkeyTable.actions')}</TableHead>
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
-                                                {user.passkeys.map((passkey, index) => (
-                                                    <TableRow key={index}>
+                                                {user.devices.map((device) => (
+                                                    <TableRow key={device.key}>
                                                         <TableCell className="font-medium">
                                                             <div className="flex items-center gap-2">
                                                                 <KeyRound className="h-4 w-4 text-muted-foreground" />
-                                                                <span>{passkey.name}</span>
+                                                                <span>{device.name}</span>
                                                             </div>
                                                         </TableCell>
-                                                        <TableCell>{format(new Date(passkey.date), "PPP")}</TableCell>
-                                                        <TableCell className="hidden md:table-cell">{passkey.ip}</TableCell>
+                                                        <TableCell>{device.createDate ? format(new Date(device.createDate), "PPP") : 'N/A'}</TableCell>
+                                                        <TableCell className="text-right">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() => handleDeletePasskey(device.key)}
+                                                                disabled={isPending && isDeleting === device.key}
+                                                                aria-label={`Delete passkey ${device.name}`}
+                                                            >
+                                                                {isPending && isDeleting === device.key ? (
+                                                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                                                ) : (
+                                                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                                                )}
+                                                            </Button>
+                                                        </TableCell>
                                                     </TableRow>
                                                 ))}
                                             </TableBody>
@@ -316,8 +350,8 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
                                 <p className="text-sm text-muted-foreground">{t('passkeysDisabled')}</p>
                             )}
 
-                            <Button variant="outline" size="sm" onClick={handleAddPasskey} disabled={isManagingPasskeys}>
-                                {isManagingPasskeys && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            <Button variant="outline" size="sm" onClick={handleAddPasskey} disabled={isManagingPasskeys || isPending}>
+                                {(isManagingPasskeys || isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 {t('addPasskeyButton')}
                             </Button>
                         </div>
