@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useTransition } from 'react'
 import { useTheme } from 'next-themes'
 import { Moon, Palette, Sun } from 'lucide-react'
 import { useTranslations } from 'next-intl'
@@ -11,31 +11,48 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Separator } from '@/components/ui/separator'
 import { Slider } from '@/components/ui/slider'
 import { LanguageSelect } from './language-select'
+import { updateUserPreferences } from '@/lib/preference-actions'
+import { useToast } from '@/hooks/use-toast'
+import type { User as UserType, UserPreferences } from '@/lib/auth'
 
-export function AppearanceSettings() {
-  const { theme, setTheme } = useTheme()
+interface AppearanceSettingsProps {
+  user: UserType
+}
+
+export function AppearanceSettings({ user }: AppearanceSettingsProps) {
   const t = useTranslations('Settings.appearance');
-  const [fontSize, setFontSize] = useState(12)
+  const { setTheme } = useTheme();
+  const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
 
-  useEffect(() => {
-    const storedFontSize = localStorage.getItem('font-size')
-    if (storedFontSize) {
-      const size = parseInt(storedFontSize, 10)
-      if (!isNaN(size)) {
-        setFontSize(size)
-        document.documentElement.style.fontSize = `${size}pt`
+  const handlePreferenceChange = (newPrefs: Partial<UserPreferences>) => {
+    startTransition(async () => {
+      // Optimistically update the UI theme immediately
+      if (newPrefs.theme) {
+        setTheme(newPrefs.theme);
       }
-    }
-  }, [])
+      // Optimistically update the font size immediately
+      if (newPrefs.fontSize) {
+         document.documentElement.style.fontSize = `${newPrefs.fontSize}pt`;
+      }
+
+      const result = await updateUserPreferences(newPrefs);
+      if (!result.success) {
+        toast({
+            variant: 'destructive',
+            title: t('updateErrorTitle'),
+            description: result.message,
+        });
+      }
+    });
+  }
 
   const handleFontSizeChange = (value: number[]) => {
-    const newSize = value[0]
+    const newSize = value[0];
     if (newSize) {
-      setFontSize(newSize)
-      document.documentElement.style.fontSize = `${newSize}pt`
-      localStorage.setItem('font-size', newSize.toString())
+      handlePreferenceChange({ fontSize: newSize });
     }
-  }
+  };
 
   return (
     <Card>
@@ -49,9 +66,10 @@ export function AppearanceSettings() {
         <div>
           <Label className="font-semibold">{t('theme')}</Label>
           <RadioGroup
-            value={theme}
-            onValueChange={setTheme}
+            defaultValue={user.preferences.theme}
+            onValueChange={(theme: UserPreferences['theme']) => handlePreferenceChange({ theme })}
             className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4"
+            disabled={isPending}
           >
             <div>
               <RadioGroupItem value="light" id="light" className="peer sr-only" />
@@ -96,10 +114,11 @@ export function AppearanceSettings() {
               min={10}
               max={20}
               step={1}
-              value={[fontSize]}
-              onValueChange={handleFontSizeChange}
+              defaultValue={[user.preferences.fontSize]}
+              onValueCommit={handleFontSizeChange}
+              disabled={isPending}
             />
-            <span className="w-12 text-right text-sm text-muted-foreground">{fontSize}pt</span>
+            <span className="w-12 text-right text-sm text-muted-foreground">{user.preferences.fontSize}pt</span>
           </div>
         </div>
 
@@ -107,7 +126,11 @@ export function AppearanceSettings() {
 
         <div className="space-y-2">
           <Label className="font-semibold">{t('language')}</Label>
-          <LanguageSelect />
+          <LanguageSelect 
+            currentLanguage={user.preferences.language}
+            onLanguageChange={(language) => handlePreferenceChange({ language })}
+            disabled={isPending}
+          />
         </div>
       </CardContent>
     </Card>

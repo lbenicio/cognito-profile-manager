@@ -154,7 +154,9 @@
       "textSize": "Tamaño del texto",
       "language": "Idioma",
       "english": "Inglés",
-      "spanish": "Español"
+      "spanish": "Español",
+      "updateErrorTitle": "Error al Actualizar",
+      "updateErrorDescription": "No se pudieron guardar tus preferencias. Inténtalo de nuevo."
     }
   },
   "Login": {

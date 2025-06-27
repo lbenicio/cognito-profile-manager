@@ -154,7 +154,9 @@
       "textSize": "Text Size",
       "language": "Language",
       "english": "English",
-      "spanish": "Spanish"
+      "spanish": "Spanish",
+      "updateErrorTitle": "Update Failed",
+      "updateErrorDescription": "Could not save your preferences. Please try again."
     }
   },
   "Login": {

@@ -2,7 +2,6 @@
 
 import { useRouter } from '@/navigation';
 import { useTransition } from 'react';
-import { useLocale } from 'next-intl';
 import { Globe } from 'lucide-react';
 import {
   DropdownMenu,
@@ -11,16 +10,21 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { setLocale } from '@/lib/locale-actions';
+import { updateUserPreferences } from '@/lib/preference-actions';
+import type { UserPreferences } from '@/lib/auth';
 
-export function LanguageSwitcher({ languageLabel }: { languageLabel: string }) {
+interface LanguageSwitcherProps {
+  languageLabel: string;
+  currentLanguage: UserPreferences['language'];
+}
+
+export function LanguageSwitcher({ languageLabel, currentLanguage }: LanguageSwitcherProps) {
   const [isPending, startTransition] = useTransition();
-  const locale = useLocale();
   const router = useRouter();
 
-  function onSelectLocale(nextLocale: string) {
+  function onSelectLocale(nextLocale: UserPreferences['language']) {
     startTransition(async () => {
-      await setLocale(nextLocale);
+      await updateUserPreferences({ language: nextLocale });
       router.refresh();
     });
   }
@@ -34,10 +38,10 @@ export function LanguageSwitcher({ languageLabel }: { languageLabel: string }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => onSelectLocale('en')} disabled={locale === 'en'}>
+        <DropdownMenuItem onClick={() => onSelectLocale('en')} disabled={currentLanguage === 'en'}>
           English
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onSelectLocale('es')} disabled={locale === 'es'}>
+        <DropdownMenuItem onClick={() => onSelectLocale('es')} disabled={currentLanguage === 'es'}>
           Español
         </DropdownMenuItem>
       </DropdownMenuContent>

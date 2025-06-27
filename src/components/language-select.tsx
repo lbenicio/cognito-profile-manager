@@ -1,8 +1,6 @@
 'use client';
 
-import { useRouter } from '@/navigation';
-import { useTransition } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 import {
   Select,
@@ -11,23 +9,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { setLocale } from '@/lib/locale-actions';
+import type { UserPreferences } from '@/lib/auth';
 
-export function LanguageSelect() {
+interface LanguageSelectProps {
+  currentLanguage: UserPreferences['language'];
+  onLanguageChange: (language: UserPreferences['language']) => void;
+  disabled?: boolean;
+}
+
+export function LanguageSelect({ currentLanguage, onLanguageChange, disabled }: LanguageSelectProps) {
   const t = useTranslations('Settings.appearance');
-  const [isPending, startTransition] = useTransition();
-  const locale = useLocale();
-  const router = useRouter();
-
-  function onSelectChange(value: string) {
-    startTransition(async () => {
-      await setLocale(value);
-      router.refresh();
-    });
-  }
 
   return (
-    <Select defaultValue={locale} onValueChange={onSelectChange} disabled={isPending}>
+    <Select
+      defaultValue={currentLanguage}
+      onValueChange={(value: UserPreferences['language']) => onLanguageChange(value)}
+      disabled={disabled}
+    >
       <SelectTrigger>
         <SelectValue placeholder={t('language')} />
       </SelectTrigger>

@@ -6,6 +6,12 @@ import { GetUserCommand } from '@aws-sdk/client-cognito-identity-provider';
 import { cognitoClient } from '@/lib/cognito';
 
 // Define the User type, which should match what the components expect.
+export type UserPreferences = {
+  theme: 'light' | 'dark' | 'system';
+  language: 'en' | 'es';
+  fontSize: number;
+};
+
 export type User = {
   username: string;
   email: string;
@@ -24,6 +30,13 @@ export type User = {
   locale: string;
   zoneinfo: string;
   website: string;
+  preferences: UserPreferences;
+};
+
+const defaultPreferences: UserPreferences = {
+  theme: 'system',
+  language: 'en',
+  fontSize: 12,
 };
 
 // Mock user data for development environment
@@ -44,7 +57,8 @@ const mockUser: User = {
   picture: `https://placehold.co/128x128.png`,
   locale: 'en-US',
   zoneinfo: 'America/New_York',
-  website: 'https://example.com'
+  website: 'https://example.com',
+  preferences: defaultPreferences,
 };
 
 const mockAdminUser: User = {
@@ -77,10 +91,8 @@ export const getUser = cache(async (): Promise<User | null> => {
   // Handle mock development session (which doesn't have an id_token)
   if (process.env.NODE_ENV === 'development' && session?.username && !session?.id_token) {
     console.log("Using mock user data for development.");
-    if (session.username === 'admin') {
-      return { ...mockAdminUser, email: session.email, username: session.username };
-    }
-    return { ...mockUser, email: session.email, username: session.username };
+    const baseUser = session.username === 'admin' ? mockAdminUser : mockUser;
+    return { ...baseUser, email: session.email, username: session.username };
   }
 
   // If there's no session or no id_token, there's no real user.
@@ -113,6 +125,18 @@ export const getUser = cache(async (): Promise<User | null> => {
     const addressClaim = payload.address as { formatted?: string } | undefined;
     const givenName = (payload.given_name as string) || '';
     const familyName = (payload.family_name as string) || '';
+    
+    let preferences: UserPreferences = { ...defaultPreferences };
+    const sessionClaim = payload['custom:session'] as string | undefined;
+    if (sessionClaim) {
+        try {
+            const parsedPrefs = JSON.parse(sessionClaim);
+            preferences = { ...preferences, ...parsedPrefs };
+        } catch (e) {
+            console.error('Failed to parse user preferences from custom:session claim', e);
+        }
+    }
+
 
     let user: User = {
       username: (payload['cognito:username'] as string) || '',
@@ -132,6 +156,7 @@ export const getUser = cache(async (): Promise<User | null> => {
       locale: (payload.locale as string) || '',
       zoneinfo: (payload.zoneinfo as string) || '',
       website: (payload.website as string) || '',
+      preferences: preferences
     };
     
     // Now, use the access token to fetch the most up-to-date user attributes from Cognito.
@@ -150,6 +175,17 @@ export const getUser = cache(async (): Promise<User | null> => {
         if (attributes) {
              const freshGivenName = attributes.given_name || '';
              const freshFamilyName = attributes.family_name || '';
+
+             // Re-parse preferences from the absolute latest data
+             if (attributes['custom:session']) {
+                 try {
+                     const parsedPrefs = JSON.parse(attributes['custom:session']);
+                     preferences = { ...defaultPreferences, ...parsedPrefs };
+                 } catch (e) {
+                     console.error('Failed to parse user preferences from GetUser API call', e);
+                 }
+             }
+
              user = {
                 ...user,
                 username: cognitoUser.Username || user.username,
@@ -164,6 +200,7 @@ export const getUser = cache(async (): Promise<User | null> => {
                 locale: attributes.locale || user.locale,
                 zoneinfo: attributes.zoneinfo || user.zoneinfo,
                 website: attributes.website || user.website,
+                preferences: preferences,
                 // Crucially, update the custom attributes from the fresh data
                 twoFactorEnabled: attributes['custom:mfa'] === 'true',
                 passkeysEnabled: attributes['custom:pless'] === 'true',

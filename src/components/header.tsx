@@ -49,6 +49,7 @@ export function Header({ user, translations: t }: { user: UserType | null, trans
   };
 
   const adminDashboardUrl = process.env.NEXT_PUBLIC_ADMIN_DASHBOARD_URL || '#';
+  const currentLanguage = user?.preferences?.language || 'en';
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card shadow-sm">
@@ -103,7 +104,10 @@ export function Header({ user, translations: t }: { user: UserType | null, trans
         
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <LanguageSwitcher languageLabel={t.language} />
+          <LanguageSwitcher 
+            languageLabel={t.language}
+            currentLanguage={currentLanguage}
+          />
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
