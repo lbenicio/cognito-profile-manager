@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -183,8 +184,10 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
             document.cookie = `oauth_state=${state}; path=/; max-age=600; secure=${window.location.protocol === 'https:'}; samesite=lax`;
 
             passkeyUrl.searchParams.set('client_id', clientId);
-            passkeyUrl.searchParams.set('state', state);
+            passkeyUrl.searchParams.set('response_type', 'code');
+            passkeyUrl.searchParams.set('scope', scope);
             passkeyUrl.searchParams.set('redirect_uri', passkeyCallbackUrl);
+            passkeyUrl.searchParams.set('state', state);
 
             window.location.href = passkeyUrl.toString();
 
