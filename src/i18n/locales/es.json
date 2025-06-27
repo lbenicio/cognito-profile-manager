@@ -89,6 +89,11 @@
       "ipAddress": "Dirección IP",
       "noHistory": "No hay historial de inicio de sesión disponible."
     },
+    "loginActivity": {
+      "title": "Actividad de Inicio de Sesión Reciente",
+      "description": "Inicios de sesión en los últimos 7 días.",
+      "logins": "Inicios de sesión"
+    },
     "sessionInfo": {
       "title": "Información de la Sesión",
       "description": "Detalles sobre tu sesión de inicio de sesión actual.",
@@ -234,7 +239,7 @@
       "disableButton": "Deshabilitar",
       "cancelButton": "Cancelar",
       "qrInstructions": "Escanea el código QR con tu app de autenticación.",
-      "manualEntryInstructions": "O introduce esta clave secreta en tu aplicación de autenticación manualmente.",
+      "manualEntryInstructions": "O introduce esta clave secreta en tu aplicación de autenticación manually.",
       "copyKeyLabel": "Copiar clave secreta",
       "secretCopiedTitle": "Secreto Copiado",
       "secretCopiedDescription": "La clave de configuración manual ha sido copiada a tu portapapeles.",

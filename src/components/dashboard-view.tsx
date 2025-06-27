@@ -14,6 +14,7 @@ import { format } from 'date-fns';
 import UAParser from 'ua-parser-js';
 import { Progress } from '@/components/ui/progress';
 import { SessionInfoCard } from './session-info-card';
+import { LoginActivityChart } from './login-activity-chart';
 
 interface DashboardViewProps {
   user: UserType;
@@ -174,6 +175,8 @@ export function DashboardView({ user }: DashboardViewProps) {
                 </Table>
               </CardContent>
             </Card>
+
+            <LoginActivityChart fingerprint={user.fingerprint} />
         </div>
         
         <div className="lg:col-span-1 space-y-8">

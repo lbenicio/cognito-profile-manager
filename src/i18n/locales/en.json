@@ -89,6 +89,11 @@
       "ipAddress": "IP Address",
       "noHistory": "No login history available."
     },
+    "loginActivity": {
+      "title": "Recent Login Activity",
+      "description": "Logins over the last 7 days.",
+      "logins": "Logins"
+    },
     "sessionInfo": {
       "title": "Session Information",
       "description": "Details about your current login session.",
