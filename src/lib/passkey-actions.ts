@@ -1,6 +1,6 @@
 'use server';
 
-import { cookies, headers } from 'next/headers';
+import { cookies } from 'next/headers';
 
 export async function getPasskeyAddUrl(): Promise<{
   success: boolean;
@@ -11,18 +11,15 @@ export async function getPasskeyAddUrl(): Promise<{
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
     const scope = process.env.NEXT_PUBLIC_OAUTH2_SCOPE;
-    
+    const passkeyCallbackUrl = process.env.NEXT_PUBLIC_PASSKEY_CALLBACK_URL;
+
     if (!wellknownUrl || !clientId || !scope) {
       throw new Error('Passkey client configuration is missing.');
     }
     
-    // The origin of the request is needed to build the callback URL.
-    const requestHeaders = headers();
-    const origin = requestHeaders.get('origin');
-    if (!origin) {
-      throw new Error('Could not determine request origin for callback URL.');
+    if (!passkeyCallbackUrl) {
+      throw new Error('Missing NEXT_PUBLIC_PASSKEY_CALLBACK_URL env var.');
     }
-    const passkeyCallbackUrl = new URL('/api/v1/auth/callback/passkey', origin).toString();
 
     const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
     if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');

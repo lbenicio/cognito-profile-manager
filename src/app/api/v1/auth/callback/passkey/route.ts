@@ -48,7 +48,10 @@ export async function GET(request: NextRequest) {
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     if (!wellknownUrl) throw new Error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
 
-    const passkeyCallbackUrl = new URL('/api/v1/auth/callback/passkey', origin).toString();
+    const passkeyCallbackUrl = process.env.NEXT_PUBLIC_PASSKEY_CALLBACK_URL;
+    if (!passkeyCallbackUrl) {
+      throw new Error('Missing NEXT_PUBLIC_PASSKEY_CALLBACK_URL env var.');
+    }
 
     const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
     if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
