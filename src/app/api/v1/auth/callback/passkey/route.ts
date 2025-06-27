@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { pathnames } from '@/navigation';
+import { enablePasskey } from '@/lib/passkey-actions';
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
@@ -33,12 +34,21 @@ export async function GET(request: NextRequest) {
     return clearStateCookie(NextResponse.redirect(profileUrl));
   }
 
-  // --- Success ---
-  // A code is returned on success, but we don't need to exchange it.
-  // The act of returning to this callback successfully implies the passkey was added.
-  // We just need to revalidate the path to force a refresh of the user data.
+  // --- Success: Update attribute and redirect ---
+  const updateResult = await enablePasskey();
+
+  if (!updateResult.success) {
+      // If updating the attribute fails, redirect with an error.
+      profileUrl.searchParams.set('error', 'passkey_update_failed');
+      profileUrl.searchParams.set('error_description', updateResult.message);
+  } else {
+      // On success, set the status for the UI toast.
+      profileUrl.searchParams.set('passkey_status', 'success');
+  }
+  
+  // The enablePasskey action already calls revalidate, but we do it here
+  // again just in case, to ensure the profile page re-fetches data.
   revalidatePath(pathnames['/profile']);
-  profileUrl.searchParams.set('passkey_status', 'success');
   
   return clearStateCookie(NextResponse.redirect(profileUrl));
 }
