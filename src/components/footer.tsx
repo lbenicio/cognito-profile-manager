@@ -9,11 +9,12 @@ export function Footer() {
   const t = useTranslations('Footer');
   const tSitemap = useTranslations('Footer.sitemap');
   const tLegal = useTranslations('Footer.legal');
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState<Date | null>(null);
 
   useEffect(() => {
-    // This code runs only on the client, after the component has mounted,
-    // ensuring the year is based on the client's clock and preventing a mismatch.
+    // This code runs only on the client, after the component has mounted.
+    // It sets the date for the first time and then starts the timer.
+    setCurrentDate(new Date());
     const timer = setInterval(() => setCurrentDate(new Date()), 1000);
     return () => {
       clearInterval(timer);
@@ -31,17 +32,17 @@ export function Footer() {
                 <LayoutDashboard className="h-6 w-6 text-primary" />
                 <span>Outpost</span>
             </Link>
-            <div className="text-sm text-muted-foreground">
-              <p>{t('copyright', { year: currentDate.getFullYear() })}</p>
+            <div className="text-sm text-muted-foreground" style={{ minHeight: '20px' }}>
+              {currentDate && <p>{t('copyright', { year: currentDate.getFullYear() })}</p>}
             </div>
              <div className="text-sm text-muted-foreground space-y-1 pt-2">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2" style={{ minHeight: '20px' }}>
                     <Calendar className="h-4 w-4" />
-                    <span>{format(currentDate, 'PPP')}</span>
+                    {currentDate && <span>{format(currentDate, 'PPP')}</span>}
                 </div>
-                 <div className="flex items-center gap-2">
+                 <div className="flex items-center gap-2" style={{ minHeight: '20px' }}>
                     <Clock className="h-4 w-4" />
-                    <span>{format(currentDate, 'p')}</span>
+                    {currentDate && <span>{format(currentDate, 'p')}</span>}
                 </div>
             </div>
           </div>
