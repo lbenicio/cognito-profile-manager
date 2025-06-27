@@ -42,6 +42,7 @@ export function Footer() {
                 <Link href="/profile" className="text-sm text-muted-foreground hover:text-primary transition-colors">{tSitemap('profile')}</Link>
                 <Link href="/security" className="text-sm text-muted-foreground hover:text-primary transition-colors">{tSitemap('security')}</Link>
                 <Link href="/settings" className="text-sm text-muted-foreground hover:text-primary transition-colors">{tSitemap('settings')}</Link>
+                <Link href="/contact" className="text-sm text-muted-foreground hover:text-primary transition-colors">{tSitemap('contact')}</Link>
               </nav>
             </div>
             {/* Future columns can be added here */}

@@ -22,7 +22,8 @@
       "account": "Cuenta",
       "profile": "Perfil",
       "settings": "Ajustes",
-      "security": "Seguridad"
+      "security": "Seguridad",
+      "contact": "Contáctanos"
     }
   },
   "Dashboard": {
@@ -323,6 +324,32 @@
           "label": "Marketing y Ofertas",
           "description": "Recibe noticias, actualizaciones y ofertas especiales."
         }
+      }
+    }
+  },
+  "Contact": {
+    "title": "Contáctanos",
+    "description": "¿Tienes alguna pregunta o comentario? Rellena el siguiente formulario y nos pondremos en contacto contigo lo antes posible.",
+    "form": {
+      "nameLabel": "Nombre Completo",
+      "emailLabel": "Correo Electrónico",
+      "categoryLabel": "Categoría",
+      "categoryPlaceholder": "Selecciona una categoría...",
+      "messageLabel": "Mensaje",
+      "messagePlaceholder": "Por favor, describe tu consulta en detalle...",
+      "submitButton": "Enviar Mensaje",
+      "successTitle": "¡Mensaje Enviado!",
+      "successDescription": "Gracias por contactarnos. Te responderemos en breve.",
+      "errorTitle": "Error al Enviar",
+      "errorDescription": "No se pudo enviar tu mensaje. Por favor, inténtalo más tarde.",
+      "categoryRequired": "Por favor, selecciona una categoría.",
+      "messageRequired": "El mensaje es obligatorio.",
+      "messageTooShort": "El mensaje debe tener al menos 10 caracteres.",
+      "categories": {
+        "general": "Consulta General",
+        "billing": "Facturación y Pagos",
+        "technical": "Soporte Técnico",
+        "feedback": "Comentarios y Sugerencias"
       }
     }
   },

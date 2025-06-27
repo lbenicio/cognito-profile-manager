@@ -22,7 +22,8 @@
       "account": "Account",
       "profile": "Profile",
       "settings": "Settings",
-      "security": "Security"
+      "security": "Security",
+      "contact": "Contact Us"
     }
   },
   "Dashboard": {
@@ -323,6 +324,32 @@
           "label": "Marketing & Offers",
           "description": "Receive news, updates, and special offers."
         }
+      }
+    }
+  },
+  "Contact": {
+    "title": "Contact Us",
+    "description": "Have a question or feedback? Fill out the form below and we'll get back to you as soon as possible.",
+    "form": {
+      "nameLabel": "Full Name",
+      "emailLabel": "Email Address",
+      "categoryLabel": "Category",
+      "categoryPlaceholder": "Select a category...",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Please describe your inquiry in detail...",
+      "submitButton": "Send Message",
+      "successTitle": "Message Sent!",
+      "successDescription": "Thank you for contacting us. We will get back to you shortly.",
+      "errorTitle": "Send Failed",
+      "errorDescription": "Could not send your message. Please try again later.",
+      "categoryRequired": "Please select a category.",
+      "messageRequired": "Message is required.",
+      "messageTooShort": "Message must be at least 10 characters long.",
+      "categories": {
+        "general": "General Inquiry",
+        "billing": "Billing & Payments",
+        "technical": "Technical Support",
+        "feedback": "Feedback & Suggestions"
       }
     }
   },
