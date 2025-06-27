@@ -25,10 +25,10 @@ const addressFormSchema = (t: (key: string) => string) => z.object({
   street: z.string().min(1, { message: t('address.streetRequired') }),
   number: z.string().min(1, { message: t('address.numberRequired') }),
   complement: z.string().optional(),
-  city: z.string().min(1, { message: t('cityRequired') }),
-  state: z.string().min(1, { message: t('stateRequired') }),
-  zipCode: z.string().min(1, { message: t('zipCodeRequired') }),
-  country: z.string().min(1, { message: t('countryRequired') }),
+  city: z.string().min(1, { message: t('address.cityRequired') }),
+  state: z.string().min(1, { message: t('address.stateRequired') }),
+  zipCode: z.string().min(1, { message: t('address.zipCodeRequired') }),
+  country: z.string().min(1, { message: t('address.countryRequired') }),
 });
 
 type AddressFormValues = z.infer<ReturnType<typeof addressFormSchema>>;
