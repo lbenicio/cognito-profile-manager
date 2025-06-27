@@ -65,7 +65,7 @@
       "notSet": "Not set"
     },
     "form": {
-      "title": "Edit Profile",
+      "title": "Edit Account",
       "description": "Update your personal information.",
       "givenNameLabel": "Given Name",
       "familyNameLabel": "Family Name",
