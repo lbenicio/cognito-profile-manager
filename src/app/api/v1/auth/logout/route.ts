@@ -6,8 +6,6 @@ export async function GET(request: NextRequest) {
   const sessionCookie = cookies().get('auth_session')?.value;
   
   const host = request.nextUrl.origin;
-  const hostname = request.nextUrl.hostname;
-  const domain = hostname === 'localhost' ? undefined : hostname;
   
   let logoutUrl = new URL('/login', host).toString();
   let isOidcSession = false;
@@ -54,8 +52,8 @@ export async function GET(request: NextRequest) {
 
   const response = NextResponse.redirect(logoutUrl);
   
-  response.cookies.set('auth_session', '', { expires: new Date(0), path: '/', domain });
-  response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/', domain });
+  response.cookies.set('auth_session', '', { expires: new Date(0), path: '/' });
+  response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
 
   return response;
 }

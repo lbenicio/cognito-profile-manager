@@ -45,12 +45,9 @@ function redirectToLogin(request: NextRequest): NextResponse {
     const loginUrl = new URL(pathnames['/login'], request.url);
     const response = NextResponse.redirect(loginUrl);
     
-    const hostname = request.nextUrl.hostname;
-    const domain = hostname === 'localhost' ? undefined : hostname;
-    
     // Clear both session and state cookies on redirect.
-    response.cookies.set('auth_session', '', { expires: new Date(0), path: '/', domain });
-    response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/', domain });
+    response.cookies.set('auth_session', '', { expires: new Date(0), path: '/' });
+    response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
 
     return response;
 }

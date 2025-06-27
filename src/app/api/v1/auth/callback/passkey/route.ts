@@ -7,7 +7,7 @@ import { pathnames } from '@/navigation';
 import { getSession } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
-  const { searchParams, origin, nextUrl } = request;
+  const { searchParams, origin } = request;
   const code = searchParams.get('code');
   const error = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
@@ -16,11 +16,8 @@ export async function GET(request: NextRequest) {
 
   const accountUrl = new URL(pathnames['/account'], origin);
   
-  const hostname = nextUrl.hostname;
-  const domain = hostname === 'localhost' ? undefined : hostname;
-
   const clearStateCookie = (response: NextResponse) => {
-    response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/', domain });
+    response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
     return response;
   };
 

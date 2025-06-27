@@ -11,8 +11,6 @@ export async function GET(request: NextRequest) {
   const storedState = request.cookies.get('oauth_state')?.value;
 
   const requestUrl = new URL(request.url);
-  const hostname = requestUrl.hostname;
-  const domain = hostname === 'localhost' ? undefined : hostname;
 
   // --- CSRF check ---
   if (!state || !storedState || state !== storedState) {
@@ -23,12 +21,12 @@ export async function GET(request: NextRequest) {
     const loginUrl = new URL('/login', requestUrl.origin);
     loginUrl.searchParams.set('error', 'invalid_state');
     const response = NextResponse.redirect(loginUrl);
-    response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/', domain });
+    response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
     return response;
   }
   
   const clearStateCookie = (response: NextResponse) => {
-      response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/', domain });
+      response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
       return response;
   };
 
@@ -144,7 +142,6 @@ export async function GET(request: NextRequest) {
     // --- End fingerprint update ---
 
     // The session will contain the tokens received from Cognito.
-    // The middleware will be responsible for validating the token on each request.
     const sessionData = {
         id_token: tokens.id_token,
         access_token: tokens.access_token,
@@ -161,7 +158,6 @@ export async function GET(request: NextRequest) {
       maxAge: 30 * 24 * 60 * 60, // 30 days; session lifetime is managed by token expiration
       path: '/',
       sameSite: 'lax',
-      domain: domain,
     });
     
     return clearStateCookie(response);
