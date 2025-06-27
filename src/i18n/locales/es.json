@@ -58,6 +58,19 @@
       "successDescription": "Tu avatar ha sido actualizado exitosamente.",
       "errorTitle": "Error al Subir"
     },
+    "banner": {
+      "editBannerTitle": "Editar Banner",
+      "editBannerDescription": "Sube una nueva imagen de banner. Tamaño recomendado 1500x500px.",
+      "changeBanner": "Cambiar Banner",
+      "uploadAndSave": "Subir y Guardar",
+      "cancel": "Cancelar",
+      "fileTooLarge": "El archivo es demasiado grande. El tamaño máximo es de 2MB.",
+      "invalidFileType": "Tipo de archivo no válido. Utilice PNG, JPG o WEBP.",
+      "genericError": "Ocurrió un error desconocido. Por favor, inténtalo de nuevo.",
+      "successTitle": "Banner Actualizado",
+      "successDescription": "Tu banner ha sido actualizado exitosamente.",
+      "errorTitle": "Error al Subir"
+    },
     "display": {
       "status": "Estado: {status}",
       "memberSince": "Miembro desde: {date}",

@@ -45,6 +45,7 @@ export type User = {
   groups: string[];
   isAdmin: boolean;
   picture: string;
+  banner: string;
   locale: string;
   zoneinfo: string;
   website: string;
@@ -95,6 +96,7 @@ const mockUser: User = {
   groups: ['users', 'beta-testers'],
   isAdmin: false,
   picture: `https://placehold.co/128x128.png`,
+  banner: `https://placehold.co/1500x500.png`,
   locale: 'en-US',
   zoneinfo: 'America/New_York',
   website: 'https://example.com',
@@ -197,6 +199,7 @@ export const getUser = cache(async (): Promise<User | null> => {
       groups: groups,
       isAdmin: isAdmin,
       picture: (payload.picture as string) || '',
+      banner: (payload['custom:banner'] as string) || '',
       locale: (payload.locale as string) || '',
       zoneinfo: (payload.zoneinfo as string) || '',
       website: (payload.website as string) || '',
@@ -275,6 +278,7 @@ export const getUser = cache(async (): Promise<User | null> => {
                 phone_number: attributes.phone_number || user.phone_number,
                 phone_number_verified: attributes.phone_number_verified === 'true',
                 picture: attributes.picture || user.picture,
+                banner: attributes['custom:banner'] || user.banner,
                 locale: attributes.locale || user.locale,
                 zoneinfo: attributes.zoneinfo || user.zoneinfo,
                 website: attributes.website || user.website,

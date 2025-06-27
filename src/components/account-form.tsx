@@ -188,7 +188,7 @@ export function AccountForm({ user, onUpdate }: AccountFormProps) {
                     <Textarea
                       placeholder={t('aboutMePlaceholder')}
                       className="resize-none"
-                      rows={5}
+                      rows={10}
                       {...field}
                     />
                   </FormControl>

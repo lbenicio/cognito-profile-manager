@@ -22,8 +22,12 @@ export async function GET(request: NextRequest) {
 
   // --- CSRF check ---
   if (!state || !storedState || state !== storedState) {
-    console.error('Passkey callback state mismatch or state missing.');
+    console.error('Passkey callback state mismatch or state missing.', {
+        queryState: state,
+        cookieState: storedState
+    });
     accountUrl.searchParams.set('error', 'invalid_state');
+    accountUrl.searchParams.set('error_description', 'Your session has expired or is invalid. Please try adding the passkey again.');
     return clearStateCookie(NextResponse.redirect(accountUrl));
   }
   

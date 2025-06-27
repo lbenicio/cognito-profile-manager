@@ -3,9 +3,11 @@
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'crypto';
-import { getUser } from '@/lib/auth';
+import { getUser, getSession } from '@/lib/auth';
 import { r2 } from '@/lib/r2';
 import { revalidatePath } from 'next/cache';
+import { cognitoClient } from './cognito';
+import { UpdateUserAttributesCommand } from '@aws-sdk/client-cognito-identity-provider';
 
 const BUCKET_NAME = process.env.R2_BUCKET_NAME;
 const PUBLIC_URL = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
@@ -51,19 +53,22 @@ export async function getPresignedUploadUrl({ type, size }: GetPresignedUrlParam
   return { presignedUrl, publicUrl };
 }
 
-// In a real app, this would call your auth provider (e.g., Cognito) to update the user's 'picture' attribute.
-// For this prototype, we'll just log it and revalidate paths. A client-side state update handles the immediate UI change.
 export async function updateUserAvatar(pictureUrl: string) {
-    const user = await getUser();
-    if (!user) {
+    const session = await getSession();
+    if (!session?.access_token) {
         throw new Error('Not authenticated');
     }
-    console.log(`Updating avatar for ${user.username} to ${pictureUrl}. In a real app, this would call an API.`);
-    // NOTE: This does not persist the change across sessions because `getUser` reads from an immutable JWT.
-    // A full implementation requires updating the user profile in your identity provider.
+
+    const command = new UpdateUserAttributesCommand({
+      AccessToken: session.access_token,
+      UserAttributes: [{ Name: 'picture', Value: pictureUrl }],
+    });
+    
+    await cognitoClient.send(command);
     
     // Revalidate paths that show the user's avatar to ensure data consistency on navigation
     revalidatePath('/');
+    revalidatePath('/account');
     revalidatePath('/profile');
 
     return { success: true };

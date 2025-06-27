@@ -58,6 +58,19 @@
       "successDescription": "Your avatar has been successfully updated.",
       "errorTitle": "Upload Failed"
     },
+    "banner": {
+      "editBannerTitle": "Edit Banner",
+      "editBannerDescription": "Upload a new banner image. Recommended size 1500x500px.",
+      "changeBanner": "Change Banner",
+      "uploadAndSave": "Upload & Save",
+      "cancel": "Cancel",
+      "fileTooLarge": "File is too large. Maximum size is 2MB.",
+      "invalidFileType": "Invalid file type. Please use PNG, JPG, or WEBP.",
+      "genericError": "An unknown error occurred. Please try again.",
+      "successTitle": "Banner Updated",
+      "successDescription": "Your banner has been successfully updated.",
+      "errorTitle": "Upload Failed"
+    },
     "display": {
       "status": "Status: {status}",
       "memberSince": "Member since: {date}",
