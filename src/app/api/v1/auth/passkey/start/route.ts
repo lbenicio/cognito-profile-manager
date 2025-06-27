@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 
 export async function GET(request: NextRequest) {
   try {
@@ -37,14 +36,15 @@ export async function GET(request: NextRequest) {
 
     const hostname = request.nextUrl.hostname;
     const domain = hostname === 'localhost' ? undefined : hostname;
+    const secure = process.env.NODE_ENV === 'production';
 
     // Set the cookie on the response that redirects the user
     response.cookies.set('oauth_state', state, {
       path: '/',
       maxAge: 600, // 10 minutes
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure,
+      sameSite: secure ? 'none' : 'lax',
       domain,
     });
 
