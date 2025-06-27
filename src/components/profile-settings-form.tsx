@@ -107,15 +107,6 @@ export function ProfileSettingsForm({ initialPreferences, onUpdate }: ProfileSet
                 />
             </div>
             <div className="flex items-center justify-between">
-                <Label htmlFor="show-address">{t('showAddressLabel')}</Label>
-                <Switch
-                    id="show-address"
-                    checked={prefs.publicFields.address}
-                    onCheckedChange={(value) => handleFieldChange('address', value)}
-                    disabled={isPending || !prefs.isPublic}
-                />
-            </div>
-            <div className="flex items-center justify-between">
                 <Label htmlFor="show-phone">{t('showPhoneLabel')}</Label>
                 <Switch
                     id="show-phone"

@@ -29,13 +29,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 const accountFormSchema = (t: (key: string) => string) => z.object({
   given_name: z.string().min(1, { message: t('givenNameRequired') }).max(50),
   family_name: z.string().min(1, { message: t('familyNameRequired') }).max(50),
-  street: z.string().min(1, { message: t('address.streetRequired') }),
-  number: z.string().min(1, { message: t('address.numberRequired') }),
-  complement: z.string().optional(),
-  city: z.string().min(1, { message: t('cityRequired') }),
-  state: z.string().min(1, { message: t('stateRequired') }),
-  zipCode: z.string().min(1, { message: t('zipCodeRequired') }),
-  country: z.string().min(1, { message: t('countryRequired') }),
   phone_number: z.string().refine((phone) => /^\+[1-9]\d{7,14}$/.test(phone), {
     message: t('phoneInvalid'),
   }),
@@ -62,13 +55,6 @@ export function AccountForm({ user, onUpdate }: AccountFormProps) {
     defaultValues: {
       given_name: '',
       family_name: '',
-      street: '',
-      number: '',
-      complement: '',
-      city: '',
-      state: '',
-      zipCode: '',
-      country: '',
       phone_number: user.phone_number || '',
       website: user.website || '',
       zoneinfo: user.zoneinfo || '',
@@ -86,13 +72,6 @@ export function AccountForm({ user, onUpdate }: AccountFormProps) {
     form.reset({
         given_name,
         family_name,
-        street: '', // Keep address fields blank for new entry
-        number: '',
-        complement: '',
-        city: '',
-        state: '',
-        zipCode: '',
-        country: '',
         phone_number: user.phone_number,
         website: user.website,
         zoneinfo: user.zoneinfo,
@@ -105,12 +84,8 @@ export function AccountForm({ user, onUpdate }: AccountFormProps) {
     setIsSubmitting(true);
     
     try {
-        const complementPart = data.complement ? `, ${data.complement}` : '';
-        const fullAddress = `${data.street} ${data.number}${complementPart}, ${data.city}, ${data.state} ${data.zipCode}, ${data.country}`;
-        
         const result = await updateUserProfile({
             ...data,
-            address: fullAddress,
             website: data.website || '',
             zoneinfo: data.zoneinfo || '',
             gender: data.gender || '',
@@ -120,7 +95,6 @@ export function AccountForm({ user, onUpdate }: AccountFormProps) {
         if (result.success) {
             onUpdate({
                 name: `${data.given_name} ${data.family_name}`.trim(),
-                address: fullAddress,
                 phone_number: data.phone_number,
                 website: data.website,
                 zoneinfo: data.zoneinfo,
@@ -207,101 +181,6 @@ export function AccountForm({ user, onUpdate }: AccountFormProps) {
                 </FormItem>
               )}
             />
-            <div className="space-y-2">
-                <FormLabel>{t('address.label')}</FormLabel>
-                <div className="space-y-4">
-                     <FormField
-                      control={form.control}
-                      name="street"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Input placeholder={t('address.streetPlaceholder')} {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                       <FormField
-                          control={form.control}
-                          name="number"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormControl>
-                                <Input placeholder={t('address.numberPlaceholder')} {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                         <FormField
-                          control={form.control}
-                          name="complement"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormControl>
-                                <Input placeholder={t('address.complementPlaceholder')} {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="city"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormControl>
-                                <Input placeholder={t('address.cityPlaceholder')} {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="state"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormControl>
-                                <Input placeholder={t('address.statePlaceholder')} {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="zipCode"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormControl>
-                                <Input placeholder={t('address.zipCodePlaceholder')} {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="country"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormControl>
-                                <Input placeholder={t('address.countryPlaceholder')} {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                    </div>
-                </div>
-            </div>
              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}

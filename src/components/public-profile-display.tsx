@@ -79,12 +79,6 @@ export function PublicProfileDisplay({ user }: PublicProfileDisplayProps) {
                                 </a>
                             </div>
                         )}
-                         {publicFields.address && user.address && (
-                            <div className="flex items-start gap-2 text-sm">
-                                <Home className="w-4 h-4 text-muted-foreground mt-0.5" />
-                                <span>{user.address}</span>
-                            </div>
-                        )}
                         {publicFields.phone_number && user.phone_number && (
                             <div className="flex items-center gap-2 text-sm">
                                 <Phone className="w-4 h-4 text-muted-foreground" />
