@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { Smartphone, KeyRound, Loader2, Plus, Trash2, Laptop, Monitor } from 'lucide-react';
+import { Smartphone, KeyRound, Loader2, Plus, Trash2, Laptop, Monitor, Copy } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from 'next-intl';
