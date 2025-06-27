@@ -13,7 +13,12 @@ import type { User } from '@/lib/auth';
 import { generateMfaSetup, verifyAndEnableMfa, disableMfa } from '@/lib/mfa-actions';
 import { cn } from '@/lib/utils';
 
-export function TwoFactorAuth({ user }: { user: User }) {
+interface TwoFactorAuthProps {
+    user: User;
+    onUpdate: (data: Partial<User>) => void;
+}
+
+export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
     const { toast } = useToast();
     const t = useTranslations('Profile.twoFactor');
 
@@ -78,7 +83,7 @@ export function TwoFactorAuth({ user }: { user: User }) {
                 setQrCode('');
                 setOtpCode('');
                 setSecret('');
-                // In a real app, you'd likely want to refresh the user session here
+                onUpdate({ twoFactorEnabled: true });
             } else {
                 toast({
                     variant: 'destructive',
@@ -106,7 +111,7 @@ export function TwoFactorAuth({ user }: { user: User }) {
                     title: t('mfaDisabledTitle'),
                     description: t('mfaDisabledDescription'),
                 });
-                // In a real app, you'd likely want to refresh the user session here
+                onUpdate({ twoFactorEnabled: false });
             }
         } catch (error) {
             toast({
