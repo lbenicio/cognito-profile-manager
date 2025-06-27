@@ -1,9 +1,9 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useTransition, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { ssoLogin, devAdminLogin } from '@/lib/auth-actions';
+import { devAdminLogin } from '@/lib/auth-actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -13,13 +13,12 @@ export function LoginView() {
     const t = useTranslations('Login');
     const searchParams = useSearchParams();
     const error = searchParams.get('error');
-    const [isSsoPending, startSsoTransition] = useTransition();
+    const [isSsoLoading, setIsSsoLoading] = useState(false);
     const [isAdminPending, startAdminTransition] = useTransition();
 
     const handleSsoLogin = () => {
-        startSsoTransition(() => {
-            ssoLogin();
-        });
+        setIsSsoLoading(true);
+        window.location.href = '/api/v1/auth/sso/start';
     };
 
     const handleAdminLogin = () => {
@@ -40,16 +39,18 @@ export function LoginView() {
                         <Alert variant="destructive" className="mb-6">
                             <AlertTriangle className="h-4 w-4" />
                             <AlertTitle>{t('errorTitle')}</AlertTitle>
-                            <AlertDescription>{error}</AlertDescription>
+                            <AlertDescription>
+                                {error === 'invalid_state' ? t('invalid_state') : error}
+                            </AlertDescription>
                         </Alert>
                     )}
                     <div className="space-y-4">
                         <Button
                             onClick={handleSsoLogin}
-                            disabled={isSsoPending || isAdminPending}
+                            disabled={isSsoLoading || isAdminPending}
                             className="w-full"
                         >
-                            {isSsoPending ? (
+                            {isSsoLoading ? (
                                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
                             ) : (
                                 <LogIn />
@@ -60,7 +61,7 @@ export function LoginView() {
                         {process.env.NODE_ENV === 'development' && (
                              <Button
                                 onClick={handleAdminLogin}
-                                disabled={isSsoPending || isAdminPending}
+                                disabled={isSsoLoading || isAdminPending}
                                 className="w-full"
                                 variant="secondary"
                             >

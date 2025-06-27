@@ -3,48 +3,6 @@
 import { cookies, headers } from 'next/headers';
 import { redirect } from '@/navigation';
 
-// Action for the main SSO login button
-export async function ssoLogin() {
-  const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
-  if (!wellknownUrl) throw new Error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
-
-  if (!process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL) {
-    throw new Error('Missing NEXT_PUBLIC_OAUTH2_CALLBACK_URL env var');
-  }
-  
-  const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
-  if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
-  const wellknown = await wellknownResponse.json();
-
-  const authorizationEndpoint = wellknown.authorization_endpoint;
-
-  const host = headers().get('host')!;
-  const hostname = new URL(`http://${host}`).hostname;
-  const domain = hostname === 'localhost' ? undefined : hostname;
-
-  // --- CSRF protection ---
-  const state = Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('hex');
-  cookies().set('oauth_state', state, {
-    path: '/',
-    maxAge: 600, // 10 minutes
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    domain,
-  });
-
-  const params = new URLSearchParams({
-    client_id: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
-    response_type: 'code',
-    scope: process.env.NEXT_PUBLIC_OAUTH2_SCOPE!,
-    redirect_uri: process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL,
-    state: state,
-  });
-
-  const loginUrl = `${authorizationEndpoint}?${params.toString()}`;
-  redirect(loginUrl);
-}
-
 // Dev-only action for the "Sign In as Admin" button
 export async function devAdminLogin() {
   if (process.env.NODE_ENV !== 'development') {
