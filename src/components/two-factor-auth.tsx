@@ -2,7 +2,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { useRouter } from '@/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from 'next-intl';
 import type { User } from '@/lib/auth';
 import { generateMfaSetup, verifyAndEnableMfa, disableMfa } from '@/lib/mfa-actions';
+import { getPasskeyAddUrl } from '@/lib/passkey-actions';
 
 interface TwoFactorAuthProps {
     user: User;
@@ -164,36 +164,12 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
     const handleAddPasskey = async () => {
         setIsManagingPasskeys(true);
         try {
-            const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
-            const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
-            const scope = process.env.NEXT_PUBLIC_OAUTH2_SCOPE;
-
-            if (!wellknownUrl || !clientId || !scope) {
-                throw new Error(t('passkeyError.configMissing'));
+            const result = await getPasskeyAddUrl();
+            if (result.success && result.url) {
+                window.location.href = result.url;
+            } else {
+                throw new Error(result.message || t('passkeyError.generic'));
             }
-            
-            const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
-            if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
-            const wellknown = await wellknownResponse.json();
-            const authorizationEndpoint = wellknown.authorization_endpoint;
-
-            const cognitoDomain = new URL(authorizationEndpoint).origin;
-            const passkeyUrl = new URL(`${cognitoDomain}/passkeys/add`);
-            
-            const passkeyCallbackUrl = new URL('/api/v1/auth/callback/passkey', window.location.origin).toString();
-
-            // --- CSRF protection ---
-            const state = Array.from(window.crypto.getRandomValues(new Uint8Array(16)), byte => byte.toString(16).padStart(2, '0')).join('');
-            document.cookie = `oauth_state=${state}; path=/; max-age=600; secure=${window.location.protocol === 'https:'}; samesite=lax`;
-
-            passkeyUrl.searchParams.set('client_id', clientId);
-            passkeyUrl.searchParams.set('response_type', 'code');
-            passkeyUrl.searchParams.set('scope', scope);
-            passkeyUrl.searchParams.set('redirect_uri', passkeyCallbackUrl);
-            passkeyUrl.searchParams.set('state', state);
-
-            window.location.href = passkeyUrl.toString();
-
         } catch (error: any) {
             toast({
                 variant: 'destructive',
