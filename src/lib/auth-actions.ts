@@ -18,11 +18,22 @@ export async function ssoLogin() {
 
   const authorizationEndpoint = wellknown.authorization_endpoint;
 
+  // --- CSRF protection ---
+  const state = Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('hex');
+  cookies().set('oauth_state', state, {
+    path: '/',
+    maxAge: 600, // 10 minutes
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+  });
+
   const params = new URLSearchParams({
     client_id: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
     response_type: 'code',
     scope: process.env.NEXT_PUBLIC_OAUTH2_SCOPE!,
     redirect_uri: process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL,
+    state: state,
   });
 
   const loginUrl = `${authorizationEndpoint}?${params.toString()}`;
@@ -47,8 +58,10 @@ export async function devAdminLogin() {
 // This function is a server action that handles user logout.
 export async function logout() {
   const sessionCookie = cookies().get('auth_session')?.value;
-  // Destroy the session by clearing the cookie.
-  cookies().set('auth_session', '', { expires: new Date(0) });
+  // Destroy the session by clearing the auth cookie.
+  cookies().set('auth_session', '', { expires: new Date(0), path: '/' });
+  // Also clear the oauth state cookie to prevent issues with stale states.
+  cookies().set('oauth_state', '', { expires: new Date(0), path: '/' });
   
   // If the session was a real OIDC session, redirect to the Cognito logout endpoint.
   if (sessionCookie && JSON.parse(sessionCookie).id_token) {
