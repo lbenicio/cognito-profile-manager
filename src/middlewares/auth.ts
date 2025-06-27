@@ -1,7 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { pathnames, locales } from '@/navigation';
-import { jwtVerify, createRemoteJWKSet } from 'jose';
+import { jwtVerify, createRemoteJWKSet, decodeJwt } from 'jose';
 
 // All pages that are public and don't require authentication
 const publicPages = [pathnames['/login']]; 
@@ -81,13 +81,16 @@ async function refreshAccessToken(refreshToken: string) {
       throw new Error('Could not refresh token');
     }
 
-    // Cognito refresh response doesn't include a new refresh token unless configured to do so.
-    // We will reuse the old one, but get new access and id tokens.
+    // Use the `exp` claim from the new ID token for an authoritative expiration time.
+    const idTokenPayload = decodeJwt(tokens.id_token);
+    const expires_at = (idTokenPayload.exp as number) * 1000;
+
+    // Cognito refresh response may include a new refresh token. We must store and use it.
     const newSessionData = {
       id_token: tokens.id_token,
       access_token: tokens.access_token,
-      refresh_token: refreshToken, // Re-use the existing refresh token
-      expires_at: Date.now() + (tokens.expires_in * 1000),
+      refresh_token: tokens.refresh_token || refreshToken,
+      expires_at: expires_at,
     };
     
     return newSessionData;
