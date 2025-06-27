@@ -91,7 +91,8 @@ export async function GET(request: NextRequest) {
     const sessionData = {
         id_token: tokens.id_token,
         access_token: tokens.access_token,
-        expires_in: tokens.expires_in,
+        refresh_token: tokens.refresh_token,
+        expires_at: Date.now() + (tokens.expires_in * 1000),
     };
 
     const dashboardUrl = new URL('/', requestUrl.origin);
@@ -101,7 +102,7 @@ export async function GET(request: NextRequest) {
     response.cookies.set('auth_session', JSON.stringify(sessionData), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: sessionData.expires_in || 3600,
+      maxAge: 30 * 24 * 60 * 60, // 30 days; session lifetime is managed by token expiration
       path: '/',
       sameSite: 'lax',
     });
