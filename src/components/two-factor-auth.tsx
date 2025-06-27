@@ -11,6 +11,18 @@ import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from 'next-intl';
 import type { User } from '@/lib/auth';
 import { generateMfaSetup, verifyAndEnableMfa, disableMfa } from '@/lib/mfa-actions';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { generatePasskeyRegistrationOptions, verifyPasskeyRegistration } from '@/lib/passkey-actions';
+import { startRegistration } from '@simplewebauthn/browser';
+import type { PublicKeyCredentialCreationOptionsJSON } from '@simplewebauthn/types';
 
 interface TwoFactorAuthProps {
     user: User;
@@ -31,7 +43,9 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
     const [isDisablingMfa, setIsDisablingMfa] = useState(false);
 
     // Passkey State
-    const [isRedirecting, setIsRedirecting] = useState(false);
+    const [isAddingPasskey, setIsAddingPasskey] = useState(false);
+    const [isPasskeyDialogOpen, setIsPasskeyDialogOpen] = useState(false);
+    const [newPasskeyName, setNewPasskeyName] = useState('');
 
     const handleStartSetup = async () => {
         setIsGenerating(true);
@@ -124,50 +138,46 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
         }
     };
 
-    const handleManagePasskeys = async () => {
-        setIsRedirecting(true);
-
-        const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
-        const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
-        const callbackUrl = process.env.NEXT_PUBLIC_OAUTH2_CALLBACK_URL;
-        const scope = process.env.NEXT_PUBLIC_OAUTH2_SCOPE;
-
-        if (!wellknownUrl || !clientId || !callbackUrl || !scope) {
-            toast({
-                variant: 'destructive',
-                title: t('passkeyError.title'),
-                description: t('passkeyError.description'),
-            });
-            setIsRedirecting(false);
-            return;
-        }
-
+    const handleAddPasskey = async () => {
+        setIsAddingPasskey(true);
+    
         try {
-            const wellknownResponse = await fetch(wellknownUrl);
-            if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID config');
-            const wellknown = await wellknownResponse.json();
-            const authEndpoint = new URL(wellknown.authorization_endpoint);
-            const cognitoOrigin = authEndpoint.origin;
-
-            const params = new URLSearchParams({
-                client_id: clientId,
-                redirect_uri: callbackUrl,
-                response_type: 'code',
-                scope: scope,
+          // 1. Get registration options from the server
+          const options: PublicKeyCredentialCreationOptionsJSON & { challenge: string } = await generatePasskeyRegistrationOptions();
+    
+          // 2. Prompt the user to create a new passkey
+          const registrationResponse = await startRegistration(options);
+    
+          // 3. Verify the registration with the server
+          const verificationResult = await verifyPasskeyRegistration(
+            registrationResponse,
+            newPasskeyName,
+            options.challenge
+          );
+    
+          if (verificationResult.success) {
+            toast({
+              title: t('passkeySuccess.title'),
+              description: t('passkeySuccess.description'),
             });
-
-            const passkeyUrl = `${cognitoOrigin}/passkeys/add?${params.toString()}`;
-            
-            window.location.href = passkeyUrl;
-        } catch (error) {
-             toast({
-                variant: 'destructive',
-                title: t('passkeyError.title'),
-                description: error instanceof Error ? error.message : 'Failed to build redirect URL.',
-            });
-            setIsRedirecting(false);
+            onUpdate({ passkeysEnabled: true });
+            setIsPasskeyDialogOpen(false);
+            setNewPasskeyName('');
+          } else {
+            throw new Error(verificationResult.message || t('passkeyError.generic'));
+          }
+        } catch (error: any) {
+          toast({
+            variant: 'destructive',
+            title: t('passkeyError.title'),
+            description: error.message || t('passkeyError.generic'),
+          });
+          // If the user cancels, the error name is often 'InvalidStateError' or 'NotAllowedError'
+          console.error("Passkey registration error:", error.name, error.message);
+        } finally {
+          setIsAddingPasskey(false);
         }
-    };
+      };
 
 
     return (
@@ -275,26 +285,55 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
                 <Separator />
 
                 {/* Passkeys Section */}
+                <Dialog open={isPasskeyDialogOpen} onOpenChange={setIsPasskeyDialogOpen}>
                  <div className="space-y-4">
                     <div className="flex items-start gap-3">
                         <KeyRound className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
                         <div className="w-full space-y-4">
                             <h4 className="font-medium text-sm">{t('passkeysTitle')}</h4>
-                            <p className="text-sm text-muted-foreground">
-                                {t('passkeysDescriptionRedirect')}
-                            </p>
                              {user.passkeysEnabled ? (
                                 <p className="text-sm text-green-700 dark:text-green-400">{t('passkeysEnabled')}</p>
                             ) : (
                                 <p className="text-sm text-muted-foreground">{t('passkeysDisabled')}</p>
                             )}
-                            <Button variant="outline" size="sm" onClick={handleManagePasskeys} disabled={isRedirecting}>
-                                {isRedirecting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                {t('managePasskeysButton')}
-                            </Button>
+                            <p className="text-sm text-muted-foreground">
+                                {t('passkeysDescription')}
+                            </p>
+                            <DialogTrigger asChild>
+                                <Button variant="outline" size="sm">
+                                    {t('addPasskeyButton')}
+                                </Button>
+                            </DialogTrigger>
                         </div>
                     </div>
                 </div>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{t('passkeyDialog.title')}</DialogTitle>
+                        <DialogDescription>{t('passkeyDialog.description')}</DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <label htmlFor="passkey-name" className='text-sm font-medium'>{t('passkeyDialog.nameLabel')}</label>
+                            <Input
+                                id="passkey-name"
+                                value={newPasskeyName}
+                                onChange={(e) => setNewPasskeyName(e.target.value)}
+                                placeholder={t('passkeyDialog.namePlaceholder')}
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button
+                            onClick={handleAddPasskey}
+                            disabled={isAddingPasskey || !newPasskeyName}
+                        >
+                            {isAddingPasskey && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {t('passkeyDialog.addButton')}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+                </Dialog>
             </CardContent>
         </Card>
     )

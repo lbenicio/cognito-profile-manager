@@ -126,13 +126,24 @@
       "mfaDisabledDescription": "2FA via authenticator app has been disabled.",
       "verificationFailedTitle": "Verification Failed",
       "passkeysTitle": "Passkeys / Security Keys",
-      "passkeysDescriptionRedirect": "Manage your passkeys on the secure page provided by our identity service. You will be redirected to add or remove passkeys.",
+      "passkeysDescription": "Use a passkey for secure, passwordless sign-in. This is the most secure way to protect your account.",
       "passkeysEnabled": "Passkeys are enabled on your account.",
       "passkeysDisabled": "Passkeys are not yet enabled on your account.",
-      "managePasskeysButton": "Manage Passkeys",
+      "addPasskeyButton": "Add a new Passkey",
+      "passkeyDialog": {
+        "title": "Add a new Passkey",
+        "description": "Follow your browser's instructions to register your device. Give your passkey a memorable name so you can identify it later.",
+        "nameLabel": "Passkey Name",
+        "namePlaceholder": "e.g., My Work Laptop",
+        "addButton": "Add and Register"
+      },
+      "passkeySuccess": {
+        "title": "Passkey Registered",
+        "description": "Your new passkey has been successfully added to your account."
+      },
       "passkeyError": {
-        "title": "Configuration Error",
-        "description": "Passkey management is not configured correctly. Please contact support."
+        "title": "Registration Failed",
+        "generic": "Something went wrong. Please try again."
       }
     }
   },
