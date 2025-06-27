@@ -9,13 +9,18 @@ export function Footer() {
   const t = useTranslations('Footer');
   const tSitemap = useTranslations('Footer.sitemap');
   const tLegal = useTranslations('Footer.legal');
-  const [currentDate, setCurrentDate] = useState<Date | null>(null);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // This code runs only on the client, after the component has mounted.
-    // It sets the date for the first time and then starts the timer.
-    setCurrentDate(new Date());
-    const timer = setInterval(() => setCurrentDate(new Date()), 1000);
+    // This effect runs only on the client, after the component has mounted.
+    // It signals that it's safe to render client-specific content.
+    setIsClient(true);
+
+    const timer = setInterval(() => {
+      setCurrentDate(new Date());
+    }, 1000);
+
     return () => {
       clearInterval(timer);
     };
@@ -33,16 +38,16 @@ export function Footer() {
                 <span>Outpost</span>
             </Link>
             <div className="text-sm text-muted-foreground" style={{ minHeight: '20px' }}>
-              {currentDate && <p>{t('copyright', { year: currentDate.getFullYear() })}</p>}
+              {isClient && <p>{t('copyright', { year: currentDate.getFullYear() })}</p>}
             </div>
              <div className="text-sm text-muted-foreground space-y-1 pt-2">
                 <div className="flex items-center gap-2" style={{ minHeight: '20px' }}>
                     <Calendar className="h-4 w-4" />
-                    {currentDate && <span>{format(currentDate, 'PPP')}</span>}
+                    {isClient && <span>{format(currentDate, 'PPP')}</span>}
                 </div>
                  <div className="flex items-center gap-2" style={{ minHeight: '20px' }}>
                     <Clock className="h-4 w-4" />
-                    {currentDate && <span>{format(currentDate, 'p')}</span>}
+                    {isClient && <span>{format(currentDate, 'p')}</span>}
                 </div>
             </div>
           </div>
