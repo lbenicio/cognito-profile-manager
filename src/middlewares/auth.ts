@@ -22,11 +22,22 @@ async function verifyToken(token: string): Promise<boolean> {
         return false;
     };
     
-    // Construct issuer and JWKS URI from the wellknown URL for efficiency in middleware
-    const issuer = wellknownUrl.replace('/.well-known/openid-configuration', '');
-    const jwksUri = new URL('.well-known/jwks.json', issuer);
+    const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
+    if (!wellknownResponse.ok) {
+        console.error('Failed to fetch OpenID configuration in middleware.');
+        return false;
+    }
+    const wellknown = await wellknownResponse.json();
 
-    const JWKS = createRemoteJWKSet(jwksUri);
+    const jwksUri = wellknown.jwks_uri;
+    const issuer = wellknown.issuer;
+    
+    if (!jwksUri || !issuer) {
+        console.error('JWKS URI or Issuer missing from OpenID configuration.');
+        return false;
+    }
+
+    const JWKS = createRemoteJWKSet(new URL(jwksUri));
 
     await jwtVerify(token, JWKS, {
       issuer: issuer,

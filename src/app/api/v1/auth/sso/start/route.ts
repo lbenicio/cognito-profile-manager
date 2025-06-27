@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
       maxAge: 600, // 10 minutes
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax', // Use 'lax' for better compatibility with OIDC redirects.
+      sameSite: 'lax',
     });
 
     return response;
