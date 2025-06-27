@@ -13,7 +13,14 @@ export function LoginView() {
     const t = useTranslations('Login');
     const searchParams = useSearchParams();
     const error = searchParams.get('error');
+    const [isSsoPending, startSsoTransition] = useTransition();
     const [isAdminPending, startAdminTransition] = useTransition();
+
+    const handleSsoLogin = () => {
+        startSsoTransition(() => {
+            window.location.href = '/api/v1/auth/sso/start';
+        });
+    };
 
     const handleAdminLogin = () => {
         startAdminTransition(() => {
@@ -39,11 +46,13 @@ export function LoginView() {
                         </Alert>
                     )}
                     <div className="space-y-4">
-                        <Button asChild className="w-full">
-                            <a href='/api/v1/auth/sso/start'>
+                        <Button onClick={handleSsoLogin} disabled={isSsoPending} className="w-full">
+                            {isSsoPending ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
+                            ) : (
                                 <LogIn />
-                                <span className="ml-2">{t('signInButton')}</span>
-                            </a>
+                            )}
+                            <span className="ml-2">{t('signInButton')}</span>
                         </Button>
 
                         {process.env.NODE_ENV === 'development' && (
