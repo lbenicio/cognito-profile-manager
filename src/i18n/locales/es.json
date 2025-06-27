@@ -123,34 +123,13 @@
       "mfaDisabledDescription": "La 2FA mediante app de autenticación ha sido deshabilitada.",
       "verificationFailedTitle": "Verificación Fallida",
       "passkeysTitle": "Passkeys / Llaves de Seguridad",
-      "passkeysDescription": "Añade y gestiona passkeys para una forma más rápida y segura de iniciar sesión sin contraseña.",
-      "passkeyLoading": "Cargando passkeys...",
-      "noPasskeys": "Aún no has añadido ninguna passkey.",
-      "addPasskeyButton": "Añadir nueva passkey",
-      "addPasskeyTitle": "Añadir una Nueva Passkey",
-      "addPasskeyDescription": "Tu navegador te pedirá que crees una nueva passkey. Dale un nombre memorable para que puedas identificarla más tarde.",
-      "passkeyNameLabel": "Nombre de la Passkey",
-      "passkeyNamePlaceholder": "p.ej., Mi portátil del trabajo",
-      "addPasskeySubmit": "Empezar",
-      "passkeyAddedOn": "Añadida el {date}",
-      "passkeyRemove": {
-        "title": "¿Estás seguro?",
-        "description": "Esto eliminará la passkey permanentemente. Ya no podrás usarla para iniciar sesión.",
-        "confirm": "Eliminar"
-      },
+      "passkeysDescriptionRedirect": "Gestiona tus passkeys en la página segura de nuestro servicio de identidad. Serás redirigido para añadir o eliminar passkeys.",
+      "passkeysEnabled": "Las passkeys están habilitadas en tu cuenta.",
+      "passkeysDisabled": "Las passkeys aún no están habilitadas en tu cuenta.",
+      "managePasskeysButton": "Gestionar Passkeys",
       "passkeyError": {
         "title": "Error de Configuración",
-        "description": "La gestión de passkeys no está configurada correctamente. Por favor, contacta a soporte.",
-        "listTitle": "No se pudieron cargar las passkeys",
-        "listError": "Ocurrió un error al buscar tus passkeys.",
-        "addTitle": "No se pudo añadir la passkey",
-        "addError": "Ocurrió un error al intentar añadir la passkey. Por favor, inténtalo de nuevo.",
-        "removeTitle": "No se pudo eliminar la passkey",
-        "removeError": "Ocurrió un error al intentar eliminar la passkey."
-      },
-      "passkeySuccess": {
-        "addTitle": "Passkey Añadida",
-        "removeTitle": "Passkey Eliminada"
+        "description": "La gestión de passkeys no está configurada correctamente. Por favor, contacta a soporte."
       }
     }
   },

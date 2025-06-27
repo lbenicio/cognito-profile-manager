@@ -123,34 +123,13 @@
       "mfaDisabledDescription": "2FA via authenticator app has been disabled.",
       "verificationFailedTitle": "Verification Failed",
       "passkeysTitle": "Passkeys / Security Keys",
-      "passkeysDescription": "Add and manage passkeys for a faster, more secure way to sign in without a password.",
-      "passkeyLoading": "Loading passkeys...",
-      "noPasskeys": "You have not added any passkeys yet.",
-      "addPasskeyButton": "Add new passkey",
-      "addPasskeyTitle": "Add a New Passkey",
-      "addPasskeyDescription": "Your browser will prompt you to create a new passkey. Give it a memorable name so you can identify it later.",
-      "passkeyNameLabel": "Passkey Name",
-      "passkeyNamePlaceholder": "e.g., My Work Laptop",
-      "addPasskeySubmit": "Begin",
-      "passkeyAddedOn": "Added on {date}",
-      "passkeyRemove": {
-        "title": "Are you sure?",
-        "description": "This will permanently remove the passkey. You will no longer be able to use it to sign in.",
-        "confirm": "Remove"
-      },
+      "passkeysDescriptionRedirect": "Manage your passkeys on the secure page provided by our identity service. You will be redirected to add or remove passkeys.",
+      "passkeysEnabled": "Passkeys are enabled on your account.",
+      "passkeysDisabled": "Passkeys are not yet enabled on your account.",
+      "managePasskeysButton": "Manage Passkeys",
       "passkeyError": {
         "title": "Configuration Error",
-        "description": "Passkey management is not configured correctly. Please contact support.",
-        "listTitle": "Could not load passkeys",
-        "listError": "An error occurred while fetching your passkeys.",
-        "addTitle": "Could not add passkey",
-        "addError": "An error occurred while trying to add the passkey. Please try again.",
-        "removeTitle": "Could not remove passkey",
-        "removeError": "An error occurred while trying to remove the passkey."
-      },
-      "passkeySuccess": {
-        "addTitle": "Passkey Added",
-        "removeTitle": "Passkey Removed"
+        "description": "Passkey management is not configured correctly. Please contact support."
       }
     }
   },
