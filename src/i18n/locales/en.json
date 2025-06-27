@@ -37,6 +37,14 @@
       "manageSecurity": "Manage Security",
       "appearanceSettings": "Appearance Settings"
     },
+    "loginHistory": {
+      "title": "Login History",
+      "description": "Here are the most recent logins to your account.",
+      "date": "Date",
+      "device": "Device",
+      "ipAddress": "IP Address",
+      "noHistory": "No login history available."
+    },
     "verified": "Verified",
     "unverified": "Unverified",
     "enabled": "Enabled",

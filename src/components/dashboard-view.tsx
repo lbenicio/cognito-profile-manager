@@ -5,9 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, KeyRound, Palette, ShieldCheck, User } from 'lucide-react';
+import { ArrowRight, KeyRound, Palette, ShieldCheck, User, Calendar, Server, Smartphone } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { User as UserType } from '@/lib/auth';
 import { useTranslations } from 'next-intl';
+import { format } from 'date-fns';
 
 interface DashboardViewProps {
   user: UserType;
@@ -101,6 +103,45 @@ export function DashboardView({ user }: DashboardViewProps) {
             </CardContent>
         </Card>
       </div>
+
+      {/* Login History Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('loginHistory.title')}</CardTitle>
+          <CardDescription>{t('loginHistory.description')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead><Calendar className="inline-block mr-2 h-4 w-4" />{t('loginHistory.date')}</TableHead>
+                <TableHead><Smartphone className="inline-block mr-2 h-4 w-4" />{t('loginHistory.device')}</TableHead>
+                <TableHead><Server className="inline-block mr-2 h-4 w-4" />{t('loginHistory.ipAddress')}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {user.fingerprint && user.fingerprint.length > 0 ? (
+                user.fingerprint.slice(0, 5).map((entry, index) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      {format(new Date(entry.date), "PPP p")}
+                    </TableCell>
+                    <TableCell className="max-w-xs truncate">{entry.device}</TableCell>
+                    <TableCell>{entry.ip}</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={3} className="text-center text-muted-foreground">
+                    {t('loginHistory.noHistory')}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
     </div>
   );
 }

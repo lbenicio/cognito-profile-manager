@@ -37,6 +37,14 @@
       "manageSecurity": "Gestionar seguridad",
       "appearanceSettings": "Ajustes de apariencia"
     },
+    "loginHistory": {
+      "title": "Historial de Inicio de Sesión",
+      "description": "Aquí están los inicios de sesión más recientes en tu cuenta.",
+      "date": "Fecha",
+      "device": "Dispositivo",
+      "ipAddress": "Dirección IP",
+      "noHistory": "No hay historial de inicio de sesión disponible."
+    },
     "verified": "Verificado",
     "unverified": "No verificado",
     "enabled": "Habilitado",

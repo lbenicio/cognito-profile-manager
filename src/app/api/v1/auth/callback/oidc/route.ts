@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { cognitoClient } from '@/lib/cognito';
+import { GetUserCommand, UpdateUserAttributesCommand } from '@aws-sdk/client-cognito-identity-provider';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -92,6 +94,55 @@ export async function GET(request: NextRequest) {
       const errorDetails = tokens.error_description || tokens.error || "Unknown token exchange error";
       throw new Error(`Token exchange failed: ${errorDetails}`);
     }
+
+    // --- Update user fingerprint ---
+    try {
+      const { access_token } = tokens;
+
+      const getUserCommand = new GetUserCommand({ AccessToken: access_token });
+      const cognitoUser = await cognitoClient.send(getUserCommand);
+      const attributes = cognitoUser.UserAttributes?.reduce((acc, attr) => {
+          if (attr.Name && attr.Value) {
+              acc[attr.Name] = attr.Value;
+          }
+          return acc;
+      }, {} as Record<string, string>);
+
+      const existingFingerprintRaw = attributes?.['custom:fingerprint'];
+      let fingerprints = [];
+      if (existingFingerprintRaw) {
+          try {
+              fingerprints = JSON.parse(existingFingerprintRaw);
+          } catch {
+            // Ignore if parsing fails, start fresh
+          }
+      }
+
+      const newFingerprint = {
+          date: new Date().toISOString(),
+          ip: request.ip ?? 'Unknown',
+          device: request.headers.get('user-agent') ?? 'Unknown',
+      };
+      fingerprints.unshift(newFingerprint);
+
+      // Keep only the last 10 entries
+      const updatedFingerprints = fingerprints.slice(0, 10);
+
+      const updateUserAttrCommand = new UpdateUserAttributesCommand({
+          AccessToken: access_token,
+          UserAttributes: [{
+              Name: 'custom:fingerprint',
+              Value: JSON.stringify(updatedFingerprints),
+          }],
+      });
+      await cognitoClient.send(updateUserAttrCommand);
+
+    } catch (e) {
+        // Log the error but don't block the login flow
+        console.error("Failed to update user fingerprint:", e);
+    }
+    // --- End fingerprint update ---
+
 
     const sessionData = {
         id_token: tokens.id_token,

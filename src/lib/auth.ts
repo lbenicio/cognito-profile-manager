@@ -38,6 +38,12 @@ export type PublicProfilePreferences = {
   };
 };
 
+export type Fingerprint = {
+  date: string; // ISO string
+  ip: string;
+  device: string;
+};
+
 export type User = {
   username: string;
   email: string;
@@ -62,6 +68,7 @@ export type User = {
   preferences: UserPreferences;
   notificationPreferences: NotificationPreferences;
   publicProfilePreferences: PublicProfilePreferences;
+  fingerprint: Fingerprint[];
 };
 
 const defaultPreferences: UserPreferences = {
@@ -121,6 +128,10 @@ const mockUser: User = {
   preferences: defaultPreferences,
   notificationPreferences: defaultNotificationPreferences,
   publicProfilePreferences: defaultPublicProfilePreferences,
+  fingerprint: [
+    { date: new Date().toISOString(), ip: '127.0.0.1', device: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36' },
+    { date: new Date(Date.now() - 86400000).toISOString(), ip: '192.168.1.1', device: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1' },
+  ],
 };
 
 const mockAdminUser: User = {
@@ -224,6 +235,7 @@ export const getUser = cache(async (): Promise<User | null> => {
       preferences: preferences,
       notificationPreferences: { ...defaultNotificationPreferences },
       publicProfilePreferences: { ...defaultPublicProfilePreferences },
+      fingerprint: [],
     };
     
     // Now, use the access token to fetch the most up-to-date user attributes from Cognito.
@@ -283,6 +295,16 @@ export const getUser = cache(async (): Promise<User | null> => {
                 marketing: attributes['custom:mkt-notifications'] === 'true',
              };
 
+             let fingerprintData: Fingerprint[] = [];
+             const fingerprintClaim = attributes['custom:fingerprint'];
+             if (fingerprintClaim) {
+                 try {
+                     fingerprintData = JSON.parse(fingerprintClaim);
+                 } catch (e) {
+                     console.error('Failed to parse user fingerprint from GetUser API call', e);
+                 }
+             }
+
              user = {
                 ...user,
                 username: cognitoUser.Username || user.username,
@@ -303,6 +325,7 @@ export const getUser = cache(async (): Promise<User | null> => {
                 preferences: preferences,
                 notificationPreferences: notificationPreferences,
                 publicProfilePreferences: publicProfilePreferences,
+                fingerprint: fingerprintData,
                 // Crucially, update the custom attributes from the fresh data
                 twoFactorEnabled: attributes['custom:mfa'] === 'true',
                 passkeysEnabled: attributes['custom:pless'] === 'true',
