@@ -1,3 +1,4 @@
+
 'use server';
 
 import { cookies, headers } from 'next/headers';
@@ -32,23 +33,24 @@ export async function logout() {
   const hostname = new URL(`http://${host}`).hostname;
   const domain = hostname === 'localhost' ? undefined : hostname;
   
-  // 1. Determine the appropriate logout URL.
   let logoutUrl = '/login'; // Default/fallback URL
   let isOidcSession = false;
 
   if (sessionCookie) {
     try {
       const sessionData = JSON.parse(sessionCookie);
+      // A real session from Cognito will have an id_token.
       if (sessionData?.id_token) {
         isOidcSession = true;
       }
     } catch {
-      // Malformed cookie, just treat as logged out.
+      // Malformed cookie, treat as logged out.
       isOidcSession = false;
     }
   }
 
   // If it's a real OIDC session, build the Cognito Single-Log-Out URL.
+  // This ensures the user is logged out of the identity provider as well.
   if (isOidcSession) {
     try {
       const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
@@ -59,28 +61,34 @@ export async function logout() {
         const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
         if (wellknownResponse.ok) {
           const wellknown = await wellknownResponse.json();
-          const logoutEndpoint = wellknown.logout_endpoint;
+          const authorizationEndpoint = wellknown.authorization_endpoint;
+          
+          if (authorizationEndpoint) {
+            const cognitoDomain = new URL(authorizationEndpoint).origin;
+            const cognitoLogoutUrl = new URL('/logout', cognitoDomain);
+            
+            // The logout_uri should be where the user is sent after Cognito logs them out.
+            const logoutRedirectBase = new URL(callbackUrl).origin;
+            const logoutRedirectUri = new URL('/login', logoutRedirectBase).toString();
 
-          const logoutRedirectBase = new URL(callbackUrl).origin;
-          const logoutRedirectUri = new URL('/login', logoutRedirectBase).toString();
-
-          const params = new URLSearchParams({
-            client_id: clientId,
-            logout_uri: logoutRedirectUri,
-          });
-          logoutUrl = `${logoutEndpoint}?${params.toString()}`;
+            cognitoLogoutUrl.searchParams.set('client_id', clientId);
+            cognitoLogoutUrl.searchParams.set('logout_uri', logoutRedirectUri);
+            
+            logoutUrl = cognitoLogoutUrl.toString();
+          }
         }
       }
     } catch (e) {
       console.error("Error building Cognito logout URL, falling back to local redirect.", e);
-      // The default logoutUrl = '/login' will be used.
+      // The default logoutUrl = '/login' will be used if construction fails.
     }
   }
 
-  // 2. ALWAYS clear the session cookies.
+  // ALWAYS clear the session cookies, regardless of whether it's a dev or real session.
+  // This is the most crucial step for ensuring the local session is terminated.
   cookies().set('auth_session', '', { expires: new Date(0), path: '/', domain });
   cookies().set('oauth_state', '', { expires: new Date(0), path: '/', domain });
 
-  // 3. Finally, perform the redirect.
+  // Finally, perform the redirect to either the Cognito logout URL or the local login page.
   redirect(logoutUrl);
 }
