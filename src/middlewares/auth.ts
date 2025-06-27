@@ -10,10 +10,9 @@ const publicPages = [
     pathnames['/terms'],
     pathnames['/privacy']
 ]; 
-const publicPathnameRegex = new RegExp(
-  `^(/(${locales.join('|')}))?(${publicPages.join('|')})/?$`,
-  'i'
-);
+
+// Simplified regex now that we know localePrefix is 'never'
+const publicPathnameRegex = new RegExp(`^(${publicPages.join('|')})/?$`, 'i');
 
 
 // Helper function to redirect to the login page and clear auth cookies
