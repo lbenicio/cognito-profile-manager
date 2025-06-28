@@ -44,7 +44,7 @@ export async function createSession(sessionData: any, expiresInSeconds: number) 
   // This cookie is long-lived. The actual session lifetime is managed by Redis TTL.
   const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7-day cookie
 
-  cookies().set(cookieName, encryptedSessionId, {
+  (await cookies()).set(cookieName, encryptedSessionId, {
     expires,
     httpOnly: true,
     secure: true,
@@ -59,7 +59,7 @@ export async function updateSession(sessionId: string, sessionData: any, expires
 }
 
 export async function deleteSession() {
-  const cookie = cookies().get(cookieName)?.value;
+  const cookie = (await cookies()).get(cookieName)?.value;
   if (cookie) {
     try {
         const payload = await decrypt(cookie);
@@ -70,11 +70,11 @@ export async function deleteSession() {
         console.error("Error deleting session from Redis:", e);
     }
   }
-  cookies().set(cookieName, '', { expires: new Date(0), path: '/' });
+  (await cookies()).set(cookieName, '', { expires: new Date(0), path: '/' });
 }
 
 export const getSession = cache(async () => {
-  const cookie = cookies().get(cookieName)?.value;
+  const cookie = (await cookies()).get(cookieName)?.value;
   const payload = await decrypt(cookie);
 
   if (!payload?.sessionId) {
