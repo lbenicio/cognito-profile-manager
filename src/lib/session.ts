@@ -57,6 +57,25 @@ export async function createSession(
   });
 }
 
+export async function createMockSession(sessionData: any) {
+  const payload = {
+    ...sessionData,
+    isMock: true,
+  };
+
+  const encryptedSession = await encrypt(payload);
+
+  const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7-day cookie
+
+  (await cookies()).set(cookieName, encryptedSession, {
+    expires,
+    httpOnly: true,
+    secure: true,
+    path: '/',
+    sameSite: 'lax',
+  });
+}
+
 export async function updateSession(
   sessionId: string,
   sessionData: any,
@@ -85,7 +104,15 @@ export const getSession = cache(async () => {
   const cookie = (await cookies()).get(cookieName)?.value;
   const payload = await decrypt(cookie);
 
-  if (!payload?.sessionId) {
+  if (!payload) {
+    return null;
+  }
+
+  if (payload.isMock) {
+    return payload;
+  }
+
+  if (!payload.sessionId) {
     return null;
   }
 
@@ -93,9 +120,6 @@ export const getSession = cache(async () => {
   let session = await getCache<any>(key);
 
   if (!session) {
-    // Session is not in Redis. The cookie is invalid. Return null.
-    // We cannot delete the cookie here. The user will be treated as logged out
-    // for this request. The invalid cookie will be overwritten on next successful login.
     return null;
   }
 
@@ -118,8 +142,6 @@ export const getSession = cache(async () => {
       await updateSession(payload.sessionId, newSessionData, newExpiresIn);
       session = newSessionData; // Update the session for the current request
     } else {
-      // Refresh failed. Delete the session data from Redis, but do not touch the cookie.
-      // This will cause subsequent requests with this cookie to also fail until a new login.
       console.log('Token refresh failed, deleting session from Redis.');
       await deleteCache(key);
       return null;

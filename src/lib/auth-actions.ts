@@ -1,7 +1,7 @@
 'use server';
 
 import { redirect } from '@/navigation';
-import { createSession, deleteSession } from '@/lib/session';
+import { createMockSession, deleteSession } from '@/lib/session';
 import { mockAdminUser } from '@/lib/auth';
 
 export async function devAdminLogin() {
@@ -13,7 +13,6 @@ export async function devAdminLogin() {
   const expiresIn = 3600; // 1 hour
 
   const sessionData = {
-    isMock: true,
     username: mockAdminUser.username,
     claims: {
       sub: mockAdminUser.sub,
@@ -27,7 +26,7 @@ export async function devAdminLogin() {
     refreshToken: 'mock-refresh-token',
   };
 
-  await createSession(sessionData, expiresIn);
+  await createMockSession(sessionData);
   redirect('/');
 }
 
