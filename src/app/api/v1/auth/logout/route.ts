@@ -40,14 +40,12 @@ export async function GET(request: NextRequest) {
   const response = NextResponse.redirect(cognitoLogoutUrl);
 
   // 3. Clear all session-related cookies on the response
-  response.cookies.set('auth_session', '', { 
-      expires: new Date(0), 
-      path: '/',
-  });
-  response.cookies.set('oauth_state', '', { 
-      expires: new Date(0), 
-      path: '/',
-  });
+  const cookieClearOptions = { expires: new Date(0), path: '/' };
+  response.cookies.set('auth_session', '', cookieClearOptions); // For dev mode
+  response.cookies.set('id_token_claims', '', cookieClearOptions);
+  response.cookies.set('access_token', '', cookieClearOptions);
+  response.cookies.set('refresh_token', '', cookieClearOptions);
+  response.cookies.set('oauth_state', '', cookieClearOptions);
 
   // 4. Return the response that redirects the user and clears cookies
   return response;

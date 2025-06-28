@@ -191,22 +191,42 @@ const mockAdminUser: User = {
 
 
 export const getSession = cache(async (): Promise<Session> => {
-  const sessionCookie = (await cookies()).get('auth_session')?.value;
-  if (!sessionCookie) return null;
-  try {
-    const session = JSON.parse(sessionCookie);
-
-    // Middleware handles validation and refresh, so here we just trust the parsed cookie.
-    // If it has 'claims', it's a real session. If it has 'username', it's a dev session.
-    if (session.claims || session.username) {
+  // Check for dev mode mock session first. It uses a single 'auth_session' cookie.
+  const mockSessionCookie = (await cookies()).get('auth_session')?.value;
+  if (mockSessionCookie) {
+    try {
+      const session = JSON.parse(mockSessionCookie);
+      if (session.username) {
         return session;
+      }
+    } catch {
+      // Invalid JSON, fall through to regular session check
     }
-    return null;
+  }
 
-  } catch {
+  // Real session: read the three separate cookies.
+  const claimsCookie = (await cookies()).get('id_token_claims')?.value;
+  const accessTokenCookie = (await cookies()).get('access_token')?.value;
+  const refreshTokenCookie = (await cookies()).get('refresh_token')?.value;
+
+  // A valid session requires all three cookies.
+  if (!claimsCookie || !accessTokenCookie || !refreshTokenCookie) {
+    return null;
+  }
+
+  try {
+    const claims = JSON.parse(claimsCookie) as JWTPayload;
+    return {
+      claims,
+      accessToken: accessTokenCookie,
+      refreshToken: refreshTokenCookie,
+    };
+  } catch (error) {
+    console.error('Failed to parse session claims cookie:', error);
     return null;
   }
 });
+
 
 // This function is cached per request and retrieves the authenticated user's data.
 export const getUser = cache(async (): Promise<User | null> => {

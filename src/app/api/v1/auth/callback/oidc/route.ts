@@ -3,6 +3,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
+import type { JWTPayload } from 'jose';
 
 function createErrorResponse(origin: string, error: string, description?: string): NextResponse {
   const loginUrl = new URL('/login', origin);
@@ -97,17 +98,10 @@ export async function GET(request: NextRequest) {
     
     // ** NEW: Verify the ID token on the server and extract claims **
     const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
-    const { payload } = await jwtVerify(tokens.id_token, JWKS, {
+    const { payload }: { payload: JWTPayload } = await jwtVerify(tokens.id_token, JWKS, {
         issuer: wellknown.issuer,
         audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
     });
-
-    // ** NEW: Create a smaller session object for the cookie **
-    const sessionData = {
-        claims: payload,
-        accessToken: tokens.access_token,
-        refreshToken: tokens.refresh_token,
-    };
 
     const dashboardUrl = new URL('/', origin);
     const response = NextResponse.redirect(dashboardUrl);
@@ -116,15 +110,22 @@ export async function GET(request: NextRequest) {
         ? tokens.expires_in
         : 3600;
 
-    // Set auth cookie AND clear state cookie on the SAME response object before returning.
-    response.cookies.set('auth_session', JSON.stringify(sessionData), {
-      httpOnly: true,
-      secure: isSecure,
-      maxAge: maxAge,
-      path: '/',
-      sameSite: 'lax', // Use 'lax' for the main session cookie
-    });
+    const cookieOptions = {
+        httpOnly: true,
+        secure: isSecure,
+        maxAge: maxAge,
+        path: '/',
+        sameSite: 'lax' as const,
+    };
+
+    // ** NEW: Split session data into multiple, smaller cookies **
+    response.cookies.set('id_token_claims', JSON.stringify(payload), cookieOptions);
+    response.cookies.set('access_token', tokens.access_token, cookieOptions);
+    if (tokens.refresh_token) {
+        response.cookies.set('refresh_token', tokens.refresh_token, cookieOptions);
+    }
     
+    // Clear the state cookie on the SAME response object before returning.
     response.cookies.set('oauth_state', '', { 
         expires: new Date(0), 
         path: '/',

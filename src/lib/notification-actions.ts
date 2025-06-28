@@ -1,3 +1,4 @@
+
 'use server';
 
 import { revalidatePath } from 'next/cache';
@@ -9,13 +10,13 @@ export async function updateNotificationPreferences(
 ): Promise<{ success: boolean; message: string }> {
   const session = await getSession();
 
-  if (!session) {
+  if (!session || !session.accessToken) {
     return { success: false, message: 'Not authenticated' };
   }
 
   try {
     const command = new UpdateUserAttributesCommand({
-      AccessToken: session.access_token,
+      AccessToken: session.accessToken,
       UserAttributes: [
         { Name: 'custom:email-notification', Value: String(newPreferences.email) },
         { Name: 'custom:app-notification', Value: String(newPreferences.app) },

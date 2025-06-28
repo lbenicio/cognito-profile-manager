@@ -2,7 +2,7 @@
 'use server';
 
 import { jwtVerify, createRemoteJWKSet } from 'jose';
-import type { Session } from './auth';
+import type { JWTPayload } from 'jose';
 
 type NewTokenResponse = {
   id_token: string;
@@ -10,7 +10,7 @@ type NewTokenResponse = {
   expires_in?: number;
 };
 
-export async function refreshAuthTokens(refreshToken: string): Promise<{ newSession: Session, newExpiresIn: number } | null> {
+export async function refreshAuthTokens(refreshToken: string): Promise<{ newClaims: JWTPayload, newAccessToken: string, newRefreshToken: string, newExpiresIn: number } | null> {
   try {
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     if (!wellknownUrl) throw new Error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
@@ -61,15 +61,15 @@ export async function refreshAuthTokens(refreshToken: string): Promise<{ newSess
 
     // Cognito refresh tokens can be long-lived. The response might not include a new refresh token.
     // If it doesn't, we must reuse the old one.
-    const newSessionData: Session = {
-      claims: payload,
-      accessToken: tokens.access_token,
-      refreshToken: tokens.refresh_token || refreshToken,
-    };
-    
+    const newRefreshToken = tokens.refresh_token || refreshToken;
     const newExpiresIn = tokens.expires_in ?? 3600;
 
-    return { newSession: newSessionData, newExpiresIn };
+    return { 
+      newClaims: payload,
+      newAccessToken: tokens.access_token,
+      newRefreshToken: newRefreshToken,
+      newExpiresIn 
+    };
 
   } catch (error) {
     console.error('Exception in refreshAuthTokens:', error);
