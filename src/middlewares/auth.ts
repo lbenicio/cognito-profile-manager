@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { jwtDecrypt } from 'jose';
 import { pathnames, locales } from '@/navigation';
 
 // List of public pages that do not require authentication
@@ -16,24 +17,52 @@ function isPublicPage(pathname: string): boolean {
   return publicPathnameRegex.test(pathname);
 }
 
+// Minimal, Edge-compatible session payload check
+async function getSessionPayload(cookie: string | undefined) {
+  if (!cookie) return null;
+
+  try {
+    const secretKey = process.env.TOTP_SECRET_ENCRYPTION_KEY;
+    if (!secretKey) {
+      console.error('TOTP_SECRET_ENCRYPTION_KEY is not set for middleware.');
+      return null;
+    }
+    const encodedKey = Buffer.from(secretKey, 'base64');
+    const { payload } = await jwtDecrypt(cookie, encodedKey, {
+      clockTolerance: '15s',
+    });
+    return payload;
+  } catch (error) {
+    // This will catch expired tokens, invalid tokens, etc.
+    return null;
+  }
+}
+
 /**
  * Authentication middleware.
  * - Redirects unauthenticated users from protected pages to login.
  * - Redirects authenticated users from public pages to dashboard.
  * - Returns null if no redirect is needed.
  */
-export function authMiddleware(request: NextRequest): NextResponse | null {
+export async function authMiddleware(
+  request: NextRequest
+): Promise<NextResponse | null> {
   const isPublic = isPublicPage(request.nextUrl.pathname);
-  const sessionCookie = request.cookies.get('session');
+  const sessionCookie = request.cookies.get('session')?.value;
+  const sessionPayload = await getSessionPayload(sessionCookie);
+  const isAuthenticated = !!sessionPayload;
 
-  // If there's no session and the user is trying to access a protected page...
-  if (!sessionCookie && !isPublic) {
+  // If not authenticated and trying to access a protected page...
+  if (!isAuthenticated && !isPublic) {
     const loginUrl = new URL(pathnames['/login'], request.url);
-    return NextResponse.redirect(loginUrl);
+    // Clear any potentially invalid cookie
+    const response = NextResponse.redirect(loginUrl);
+    response.cookies.set('session', '', { expires: new Date(0), path: '/' });
+    return response;
   }
 
-  // If there IS a session and the user is on a public page (like /login)...
-  if (sessionCookie && isPublic) {
+  // If authenticated and on a public page (like /login)...
+  if (isAuthenticated && isPublic) {
     const dashboardUrl = new URL(pathnames['/'], request.url);
     return NextResponse.redirect(dashboardUrl);
   }

@@ -1,10 +1,10 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { handleI18n } from './middlewares/i18n';
 import { authMiddleware } from './middlewares/auth';
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   // Run authentication middleware first
-  const authResult = authMiddleware(request);
+  const authResult = await authMiddleware(request);
   if (authResult) {
     return authResult;
   }
