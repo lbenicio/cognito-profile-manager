@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -156,69 +155,79 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
                         {user.devices && user.devices.length > 0 ? (
                             <div className="space-y-4">
                                 <p className="text-sm text-green-700 dark:text-green-400">{t('statusEnabled')}</p>
-                                <div className="rounded-md border">
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>{t('table.name')}</TableHead>
-                                                <TableHead>{t('table.addedOn')}</TableHead>
-                                                <TableHead className="text-right">{t('table.actions')}</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {user.devices.map((device) => (
-                                                <TableRow 
-                                                    key={device.key}
-                                                    className={cn(
-                                                        "transition-opacity",
-                                                        isDeleting === device.key && "opacity-50"
-                                                    )}
-                                                >
-                                                    <TableCell className="font-medium">
-                                                        <div className="flex items-center gap-2">
-                                                            <KeyRound className="h-4 w-4 text-muted-foreground" />
-                                                            <span>{device.name}</span>
-                                                        </div>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {isMounted && device.createDate ? format(new Date(device.createDate), "PPP") : '...'}
-                                                    </TableCell>
-                                                    <TableCell className="text-right">
-                                                        <AlertDialog>
-                                                            <AlertDialogTrigger asChild>
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    disabled={isDeleting === device.key || isPending}
-                                                                    aria-label={`Delete passkey ${device.name}`}
-                                                                >
-                                                                    {isDeleting === device.key ? (
-                                                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                                                    ) : (
-                                                                        <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
-                                                                    )}
-                                                                </Button>
-                                                            </AlertDialogTrigger>
-                                                            <AlertDialogContent>
-                                                                <AlertDialogHeader>
-                                                                    <AlertDialogTitle>{t('deleteDialog.title')}</AlertDialogTitle>
-                                                                    <AlertDialogDescription>
-                                                                        {t('deleteDialog.description', { deviceName: device.name })}
-                                                                    </AlertDialogDescription>
-                                                                </AlertDialogHeader>
-                                                                <AlertDialogFooter>
-                                                                    <AlertDialogCancel>{t('deleteDialog.cancel')}</AlertDialogCancel>
-                                                                    <AlertDialogAction onClick={() => handleDeletePasskey(device.key)}>
-                                                                        {t('deleteDialog.confirm')}
-                                                                    </AlertDialogAction>
-                                                                </AlertDialogFooter>
-                                                            </AlertDialogContent>
-                                                        </AlertDialog>
-                                                    </TableCell>
+                                <div className="relative">
+                                    {isPending && (
+                                        <div className="absolute inset-0 bg-card/80 backdrop-blur-sm flex items-center justify-center z-10 rounded-md">
+                                            <div className="flex items-center gap-2 text-muted-foreground">
+                                                <Loader2 className="h-5 w-5 animate-spin" />
+                                                <span>{t('updatingList')}</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div className="rounded-md border">
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead>{t('table.name')}</TableHead>
+                                                    <TableHead>{t('table.addedOn')}</TableHead>
+                                                    <TableHead className="text-right">{t('table.actions')}</TableHead>
                                                 </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {user.devices.map((device) => (
+                                                    <TableRow 
+                                                        key={device.key}
+                                                        className={cn(
+                                                            "transition-opacity",
+                                                            isDeleting === device.key && "opacity-50"
+                                                        )}
+                                                    >
+                                                        <TableCell className="font-medium">
+                                                            <div className="flex items-center gap-2">
+                                                                <KeyRound className="h-4 w-4 text-muted-foreground" />
+                                                                <span>{device.name}</span>
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {isMounted && device.createDate ? format(new Date(device.createDate), "PPP") : '...'}
+                                                        </TableCell>
+                                                        <TableCell className="text-right">
+                                                            <AlertDialog>
+                                                                <AlertDialogTrigger asChild>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        disabled={isDeleting === device.key || isPending}
+                                                                        aria-label={`Delete passkey ${device.name}`}
+                                                                    >
+                                                                        {isDeleting === device.key ? (
+                                                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                                                        ) : (
+                                                                            <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+                                                                        )}
+                                                                    </Button>
+                                                                </AlertDialogTrigger>
+                                                                <AlertDialogContent>
+                                                                    <AlertDialogHeader>
+                                                                        <AlertDialogTitle>{t('deleteDialog.title')}</AlertDialogTitle>
+                                                                        <AlertDialogDescription>
+                                                                            {t('deleteDialog.description', { deviceName: device.name })}
+                                                                        </AlertDialogDescription>
+                                                                    </AlertDialogHeader>
+                                                                    <AlertDialogFooter>
+                                                                        <AlertDialogCancel>{t('deleteDialog.cancel')}</AlertDialogCancel>
+                                                                        <AlertDialogAction onClick={() => handleDeletePasskey(device.key)}>
+                                                                            {t('deleteDialog.confirm')}
+                                                                        </AlertDialogAction>
+                                                                    </AlertDialogFooter>
+                                                                </AlertDialogContent>
+                                                            </AlertDialog>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
                                 </div>
                             </div>
                         ) : (

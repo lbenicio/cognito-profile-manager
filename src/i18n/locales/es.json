@@ -290,7 +290,8 @@
         "description": "Esto eliminará permanentemente la passkey llamada \"{deviceName}\". Esta acción no se puede deshacer.",
         "confirm": "Eliminar",
         "cancel": "Cancelar"
-      }
+      },
+      "updatingList": "Actualizando lista..."
     }
   },
   "Profile": {

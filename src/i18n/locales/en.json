@@ -290,7 +290,8 @@
         "description": "This will permanently delete the passkey named \"{deviceName}\". This action cannot be undone.",
         "confirm": "Delete",
         "cancel": "Cancel"
-      }
+      },
+      "updatingList": "Updating list..."
     }
   },
   "Profile": {
