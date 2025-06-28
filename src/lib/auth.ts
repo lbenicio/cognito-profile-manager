@@ -303,7 +303,7 @@ export const getUser = cache(async (): Promise<User | null> => {
       }
     }
 
-    let devices: (Device | null)[] = [];
+    let devices: Device[] = [];
     try {
       const listCredentialsCommand = new ListWebAuthnCredentialsCommand({
         AccessToken: session.accessToken,

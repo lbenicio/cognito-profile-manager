@@ -34,6 +34,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { sendContactEmail } from '@/lib/contact-actions';
+import { Label } from './ui/label';
 
 const contactFormSchema = (t: any) =>
   z.object({

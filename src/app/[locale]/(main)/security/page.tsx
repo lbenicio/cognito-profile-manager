@@ -6,7 +6,7 @@ import { syncPasskeysEnabledFlag } from '@/lib/passkey-actions';
 export default async function SecurityPage(props: {
   params: Promise<{ locale: string }>;
 }) {
-  const { params } = props;
+  const params = await props.params;
   unstable_setRequestLocale(params.locale);
   let user = await getUser();
 
