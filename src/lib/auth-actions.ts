@@ -15,7 +15,7 @@ export async function devAdminLogin() {
 
   const sessionData = {
     isMock: true,
-    username: 'admin',
+    username: mockAdminUser.username,
     claims: {
         sub: mockAdminUser.sub,
         email: mockAdminUser.email,

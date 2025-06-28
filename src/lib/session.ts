@@ -4,7 +4,7 @@ import 'server-only';
 import { cache } from 'react';
 import { EncryptJWT, jwtDecrypt } from 'jose';
 import { cookies } from 'next/headers';
-import { redis } from './redis';
+import { getCache, setCache, deleteCache } from './redis';
 import { refreshAuthTokens } from './session-actions';
 
 const secretKey = process.env.TOTP_SECRET_ENCRYPTION_KEY;
@@ -37,14 +37,14 @@ async function decrypt(session: string | undefined = ''): Promise<any> {
 export async function createSession(sessionData: any, expiresInSeconds: number) {
   const sessionId = crypto.randomUUID();
   const key = `${sessionPrefix}${sessionId}`;
-  if (!redis) return;
-  await redis.set(key, JSON.stringify(sessionData), { EX: expiresInSeconds });
+  
+  await setCache(key, sessionData, expiresInSeconds);
 
   const encryptedSessionId = await encrypt({ sessionId });
   
   const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7-day cookie
 
-  (await cookies()).set(cookieName, encryptedSessionId, {
+  cookies().set(cookieName, encryptedSessionId, {
     expires,
     httpOnly: true,
     secure: true,
@@ -55,28 +55,26 @@ export async function createSession(sessionData: any, expiresInSeconds: number) 
 
 export async function updateSession(sessionId: string, sessionData: any, expiresInSeconds: number) {
     const key = `${sessionPrefix}${sessionId}`;
-    if (!redis) return;
-    await redis.set(key, JSON.stringify(sessionData), { EX: expiresInSeconds });
+    await setCache(key, sessionData, expiresInSeconds);
 }
 
 export async function deleteSession() {
-  const cookie = (await cookies()).get(cookieName)?.value;
+  const cookie = cookies().get(cookieName)?.value;
   if (cookie) {
     try {
         const payload = await decrypt(cookie);
         if (payload?.sessionId) {
-            if (!redis) return;
-            await redis.del(`${sessionPrefix}${payload.sessionId}`);
+            await deleteCache(`${sessionPrefix}${payload.sessionId}`);
         }
     } catch (e) {
         console.error("Error deleting session from Redis:", e);
     }
   }
-  (await cookies()).set(cookieName, '', { expires: new Date(0), path: '/' });
+  cookies().set(cookieName, '', { expires: new Date(0), path: '/' });
 }
 
 export const getSession = cache(async () => {
-  const cookie = (await cookies()).get(cookieName)?.value;
+  const cookie = cookies().get(cookieName)?.value;
   const payload = await decrypt(cookie);
 
   if (!payload?.sessionId) {
@@ -84,16 +82,13 @@ export const getSession = cache(async () => {
   }
 
   const key = `${sessionPrefix}${payload.sessionId}`;
-  if (!redis) return;
-  const sessionString = await redis.get(key);
+  const session = await getCache<any>(key);
   
-  if (!sessionString) {
+  if (!session) {
     await deleteSession(); // Clean up invalid cookie
     return null;
   }
   
-  const session = JSON.parse(sessionString);
-
   // Check if the token is expired and refresh if necessary
   if (session.claims.exp * 1000 < Date.now()) {
     console.log('Session token expired, attempting refresh...');

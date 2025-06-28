@@ -1,7 +1,7 @@
 import 'server-only';
 import { cache } from 'react';
 import { cognitoClient, GetUserCommand, ListWebAuthnCredentialsCommand } from '@/lib/cognito';
-import { getSession as getRedisSession } from '@/lib/session';
+import { getSession as getRedisSession, deleteSession as deleteRedisSession } from '@/lib/session';
 
 export { getSession } from '@/lib/session';
 
@@ -187,7 +187,7 @@ export const getUser = cache(async (): Promise<User | null> => {
   
   if (session?.isMock) {
     console.log('Using mock user data for development.');
-    const baseUser = session.username === 'admin' ? mockAdminUser : mockUser;
+    const baseUser = session.username === mockAdminUser.username ? mockAdminUser : mockUser;
     return {
       ...baseUser,
       username: session.username,
@@ -332,13 +332,7 @@ export const getUser = cache(async (): Promise<User | null> => {
     };
   } catch (error: any) {
     console.error('General error in getUser, likely during device list or user attribute fetch:', error);
-    await deleteSession();
+    await deleteRedisSession();
     return null;
   }
 });
-
-// Duplicating deleteSession here to avoid circular dependency
-async function deleteSession() {
-  const { deleteSession: deleteRedisSession } = await import('@/lib/session');
-  await deleteRedisSession();
-}
