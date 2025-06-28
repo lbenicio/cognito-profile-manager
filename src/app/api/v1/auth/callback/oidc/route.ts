@@ -133,12 +133,12 @@ export async function GET(request: NextRequest) {
         } else {
            console.error(`checkip.amazonaws.com failed with status: ${ipResponse.status}. Falling back to headers.`);
            const forwarded = request.headers.get('x-forwarded-for');
-           ip = forwarded ? forwarded.split(/, /)[0] : request.ip ?? 'Unknown';
+           ip = forwarded ? forwarded.split(/, /)[0] : 'Unknown';
         }
       } catch (ipError) {
         console.error("Could not fetch user IP from checkip.amazonaws.com:", ipError, ". Falling back to headers.");
         const forwarded = request.headers.get('x-forwarded-for');
-        ip = forwarded ? forwarded.split(/, /)[0] : request.ip ?? 'Unknown';
+        ip = forwarded ? forwarded.split(/, /)[0] : 'Unknown';
       }
 
       const newFingerprint = {
@@ -198,9 +198,15 @@ export async function GET(request: NextRequest) {
       sameSite: isProd ? 'none' : 'lax',
       domain: cookieDomain,
     });
+
+    const addHours = function(h: number) {
+      const date = new Date();
+      date.setTime(date.getTime() + (h*60*60*1000));
+      return date;
+    }
     
     response.cookies.set('oauth_state', '', { 
-        expires: new Date(0), 
+        expires: addHours(maxAge), 
         path: '/',
         domain: cookieDomain,
     });
