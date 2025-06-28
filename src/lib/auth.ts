@@ -183,189 +183,231 @@ const mockAdminUser: User = {
 
 
 const getRawSession = cache(async (): Promise<Session> => {
-    const sessionCookie = cookies().get('auth_session')?.value;
-    if (!sessionCookie) return null;
-    try {
-        return JSON.parse(sessionCookie);
-    } catch {
-        return null;
-    }
+  const sessionCookie = (await cookies()).get('auth_session')?.value;
+  if (!sessionCookie) return null;
+  try {
+    return JSON.parse(sessionCookie);
+  } catch {
+    return null;
+  }
 });
 
 export const getSession = cache(async (): Promise<Session> => {
-    const session = await getRawSession();
-    if (!session) return null;
+  const session = await getRawSession();
+  if (!session) return null;
 
-    // Dev mode mock session doesn't need validation/refresh
-    if (session.username && !session.id_token) {
-        return session;
+  // Dev mode mock session doesn't need validation/refresh
+  if (session.username && !session.id_token) {
+    return session;
+  }
+
+  if (!session.id_token) {
+    return null;
+  }
+
+  const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
+  if (!wellknownUrl) {
+    console.error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
+    return null;
+  }
+
+  try {
+    const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
+    if (!wellknownResponse.ok)
+      throw new Error('Failed to fetch OpenID configuration');
+    const wellknown = await wellknownResponse.json();
+    const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
+
+    // This will throw if the token is invalid or expired
+    await jwtVerify(session.id_token, JWKS, {
+      issuer: wellknown.issuer,
+      audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
+    });
+
+    // If we get here, the token is valid (not expired, signature is good)
+    return session;
+  } catch (error: any) {
+    // If validation fails (e.g., expired, invalid signature), treat session as invalid.
+    // Middleware is responsible for handling the refresh. If we get an expired
+    // token here, it means the refresh likely failed.
+    if (error.code !== 'ERR_JWT_EXPIRED') {
+      console.error('JWT validation error in getSession:', error.message);
     }
-
-    if (!session.id_token) {
-        return null;
-    }
-    
-    const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
-    if (!wellknownUrl) {
-        console.error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
-        return null;
-    }
-
-    try {
-        const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
-        if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
-        const wellknown = await wellknownResponse.json();
-        const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
-        
-        // This will throw if the token is invalid or expired
-        await jwtVerify(session.id_token, JWKS, {
-            issuer: wellknown.issuer,
-            audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
-        });
-
-        // If we get here, the token is valid (not expired, signature is good)
-        return session;
-
-    } catch (error: any) {
-        // If validation fails (e.g., expired, invalid signature), treat session as invalid.
-        // Middleware is responsible for handling the refresh. If we get an expired
-        // token here, it means the refresh likely failed.
-        if (error.code !== 'ERR_JWT_EXPIRED') {
-          console.error("JWT validation error in getSession:", error.message);
-        }
-        return null;
-    }
+    return null;
+  }
 });
-
 
 // This function is cached per request and retrieves the authenticated user's data.
 export const getUser = cache(async (): Promise<User | null> => {
   const session = await getSession();
+  const user = await getUser();
 
   // Handle mock development session (which doesn't have an id_token)
-  if (process.env.NODE_ENV === 'development' && session?.username && !session?.id_token) {
-    console.log("Using mock user data for development.");
+  if (
+    process.env.NODE_ENV === 'development' &&
+    session?.username &&
+    !session?.id_token
+  ) {
+    console.log('Using mock user data for development.');
     const baseUser = session.username === 'admin' ? mockAdminUser : mockUser;
-    return { ...baseUser, email: session.email, username: session.username };
+    return {
+      ...baseUser,
+      email: user?.email || 'email@example.com',
+      username: session.username,
+    };
   }
 
   // If there's no session or no id_token after validation/refresh, there's no real user.
   if (!session?.id_token) {
     return null;
   }
-  
+
   const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
   if (!wellknownUrl) {
-      console.error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
-      return null;
+    console.error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
+    return null;
   }
 
   try {
     const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
-    if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
+    if (!wellknownResponse.ok)
+      throw new Error('Failed to fetch OpenID configuration');
     const wellknown = await wellknownResponse.json();
     const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
-    
+
     // We trust the token is valid because getSession() handled it.
     // Now, fetch the most up-to-date user attributes from Cognito.
     const { payload } = await jwtVerify(session.id_token, JWKS);
-    const getUserCommand = new GetUserCommand({ AccessToken: session.access_token });
+    const getUserCommand = new GetUserCommand({
+      AccessToken: session.access_token,
+    });
     const cognitoUser = await cognitoClient.send(getUserCommand);
-    const attributes = cognitoUser.UserAttributes?.reduce((acc, attr) => {
-        if (attr.Name && attr.Value) {
+    const attributes =
+      cognitoUser.UserAttributes?.reduce(
+        (acc, attr) => {
+          if (attr.Name && attr.Value) {
             acc[attr.Name] = attr.Value;
-        }
-        return acc;
-    }, {} as Record<string, string>) || {};
+          }
+          return acc;
+        },
+        {} as Record<string, string>
+      ) || {};
 
     const adminGroupName = process.env.COGNITO_ADMIN_GROUP_NAME || 'admins';
-    const groupsClaimKey = process.env.COGNITO_GROUPS_CLAIM_KEY || 'cognito:groups';
+    const groupsClaimKey =
+      process.env.COGNITO_GROUPS_CLAIM_KEY || 'cognito:groups';
     const groups = (payload[groupsClaimKey] as string[]) || [];
     const isAdmin = groups.includes(adminGroupName);
-    
+
     const freshGivenName = attributes.given_name || '';
     const freshFamilyName = attributes.family_name || '';
 
     let preferences: UserPreferences = { ...defaultPreferences };
     if (attributes['custom:session']) {
-        try {
-            preferences = { ...defaultPreferences, ...JSON.parse(attributes['custom:session']) };
-        } catch (e) {
-            console.error('Failed to parse user preferences from GetUser API call', e);
-        }
+      try {
+        preferences = {
+          ...defaultPreferences,
+          ...JSON.parse(attributes['custom:session']),
+        };
+      } catch (e) {
+        console.error(
+          'Failed to parse user preferences from GetUser API call',
+          e
+        );
+      }
     }
-    
-    let publicProfilePreferences: PublicProfilePreferences = { ...defaultPublicProfilePreferences };
+
+    let publicProfilePreferences: PublicProfilePreferences = {
+      ...defaultPublicProfilePreferences,
+    };
     const publicProfileClaim = attributes['custom:public-profile'];
     if (publicProfileClaim) {
-        try {
-            const parsedPrefs = JSON.parse(publicProfileClaim);
-            publicProfilePreferences = {
-                isPublic: parsedPrefs.isPublic ?? defaultPublicProfilePreferences.isPublic,
-                publicFields: {
-                    ...defaultPublicProfilePreferences.publicFields,
-                    ...(parsedPrefs.publicFields || {}),
-                }
-            };
-        } catch (e) {
-            console.error('Failed to parse public profile preferences from GetUser API call', e);
-        }
+      try {
+        const parsedPrefs = JSON.parse(publicProfileClaim);
+        publicProfilePreferences = {
+          isPublic:
+            parsedPrefs.isPublic ?? defaultPublicProfilePreferences.isPublic,
+          publicFields: {
+            ...defaultPublicProfilePreferences.publicFields,
+            ...(parsedPrefs.publicFields || {}),
+          },
+        };
+      } catch (e) {
+        console.error(
+          'Failed to parse public profile preferences from GetUser API call',
+          e
+        );
+      }
     }
 
     const notificationPreferences: NotificationPreferences = {
-        email: attributes['custom:email-notification'] === 'true',
-        app: attributes['custom:app-notification'] === 'true',
-        telegram: attributes['custom:tlgm-notification'] === 'true',
-        user: attributes['custom:user-notifications'] === 'true',
-        system: attributes['custom:system-notifications'] === 'true',
-        marketing: attributes['custom:mkt-notifications'] === 'true',
+      email: attributes['custom:email-notification'] === 'true',
+      app: attributes['custom:app-notification'] === 'true',
+      telegram: attributes['custom:tlgm-notification'] === 'true',
+      user: attributes['custom:user-notifications'] === 'true',
+      system: attributes['custom:system-notifications'] === 'true',
+      marketing: attributes['custom:mkt-notifications'] === 'true',
     };
 
     let fingerprintData: Fingerprint[] = [];
     if (attributes['custom:fingerprint']) {
-        try {
-            fingerprintData = JSON.parse(attributes['custom:fingerprint']);
-        } catch (e) {
-            console.error('Failed to parse user fingerprint from GetUser API call', e);
-        }
+      try {
+        fingerprintData = JSON.parse(attributes['custom:fingerprint']);
+      } catch (e) {
+        console.error(
+          'Failed to parse user fingerprint from GetUser API call',
+          e
+        );
+      }
     }
-    
+
     // Fetch user's registered devices (including passkeys).
     let devices: Device[] = [];
     try {
-        const listDevicesCommand = new ListDevicesCommand({
-            AccessToken: session.access_token,
-        });
-        const devicesResponse = await cognitoClient.send(listDevicesCommand);
-        
-        devices = (devicesResponse.Devices || []).map((device) => {
-            const deviceNameAttr = device.DeviceAttributes?.find(attr => attr.Name === 'device_name');
-            // Provide a sensible fallback name. The device key is too long and not user-friendly.
-            const name = deviceNameAttr?.Value || `Security Key`; 
-            
-            return {
-                key: device.DeviceKey || '',
-                name: name,
-                createDate: device.DeviceCreateDate?.toISOString(),
-                lastAuthDate: device.DeviceLastAuthenticatedDate?.toISOString(),
-            };
-        }).filter(d => d.key);
-    } catch(e: any) {
-        console.error("Could not fetch devices for user:", e);
+      const listDevicesCommand = new ListDevicesCommand({
+        AccessToken: session.access_token,
+      });
+      const devicesResponse = await cognitoClient.send(listDevicesCommand);
+
+      devices = (devicesResponse.Devices || [])
+        .map((device) => {
+          const deviceNameAttr = device.DeviceAttributes?.find(
+            (attr) => attr.Name === 'device_name'
+          );
+          // Provide a sensible fallback name. The device key is too long and not user-friendly.
+          const name = deviceNameAttr?.Value || `Security Key`;
+
+          return {
+            key: device.DeviceKey || '',
+            name: name,
+            createDate: device.DeviceCreateDate?.toISOString(),
+            lastAuthDate: device.DeviceLastAuthenticatedDate?.toISOString(),
+          };
+        })
+        .filter((d) => d.key);
+    } catch (e: any) {
+      console.error('Could not fetch devices for user:', e);
     }
 
     return {
       sub: payload.sub as string,
-      username: cognitoUser.Username || (payload['cognito:username'] as string) || '',
+      username:
+        cognitoUser.Username || (payload['cognito:username'] as string) || '',
       email: attributes.email || (payload.email as string) || '',
       email_verified: attributes.email_verified === 'true',
-      name: [freshGivenName, freshFamilyName].filter(Boolean).join(' ') || (payload.name as string) || '',
+      name:
+        [freshGivenName, freshFamilyName].filter(Boolean).join(' ') ||
+        (payload.name as string) ||
+        '',
       address: attributes.address || '',
-      phone_number: attributes.phone_number || (payload.phone_number as string) || '',
+      phone_number:
+        attributes.phone_number || (payload.phone_number as string) || '',
       phone_number_verified: attributes.phone_number_verified === 'true',
       birthdate: attributes.birthdate || '',
-      creationDate: new Date((payload.auth_time as number) * 1000).toISOString(),
-      userStatus: cognitoUser.UserStatus || 'CONFIRMED',
+      creationDate: new Date(
+        (payload.auth_time as number) * 1000
+      ).toISOString(),
+      userStatus: attributes.email_verified || 'CONFIRMED',
       twoFactorEnabled: attributes['custom:mfa'] === 'true',
       passkeysEnabled: attributes['custom:pless'] === 'true',
       groups: groups,
@@ -382,14 +424,19 @@ export const getUser = cache(async (): Promise<User | null> => {
       publicProfilePreferences: publicProfilePreferences,
       fingerprint: fingerprintData,
       devices: devices,
-      sessionStartedAt: (payload.auth_time as number),
-      sessionExpiresAt: (payload.exp as number),
+      sessionStartedAt: payload.auth_time as number,
+      sessionExpiresAt: payload.exp as number,
     };
-
   } catch (error: any) {
-    console.error("General error in getUser, likely during device list or user attribute fetch:", error);
+    console.error(
+      'General error in getUser, likely during device list or user attribute fetch:',
+      error
+    );
     // Clearing the cookie here is a safe fallback
-    cookies().set('auth_session', '', { expires: new Date(0), path: '/' });
+    (await cookies()).set('auth_session', '', {
+      expires: new Date(0),
+      path: '/',
+    });
     return null;
   }
 });
