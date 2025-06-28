@@ -53,25 +53,39 @@ async function ensureConnected(): Promise<boolean> {
   if (!redis) {
     return false;
   }
+
   if (redis.isReady) {
     return true;
   }
-  // If the client is created but not connected, try to connect.
-  // The client handles the case where it's already connecting or connected.
-  try {
-    await redis.connect();
-    return true;
-  } catch (err) {
-    // This might catch errors if connect() is called while it's already trying
-    // and failing in the background. We can treat this as a failed connection.
-    if ((err as Error).message.includes('already connecting')) {
-      // Give it a moment to see if it becomes ready
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      return redis.isReady;
+
+  // The redis client `connect` method throws an error if it's already connected.
+  // We should only call it if the client's socket is not open.
+  if (!redis.isOpen) {
+    try {
+      await redis.connect();
+    } catch (err) {
+      // This catch block handles errors during the initial connection attempt.
+      // It's possible another request initiated the connection in the meantime.
+      if (
+        err instanceof Error &&
+        (err.message.includes('Socket already opened') ||
+          err.message.includes('already connected'))
+      ) {
+        // This is a recoverable race condition. We can proceed.
+      } else {
+        console.error(
+          `${LOG_CONTEXT}: Connection failed on redis.connect():`,
+          err
+        );
+        return false;
+      }
     }
-    console.error(`${LOG_CONTEXT}: Connection failed:`, err);
-    return false;
   }
+
+  // After attempting to connect (if needed), we return the current ready state.
+  // If it was already in the process of connecting, `isReady` will be false for this request.
+  // The functions using this will then fail gracefully (e.g., return null from cache).
+  return redis.isReady;
 }
 
 export async function getCache<T>(key: string): Promise<T | null> {
