@@ -1,9 +1,4 @@
-export type Country = {
-  name: string;
-  dialCode: string;
-  iso2: string;
-  flag: string;
-};
+import type { Country } from '@/types/country.types';
 
 export const countries: Country[] = [
   { name: 'Afghanistan', dialCode: '+93', iso2: 'af', flag: '🇦🇫' },

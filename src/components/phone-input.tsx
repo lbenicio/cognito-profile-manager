@@ -20,7 +20,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { countries, type Country } from '@/lib/countries';
+import { countries } from '@/lib/countries';
+import { Country } from '@/types/country.types';
 
 // Find the country that best matches the beginning of the E.164 number
 const findCountry = (value: string): Country | undefined => {

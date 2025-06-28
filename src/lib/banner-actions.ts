@@ -1,4 +1,3 @@
-
 'use server';
 
 import { PutObjectCommand } from '@aws-sdk/client-s3';
@@ -16,10 +15,7 @@ const PUBLIC_URL = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
 const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_FILE_SIZE = 1024 * 1024 * 2; // 2 MB
 
-type GetPresignedUrlParams = {
-  type: string;
-  size: number;
-};
+import type { GetPresignedUrlParams } from '@/types/r2.types';
 
 export async function getBannerPresignedUploadUrl({
   type,
