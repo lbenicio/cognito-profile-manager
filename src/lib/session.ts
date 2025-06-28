@@ -10,7 +10,7 @@ import type {
   SessionPayload,
   SessionCacheData,
 } from '@/interfaces/lib/session.interfaces';
-import { JWTPayload } from 'jose';
+import type { JWTPayload } from 'jose';
 
 const secretKey = process.env.TOTP_SECRET_ENCRYPTION_KEY;
 if (!secretKey) {
@@ -118,7 +118,13 @@ export const getSession = cache(async (): Promise<Session | null> => {
   }
 
   if (payload.isMock) {
-    return payload as Session;
+    // Manually construct the Session object to ensure type safety.
+    // The payload for a mock session contains all necessary data.
+    const sessionData = payload as SessionCacheData;
+    return {
+      ...sessionData,
+      sessionId: 'mock_session',
+    };
   }
 
   if (!payload.sessionId) {

@@ -1,8 +1,9 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { createMockSession, deleteSession } from '@/lib/session';
+import { createMockSession } from '@/lib/session';
 import { mockAdminUser } from '@/lib/mock-data';
+import type { SessionCacheData } from '@/interfaces/lib/session.interfaces';
 
 export async function ssoLogin(): Promise<void> {
   redirect('/api/v1/auth/sso/start');
@@ -16,8 +17,10 @@ export async function devAdminLogin(): Promise<void> {
   const now = Math.floor(Date.now() / 1000);
   const expiresIn = 3600; // 1 hour
 
-  const sessionData = {
+  const sessionData: SessionCacheData = {
     username: mockAdminUser.username,
+    accessToken: 'mock-access-token',
+    refreshToken: 'mock-refresh-token',
     claims: {
       sub: mockAdminUser.sub,
       email: mockAdminUser.email,
@@ -25,7 +28,6 @@ export async function devAdminLogin(): Promise<void> {
       exp: now + expiresIn,
       auth_time: now,
     },
-    refreshToken: 'mock-refresh-token',
   };
 
   await createMockSession(sessionData);
