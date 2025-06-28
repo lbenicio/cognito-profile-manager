@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { devAdminLogin, ssoLogin } from '@/lib/auth-actions';
@@ -12,13 +12,18 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { LogIn } from 'lucide-react';
+import { Loader2, LogIn } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import type { LoginViewProps } from '@/interfaces/views/login-view.interfaces';
 
-export function LoginView() {
+export function LoginView({}: LoginViewProps) {
   const t = useTranslations('Login');
   const searchParams = useSearchParams();
   const { toast } = useToast();
+  const [isSsoLoading, setIsSsoLoading] = useState<boolean>(false);
+  const [isAdminLoading, setIsAdminLoading] = useState<boolean>(false);
+
+  const isSubmitting = isSsoLoading || isAdminLoading;
 
   useEffect(() => {
     const error = searchParams.get('error');
@@ -48,17 +53,33 @@ export function LoginView() {
         </CardHeader>
         <CardContent>
           <div className='space-y-4'>
-            <form action={ssoLogin}>
-              <Button type='submit' className='w-full'>
-                <LogIn />
+            <form action={ssoLogin} onSubmit={() => setIsSsoLoading(true)}>
+              <Button type='submit' className='w-full' disabled={isSubmitting}>
+                {isSsoLoading ? (
+                  <Loader2 className='animate-spin' />
+                ) : (
+                  <LogIn />
+                )}
                 <span className='ml-2'>{t('signInButton')}</span>
               </Button>
             </form>
 
             {process.env.NODE_ENV === 'development' && (
-              <form action={devAdminLogin}>
-                <Button type='submit' className='w-full' variant='secondary'>
-                  <LogIn />
+              <form
+                action={devAdminLogin}
+                onSubmit={() => setIsAdminLoading(true)}
+              >
+                <Button
+                  type='submit'
+                  className='w-full'
+                  variant='secondary'
+                  disabled={isSubmitting}
+                >
+                  {isAdminLoading ? (
+                    <Loader2 className='animate-spin' />
+                  ) : (
+                    <LogIn />
+                  )}
                   <span className='ml-2'>{t('signInAdminButton')}</span>
                 </Button>
               </form>

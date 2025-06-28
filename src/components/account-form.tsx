@@ -2,7 +2,6 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,7 +23,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Save } from 'lucide-react';
+import { Loader2, Save } from 'lucide-react';
 import React from 'react';
 import { updateUserProfile } from '@/lib/profile-actions';
 import { TimezoneSelect } from './timezone-select';
@@ -39,16 +38,14 @@ import {
 } from './ui/select';
 import { DatePicker } from './ui/date-picker';
 import { format } from 'date-fns';
-import type {
-  AccountFormProps,
-  AccountFormValues,
-} from '@/interfaces/forms/account-form.interfaces';
+import type { AccountFormValues } from '@/types/forms/account-form.types';
 import { accountFormSchema } from '@/types/forms/account-form.types';
+import type { AccountFormProps } from '@/interfaces/props/account-form.interfaces';
 
 export function AccountForm({ user, onUpdateAction }: AccountFormProps) {
   const { toast } = useToast();
   const t = useTranslations('Account.form');
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
 
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountFormSchema(t)),
@@ -82,7 +79,7 @@ export function AccountForm({ user, onUpdateAction }: AccountFormProps) {
     });
   }, [user, form]);
 
-  async function onSubmit(data: AccountFormValues) {
+  async function onSubmit(data: AccountFormValues): Promise<void> {
     setIsSubmitting(true);
 
     try {
@@ -99,7 +96,9 @@ export function AccountForm({ user, onUpdateAction }: AccountFormProps) {
         onUpdateAction({
           name: `${data.given_name} ${data.family_name}`.trim(),
           phone_number: data.phone_number,
-          birthdate: data.birthdate ? format(data.birthdate, 'yyyy-MM-dd') : '',
+          birthdate: data.birthdate
+            ? format(data.birthdate, 'yyyy-MM-dd')
+            : '',
           website: data.website,
           zoneinfo: data.zoneinfo,
           gender: data.gender,
@@ -277,11 +276,7 @@ export function AccountForm({ user, onUpdateAction }: AccountFormProps) {
           </CardContent>
           <CardFooter>
             <Button type='submit' disabled={isSubmitting}>
-              {isSubmitting ? (
-                <div className='h-4 w-4 animate-spin rounded-full border-b-2 border-primary-foreground'></div>
-              ) : (
-                <Save />
-              )}
+              {isSubmitting ? <Loader2 className='animate-spin' /> : <Save />}
               <span className='ml-2'>{t('save')}</span>
             </Button>
           </CardFooter>

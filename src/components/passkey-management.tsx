@@ -14,7 +14,6 @@ import { Button } from '@/components/ui/button';
 import { KeyRound, Loader2, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from 'next-intl';
-import type { User } from '@/lib/auth';
 import { deletePasskey } from '@/lib/passkey-actions';
 import {
   Table,
@@ -37,10 +36,8 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
-
-interface PasskeyManagementProps {
-  user: User;
-}
+import type { PasskeyManagementProps } from '@/interfaces/props/passkey-management.interfaces';
+import type { User } from '@/types/user/user.types';
 
 export function PasskeyManagement({ user }: PasskeyManagementProps) {
   const { toast } = useToast();
@@ -49,9 +46,9 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  const [isAddingPasskey, setIsAddingPasskey] = useState(false);
-  const [isDeleting, setIsDeleting] = useState<string | null>(null);
-  const [isMounted, setIsMounted] = useState(false);
+  const [isAddingPasskey, setIsAddingPasskey] = useState<boolean>(false);
+  const [deletingKey, setDeletingKey] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState<boolean>(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -82,14 +79,14 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
     }
   }, [searchParams, router, t, toast]);
 
-  const handleAddPasskey = () => {
+  const handleAddPasskey = (): void => {
     setIsAddingPasskey(true);
     window.location.href = '/api/v1/auth/passkey/start';
   };
 
-  const handleDeletePasskey = (key: string) => {
+  const handleDeletePasskey = (key: string): void => {
+    setDeletingKey(key);
     startTransition(async () => {
-      setIsDeleting(key);
       const result = await deletePasskey(key);
       if (result.success) {
         toast({
@@ -104,7 +101,7 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
           description: result.message,
         });
       }
-      setIsDeleting(null);
+      setDeletingKey(null);
     });
   };
 
@@ -149,7 +146,9 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
                             key={device.key}
                             className={cn(
                               'transition-opacity',
-                              isDeleting === device.key && 'opacity-50'
+                              isPending &&
+                                deletingKey === device.key &&
+                                'opacity-50'
                             )}
                           >
                             <TableCell className='font-medium'>
@@ -169,16 +168,10 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
                                   <Button
                                     variant='ghost'
                                     size='icon'
-                                    disabled={
-                                      isDeleting === device.key || isPending
-                                    }
+                                    disabled={isPending}
                                     aria-label={`Delete passkey ${device.name}`}
                                   >
-                                    {isDeleting === device.key ? (
-                                      <Loader2 className='h-4 w-4 animate-spin' />
-                                    ) : (
-                                      <Trash2 className='h-4 w-4 text-muted-foreground hover:text-destructive' />
-                                    )}
+                                    <Trash2 className='h-4 w-4 text-muted-foreground hover:text-destructive' />
                                   </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
@@ -193,14 +186,23 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
-                                    <AlertDialogCancel>
+                                    <AlertDialogCancel
+                                      disabled={
+                                        isPending && deletingKey === device.key
+                                      }
+                                    >
                                       {t('deleteDialog.cancel')}
                                     </AlertDialogCancel>
                                     <AlertDialogAction
                                       onClick={() =>
                                         handleDeletePasskey(device.key)
                                       }
+                                      disabled={isPending}
                                     >
+                                      {isPending &&
+                                        deletingKey === device.key && (
+                                          <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                                        )}
                                       {t('deleteDialog.confirm')}
                                     </AlertDialogAction>
                                   </AlertDialogFooter>
@@ -222,14 +224,7 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
 
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button
-                  variant='outline'
-                  size='sm'
-                  disabled={isAddingPasskey || isPending}
-                >
-                  {(isAddingPasskey || isPending) && (
-                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                  )}
+                <Button variant='outline' size='sm' disabled={isPending}>
                   {t('addButton')}
                 </Button>
               </AlertDialogTrigger>
@@ -243,10 +238,16 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>
+                  <AlertDialogCancel disabled={isAddingPasskey}>
                     {t('addPasskeyDialog.cancel')}
                   </AlertDialogCancel>
-                  <AlertDialogAction onClick={handleAddPasskey}>
+                  <AlertDialogAction
+                    onClick={handleAddPasskey}
+                    disabled={isAddingPasskey}
+                  >
+                    {isAddingPasskey && (
+                      <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                    )}
                     {t('addPasskeyDialog.continue')}
                   </AlertDialogAction>
                 </AlertDialogFooter>

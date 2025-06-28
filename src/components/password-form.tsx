@@ -23,32 +23,16 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { KeyRound } from 'lucide-react';
+import { KeyRound, Loader2 } from 'lucide-react';
 import React from 'react';
 import { changePassword } from '@/lib/password-actions';
-
-const passwordFormSchema = (t: (key: string) => string) =>
-  z
-    .object({
-      currentPassword: z
-        .string()
-        .min(1, { message: 'Current password is required.' }),
-      newPassword: z
-        .string()
-        .min(8, { message: 'Password must be at least 8 characters.' }),
-      confirmPassword: z.string(),
-    })
-    .refine((data) => data.newPassword === data.confirmPassword, {
-      message: t('passwordMismatch'),
-      path: ['confirmPassword'],
-    });
-
-type PasswordFormValues = z.infer<ReturnType<typeof passwordFormSchema>>;
+import type { PasswordFormValues } from '@/types/forms/password-form.types';
+import { passwordFormSchema } from '@/types/forms/password-form.types';
 
 export function PasswordForm() {
   const { toast } = useToast();
   const t = useTranslations('Security.passwordForm');
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
 
   const form = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordFormSchema(t)),
@@ -60,7 +44,7 @@ export function PasswordForm() {
     mode: 'onChange',
   });
 
-  async function onSubmit(data: PasswordFormValues) {
+  async function onSubmit(data: PasswordFormValues): Promise<void> {
     setIsSubmitting(true);
 
     const result = await changePassword(data.currentPassword, data.newPassword);
@@ -145,7 +129,7 @@ export function PasswordForm() {
           <CardFooter>
             <Button type='submit' disabled={isSubmitting}>
               {isSubmitting ? (
-                <div className='h-4 w-4 animate-spin rounded-full border-b-2 border-primary-foreground'></div>
+                <Loader2 className='animate-spin' />
               ) : (
                 <KeyRound />
               )}
