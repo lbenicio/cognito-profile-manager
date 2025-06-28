@@ -8,12 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import type { User as UserType } from '@/types/user/user.types';
 import { getPresignedUploadUrl, updateUserAvatar } from '@/lib/avatar-actions';
-
-interface AvatarEditorProps {
-  user: UserType;
-  onUpdateAction: (data: Partial<UserType>) => void;
-  onCloseAction: () => void;
-}
+import { AvatarEditorProps } from '@/interfaces/components/avatar-editor.interfaces';
 
 export function AvatarEditor({
   user,

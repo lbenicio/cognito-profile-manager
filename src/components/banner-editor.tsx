@@ -6,17 +6,12 @@ import { useTranslations } from 'next-intl';
 import { UploadCloud, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import type { User as UserType } from '@/types/user/user.types';
+
 import {
   getBannerPresignedUploadUrl,
   updateUserBanner,
 } from '@/lib/banner-actions';
-
-interface BannerEditorProps {
-  user: UserType;
-  onUpdateAction: (data: Partial<UserType>) => void;
-  onCloseAction: () => void;
-}
+import { BannerEditorProps } from '@/interfaces/components/banner-editor.interfaces';
 
 export function BannerEditor({
   user,

@@ -35,6 +35,10 @@ import {
 } from '@/components/ui/select';
 import { sendContactEmail } from '@/lib/contact-actions';
 import { Label } from './ui/label';
+import {
+  ContactFormProps,
+  ContactFormValues,
+} from '@/interfaces/components/contact-form.interfaces';
 
 const contactFormSchema = (t: {
   categoryRequired: string;
@@ -44,34 +48,6 @@ const contactFormSchema = (t: {
     category: z.string().min(1, { message: t.categoryRequired }),
     message: z.string().min(10, { message: t.messageTooShort }),
   });
-
-export type ContactFormValues = z.infer<ReturnType<typeof contactFormSchema>>;
-
-export interface ContactFormProps {
-  user: User;
-  translations: {
-    nameLabel: string;
-    emailLabel: string;
-    categoryLabel: string;
-    categoryPlaceholder: string;
-    messageLabel: string;
-    messagePlaceholder: string;
-    submitButton: string;
-    successTitle: string;
-    successDescription: string;
-    errorTitle: string;
-    errorDescription: string;
-    categoryRequired: string;
-    messageRequired: string;
-    messageTooShort: string;
-    categories: {
-      general: string;
-      billing: string;
-      technical: string;
-      feedback: string;
-    };
-  };
-}
 
 export function ContactForm({ user, translations }: ContactFormProps) {
   const { toast } = useToast();

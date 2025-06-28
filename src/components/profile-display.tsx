@@ -40,14 +40,9 @@ import { AvatarEditor } from './avatar-editor';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
+import { ProfileDisplayProps } from '@/interfaces/components/profile-display.interfaces';
 
-export function ProfileDisplay({
-  user,
-  onUpdateAction,
-}: {
-  user: User;
-  onUpdateAction: (data: Partial<User>) => void;
-}) {
+export function ProfileDisplay({ user, onUpdateAction }: ProfileDisplayProps) {
   const t = useTranslations('Dashboard');
   const tProfile = useTranslations('Profile');
   const tDashboard = useTranslations('Dashboard.profileCard');

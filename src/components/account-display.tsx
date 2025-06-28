@@ -44,14 +44,9 @@ import { BannerEditor } from './banner-editor';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
+import { AccountDisplayProps } from '@/interfaces/components/account-display.interfaces';
 
-export function AccountDisplay({
-  user,
-  onUpdateAction,
-}: {
-  user: User;
-  onUpdateAction: (data: Partial<User>) => void;
-}) {
+export function AccountDisplay({ user, onUpdateAction }: AccountDisplayProps) {
   const t = useTranslations('Dashboard');
   const tAccount = useTranslations('Account');
   const tDashboard = useTranslations('Dashboard.profileCard');
