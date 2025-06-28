@@ -16,21 +16,19 @@ export async function devAdminLogin() {
   const now = Math.floor(Date.now() / 1000);
   const expiresIn = 3600; // 1 hour
 
-  const sessionData = {
+  await createMockSession({
     username: mockAdminUser.username,
     claims: {
       sub: mockAdminUser.sub,
       email: mockAdminUser.email,
       name: mockAdminUser.name,
-      // Mock claims need expiry for middleware to work
       exp: now + expiresIn,
       auth_time: now,
     },
-    // Mock refresh token for consistency if middleware needs it
+    accessToken: 'mock-access-token', // Required for a valid mock session
     refreshToken: 'mock-refresh-token',
-  };
+  });
 
-  await createMockSession(sessionData);
   redirect('/');
 }
 
