@@ -1,6 +1,6 @@
 'use server';
 
-import { redirect } from '@/navigation';
+import { redirect } from 'next/navigation';
 import { createMockSession, deleteSession } from '@/lib/session';
 import { mockAdminUser } from '@/lib/auth';
 
