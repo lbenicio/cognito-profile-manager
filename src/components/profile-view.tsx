@@ -1,19 +1,16 @@
 'use client';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import type { User as UserType, PublicProfilePreferences } from '@/lib/auth';
 import { PublicProfileDisplay } from './public-profile-display';
 import { ProfileSettingsForm } from './profile-settings-form';
-
-interface ProfileViewProps {
-  user: UserType;
-}
+import type { User, PublicProfilePreferences } from '@/types/user/user.types';
+import type { ProfileViewProps } from '@/interfaces/components/profile-view.interfaces';
 
 export function ProfileView({ user: initialUser }: ProfileViewProps) {
-  const [user, setUser] = useState(initialUser);
+  const [user, setUser] = useState<User>(initialUser);
   const t = useTranslations('Profile');
 
-  const handleUpdate = (newPrefs: PublicProfilePreferences) => {
+  const handleUpdate = (newPrefs: PublicProfilePreferences): void => {
     setUser((currentUser) => ({
       ...currentUser,
       publicProfilePreferences: newPrefs,

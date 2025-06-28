@@ -1,4 +1,3 @@
-
 'use server';
 
 import { PutObjectCommand } from '@aws-sdk/client-s3';
@@ -9,6 +8,7 @@ import { getSession } from '@/lib/session';
 import { r2 } from '@/lib/r2';
 import { revalidatePath } from 'next/cache';
 import { cognitoClient, UpdateUserAttributesCommand } from './cognito';
+import type { GetPresignedUrlParams } from '@/interfaces/lib/s3.interfaces';
 
 const BUCKET_NAME = process.env.R2_BUCKET_NAME;
 const PUBLIC_URL = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
@@ -16,15 +16,13 @@ const PUBLIC_URL = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
 const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_FILE_SIZE = 1024 * 1024 * 2; // 2 MB
 
-type GetPresignedUrlParams = {
-  type: string;
-  size: number;
-};
-
 export async function getBannerPresignedUploadUrl({
   type,
   size,
-}: GetPresignedUrlParams) {
+}: GetPresignedUrlParams): Promise<{
+  presignedUrl: string;
+  publicUrl: string;
+}> {
   if (!BUCKET_NAME || !PUBLIC_URL) {
     throw new Error('R2 bucket configuration is missing.');
   }
@@ -57,7 +55,9 @@ export async function getBannerPresignedUploadUrl({
   return { presignedUrl, publicUrl };
 }
 
-export async function updateUserBanner(bannerUrl: string) {
+export async function updateUserBanner(
+  bannerUrl: string
+): Promise<{ success: boolean }> {
   const session = await getSession();
   if (!session?.accessToken) {
     throw new Error('Not authenticated');

@@ -16,12 +16,9 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Save, Loader2 } from 'lucide-react';
-import type { User as UserType, NotificationPreferences } from '@/lib/auth';
 import { updateNotificationPreferences } from '@/lib/notification-actions';
-
-interface NotificationSettingsProps {
-  user: UserType;
-}
+import type { NotificationPreferences } from '@/types/user/user.types';
+import type { NotificationSettingsProps } from '@/interfaces/components/notification-settings.interfaces';
 
 export function NotificationSettings({ user }: NotificationSettingsProps) {
   const t = useTranslations('Settings.notifications');
@@ -35,11 +32,11 @@ export function NotificationSettings({ user }: NotificationSettingsProps) {
   const handleSwitchChange = (
     field: keyof NotificationPreferences,
     value: boolean
-  ) => {
+  ): void => {
     setPrefs((current) => ({ ...current, [field]: value }));
   };
 
-  const handleSave = () => {
+  const handleSave = (): void => {
     startTransition(async () => {
       const result = await updateNotificationPreferences(prefs);
       if (result.success) {
@@ -64,7 +61,6 @@ export function NotificationSettings({ user }: NotificationSettingsProps) {
         <CardDescription>{t('description')}</CardDescription>
       </CardHeader>
       <CardContent className='space-y-8'>
-        {/* -- Communication Channels -- */}
         <div className='space-y-4'>
           <h4 className='font-semibold'>{t('channels.title')}</h4>
           <div className='flex items-center justify-between'>
@@ -100,7 +96,6 @@ export function NotificationSettings({ user }: NotificationSettingsProps) {
 
         <Separator />
 
-        {/* -- Notification Types -- */}
         <div className='space-y-4'>
           <h4 className='font-semibold'>{t('types.title')}</h4>
           <div className='flex items-start justify-between'>

@@ -1,4 +1,3 @@
-
 'use server';
 
 import { authenticator } from 'otplib';
@@ -14,7 +13,10 @@ import {
 import { getUser } from './auth';
 import { getSession } from './session';
 
-export async function generateMfaSetup() {
+export async function generateMfaSetup(): Promise<{
+  qrCodeDataUrl: string;
+  secretCode: string;
+}> {
   const user = await getUser();
   const session = await getSession();
   if (!user || !session?.accessToken) {

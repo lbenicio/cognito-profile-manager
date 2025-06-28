@@ -1,26 +1,19 @@
 'use client';
 import { useState, useEffect } from 'react';
-import type { User as UserType } from '@/lib/auth';
 import { PasswordForm } from '@/components/password-form';
 import { TwoFactorAuth } from '@/components/two-factor-auth';
 import { PasskeyManagement } from './passkey-management';
-
-interface SecurityViewProps {
-  initialUser: UserType;
-  translations: {
-    title: string;
-    description: string;
-  };
-}
+import type { User } from '@/types/user/user.types';
+import type { SecurityViewProps } from '@/interfaces/components/security-view.interfaces';
 
 export function SecurityView({ initialUser, translations }: SecurityViewProps) {
-  const [user, setUser] = useState(initialUser);
+  const [user, setUser] = useState<User>(initialUser);
 
   useEffect(() => {
     setUser(initialUser);
   }, [initialUser]);
 
-  const handleProfileUpdate = (updatedData: Partial<UserType>) => {
+  const handleProfileUpdate = (updatedData: Partial<User>): void => {
     setUser((prevUser) => ({ ...prevUser, ...updatedData }));
   };
 

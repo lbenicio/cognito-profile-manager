@@ -13,14 +13,11 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  type ChartConfig,
 } from '@/components/ui/chart';
-import type { Fingerprint } from '@/lib/auth';
 import { useTranslations } from 'next-intl';
 import { format, subDays, startOfDay } from 'date-fns';
-
-interface LoginActivityChartProps {
-  fingerprint: Fingerprint[];
-}
+import type { LoginActivityChartProps } from '@/interfaces/components/login-activity-chart.interfaces';
 
 export function LoginActivityChart({ fingerprint }: LoginActivityChartProps) {
   const t = useTranslations('Dashboard.loginActivity');
@@ -29,7 +26,7 @@ export function LoginActivityChart({ fingerprint }: LoginActivityChartProps) {
     const dataPoints = Array.from({ length: 7 }).map((_, i) => {
       const date = subDays(new Date(), 6 - i);
       return {
-        date: format(date, 'EEE'), // Short day name e.g., "Mon"
+        date: format(date, 'EEE'),
         fullDate: format(date, 'yyyy-MM-dd'),
         logins: 0,
       };
@@ -56,7 +53,7 @@ export function LoginActivityChart({ fingerprint }: LoginActivityChartProps) {
       label: t('logins'),
       color: 'hsl(var(--primary))',
     },
-  };
+  } satisfies ChartConfig;
 
   return (
     <Card>

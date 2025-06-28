@@ -1,8 +1,4 @@
 import * as z from 'zod';
-import type {
-  ProfileFormProps,
-  ProfileFormValues,
-} from '@/interfaces/forms/profile-form.interfaces';
 
 /**
  * Schema for the Profile Form using zod.
@@ -40,3 +36,8 @@ export const profileFormSchema = (t: (key: string) => string) =>
       .max(250, { message: t('aboutMeTooLong') })
       .optional(),
   });
+
+/**
+ * Type for Profile Form values, inferred from the schema.
+ */
+export type ProfileFormValues = z.infer<ReturnType<typeof profileFormSchema>>;

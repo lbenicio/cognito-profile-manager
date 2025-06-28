@@ -2,7 +2,6 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -17,14 +16,10 @@ import {
   Card,
   CardContent,
   CardFooter,
-  CardHeader,
-  CardTitle,
-  CardDescription,
 } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Send } from 'lucide-react';
 import React, { useMemo } from 'react';
-import type { User as UserType } from '@/lib/auth';
 import { Textarea } from './ui/textarea';
 import {
   Select,
@@ -35,44 +30,15 @@ import {
 } from '@/components/ui/select';
 import { sendContactEmail } from '@/lib/contact-actions';
 import { Label } from './ui/label';
-
-const contactFormSchema = (t: any) =>
-  z.object({
-    category: z.string().min(1, { message: t.categoryRequired }),
-    message: z.string().min(10, { message: t.messageTooShort }),
-  });
-
-type ContactFormValues = z.infer<ReturnType<typeof contactFormSchema>>;
-
-interface ContactFormProps {
-  user: UserType;
-  translations: {
-    nameLabel: string;
-    emailLabel: string;
-    categoryLabel: string;
-    categoryPlaceholder: string;
-    messageLabel: string;
-    messagePlaceholder: string;
-    submitButton: string;
-    successTitle: string;
-    successDescription: string;
-    errorTitle: string;
-    errorDescription: string;
-    categoryRequired: string;
-    messageRequired: string;
-    messageTooShort: string;
-    categories: {
-      general: string;
-      billing: string;
-      technical: string;
-      feedback: string;
-    };
-  };
-}
+import type { ContactFormProps } from '@/interfaces/components/contact-form.interfaces';
+import {
+  contactFormSchema,
+  type ContactFormValues,
+} from '@/types/forms/contact-form.types';
 
 export function ContactForm({ user, translations }: ContactFormProps) {
   const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
 
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema(translations)),
@@ -93,7 +59,7 @@ export function ContactForm({ user, translations }: ContactFormProps) {
     [translations]
   );
 
-  async function onSubmit(data: ContactFormValues) {
+  async function onSubmit(data: ContactFormValues): Promise<void> {
     setIsSubmitting(true);
 
     try {

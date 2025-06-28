@@ -1,9 +1,5 @@
-/**
- * Interfaces for the Profile Form component.
- * Moved from types/forms/profile-form.types.ts for consolidation.
- */
-
 import type { User } from '@/types/user/user.types';
+import type { ProfileFormValues } from '@/types/forms/profile-form.types';
 
 /**
  * Props for the ProfileForm component.
@@ -13,18 +9,5 @@ export interface ProfileFormProps {
   onUpdateAction: (data: Partial<User>) => void;
 }
 
-/**
- * Type for Profile Form values, inferred from the schema.
- * This should be kept in sync with the zod schema in types/forms/profile-form.types.ts.
- */
-export type ProfileFormValues = {
-  given_name: string;
-  family_name: string;
-  address: string;
-  phone_number: string;
-  birthdate?: Date;
-  website?: string;
-  zoneinfo?: string;
-  gender?: string;
-  aboutMe?: string;
-};
+// Re-export for convenience if needed, but primary source is the types file.
+export type { ProfileFormValues };

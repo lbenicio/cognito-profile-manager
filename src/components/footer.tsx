@@ -9,12 +9,10 @@ export function Footer() {
   const t = useTranslations('Footer');
   const tSitemap = useTranslations('Footer.sitemap');
   const tLegal = useTranslations('Footer.legal');
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [isClient, setIsClient] = useState(false);
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [isClient, setIsClient] = useState<boolean>(false);
 
   useEffect(() => {
-    // This effect runs only on the client, after the component has mounted.
-    // It signals that it's safe to render client-specific content.
     setIsClient(true);
 
     const timer = setInterval(() => {
@@ -30,7 +28,6 @@ export function Footer() {
     <footer className='border-t bg-card'>
       <div className='container mx-auto px-4 py-8 md:px-8'>
         <div className='grid grid-cols-1 gap-8 md:grid-cols-4'>
-          {/* Left side: Logo, Copyright, and Clock */}
           <div className='flex flex-col items-start gap-4 md:col-span-2'>
             <Link
               href='/'
@@ -65,7 +62,6 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Right side: Sitemap Columns */}
           <div className='grid grid-cols-2 gap-8 md:col-span-2 md:grid-cols-3'>
             <div>
               <h3 className='mb-4 font-semibold'>

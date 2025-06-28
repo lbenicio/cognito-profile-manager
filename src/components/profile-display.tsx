@@ -22,11 +22,9 @@ import {
   Languages,
   Edit,
   PersonStanding,
-  BookUser,
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { useTranslations } from 'next-intl';
-import type { User } from '@/lib/auth';
 import {
   Dialog,
   DialogContent,
@@ -40,34 +38,26 @@ import { AvatarEditor } from './avatar-editor';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
+import type { ProfileDisplayProps } from '@/interfaces/components/profile-display.interfaces';
 
-export function ProfileDisplay({
-  user,
-  onUpdate,
-}: {
-  user: User;
-  onUpdate: (data: Partial<User>) => void;
-}) {
+export function ProfileDisplay({ user, onUpdate }: ProfileDisplayProps) {
   const t = useTranslations('Dashboard');
   const tProfile = useTranslations('Profile');
   const tDashboard = useTranslations('Dashboard.profileCard');
-  const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [isEditorOpen, setIsEditorOpen] = useState<boolean>(false);
   const [memberSince, setMemberSince] = useState<string | null>(null);
 
-  // Logic for verification actions
   const { toast } = useToast();
-  const [emailLoading, setEmailLoading] = useState(false);
-  const [phoneLoading, setPhoneLoading] = useState(false);
+  const [emailLoading, setEmailLoading] = useState<boolean>(false);
+  const [phoneLoading, setPhoneLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    // This code runs only on the client, after the component has mounted,
-    // ensuring the date is formatted using the client's locale and preventing a mismatch.
     if (user.creationDate) {
       setMemberSince(format(parseISO(user.creationDate), 'MMMM d, yyyy'));
     }
   }, [user.creationDate]);
 
-  const handleSendVerificationEmail = async () => {
+  const handleSendVerificationEmail = async (): Promise<void> => {
     setEmailLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
     toast({
@@ -79,7 +69,7 @@ export function ProfileDisplay({
     setEmailLoading(false);
   };
 
-  const handleSendVerificationSms = async () => {
+  const handleSendVerificationSms = async (): Promise<void> => {
     setPhoneLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
     toast({

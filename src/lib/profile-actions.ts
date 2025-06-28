@@ -1,20 +1,9 @@
-
 'use server';
 
 import { revalidatePath } from 'next/cache';
 import { cognitoClient, UpdateUserAttributesCommand } from './cognito';
 import { getSession } from './session';
-
-type UserProfileAttributes = {
-  given_name: string;
-  family_name: string;
-  phone_number: string;
-  birthdate?: string;
-  website: string;
-  zoneinfo: string;
-  gender: string;
-  aboutMe: string;
-};
+import type { UserProfileAttributes } from '@/interfaces/lib/profile-actions.interfaces';
 
 export async function updateUserProfile(
   data: Partial<UserProfileAttributes>

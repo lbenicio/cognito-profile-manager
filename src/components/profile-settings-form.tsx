@@ -16,13 +16,9 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Save, Loader2 } from 'lucide-react';
-import type { PublicProfilePreferences } from '@/lib/auth';
 import { updatePublicProfilePreferences } from '@/lib/profile-settings-actions';
-
-interface ProfileSettingsFormProps {
-  initialPreferences: PublicProfilePreferences;
-  onUpdateAction: (newPrefs: PublicProfilePreferences) => void;
-}
+import type { PublicProfilePreferences } from '@/types/user/user.types';
+import type { ProfileSettingsFormProps } from '@/interfaces/components/profile-settings-form.interfaces';
 
 export function ProfileSettingsForm({
   initialPreferences,
@@ -30,17 +26,18 @@ export function ProfileSettingsForm({
 }: ProfileSettingsFormProps) {
   const t = useTranslations('Profile.settings');
   const { toast } = useToast();
-  const [prefs, setPrefs] = useState(initialPreferences);
+  const [prefs, setPrefs] =
+    useState<PublicProfilePreferences>(initialPreferences);
   const [isPending, startTransition] = useTransition();
 
-  const handleIsPublicChange = (value: boolean) => {
+  const handleIsPublicChange = (value: boolean): void => {
     setPrefs((current) => ({ ...current, isPublic: value }));
   };
 
   const handleFieldChange = (
     field: keyof PublicProfilePreferences['publicFields'],
     value: boolean
-  ) => {
+  ): void => {
     setPrefs((current) => ({
       ...current,
       publicFields: {
@@ -50,7 +47,7 @@ export function ProfileSettingsForm({
     }));
   };
 
-  const handleSave = () => {
+  const handleSave = (): void => {
     startTransition(async () => {
       const result = await updatePublicProfilePreferences(prefs);
       if (result.success) {

@@ -9,13 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { UserPreferences } from '@/lib/auth';
-
-interface LanguageSelectProps {
-  currentLanguage: UserPreferences['language'];
-  onLanguageChange: (language: UserPreferences['language']) => void;
-  disabled?: boolean;
-}
+import type { UserPreferences } from '@/types/user/user.types';
+import type { LanguageSelectProps } from '@/interfaces/components/language-select.interfaces';
 
 export function LanguageSelect({
   currentLanguage,

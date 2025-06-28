@@ -11,12 +11,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { updateUserPreferences } from '@/lib/preference-actions';
-import type { UserPreferences } from '@/lib/auth';
-
-interface LanguageSwitcherProps {
-  languageLabel: string;
-  currentLanguage: UserPreferences['language'];
-}
+import type { UserPreferences } from '@/types/user/user.types';
+import type { LanguageSwitcherProps } from '@/interfaces/components/language-switcher.interfaces';
 
 export function LanguageSwitcher({
   languageLabel,
@@ -25,7 +21,7 @@ export function LanguageSwitcher({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  function onSelectLocale(nextLocale: UserPreferences['language']) {
+  function onSelectLocale(nextLocale: UserPreferences['language']): void {
     startTransition(async () => {
       await updateUserPreferences({ language: nextLocale });
       router.refresh();

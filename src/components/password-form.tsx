@@ -2,7 +2,6 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,29 +25,15 @@ import { useToast } from '@/hooks/use-toast';
 import { KeyRound } from 'lucide-react';
 import React from 'react';
 import { changePassword } from '@/lib/password-actions';
-
-const passwordFormSchema = (t: (key: string) => string) =>
-  z
-    .object({
-      currentPassword: z
-        .string()
-        .min(1, { message: 'Current password is required.' }),
-      newPassword: z
-        .string()
-        .min(8, { message: 'Password must be at least 8 characters.' }),
-      confirmPassword: z.string(),
-    })
-    .refine((data) => data.newPassword === data.confirmPassword, {
-      message: t('passwordMismatch'),
-      path: ['confirmPassword'],
-    });
-
-type PasswordFormValues = z.infer<ReturnType<typeof passwordFormSchema>>;
+import {
+  passwordFormSchema,
+  type PasswordFormValues,
+} from '@/types/forms/password-form.types';
 
 export function PasswordForm() {
   const { toast } = useToast();
   const t = useTranslations('Security.passwordForm');
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
 
   const form = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordFormSchema(t)),
@@ -60,7 +45,7 @@ export function PasswordForm() {
     mode: 'onChange',
   });
 
-  async function onSubmit(data: PasswordFormValues) {
+  async function onSubmit(data: PasswordFormValues): Promise<void> {
     setIsSubmitting(true);
 
     const result = await changePassword(data.currentPassword, data.newPassword);

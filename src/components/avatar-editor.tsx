@@ -6,25 +6,21 @@ import { useTranslations } from 'next-intl';
 import { UploadCloud, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import type { User as UserType } from '@/lib/auth';
 import { getPresignedUploadUrl, updateUserAvatar } from '@/lib/avatar-actions';
-
-interface AvatarEditorProps {
-  user: UserType;
-  onUpdate: (data: Partial<UserType>) => void;
-  onClose: () => void;
-}
+import type { AvatarEditorProps } from '@/interfaces/components/avatar-editor.interfaces';
 
 export function AvatarEditor({ user, onUpdate, onClose }: AvatarEditorProps) {
   const t = useTranslations('Account.avatar');
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(user.picture);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ): void => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
       if (selectedFile.size > 2 * 1024 * 1024) {
@@ -43,7 +39,7 @@ export function AvatarEditor({ user, onUpdate, onClose }: AvatarEditorProps) {
     }
   };
 
-  const handleUpload = async () => {
+  const handleUpload = async (): Promise<void> => {
     if (!file) return;
 
     setIsLoading(true);

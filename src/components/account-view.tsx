@@ -3,22 +3,19 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { AccountDisplay } from '@/components/account-display';
 import { AccountForm } from '@/components/account-form';
-import type { User as UserType } from '@/lib/auth';
 import { AddressForm } from './address-form';
-
-interface AccountViewProps {
-  initialUser: UserType;
-}
+import type { AccountViewProps } from '@/interfaces/components/account-view.interfaces';
+import type { User } from '@/types/user/user.types';
 
 export function AccountView({ initialUser }: AccountViewProps) {
-  const [user, setUser] = useState(initialUser);
+  const [user, setUser] = useState<User>(initialUser);
   const t = useTranslations('Account');
 
   useEffect(() => {
     setUser(initialUser);
   }, [initialUser]);
 
-  const handleProfileUpdate = (updatedData: Partial<UserType>) => {
+  const handleProfileUpdate = (updatedData: Partial<User>): void => {
     setUser((prevUser) => ({ ...prevUser, ...updatedData }));
   };
 

@@ -21,18 +21,16 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { countries, type Country } from '@/lib/countries';
+import type { PhoneInputProps } from '@/interfaces/components/phone-input.interfaces';
 
-// Find the country that best matches the beginning of the E.164 number
 const findCountry = (value: string): Country | undefined => {
   if (!value || !value.startsWith('+')) return undefined;
-  // Sort by dial code length descending to match longest prefix first (e.g., +44 before +4)
   return countries
     .slice()
     .sort((a, b) => b.dialCode.length - a.dialCode.length)
     .find((c) => value.startsWith(c.dialCode));
 };
 
-// Parse the E.164 number into its parts
 const parsePhoneNumber = (
   value: string
 ): { country?: Country; nationalNumber: string } => {
@@ -43,15 +41,6 @@ const parsePhoneNumber = (
   return { country, nationalNumber };
 };
 
-interface PhoneInputProps
-  extends Omit<
-    React.InputHTMLAttributes<HTMLInputElement>,
-    'onChange' | 'value'
-  > {
-  value: string;
-  onChange: (value: string) => void;
-}
-
 export function PhoneInput({ value, onChange, ...props }: PhoneInputProps) {
   const t = useTranslations('Account.form');
   const [open, setOpen] = React.useState(false);
@@ -61,18 +50,17 @@ export function PhoneInput({ value, onChange, ...props }: PhoneInputProps) {
     [value]
   );
 
-  const handleCountrySelect = (newCountry: Country) => {
+  const handleCountrySelect = (newCountry: Country): void => {
     onChange(`${newCountry.dialCode}${nationalNumber}`);
     setOpen(false);
   };
 
-  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const newNationalNumber = e.target.value.replace(/\D/g, '');
     const dialCode = country?.dialCode || '';
     onChange(`${dialCode}${newNationalNumber}`);
   };
 
-  // Default to US if no country is matched or value is empty
   const selectedCountry = country || countries.find((c) => c.iso2 === 'us');
 
   return (

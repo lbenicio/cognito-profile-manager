@@ -1,18 +1,11 @@
 'use server';
 
 import { getUser } from '@/lib/auth';
-import * as z from 'zod';
 import nodemailer from 'nodemailer';
-
-const contactSchema = z.object({
-  category: z.string(),
-  message: z.string(),
-});
-
-type ContactData = z.infer<typeof contactSchema>;
+import type { ContactFormValues } from '@/types/forms/contact-form.types';
 
 export async function sendContactEmail(
-  data: ContactData
+  data: ContactFormValues
 ): Promise<{ success: boolean; message: string }> {
   const user = await getUser();
   if (!user) {
@@ -43,7 +36,7 @@ export async function sendContactEmail(
   const transporter = nodemailer.createTransport({
     host: SMTP_HOST,
     port: parseInt(SMTP_PORT, 10),
-    secure: parseInt(SMTP_PORT, 10) === 465, // true for 465, false for other ports
+    secure: parseInt(SMTP_PORT, 10) === 465,
     auth: {
       user: SMTP_USER,
       pass: SMTP_PASS,

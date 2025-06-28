@@ -19,11 +19,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { timezones } from '@/lib/timezones';
-
-interface TimezoneSelectProps {
-  value: string;
-  onChange: (value: string) => void;
-}
+import type { TimezoneSelectProps } from '@/interfaces/components/timezone-select.interfaces';
 
 export function TimezoneSelect({ value, onChange }: TimezoneSelectProps) {
   const [open, setOpen] = React.useState(false);

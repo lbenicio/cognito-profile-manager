@@ -14,7 +14,6 @@ import { Button } from '@/components/ui/button';
 import { KeyRound, Loader2, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from 'next-intl';
-import type { User } from '@/lib/auth';
 import { deletePasskey } from '@/lib/passkey-actions';
 import {
   Table,
@@ -37,10 +36,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
-
-interface PasskeyManagementProps {
-  user: User;
-}
+import type { PasskeyManagementProps } from '@/interfaces/components/passkey-management.interfaces';
 
 export function PasskeyManagement({ user }: PasskeyManagementProps) {
   const { toast } = useToast();
@@ -49,9 +45,9 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  const [isAddingPasskey, setIsAddingPasskey] = useState(false);
+  const [isAddingPasskey, setIsAddingPasskey] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
-  const [isMounted, setIsMounted] = useState(false);
+  const [isMounted, setIsMounted] = useState<boolean>(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -60,7 +56,6 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
     const errorDescription = searchParams.get('error_description');
 
     if (error || result) {
-      // Clean the URL to prevent the toast from re-appearing on refresh.
       const currentPath = window.location.pathname;
       window.history.replaceState(null, '', currentPath);
 
@@ -82,12 +77,12 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
     }
   }, [searchParams, router, t, toast]);
 
-  const handleAddPasskey = () => {
+  const handleAddPasskey = (): void => {
     setIsAddingPasskey(true);
     window.location.href = '/api/v1/auth/passkey/start';
   };
 
-  const handleDeletePasskey = (key: string) => {
+  const handleDeletePasskey = (key: string): void => {
     startTransition(async () => {
       setIsDeleting(key);
       const result = await deletePasskey(key);

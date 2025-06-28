@@ -36,17 +36,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import type { User as UserType } from '@/lib/auth';
 import { useTranslations } from 'next-intl';
 import { format } from 'date-fns';
 import UAParser from 'ua-parser-js';
 import { Progress } from '@/components/ui/progress';
 import { SessionInfoCard } from './session-info-card';
 import { LoginActivityChart } from './login-activity-chart';
-
-interface DashboardViewProps {
-  user: UserType;
-}
+import type { DashboardViewProps } from '@/interfaces/components/dashboard-view.interfaces';
 
 const formatUserAgent = (uaString: string): string => {
   if (!uaString || uaString === 'Unknown') {
@@ -81,7 +77,7 @@ const formatUserAgent = (uaString: string): string => {
 
 export function DashboardView({ user }: DashboardViewProps) {
   const t = useTranslations('Dashboard');
-  const [isMounted, setIsMounted] = useState(false);
+  const [isMounted, setIsMounted] = useState<boolean>(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -126,7 +122,6 @@ export function DashboardView({ user }: DashboardViewProps) {
 
       <div className='grid grid-cols-1 gap-8 lg:grid-cols-3'>
         <div className='space-y-8 lg:col-span-2'>
-          {/* Profile Card */}
           <Card>
             <CardHeader className='flex flex-row items-center gap-4'>
               <Avatar className='h-16 w-16'>
@@ -197,7 +192,6 @@ export function DashboardView({ user }: DashboardViewProps) {
             </CardFooter>
           </Card>
 
-          {/* Login History Card */}
           <Card>
             <CardHeader>
               <CardTitle>{t('loginHistory.title')}</CardTitle>
@@ -259,7 +253,6 @@ export function DashboardView({ user }: DashboardViewProps) {
         <div className='space-y-8 lg:col-span-1'>
           <SessionInfoCard user={user} />
 
-          {/* Security Health Card */}
           <Card className='flex flex-col'>
             <CardHeader>
               <CardTitle className='flex items-center gap-2'>
@@ -300,7 +293,6 @@ export function DashboardView({ user }: DashboardViewProps) {
             </CardFooter>
           </Card>
 
-          {/* Profile Completion Card */}
           <Card className='flex flex-col'>
             <CardHeader>
               <CardTitle className='flex items-center gap-2'>
@@ -348,7 +340,6 @@ export function DashboardView({ user }: DashboardViewProps) {
             </CardFooter>
           </Card>
 
-          {/* Quick Actions Card */}
           <Card>
             <CardHeader>
               <CardTitle>{t('quickActions.title')}</CardTitle>

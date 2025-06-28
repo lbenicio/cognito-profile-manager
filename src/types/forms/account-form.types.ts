@@ -1,8 +1,4 @@
 import * as z from 'zod';
-import type {
-  AccountFormProps,
-  AccountFormValues,
-} from '@/interfaces/forms/account-form.interfaces';
 
 /**
  * Schema for the Account Form using zod.
@@ -36,3 +32,8 @@ export const accountFormSchema = (t: (key: string) => string) =>
       .max(250, { message: t('aboutMeTooLong') })
       .optional(),
   });
+
+/**
+ * Type for Account Form values, inferred from the schema.
+ */
+export type AccountFormValues = z.infer<ReturnType<typeof accountFormSchema>>;

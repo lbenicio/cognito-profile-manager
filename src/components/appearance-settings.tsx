@@ -19,11 +19,8 @@ import { Slider } from '@/components/ui/slider';
 import { LanguageSelect } from './language-select';
 import { updateUserPreferences } from '@/lib/preference-actions';
 import { useToast } from '@/hooks/use-toast';
-import type { User as UserType, UserPreferences } from '@/lib/auth';
-
-interface AppearanceSettingsProps {
-  user: UserType;
-}
+import type { UserPreferences } from '@/types/user/user.types';
+import type { AppearanceSettingsProps } from '@/interfaces/components/appearance-settings.interfaces';
 
 export function AppearanceSettings({ user }: AppearanceSettingsProps) {
   const t = useTranslations('Settings.appearance');
@@ -31,13 +28,13 @@ export function AppearanceSettings({ user }: AppearanceSettingsProps) {
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
 
-  const handlePreferenceChange = (newPrefs: Partial<UserPreferences>) => {
+  const handlePreferenceChange = (
+    newPrefs: Partial<UserPreferences>
+  ): void => {
     startTransition(async () => {
-      // Optimistically update the UI theme immediately
       if (newPrefs.theme) {
         setTheme(newPrefs.theme);
       }
-      // Optimistically update the font size immediately
       if (newPrefs.fontSize) {
         document.documentElement.style.fontSize = `${newPrefs.fontSize}pt`;
       }
@@ -53,7 +50,7 @@ export function AppearanceSettings({ user }: AppearanceSettingsProps) {
     });
   };
 
-  const handleFontSizeChange = (value: number[]) => {
+  const handleFontSizeChange = (value: number[]): void => {
     const newSize = value[0];
     if (newSize) {
       handlePreferenceChange({ fontSize: newSize });

@@ -21,12 +21,8 @@ import {
   Languages,
   Cake,
 } from 'lucide-react';
-import type { User } from '@/lib/auth';
 import { format, parseISO } from 'date-fns';
-
-interface PublicProfileDisplayProps {
-  user: User;
-}
+import type { PublicProfileDisplayProps } from '@/interfaces/components/public-profile-display.interfaces';
 
 export function PublicProfileDisplay({ user }: PublicProfileDisplayProps) {
   const t = useTranslations('Profile.preview');

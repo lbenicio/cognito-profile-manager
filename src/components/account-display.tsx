@@ -22,14 +22,12 @@ import {
   Languages,
   Edit,
   PersonStanding,
-  BookUser,
   Image as ImageIcon,
   Cake,
 } from 'lucide-react';
 import Image from 'next/image';
 import { format, parseISO } from 'date-fns';
 import { useTranslations } from 'next-intl';
-import type { User } from '@/lib/auth';
 import {
   Dialog,
   DialogContent,
@@ -44,25 +42,19 @@ import { BannerEditor } from './banner-editor';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
+import type { AccountDisplayProps } from '@/interfaces/components/account-display.interfaces';
 
-export function AccountDisplay({
-  user,
-  onUpdateAction,
-}: {
-  user: User;
-  onUpdateAction: (data: Partial<User>) => void;
-}) {
+export function AccountDisplay({ user, onUpdateAction }: AccountDisplayProps) {
   const t = useTranslations('Dashboard');
   const tAccount = useTranslations('Account');
   const tDashboard = useTranslations('Dashboard.profileCard');
-  const [isAvatarEditorOpen, setIsAvatarEditorOpen] = useState(false);
-  const [isBannerEditorOpen, setIsBannerEditorOpen] = useState(false);
+  const [isAvatarEditorOpen, setIsAvatarEditorOpen] = useState<boolean>(false);
+  const [isBannerEditorOpen, setIsBannerEditorOpen] = useState<boolean>(false);
   const [memberSince, setMemberSince] = useState<string | null>(null);
 
-  // Logic for verification actions
   const { toast } = useToast();
-  const [emailLoading, setEmailLoading] = useState(false);
-  const [phoneLoading, setPhoneLoading] = useState(false);
+  const [emailLoading, setEmailLoading] = useState<boolean>(false);
+  const [phoneLoading, setPhoneLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (user.creationDate) {
@@ -70,7 +62,7 @@ export function AccountDisplay({
     }
   }, [user.creationDate]);
 
-  const handleSendVerificationEmail = async () => {
+  const handleSendVerificationEmail = async (): Promise<void> => {
     setEmailLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
     toast({
@@ -82,7 +74,7 @@ export function AccountDisplay({
     setEmailLoading(false);
   };
 
-  const handleSendVerificationSms = async () => {
+  const handleSendVerificationSms = async (): Promise<void> => {
     setPhoneLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
     toast({

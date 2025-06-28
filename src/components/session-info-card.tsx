@@ -11,12 +11,8 @@ import {
 } from '@/components/ui/card';
 import { Clock, Computer, Globe, Timer } from 'lucide-react';
 import { format, formatDistanceToNowStrict } from 'date-fns';
-import type { User } from '@/lib/auth';
 import UAParser from 'ua-parser-js';
-
-interface SessionInfoCardProps {
-  user: User;
-}
+import type { SessionInfoCardProps } from '@/interfaces/components/session-info-card.interfaces';
 
 const formatUserAgent = (uaString: string): string => {
   if (!uaString || uaString === 'Unknown') {
@@ -51,13 +47,13 @@ const formatUserAgent = (uaString: string): string => {
 
 export function SessionInfoCard({ user }: SessionInfoCardProps) {
   const t = useTranslations('Dashboard.sessionInfo');
-  const [timeLeft, setTimeLeft] = useState('');
-  const [isMounted, setIsMounted] = useState(false);
+  const [timeLeft, setTimeLeft] = useState<string>('');
+  const [isMounted, setIsMounted] = useState<boolean>(false);
 
   useEffect(() => {
     setIsMounted(true);
 
-    const calculateTimeLeft = () => {
+    const calculateTimeLeft = (): void => {
       const expiresAt = new Date(user.sessionExpiresAt * 1000);
       const now = new Date();
       if (expiresAt < now) {

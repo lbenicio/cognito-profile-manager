@@ -1,6 +1,6 @@
 'use client';
 
-import { Link, useRouter } from '@/navigation';
+import { Link } from '@/navigation';
 import {
   LogOut,
   Settings,
@@ -32,43 +32,18 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from './theme-toggle';
 import { LanguageSwitcher } from './language-switcher';
-import type { User as UserType } from '@/lib/auth';
 import { Separator } from '@/components/ui/separator';
 import { useTransition } from 'react';
-import { useToast } from '@/hooks/use-toast';
 import { localLogout } from '@/lib/auth-actions';
+import type { HeaderProps } from '@/interfaces/components/header.interfaces';
 
-type HeaderTranslations = {
-  title: string;
-  userMenu: {
-    profile: string;
-    settings: string;
-    logout: string;
-    adminDashboard: string;
-    account: string;
-    security: string;
-  };
-  mobileMenuTitle: string;
-  mobileMenuTrigger: string;
-  language: string;
-};
-
-export function Header({
-  user,
-  translations: t,
-}: {
-  user: UserType | null;
-  translations: HeaderTranslations;
-}) {
+export function Header({ user, translations: t }: HeaderProps) {
   const adminDashboardUrl = process.env.NEXT_PUBLIC_ADMIN_DASHBOARD_URL || '#';
   const currentLanguage = user?.preferences?.language || 'en';
   const [isLoggingOut, startTransition] = useTransition();
-  const { toast } = useToast();
 
-  const handleLogout = () => {
+  const handleLogout = (): void => {
     startTransition(() => {
-      // This is a local logout. It clears the session and redirects to /login.
-      // It does not perform a full OIDC single-logout.
       localLogout();
     });
   };
@@ -76,13 +51,11 @@ export function Header({
   return (
     <header className='sticky top-0 z-50 w-full border-b bg-card shadow-sm'>
       <div className='container mx-auto flex h-16 items-center justify-between px-4 md:px-8'>
-        {/* Left side: App Logo and Title */}
         <Link href='/' className='flex items-center gap-2 text-xl font-bold'>
           <LayoutDashboard className='h-6 w-6 text-primary' />
           <span className='hidden sm:inline-block'>{t.title}</span>
         </Link>
 
-        {/* Right side: Controls */}
         <div className='flex items-center gap-2'>
           <ThemeToggle />
           <LanguageSwitcher
@@ -91,7 +64,6 @@ export function Header({
           />
           {user && (
             <>
-              {/* Desktop: User Avatar Dropdown */}
               <div className='hidden md:block'>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -165,23 +137,26 @@ export function Header({
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={handleLogout}
-                      disabled={isLoggingOut}
-                      className='cursor-pointer'
-                    >
-                      {isLoggingOut ? (
-                        <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                      ) : (
-                        <LogOut className='mr-2 h-4 w-4' />
-                      )}
-                      <span>{t.userMenu.logout}</span>
-                    </DropdownMenuItem>
+                    <form action={handleLogout}>
+                      <DropdownMenuItem
+                        asChild
+                        disabled={isLoggingOut}
+                        className='cursor-pointer'
+                      >
+                        <button type='submit' className='w-full'>
+                          {isLoggingOut ? (
+                            <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                          ) : (
+                            <LogOut className='mr-2 h-4 w-4' />
+                          )}
+                          <span>{t.userMenu.logout}</span>
+                        </button>
+                      </DropdownMenuItem>
+                    </form>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
 
-              {/* Mobile: Hamburger Menu Sheet */}
               <div className='md:hidden'>
                 <Sheet>
                   <SheetTrigger asChild>
@@ -284,21 +259,23 @@ export function Header({
                       </SheetClose>
                     </nav>
                     <div className='mt-auto border-t p-4'>
-                      <SheetClose asChild>
-                        <Button
-                          variant='outline'
-                          className='w-full cursor-pointer justify-start'
-                          onClick={handleLogout}
-                          disabled={isLoggingOut}
-                        >
-                          {isLoggingOut ? (
-                            <Loader2 className='mr-3 h-4 w-4 animate-spin' />
-                          ) : (
-                            <LogOut className='mr-3 h-4 w-4' />
-                          )}
-                          <span>{t.userMenu.logout}</span>
-                        </Button>
-                      </SheetClose>
+                      <form action={handleLogout}>
+                        <SheetClose asChild>
+                          <Button
+                            type='submit'
+                            variant='outline'
+                            className='w-full cursor-pointer justify-start'
+                            disabled={isLoggingOut}
+                          >
+                            {isLoggingOut ? (
+                              <Loader2 className='mr-3 h-4 w-4 animate-spin' />
+                            ) : (
+                              <LogOut className='mr-3 h-4 w-4' />
+                            )}
+                            <span>{t.userMenu.logout}</span>
+                          </Button>
+                        </SheetClose>
+                      </form>
                     </div>
                   </SheetContent>
                 </Sheet>

@@ -15,32 +15,26 @@ import { Smartphone, Loader2, Copy } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from 'next-intl';
-import type { User } from '@/lib/auth';
 import {
   generateMfaSetup,
   verifyAndEnableMfa,
   disableMfa,
 } from '@/lib/mfa-actions';
-
-interface TwoFactorAuthProps {
-  user: User;
-  onUpdate: (data: Partial<User>) => void;
-}
+import type { TwoFactorAuthProps } from '@/interfaces/components/two-factor-auth.interfaces';
 
 export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
   const { toast } = useToast();
   const t = useTranslations('Security.twoFactor');
 
-  // MFA/TOTP State
-  const [showSetup, setShowSetup] = useState(false);
-  const [qrCode, setQrCode] = useState('');
-  const [secret, setSecret] = useState('');
-  const [otpCode, setOtpCode] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [isDisablingMfa, setIsDisablingMfa] = useState(false);
+  const [showSetup, setShowSetup] = useState<boolean>(false);
+  const [qrCode, setQrCode] = useState<string>('');
+  const [secret, setSecret] = useState<string>('');
+  const [otpCode, setOtpCode] = useState<string>('');
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
+  const [isDisablingMfa, setIsDisablingMfa] = useState<boolean>(false);
 
-  const handleStartSetup = async () => {
+  const handleStartSetup = async (): Promise<void> => {
     setIsGenerating(true);
     try {
       const { qrCodeDataUrl, secretCode } = await generateMfaSetup();
@@ -59,14 +53,14 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
     }
   };
 
-  const handleCancelSetup = () => {
+  const handleCancelSetup = (): void => {
     setShowSetup(false);
     setQrCode('');
     setOtpCode('');
     setSecret('');
   };
 
-  const handleCopySecret = () => {
+  const handleCopySecret = (): void => {
     if (!secret) return;
     navigator.clipboard.writeText(secret).then(() => {
       toast({
@@ -76,7 +70,7 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
     });
   };
 
-  const handleVerifyOtp = async () => {
+  const handleVerifyOtp = async (): Promise<void> => {
     setIsVerifying(true);
     try {
       const result = await verifyAndEnableMfa(otpCode);
@@ -109,7 +103,7 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
     }
   };
 
-  const handleDisableOtp = async () => {
+  const handleDisableOtp = async (): Promise<void> => {
     setIsDisablingMfa(true);
     try {
       const result = await disableMfa();
