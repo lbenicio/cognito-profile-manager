@@ -109,23 +109,30 @@ export function DashboardView({ user }: DashboardViewProps) {
                     </div>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-3">
-                    <Mail className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                    <span className="truncate">{user.email}</span>
+              <CardContent className="grid grid-cols-1 gap-6 pt-6 md:grid-cols-2">
+                <div className="flex items-start gap-4">
+                  <Mail className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
+                  <div>
+                    <h4 className="font-semibold text-sm">{t('profileCard.email')}</h4>
+                    <p className="text-sm text-muted-foreground truncate">{user.email}</p>
+                  </div>
                 </div>
-                <div className="flex items-start gap-3">
-                    <Users className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
-                    <div className="flex-1">
-                        <span className="font-semibold">{t('profileCard.groups')}</span>
-                        <div className="flex flex-wrap gap-2 mt-2">
-                            {user.groups.length > 0 ? user.groups.map(group => (
-                                <Badge key={group} variant="outline">{group}</Badge>
-                            )) : (
-                                <span className="text-muted-foreground">{t('profileCard.noGroups')}</span>
-                            )}
-                        </div>
+                <div className="flex items-start gap-4">
+                  <Users className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
+                  <div>
+                    <h4 className="font-semibold text-sm">{t('profileCard.groups')}</h4>
+                    <div className="mt-1 flex flex-wrap gap-2">
+                      {user.groups.length > 0 ? (
+                        user.groups.map((group) => (
+                          <Badge key={group} variant="outline">
+                            {group}
+                          </Badge>
+                        ))
+                      ) : (
+                        <p className="text-sm text-muted-foreground">{t('profileCard.noGroups')}</p>
+                      )}
                     </div>
+                  </div>
                 </div>
               </CardContent>
               <CardFooter>
