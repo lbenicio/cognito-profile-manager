@@ -1,3 +1,4 @@
+
 import 'server-only';
 import {
   CognitoIdentityProviderClient,
@@ -12,6 +13,7 @@ import {
   ListDevicesCommand,
   ForgetDeviceCommand,
   ListWebAuthnCredentialsCommand,
+  DeleteWebAuthnCredentialCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
 
 const region = process.env.AWS_REGION;
@@ -36,5 +38,6 @@ export {
   ListDevicesCommand,
   ForgetDeviceCommand,
   ListWebAuthnCredentialsCommand,
+  DeleteWebAuthnCredentialCommand,
   CognitoIdentityProviderClient,
 };

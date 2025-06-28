@@ -3,7 +3,7 @@ import 'server-only';
 import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
-import { cognitoClient, GetUserCommand, ListDevicesCommand } from '@/lib/cognito';
+import { cognitoClient, GetUserCommand, ListWebAuthnCredentialsCommand } from '@/lib/cognito';
 
 
 // Define the User type, which should match what the components expect.
@@ -359,32 +359,32 @@ export const getUser = cache(async (): Promise<User | null> => {
       }
     }
 
-    // Fetch user's registered devices (including passkeys).
+    // Fetch user's registered WebAuthn credentials (passkeys).
     let devices: Device[] = [];
     try {
-      const listDevicesCommand = new ListDevicesCommand({
+      const listCredentialsCommand = new ListWebAuthnCredentialsCommand({
         AccessToken: session.access_token,
       });
-      const devicesResponse = await cognitoClient.send(listDevicesCommand);
+      const credentialsResponse = await cognitoClient.send(listCredentialsCommand);
 
-      devices = (devicesResponse.Devices || [])
-        .map((device) => {
-          const deviceNameAttr = device.DeviceAttributes?.find(
-            (attr) => attr.Name === 'device_name'
-          );
-          // Provide a sensible fallback name. The device key is too long and not user-friendly.
-          const name = deviceNameAttr?.Value || `Security Key`;
+      devices = (credentialsResponse.Credentials || [])
+        .map((credential) => {
+          if (!credential.CredentialId) return null;
 
+          // Create a user-friendly name. The API doesn't provide one.
+          const name = `Passkey (${credential.CredentialId.slice(0, 4)}...${credential.CredentialId.slice(-4)})`;
+          
           return {
-            key: device.DeviceKey || '',
+            key: credential.CredentialId,
             name: name,
-            createDate: device.DeviceCreateDate?.toISOString(),
-            lastAuthDate: device.DeviceLastAuthenticatedDate?.toISOString(),
+            createDate: credential.CreateDate?.toISOString(),
+            lastAuthDate: credential.LastUsedDate?.toISOString(),
           };
         })
-        .filter((d) => d.key);
+        .filter((d): d is Device => d !== null);
+
     } catch (e: any) {
-      console.error('Could not fetch devices for user:', e);
+      console.error('Could not fetch WebAuthn credentials for user:', e);
     }
 
     return {

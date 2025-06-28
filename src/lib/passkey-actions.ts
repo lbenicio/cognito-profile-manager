@@ -1,37 +1,37 @@
+
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { cognitoClient, ForgetDeviceCommand, ListDevicesCommand, UpdateUserAttributesCommand } from './cognito';
+import { cognitoClient, DeleteWebAuthnCredentialCommand, ListWebAuthnCredentialsCommand, UpdateUserAttributesCommand } from './cognito';
 import { getSession } from './auth';
 
 export async function deletePasskey(
-  deviceKey: string
+  credentialId: string
 ): Promise<{ success: boolean; message: string }> {
   const session = await getSession();
   if (!session) {
     return { success: false, message: 'Not authenticated' };
   }
 
-  if (!deviceKey) {
-    return { success: false, message: 'Device key is required.' };
+  if (!credentialId) {
+    return { success: false, message: 'Credential ID is required.' };
   }
 
   try {
-    const forgetCommand = new ForgetDeviceCommand({
+    const deleteCommand = new DeleteWebAuthnCredentialCommand({
       AccessToken: session.access_token,
-      DeviceKey: deviceKey,
+      CredentialId: credentialId,
     });
-    await cognitoClient.send(forgetCommand);
+    await cognitoClient.send(deleteCommand);
 
-    // After deleting, check if any devices remain.
-    const listDevicesCommand = new ListDevicesCommand({
+    // After deleting, check if any credentials remain.
+    const listCredentialsCommand = new ListWebAuthnCredentialsCommand({
         AccessToken: session.access_token,
-        Limit: 1, // We just need to know if the list is empty or not
     });
-    const devicesResponse = await cognitoClient.send(listDevicesCommand);
+    const credentialsResponse = await cognitoClient.send(listCredentialsCommand);
 
-    if (!devicesResponse.Devices || devicesResponse.Devices.length === 0) {
-        // If no devices are left, update the custom attribute.
+    if (!credentialsResponse.Credentials || credentialsResponse.Credentials.length === 0) {
+        // If no credentials are left, update the custom attribute.
         const updateUserAttrCommand = new UpdateUserAttributesCommand({
             AccessToken: session.access_token,
             UserAttributes: [{
