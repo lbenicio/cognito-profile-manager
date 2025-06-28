@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
   const result = searchParams.get('result');
   const errorParam = searchParams.get('error');
-  const errorDescription = searchParams.get('error_description');
+  const errorDescription = search_params.get('error_description');
   
   // --- Security Checks ---
   if (errorParam) {
@@ -35,13 +35,13 @@ export async function GET(request: NextRequest) {
 
   try {
     const session = await getSession();
-    if (!session?.access_token) {
+    if (!session?.accessToken) {
       throw new Error('No active session found. Please log in again.');
     }
     
     // If the result is "success", update the user attribute in Cognito to reflect that passkeys are enabled.
     const updateUserAttrCommand = new UpdateUserAttributesCommand({
-        AccessToken: session.access_token,
+        AccessToken: session.accessToken,
         UserAttributes: [{
             Name: 'custom:pless',
             Value: 'true',

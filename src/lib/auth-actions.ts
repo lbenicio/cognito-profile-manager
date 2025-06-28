@@ -9,7 +9,7 @@ export async function devAdminLogin() {
   if (process.env.NODE_ENV !== 'development') {
     return 'This action is only available in development.';
   }
-  const sessionData = { username: 'admin', email: 'sso-admin-dev@example.com' };
+  const sessionData = { username: 'admin' };
 
   // Determine if the connection is secure by checking the protocol header
   const protocol = headers().get('x-forwarded-proto') || 'http';
@@ -20,7 +20,7 @@ export async function devAdminLogin() {
     secure: isSecure,
     maxAge: 60 * 60 * 24 * 7, // 1 week
     path: '/',
-    sameSite: isSecure ? 'none' : 'lax',
+    sameSite: 'lax',
   });
   redirect('/');
 }

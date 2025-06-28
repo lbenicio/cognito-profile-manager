@@ -1,3 +1,4 @@
+
 'use server';
 
 import { revalidatePath } from 'next/cache';
@@ -9,7 +10,7 @@ export async function updatePublicProfilePreferences(
 ): Promise<{ success: boolean; message: string }> {
   const session = await getSession();
 
-  if (!session) {
+  if (!session?.accessToken) {
     return { success: false, message: 'Not authenticated' };
   }
 
@@ -17,7 +18,7 @@ export async function updatePublicProfilePreferences(
     const preferencesJson = JSON.stringify(newPreferences);
 
     const command = new UpdateUserAttributesCommand({
-      AccessToken: session.access_token,
+      AccessToken: session.accessToken,
       UserAttributes: [
         { Name: 'custom:public-profile', Value: preferencesJson },
       ],

@@ -2,7 +2,7 @@
 import 'server-only';
 import { cache } from 'react';
 import { cookies } from 'next/headers';
-import { jwtVerify, createRemoteJWKSet } from 'jose';
+import { jwtVerify, createRemoteJWKSet, type JWTPayload } from 'jose';
 import { cognitoClient, GetUserCommand, ListWebAuthnCredentialsCommand } from '@/lib/cognito';
 
 
@@ -85,12 +85,20 @@ export type User = {
   sessionExpiresAt: number; // Unix timestamp (seconds)
 };
 
-export type Session = {
-  id_token: string;
-  access_token: string;
-  refresh_token: string;
-  username?: string; // for dev mode
+export type Session = ({
+  claims: JWTPayload;
+  accessToken: string;
+  refreshToken: string;
+} | {
+  // For dev mode
+  username: string;
+  claims?: never;
+  accessToken?: never;
+  refreshToken?: never;
+}) & {
+  // Common properties for both session types
 } | null;
+
 
 const defaultPreferences: UserPreferences = {
   theme: 'system',
@@ -161,7 +169,7 @@ const mockUser: User = {
   devices: [
     {
         key: 'mock_device_1',
-        name: 'Chrome on macOS',
+        name: 'Passkey on macOS',
         createDate: new Date(Date.now() - 86400000 * 2).toISOString(),
         lastAuthDate: new Date(Date.now() - 86400000 * 2).toISOString(),
     }
@@ -182,57 +190,20 @@ const mockAdminUser: User = {
 };
 
 
-const getRawSession = cache(async (): Promise<Session> => {
+export const getSession = cache(async (): Promise<Session> => {
   const sessionCookie = (await cookies()).get('auth_session')?.value;
   if (!sessionCookie) return null;
   try {
-    return JSON.parse(sessionCookie);
-  } catch {
-    return null;
-  }
-});
+    const session = JSON.parse(sessionCookie);
 
-export const getSession = cache(async (): Promise<Session> => {
-  const session = await getRawSession();
-  if (!session) return null;
-
-  // Dev mode mock session doesn't need validation/refresh
-  if (session.username && !session.id_token) {
-    return session;
-  }
-
-  if (!session.id_token) {
-    return null;
-  }
-
-  const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
-  if (!wellknownUrl) {
-    console.error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
-    return null;
-  }
-
-  try {
-    const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
-    if (!wellknownResponse.ok)
-      throw new Error('Failed to fetch OpenID configuration');
-    const wellknown = await wellknownResponse.json();
-    const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
-
-    // This will throw if the token is invalid or expired
-    await jwtVerify(session.id_token, JWKS, {
-      issuer: wellknown.issuer,
-      audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
-    });
-
-    // If we get here, the token is valid (not expired, signature is good)
-    return session;
-  } catch (error: any) {
-    // If validation fails (e.g., expired, invalid signature), treat session as invalid.
-    // Middleware is responsible for handling the refresh. If we get an expired
-    // token here, it means the refresh likely failed.
-    if (error.code !== 'ERR_JWT_EXPIRED') {
-      console.error('JWT validation error in getSession:', error.message);
+    // Middleware handles validation and refresh, so here we just trust the parsed cookie.
+    // If it has 'claims', it's a real session. If it has 'username', it's a dev session.
+    if (session.claims || session.username) {
+        return session;
     }
+    return null;
+
+  } catch {
     return null;
   }
 });
@@ -241,12 +212,8 @@ export const getSession = cache(async (): Promise<Session> => {
 export const getUser = cache(async (): Promise<User | null> => {
   const session = await getSession();
 
-  // Handle mock development session (which doesn't have an id_token)
-  if (
-    process.env.NODE_ENV === 'development' &&
-    session?.username &&
-    !session?.id_token
-  ) {
+  // Handle mock development session
+  if (session?.username) {
     console.log('Using mock user data for development.');
     const baseUser = session.username === 'admin' ? mockAdminUser : mockUser;
     return {
@@ -255,31 +222,18 @@ export const getUser = cache(async (): Promise<User | null> => {
     };
   }
 
-  // If there's no session or no id_token after validation/refresh, there's no real user.
-  if (!session?.id_token) {
-    return null;
-  }
-
-  const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
-  if (!wellknownUrl) {
-    console.error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
+  // If there's no session or it's not a valid session structure, return null.
+  if (!session?.claims || !session.accessToken) {
     return null;
   }
 
   try {
-    const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
-    if (!wellknownResponse.ok)
-      throw new Error('Failed to fetch OpenID configuration');
-    const wellknown = await wellknownResponse.json();
-    const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
-
-    // We trust the token is valid because getSession() handled it.
-    // Now, fetch the most up-to-date user attributes from Cognito.
-    const { payload } = await jwtVerify(session.id_token, JWKS);
+    // Fetch the most up-to-date user attributes from Cognito using the access token.
     const getUserCommand = new GetUserCommand({
-      AccessToken: session.access_token,
+      AccessToken: session.accessToken,
     });
     const cognitoUser = await cognitoClient.send(getUserCommand);
+
     const attributes =
       cognitoUser.UserAttributes?.reduce(
         (acc, attr) => {
@@ -290,11 +244,12 @@ export const getUser = cache(async (): Promise<User | null> => {
         },
         {} as Record<string, string>
       ) || {};
-
+    
+    // Use claims from the session for data that doesn't change or is authoritative from the token.
+    const { claims } = session;
     const adminGroupName = process.env.COGNITO_ADMIN_GROUP_NAME || 'admins';
-    const groupsClaimKey =
-      process.env.COGNITO_GROUPS_CLAIM_KEY || 'cognito:groups';
-    const groups = (payload[groupsClaimKey] as string[]) || [];
+    const groupsClaimKey = process.env.COGNITO_GROUPS_CLAIM_KEY || 'cognito:groups';
+    const groups = (claims[groupsClaimKey] as string[]) || [];
     const isAdmin = groups.includes(adminGroupName);
 
     const freshGivenName = attributes.given_name || '';
@@ -308,33 +263,24 @@ export const getUser = cache(async (): Promise<User | null> => {
           ...JSON.parse(attributes['custom:session']),
         };
       } catch (e) {
-        console.error(
-          'Failed to parse user preferences from GetUser API call',
-          e
-        );
+        console.error('Failed to parse user preferences from GetUser API call', e);
       }
     }
 
-    let publicProfilePreferences: PublicProfilePreferences = {
-      ...defaultPublicProfilePreferences,
-    };
+    let publicProfilePreferences: PublicProfilePreferences = { ...defaultPublicProfilePreferences };
     const publicProfileClaim = attributes['custom:public-profile'];
     if (publicProfileClaim) {
       try {
         const parsedPrefs = JSON.parse(publicProfileClaim);
         publicProfilePreferences = {
-          isPublic:
-            parsedPrefs.isPublic ?? defaultPublicProfilePreferences.isPublic,
+          isPublic: parsedPrefs.isPublic ?? defaultPublicProfilePreferences.isPublic,
           publicFields: {
             ...defaultPublicProfilePreferences.publicFields,
             ...(parsedPrefs.publicFields || {}),
           },
         };
       } catch (e) {
-        console.error(
-          'Failed to parse public profile preferences from GetUser API call',
-          e
-        );
+        console.error('Failed to parse public profile preferences from GetUser API call', e);
       }
     }
 
@@ -352,10 +298,7 @@ export const getUser = cache(async (): Promise<User | null> => {
       try {
         fingerprintData = JSON.parse(attributes['custom:fingerprint']);
       } catch (e) {
-        console.error(
-          'Failed to parse user fingerprint from GetUser API call',
-          e
-        );
+        console.error('Failed to parse user fingerprint from GetUser API call', e);
       }
     }
 
@@ -363,7 +306,7 @@ export const getUser = cache(async (): Promise<User | null> => {
     let devices: Device[] = [];
     try {
       const listCredentialsCommand = new ListWebAuthnCredentialsCommand({
-        AccessToken: session.access_token,
+        AccessToken: session.accessToken,
       });
       const credentialsResponse = await cognitoClient.send(listCredentialsCommand);
 
@@ -371,8 +314,7 @@ export const getUser = cache(async (): Promise<User | null> => {
         .map((credential) => {
           if (!credential.CredentialId) return null;
 
-          // Create a user-friendly name. The API doesn't provide one.
-          const name = `Passkey (${credential.CredentialId.slice(0, 4)}...${credential.CredentialId.slice(-4)})`;
+          const name = `Passkey on ${credential.UserAgent ? credential.UserAgent.split(') ')[0].split(' (').pop() : 'Unknown Device'}`;
           
           return {
             key: credential.CredentialId,
@@ -388,53 +330,40 @@ export const getUser = cache(async (): Promise<User | null> => {
     }
 
     return {
-      sub: payload.sub as string,
-      username:
-        cognitoUser.Username || (payload['cognito:username'] as string) || '',
-      email: attributes.email || (payload.email as string) || '',
+      sub: claims.sub as string,
+      username: cognitoUser.Username || (claims['cognito:username'] as string) || '',
+      email: attributes.email || (claims.email as string) || '',
       email_verified: attributes.email_verified === 'true',
-      name:
-        [freshGivenName, freshFamilyName].filter(Boolean).join(' ') ||
-        (payload.name as string) ||
-        '',
+      name: [freshGivenName, freshFamilyName].filter(Boolean).join(' ') || (claims.name as string) || '',
       address: attributes.address || '',
-      phone_number:
-        attributes.phone_number || (payload.phone_number as string) || '',
+      phone_number: attributes.phone_number || (claims.phone_number as string) || '',
       phone_number_verified: attributes.phone_number_verified === 'true',
       birthdate: attributes.birthdate || '',
-      creationDate: new Date(
-        (payload.auth_time as number) * 1000
-      ).toISOString(),
+      creationDate: new Date((claims.auth_time as number) * 1000).toISOString(),
       userStatus: attributes.email_verified || 'CONFIRMED',
       twoFactorEnabled: attributes['custom:mfa'] === 'true',
       passkeysEnabled: attributes['custom:pless'] === 'true',
       groups: groups,
       isAdmin: isAdmin,
-      picture: attributes.picture || (payload.picture as string) || '',
+      picture: attributes.picture || (claims.picture as string) || '',
       banner: attributes['custom:banner'] || '',
-      locale: attributes.locale || (payload.locale as string) || '',
-      zoneinfo: attributes.zoneinfo || (payload.zoneinfo as string) || '',
-      website: attributes.website || (payload.website as string) || '',
-      gender: attributes.gender || (payload.gender as string) || '',
+      locale: attributes.locale || (claims.locale as string) || '',
+      zoneinfo: attributes.zoneinfo || (claims.zoneinfo as string) || '',
+      website: attributes.website || (claims.website as string) || '',
+      gender: attributes.gender || (claims.gender as string) || '',
       aboutMe: attributes['custom:aboutme'] || '',
       preferences: preferences,
       notificationPreferences: notificationPreferences,
       publicProfilePreferences: publicProfilePreferences,
       fingerprint: fingerprintData,
       devices: devices,
-      sessionStartedAt: payload.auth_time as number,
-      sessionExpiresAt: payload.exp as number,
+      sessionStartedAt: claims.auth_time as number,
+      sessionExpiresAt: claims.exp as number,
     };
   } catch (error: any) {
-    console.error(
-      'General error in getUser, likely during device list or user attribute fetch:',
-      error
-    );
+    console.error('General error in getUser, likely during device list or user attribute fetch:', error);
     // Clearing the cookie here is a safe fallback
-    (await cookies()).set('auth_session', '', {
-      expires: new Date(0),
-      path: '/',
-    });
+    (await cookies()).set('auth_session', '', { expires: new Date(0), path: '/' });
     return null;
   }
 });

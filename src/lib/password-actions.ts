@@ -1,3 +1,4 @@
+
 'use server';
 
 import {
@@ -13,13 +14,13 @@ export async function changePassword(
   newPassword: string
 ): Promise<{ success: boolean; errorType?: 'currentPassword' | 'newPassword'; message: string }> {
   const session = await getSession();
-  if (!session) {
+  if (!session?.accessToken) {
     return { success: false, message: 'Not authenticated' };
   }
 
   try {
     const command = new ChangePasswordCommand({
-      AccessToken: session.access_token,
+      AccessToken: session.accessToken,
       PreviousPassword: currentPassword,
       ProposedPassword: newPassword,
     });

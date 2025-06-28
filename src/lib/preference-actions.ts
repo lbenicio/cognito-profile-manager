@@ -1,3 +1,4 @@
+
 'use server';
 
 import { cookies } from 'next/headers';
@@ -12,7 +13,7 @@ export async function updateUserPreferences(
   const session = await getSession();
   const user = await getUser();
 
-  if (!session || !user) {
+  if (!session?.accessToken || !user) {
     return { success: false, message: 'Not authenticated' };
   }
 
@@ -22,7 +23,7 @@ export async function updateUserPreferences(
     const preferencesJson = JSON.stringify(mergedPreferences);
 
     const command = new UpdateUserAttributesCommand({
-      AccessToken: session.access_token,
+      AccessToken: session.accessToken,
       UserAttributes: [{ Name: 'custom:session', Value: preferencesJson }],
     });
 

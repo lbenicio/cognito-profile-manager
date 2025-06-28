@@ -1,3 +1,4 @@
+
 'use server';
 
 import { PutObjectCommand } from '@aws-sdk/client-s3';
@@ -54,12 +55,12 @@ export async function getPresignedUploadUrl({ type, size }: GetPresignedUrlParam
 
 export async function updateUserAvatar(pictureUrl: string) {
     const session = await getSession();
-    if (!session) {
+    if (!session?.accessToken) {
         throw new Error('Not authenticated');
     }
 
     const command = new UpdateUserAttributesCommand({
-      AccessToken: session.access_token,
+      AccessToken: session.accessToken,
       UserAttributes: [{ Name: 'picture', Value: pictureUrl }],
     });
     

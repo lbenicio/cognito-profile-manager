@@ -1,16 +1,16 @@
 
 'use server';
 
-import { cookies } from 'next/headers';
+import { jwtVerify, createRemoteJWKSet } from 'jose';
+import type { Session } from './auth';
 
-export type NewSessionData = {
+type NewTokenResponse = {
   id_token: string;
   access_token: string;
-  refresh_token: string;
   expires_in?: number;
 };
 
-export async function refreshAuthTokens(refreshToken: string): Promise<NewSessionData | null> {
+export async function refreshAuthTokens(refreshToken: string): Promise<{ newSession: Session, newExpiresIn: number } | null> {
   try {
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     if (!wellknownUrl) throw new Error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
@@ -46,23 +46,30 @@ export async function refreshAuthTokens(refreshToken: string): Promise<NewSessio
       cache: 'no-store',
     });
 
-    const tokens = await tokenResponse.json();
+    const tokens: NewTokenResponse & { refresh_token?: string } = await tokenResponse.json();
 
     if (!tokenResponse.ok) {
-      console.error('Failed to refresh tokens:', tokens.error_description || tokens.error || 'Unknown error');
+      console.error('Failed to refresh tokens:', (tokens as any).error_description || (tokens as any).error || 'Unknown error');
       return null;
     }
 
+    const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
+    const { payload } = await jwtVerify(tokens.id_token, JWKS, {
+        issuer: wellknown.issuer,
+        audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
+    });
+
     // Cognito refresh tokens can be long-lived. The response might not include a new refresh token.
     // If it doesn't, we must reuse the old one.
-    const newSessionData: NewSessionData = {
-      id_token: tokens.id_token,
-      access_token: tokens.access_token,
-      refresh_token: tokens.refresh_token || refreshToken,
-      expires_in: tokens.expires_in,
+    const newSessionData: Session = {
+      claims: payload,
+      accessToken: tokens.access_token,
+      refreshToken: tokens.refresh_token || refreshToken,
     };
+    
+    const newExpiresIn = tokens.expires_in ?? 3600;
 
-    return newSessionData;
+    return { newSession: newSessionData, newExpiresIn };
 
   } catch (error) {
     console.error('Exception in refreshAuthTokens:', error);

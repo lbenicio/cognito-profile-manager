@@ -2,6 +2,7 @@
 'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
+import { jwtVerify, createRemoteJWKSet } from 'jose';
 
 function createErrorResponse(origin: string, error: string, description?: string): NextResponse {
   const loginUrl = new URL('/login', origin);
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
   const errorParam = searchParams.get('error');
-  const errorDescription = searchParams.get('error_description');
+  const errorDescription = search_params.get('error_description');
   const state = searchParams.get('state');
   const storedState = request.cookies.get('oauth_state')?.value;
   const isSecure = new URL(request.url).protocol === 'https:';
@@ -93,12 +94,19 @@ export async function GET(request: NextRequest) {
       console.error(`Token exchange failed with Cognito. Status: ${tokenResponse.status}. Details: ${errorDetails}. Check if the redirect_uri in your Cognito App Client settings matches: ${callbackUrl}`);
       throw new Error(errorDetails);
     }
+    
+    // ** NEW: Verify the ID token on the server and extract claims **
+    const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
+    const { payload } = await jwtVerify(tokens.id_token, JWKS, {
+        issuer: wellknown.issuer,
+        audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
+    });
 
+    // ** NEW: Create a smaller session object for the cookie **
     const sessionData = {
-        id_token: tokens.id_token,
-        access_token: tokens.access_token,
-        refresh_token: tokens.refresh_token,
-        expires_in: tokens.expires_in,
+        claims: payload,
+        accessToken: tokens.access_token,
+        refreshToken: tokens.refresh_token,
     };
 
     const dashboardUrl = new URL('/', origin);
@@ -114,7 +122,7 @@ export async function GET(request: NextRequest) {
       secure: isSecure,
       maxAge: maxAge,
       path: '/',
-      sameSite: isSecure ? 'none' : 'lax',
+      sameSite: 'lax', // Use 'lax' for the main session cookie
     });
     
     response.cookies.set('oauth_state', '', { 

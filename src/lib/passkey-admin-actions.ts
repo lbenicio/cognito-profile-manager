@@ -32,7 +32,7 @@ export async function listCognitoPasskeys(
 
   const session: Session = await getSession();
 
-  if (!session) {
+  if (!session?.accessToken) {
     return {
       success: false,
       message: 'User session not found. Please log in.',
@@ -41,7 +41,7 @@ export async function listCognitoPasskeys(
 
   try {
     const command = new ListWebAuthnCredentialsCommand({
-      AccessToken: session.access_token,
+      AccessToken: session.accessToken,
     });
     const response = await cognitoClient.send(command);
 

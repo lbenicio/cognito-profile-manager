@@ -9,7 +9,7 @@ export async function deletePasskey(
   credentialId: string
 ): Promise<{ success: boolean; message: string }> {
   const session = await getSession();
-  if (!session) {
+  if (!session?.accessToken) {
     return { success: false, message: 'Not authenticated' };
   }
 
@@ -19,21 +19,21 @@ export async function deletePasskey(
 
   try {
     const deleteCommand = new DeleteWebAuthnCredentialCommand({
-      AccessToken: session.access_token,
+      AccessToken: session.accessToken,
       CredentialId: credentialId,
     });
     await cognitoClient.send(deleteCommand);
 
     // After deleting, check if any credentials remain.
     const listCredentialsCommand = new ListWebAuthnCredentialsCommand({
-        AccessToken: session.access_token,
+        AccessToken: session.accessToken,
     });
     const credentialsResponse = await cognitoClient.send(listCredentialsCommand);
 
     if (!credentialsResponse.Credentials || credentialsResponse.Credentials.length === 0) {
         // If no credentials are left, update the custom attribute.
         const updateUserAttrCommand = new UpdateUserAttributesCommand({
-            AccessToken: session.access_token,
+            AccessToken: session.accessToken,
             UserAttributes: [{
                 Name: 'custom:pless',
                 Value: 'false',

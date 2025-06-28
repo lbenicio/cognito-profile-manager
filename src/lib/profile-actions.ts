@@ -1,3 +1,4 @@
+
 'use server';
 
 import { revalidatePath } from 'next/cache';
@@ -7,7 +8,6 @@ import { getSession } from './auth';
 type UserProfileAttributes = {
     given_name: string;
     family_name: string;
-    address: string;
     phone_number: string;
     birthdate?: string;
     website: string;
@@ -16,34 +16,36 @@ type UserProfileAttributes = {
     aboutMe: string;
 }
 
-export async function updateUserProfile(data: UserProfileAttributes): Promise<{ success: boolean; message: string }> {
+export async function updateUserProfile(data: Partial<UserProfileAttributes>): Promise<{ success: boolean; message: string }> {
     const session = await getSession();
-    if (!session) {
+    if (!session?.accessToken) {
         return { success: false, message: 'Not authenticated' };
     }
 
     try {
-        const attributesToUpdate = [
-            { Name: 'given_name', Value: data.given_name },
-            { Name: 'family_name', Value: data.family_name },
-            { Name: 'phone_number', Value: data.phone_number },
-            { Name: 'website', Value: data.website },
-            { Name: 'zoneinfo', Value: data.zoneinfo },
-            { Name: 'gender', Value: data.gender },
-            { Name: 'custom:aboutme', Value: data.aboutMe },
-            { Name: 'name', Value: `${data.given_name} ${data.family_name}`.trim() },
-        ];
-
-        if (data.birthdate) {
-            attributesToUpdate.push({ Name: 'birthdate', Value: data.birthdate });
+        const attributesToUpdate = Object.entries(data)
+          .filter(([_, value]) => value !== undefined && value !== null)
+          .map(([key, value]) => {
+            const cognitoKey = key === 'aboutMe' ? 'custom:aboutme' : key;
+            return { Name: cognitoKey, Value: String(value) };
+          });
+        
+        // Ensure name attribute is always updated if given_name or family_name changes
+        if(data.given_name || data.family_name) {
+            const user = await getSession();
+            const currentName = user?.claims?.name as string || '';
+            const [currentGiven, ...currentFamily] = currentName.split(' ');
+            const newGiven = data.given_name || currentGiven;
+            const newFamily = data.family_name || currentFamily.join(' ');
+            attributesToUpdate.push({ Name: 'name', Value: `${newGiven} ${newFamily}`.trim() });
         }
-        if (data.address) {
-            attributesToUpdate.push({ Name: 'address', Value: data.address });
-        }
 
+        if (attributesToUpdate.length === 0) {
+            return { success: true, message: 'No changes to update.' };
+        }
 
         const command = new UpdateUserAttributesCommand({
-            AccessToken: session.access_token,
+            AccessToken: session.accessToken,
             UserAttributes: attributesToUpdate,
         });
         await cognitoClient.send(command);
@@ -63,13 +65,13 @@ export async function updateUserProfile(data: UserProfileAttributes): Promise<{ 
 
 export async function updateUserAddress(address: string): Promise<{ success: boolean; message: string }> {
     const session = await getSession();
-    if (!session) {
+    if (!session?.accessToken) {
         return { success: false, message: 'Not authenticated' };
     }
 
     try {
         const command = new UpdateUserAttributesCommand({
-            AccessToken: session.access_token,
+            AccessToken: session.accessToken,
             UserAttributes: [
                 { Name: 'address', Value: address },
             ],
@@ -77,6 +79,7 @@ export async function updateUserAddress(address: string): Promise<{ success: boo
         await cognitoClient.send(command);
         
         revalidatePath('/account');
+        revalidatePath('/profile');
 
         return { success: true, message: 'Address updated successfully.' };
 

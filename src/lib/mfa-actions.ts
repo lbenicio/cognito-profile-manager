@@ -1,3 +1,4 @@
+
 'use server';
 
 import { authenticator } from 'otplib';
@@ -15,12 +16,12 @@ import { getUser, getSession } from './auth';
 export async function generateMfaSetup() {
   const user = await getUser();
   const session = await getSession();
-  if (!user || !session) {
+  if (!user || !session?.accessToken) {
     throw new Error('Not authenticated');
   }
 
   const command = new AssociateSoftwareTokenCommand({
-    AccessToken: session.access_token,
+    AccessToken: session.accessToken,
   });
 
   const response = await cognitoClient.send(command);
@@ -45,19 +46,19 @@ export async function verifyAndEnableMfa(
   code: string
 ): Promise<{ success: boolean; message: string }> {
   const session = await getSession();
-  if (!session) {
+  if (!session?.accessToken) {
     throw new Error('Not authenticated');
   }
 
   try {
     const verifyCommand = new VerifySoftwareTokenCommand({
-      AccessToken: session.access_token,
+      AccessToken: session.accessToken,
       UserCode: code,
     });
     await cognitoClient.send(verifyCommand);
 
     const setMfaCommand = new SetUserMFAPreferenceCommand({
-      AccessToken: session.access_token,
+      AccessToken: session.accessToken,
       SoftwareTokenMfaSettings: {
         Enabled: true,
         PreferredMfa: true,
@@ -66,7 +67,7 @@ export async function verifyAndEnableMfa(
     await cognitoClient.send(setMfaCommand);
     
     const updateUserAttrCommand = new UpdateUserAttributesCommand({
-        AccessToken: session.access_token,
+        AccessToken: session.accessToken,
         UserAttributes: [{ Name: 'custom:mfa', Value: 'true' }],
     });
     await cognitoClient.send(updateUserAttrCommand);
@@ -92,13 +93,13 @@ export async function verifyAndEnableMfa(
 
 export async function disableMfa(): Promise<{ success: boolean; message: string }> {
   const session = await getSession();
-  if (!session) {
+  if (!session?.accessToken) {
     throw new Error('Not authenticated');
   }
 
   try {
     const command = new SetUserMFAPreferenceCommand({
-      AccessToken: session.access_token,
+      AccessToken: session.accessToken,
       SoftwareTokenMfaSettings: {
         Enabled: false,
         PreferredMfa: false,
@@ -107,7 +108,7 @@ export async function disableMfa(): Promise<{ success: boolean; message: string 
     await cognitoClient.send(command);
 
     const updateUserAttrCommand = new UpdateUserAttributesCommand({
-        AccessToken: session.access_token,
+        AccessToken: session.accessToken,
         UserAttributes: [{ Name: 'custom:mfa', Value: 'false' }],
     });
     await cognitoClient.send(updateUserAttrCommand);

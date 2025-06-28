@@ -4,12 +4,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { pathnames } from '@/navigation';
+import { jwtVerify, createRemoteJWKSet } from 'jose';
 
 export async function GET(request: NextRequest) {
   try {
-    // 1. Check for active session with a valid ID token
+    // 1. Check for active session with a valid access token
     const session = await getSession();
-    if (!session?.id_token) {
+    if (!session?.accessToken) {
       const loginUrl = new URL(pathnames['/login'], request.url);
       loginUrl.searchParams.set('error', 'authentication_required');
       loginUrl.searchParams.set('error_description', 'You must be logged in to add a passkey.');
@@ -38,15 +39,15 @@ export async function GET(request: NextRequest) {
     const params = new URLSearchParams({
       client_id: clientId,
       // The response_type is intentionally omitted for this specific flow.
-      // Cognito will infer the passkey registration flow from the id_token_hint.
+      // Cognito will infer the passkey registration flow from the access token.
       scope: 'openid', // Minimal scope needed
       redirect_uri: callbackUrl,
-      id_token_hint: session.id_token, // Provide user context to Cognito
     });
   
-    // 4. Redirect to Cognito's authorization endpoint
+    // 4. Redirect to Cognito's authorization endpoint, passing the access token in the header
     const passkeySetupUrl = `${authorizationEndpoint}?${params.toString()}`;
     const response = NextResponse.redirect(passkeySetupUrl);
+    response.headers.set('Authorization', `Bearer ${session.accessToken}`);
     
     return response;
 

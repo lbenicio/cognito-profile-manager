@@ -2,8 +2,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import createI18nMiddleware from 'next-intl/middleware';
 import { pathnames, locales, localePrefix } from '@/navigation';
-import { jwtVerify, createRemoteJWKSet } from 'jose';
-import { refreshAuthTokens, type NewSessionData } from '@/lib/session-actions';
+import { refreshAuthTokens } from '@/lib/session-actions';
+import type { Session } from './lib/auth';
 
 const publicPages = ['/login', '/terms', '/privacy'];
 const publicPathnameRegex = new RegExp(`^(/(${locales.join('|')}))?(${publicPages.join('|')})/?$`, 'i');
@@ -20,75 +20,57 @@ async function checkAndRefreshSession(request: NextRequest): Promise<{ isValid: 
     const sessionCookie = request.cookies.get('auth_session');
     if (!sessionCookie) return { isValid: false };
 
-    let session;
+    let session: Session;
     try {
         session = JSON.parse(sessionCookie.value);
     } catch {
         return { isValid: false }; // Invalid cookie format
     }
 
-    if (session.username && !session.id_token && process.env.NODE_ENV === 'development') {
+    if (session?.username && process.env.NODE_ENV === 'development') {
         return { isValid: true }; // Dev mode mock session
     }
 
-    // A session is invalid if it doesn't have an ID token.
-    if (!session.id_token) {
-        return { isValid: false };
-    }
-
-    const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
-    if (!wellknownUrl) {
-        console.error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
+    // A real session must have claims, accessToken, and refreshToken.
+    if (!session?.claims || !session.accessToken || !session.refreshToken) {
         return { isValid: false };
     }
     
-    try {
-        const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
-        if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
-        const wellknown = await wellknownResponse.json();
-        const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
-        
-        await jwtVerify(session.id_token, JWKS, {
-            issuer: wellknown.issuer,
-            audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
-            clockTolerance: '10 seconds', // Add tolerance for clock skew
-        });
-        
-        return { isValid: true }; // Token is valid
-
-    } catch (error: any) {
-        // If the token is expired, try to refresh it.
-        if (error.code === 'ERR_JWT_EXPIRED') {
-            // We can only refresh if we have a refresh token.
-            if (session.refresh_token) {
-                const newSessionData = await refreshAuthTokens(session.refresh_token);
-                if (newSessionData) {
-                    const isSecure = new URL(request.url).protocol === 'https:';
-                    const maxAge = newSessionData.expires_in ?? 3600;
-
-                    return {
-                        isValid: true,
-                        newCookie: {
-                            name: 'auth_session',
-                            value: JSON.stringify(newSessionData),
-                            options: {
-                                httpOnly: true,
-                                secure: isSecure,
-                                maxAge: maxAge,
-                                path: '/',
-                                sameSite: isSecure ? 'none' : 'lax',
-                            }
-                        }
-                    };
-                }
-            }
-        } else {
-            console.error("Middleware JWT validation error:", error.message);
-        }
-        
-        // If refresh fails or any other JWT error occurs, the session is invalid.
-        return { isValid: false };
+    // Check if the token is expired.
+    const isExpired = session.claims.exp! * 1000 < Date.now();
+    
+    if (!isExpired) {
+      return { isValid: true };
     }
+
+    // Token is expired, try to refresh it.
+    try {
+        const refreshResult = await refreshAuthTokens(session.refreshToken);
+        if (refreshResult) {
+            const { newSession, newExpiresIn } = refreshResult;
+            const isSecure = new URL(request.url).protocol === 'https:';
+
+            return {
+                isValid: true,
+                newCookie: {
+                    name: 'auth_session',
+                    value: JSON.stringify(newSession),
+                    options: {
+                        httpOnly: true,
+                        secure: isSecure,
+                        maxAge: newExpiresIn,
+                        path: '/',
+                        sameSite: 'lax',
+                    }
+                }
+            };
+        }
+    } catch(error) {
+        console.error("Middleware token refresh failed:", error);
+    }
+        
+    // If refresh fails, the session is invalid.
+    return { isValid: false };
 }
 
 // The main middleware function
