@@ -11,11 +11,15 @@ import { getPresignedUploadUrl, updateUserAvatar } from '@/lib/avatar-actions';
 
 interface AvatarEditorProps {
   user: UserType;
-  onUpdate: (data: Partial<UserType>) => void;
-  onClose: () => void;
+  onUpdateAction: (data: Partial<UserType>) => void;
+  onCloseAction: () => void;
 }
 
-export function AvatarEditor({ user, onUpdate, onClose }: AvatarEditorProps) {
+export function AvatarEditor({
+  user,
+  onUpdateAction,
+  onCloseAction,
+}: AvatarEditorProps) {
   const t = useTranslations('Account.avatar');
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
@@ -69,12 +73,12 @@ export function AvatarEditor({ user, onUpdate, onClose }: AvatarEditorProps) {
 
       await updateUserAvatar(publicUrl);
 
-      onUpdate({ picture: publicUrl });
+      onUpdateAction({ picture: publicUrl });
       toast({
         title: t('successTitle'),
         description: t('successDescription'),
       });
-      onClose();
+      onCloseAction();
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : t('genericError');
       setError(errorMessage);
@@ -117,7 +121,7 @@ export function AvatarEditor({ user, onUpdate, onClose }: AvatarEditorProps) {
       {error && <p className='text-sm text-destructive'>{error}</p>}
 
       <div className='flex gap-4'>
-        <Button variant='outline' onClick={onClose} disabled={isLoading}>
+        <Button variant='outline' onClick={onCloseAction} disabled={isLoading}>
           {t('cancel')}
         </Button>
         <Button onClick={handleUpload} disabled={!file || isLoading}>

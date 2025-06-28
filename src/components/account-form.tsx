@@ -190,7 +190,7 @@ export function AccountForm({ user, onUpdateAction }: AccountFormProps) {
                   <FormItem>
                     <FormLabel>{t('phoneLabel')}</FormLabel>
                     <FormControl>
-                      <PhoneInput {...field} />
+                      <PhoneInput {...field} onChangeAction={field.onChange} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -265,7 +265,7 @@ export function AccountForm({ user, onUpdateAction }: AccountFormProps) {
                   <FormControl>
                     <TimezoneSelect
                       value={field.value || ''}
-                      onChange={field.onChange}
+                      onChangeAction={field.onChange}
                     />
                   </FormControl>
                   <FormDescription>{t('zoneinfoDescription')}</FormDescription>

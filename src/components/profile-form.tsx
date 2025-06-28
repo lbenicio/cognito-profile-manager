@@ -209,7 +209,7 @@ export function ProfileForm({ user, onUpdateAction }: ProfileFormProps) {
                   <FormItem>
                     <FormLabel>{t('phoneLabel')}</FormLabel>
                     <FormControl>
-                      <PhoneInput {...field} />
+                      <PhoneInput {...field} onChangeAction={field.onChange} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -284,7 +284,7 @@ export function ProfileForm({ user, onUpdateAction }: ProfileFormProps) {
                   <FormControl>
                     <TimezoneSelect
                       value={field.value || ''}
-                      onChange={field.onChange}
+                      onChangeAction={field.onChange}
                     />
                   </FormControl>
                   <FormDescription>{t('zoneinfoDescription')}</FormDescription>

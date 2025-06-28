@@ -146,7 +146,7 @@ export function AppearanceSettings({ user }: AppearanceSettingsProps) {
           <Label className='font-semibold'>{t('language')}</Label>
           <LanguageSelect
             currentLanguage={user.preferences.language}
-            onLanguageChange={(language) =>
+            onLanguageChangeAction={(language: UserPreferences['language']) =>
               handlePreferenceChange({ language })
             }
             disabled={isPending}

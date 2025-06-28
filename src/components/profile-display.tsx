@@ -43,10 +43,10 @@ import { Separator } from '@/components/ui/separator';
 
 export function ProfileDisplay({
   user,
-  onUpdate,
+  onUpdateAction,
 }: {
   user: User;
-  onUpdate: (data: Partial<User>) => void;
+  onUpdateAction: (data: Partial<User>) => void;
 }) {
   const t = useTranslations('Dashboard');
   const tProfile = useTranslations('Profile');
@@ -292,8 +292,8 @@ export function ProfileDisplay({
         </DialogHeader>
         <AvatarEditor
           user={user}
-          onUpdate={onUpdate}
-          onClose={() => setIsEditorOpen(false)}
+          onUpdateAction={onUpdateAction}
+          onCloseAction={() => setIsEditorOpen(false)}
         />
       </DialogContent>
     </Dialog>

@@ -14,11 +14,15 @@ import {
 
 interface BannerEditorProps {
   user: UserType;
-  onUpdate: (data: Partial<UserType>) => void;
-  onClose: () => void;
+  onUpdateAction: (data: Partial<UserType>) => void;
+  onCloseAction: () => void;
 }
 
-export function BannerEditor({ user, onUpdate, onClose }: BannerEditorProps) {
+export function BannerEditor({
+  user,
+  onUpdateAction,
+  onCloseAction,
+}: BannerEditorProps) {
   const t = useTranslations('Account.banner');
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
@@ -72,12 +76,12 @@ export function BannerEditor({ user, onUpdate, onClose }: BannerEditorProps) {
 
       await updateUserBanner(publicUrl);
 
-      onUpdate({ banner: publicUrl });
+      onUpdateAction({ banner: publicUrl });
       toast({
         title: t('successTitle'),
         description: t('successDescription'),
       });
-      onClose();
+      onCloseAction();
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : t('genericError');
       setError(errorMessage);
@@ -121,7 +125,7 @@ export function BannerEditor({ user, onUpdate, onClose }: BannerEditorProps) {
       {error && <p className='text-sm text-destructive'>{error}</p>}
 
       <div className='flex gap-4'>
-        <Button variant='outline' onClick={onClose} disabled={isLoading}>
+        <Button variant='outline' onClick={onCloseAction} disabled={isLoading}>
           {t('cancel')}
         </Button>
         <Button onClick={handleUpload} disabled={!file || isLoading}>

@@ -13,13 +13,13 @@ import type { UserPreferences } from '@/types/user/user.types';
 
 interface LanguageSelectProps {
   currentLanguage: UserPreferences['language'];
-  onLanguageChange: (language: UserPreferences['language']) => void;
+  onLanguageChangeAction: (language: UserPreferences['language']) => void;
   disabled?: boolean;
 }
 
 export function LanguageSelect({
   currentLanguage,
-  onLanguageChange,
+  onLanguageChangeAction,
   disabled,
 }: LanguageSelectProps) {
   const t = useTranslations('Settings.appearance');
@@ -28,7 +28,7 @@ export function LanguageSelect({
     <Select
       defaultValue={currentLanguage}
       onValueChange={(value: UserPreferences['language']) =>
-        onLanguageChange(value)
+        onLanguageChangeAction(value)
       }
       disabled={disabled}
     >

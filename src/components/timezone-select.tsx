@@ -22,10 +22,10 @@ import { timezones } from '@/lib/timezones';
 
 interface TimezoneSelectProps {
   value: string;
-  onChange: (value: string) => void;
+  onChangeAction: (value: string) => void;
 }
 
-export function TimezoneSelect({ value, onChange }: TimezoneSelectProps) {
+export function TimezoneSelect({ value, onChangeAction }: TimezoneSelectProps) {
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -54,7 +54,7 @@ export function TimezoneSelect({ value, onChange }: TimezoneSelectProps) {
                   key={timezone.value}
                   value={timezone.value}
                   onSelect={(currentValue) => {
-                    onChange(currentValue === value ? '' : currentValue);
+                    onChangeAction(currentValue === value ? '' : currentValue);
                     setOpen(false);
                   }}
                 >

@@ -49,10 +49,14 @@ interface PhoneInputProps
     'onChange' | 'value'
   > {
   value: string;
-  onChange: (value: string) => void;
+  onChangeAction: (value: string) => void;
 }
 
-export function PhoneInput({ value, onChange, ...props }: PhoneInputProps) {
+export function PhoneInput({
+  value,
+  onChangeAction,
+  ...props
+}: PhoneInputProps) {
   const t = useTranslations('Account.form');
   const [open, setOpen] = React.useState(false);
 
@@ -62,14 +66,14 @@ export function PhoneInput({ value, onChange, ...props }: PhoneInputProps) {
   );
 
   const handleCountrySelect = (newCountry: Country) => {
-    onChange(`${newCountry.dialCode}${nationalNumber}`);
+    onChangeAction(`${newCountry.dialCode}${nationalNumber}`);
     setOpen(false);
   };
 
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newNationalNumber = e.target.value.replace(/\D/g, '');
     const dialCode = country?.dialCode || '';
-    onChange(`${dialCode}${newNationalNumber}`);
+    onChangeAction(`${dialCode}${newNationalNumber}`);
   };
 
   // Default to US if no country is matched or value is empty

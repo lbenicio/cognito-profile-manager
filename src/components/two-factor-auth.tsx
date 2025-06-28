@@ -24,10 +24,10 @@ import {
 
 interface TwoFactorAuthProps {
   user: User;
-  onUpdate: (data: Partial<User>) => void;
+  onUpdateAction: (data: Partial<User>) => void;
 }
 
-export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
+export function TwoFactorAuth({ user, onUpdateAction }: TwoFactorAuthProps) {
   const { toast } = useToast();
   const t = useTranslations('Security.twoFactor');
 
@@ -89,7 +89,7 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
         setQrCode('');
         setOtpCode('');
         setSecret('');
-        onUpdate({ twoFactorEnabled: true });
+        onUpdateAction({ twoFactorEnabled: true });
       } else {
         toast({
           variant: 'destructive',
@@ -118,7 +118,7 @@ export function TwoFactorAuth({ user, onUpdate }: TwoFactorAuthProps) {
           title: t('mfaDisabledTitle'),
           description: t('mfaDisabledDescription'),
         });
-        onUpdate({ twoFactorEnabled: false });
+        onUpdateAction({ twoFactorEnabled: false });
       } else {
         throw new Error(result.message);
       }

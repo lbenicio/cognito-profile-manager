@@ -152,8 +152,8 @@ export function AccountDisplay({
                 </DialogHeader>
                 <AvatarEditor
                   user={user}
-                  onUpdate={onUpdateAction}
-                  onClose={() => setIsAvatarEditorOpen(false)}
+                  onUpdateAction={onUpdateAction}
+                  onCloseAction={() => setIsAvatarEditorOpen(false)}
                 />
               </DialogContent>
             </Dialog>
@@ -342,8 +342,8 @@ export function AccountDisplay({
         </DialogHeader>
         <BannerEditor
           user={user}
-          onUpdate={onUpdateAction}
-          onClose={() => setIsBannerEditorOpen(false)}
+          onUpdateAction={onUpdateAction}
+          onCloseAction={() => setIsBannerEditorOpen(false)}
         />
       </DialogContent>
     </Dialog>
