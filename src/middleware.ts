@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import createI18nMiddleware from 'next-intl/middleware';
 import { pathnames, locales, localePrefix } from '@/navigation';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
-import { refreshAuthTokens, type NewSessionData } from '@/lib/session-actions';
+import { refreshAuthTokens } from '@/lib/session-actions';
 
 // Define public pages
 const publicPages = [
@@ -23,8 +23,6 @@ const i18nMiddleware = createI18nMiddleware({
 
 // The main middleware function
 export async function middleware(request: NextRequest) {
-    let newSessionData: NewSessionData | null = null;
-    
     const sessionCookie = request.cookies.get('auth_session');
     const isPublicPage = publicPathnameRegex.test(request.nextUrl.pathname);
 
@@ -106,32 +104,31 @@ export async function middleware(request: NextRequest) {
                 if (!refreshed) {
                     return redirectToLogin();
                 }
-                // If refresh succeeded, store new tokens to be set on the response later.
-                newSessionData = refreshed;
+                
+                // Refresh succeeded. Redirect to the same URL with the new cookie set.
+                // This ensures the next request has the valid token.
+                const response = NextResponse.redirect(request.url);
+                
+                const isProd = process.env.NODE_ENV === 'production';
+                const appUrl = process.env.APP_URL;
+                const cookieDomain = isProd && appUrl ? new URL(appUrl).hostname : undefined;
+                
+                response.cookies.set('auth_session', JSON.stringify(refreshed), {
+                    httpOnly: true,
+                    secure: isProd,
+                    maxAge: 30 * 24 * 60 * 60, // 30 days
+                    path: '/',
+                    sameSite: isProd ? 'none' : 'lax',
+                    domain: cookieDomain,
+                });
+
+                return response; // Return the redirect response
             }
         }
     }
 
     // --- I18n Logic ---
-    const response = i18nMiddleware(request);
-
-    // If we have new session data from a token refresh, set the cookie on the response.
-    if (newSessionData) {
-        const isProd = process.env.NODE_ENV === 'production';
-        const appUrl = process.env.APP_URL;
-        const cookieDomain = isProd && appUrl ? new URL(appUrl).hostname : undefined;
-
-        response.cookies.set('auth_session', JSON.stringify(newSessionData), {
-            httpOnly: true,
-            secure: isProd,
-            maxAge: 30 * 24 * 60 * 60,
-            path: '/',
-            sameSite: isProd ? 'none' : 'lax',
-            domain: cookieDomain,
-        });
-    }
-
-    return response;
+    return i18nMiddleware(request);
 }
 
 export const config = {
