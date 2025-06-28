@@ -1,4 +1,3 @@
-
 'use server';
 
 import {
@@ -37,7 +36,6 @@ export async function changePassword(
       };
     }
     if (error instanceof InvalidPasswordException) {
-      // The error message from Cognito is user-friendly, e.g., "Password not long enough"
       return {
         success: false,
         errorType: 'newPassword',

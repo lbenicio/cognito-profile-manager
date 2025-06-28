@@ -1,4 +1,3 @@
-
 'use server';
 
 import { PutObjectCommand } from '@aws-sdk/client-s3';
@@ -55,7 +54,7 @@ export async function getBannerPresignedUploadUrl({ type, size }: GetPresignedUr
 
 export async function updateUserBanner(bannerUrl: string) {
     const session = await getSession();
-    if (!session || !session.accessToken) {
+    if (!session?.accessToken) {
         throw new Error('Not authenticated');
     }
 

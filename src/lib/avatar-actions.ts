@@ -1,4 +1,3 @@
-
 'use server';
 
 import { PutObjectCommand } from '@aws-sdk/client-s3';
@@ -66,7 +65,6 @@ export async function updateUserAvatar(pictureUrl: string) {
     
     await cognitoClient.send(command);
     
-    // Revalidate paths that show the user's avatar to ensure data consistency on navigation
     revalidatePath('/');
     revalidatePath('/account');
     revalidatePath('/profile');

@@ -1,26 +1,24 @@
-
 'use server';
 
-import { cookies, headers } from 'next/headers';
 import { redirect } from '@/navigation';
+import { createSession } from '@/lib/session';
+import { mockAdminUser } from '@/lib/auth';
 
-// Dev-only action for the "Sign In as Admin" button
 export async function devAdminLogin() {
   if (process.env.NODE_ENV !== 'development') {
     return 'This action is only available in development.';
   }
-  const sessionData = { username: 'admin' };
 
-  // Determine if the connection is secure by checking the protocol header
-  const protocol = headers().get('x-forwarded-proto') || 'http';
-  const isSecure = protocol === 'https';
-  
-  (await cookies()).set('auth_session', JSON.stringify(sessionData), {
-    httpOnly: true,
-    secure: isSecure,
-    maxAge: 60 * 60 * 24 * 7, // 1 week
-    path: '/',
-    sameSite: 'lax',
-  });
+  const sessionData = {
+    isMock: true,
+    username: 'admin',
+    claims: {
+        sub: mockAdminUser.sub,
+        email: mockAdminUser.email,
+        name: mockAdminUser.name,
+    }
+  };
+
+  await createSession(sessionData, 3600); // Mock session for 1 hour
   redirect('/');
 }

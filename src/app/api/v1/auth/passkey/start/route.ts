@@ -1,14 +1,11 @@
-
 'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { pathnames } from '@/navigation';
-import { jwtVerify, createRemoteJWKSet } from 'jose';
 
 export async function GET(request: NextRequest) {
   try {
-    // 1. Check for active session with a valid access token
     const session = await getSession();
     if (!session?.accessToken) {
       const loginUrl = new URL(pathnames['/login'], request.url);
@@ -17,7 +14,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
     
-    // 2. Get Cognito configuration
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
     const appUrl = process.env.APP_URL?.replace(/\/$/, '');
@@ -38,13 +34,10 @@ export async function GET(request: NextRequest) {
     
     const params = new URLSearchParams({
       client_id: clientId,
-      // The response_type is intentionally omitted for this specific flow.
-      // Cognito will infer the passkey registration flow from the access token.
-      scope: 'openid', // Minimal scope needed
+      scope: 'openid',
       redirect_uri: callbackUrl,
     });
   
-    // 4. Redirect to Cognito's authorization endpoint, passing the access token in the header
     const passkeySetupUrl = `${authorizationEndpoint}?${params.toString()}`;
     const response = NextResponse.redirect(passkeySetupUrl);
     response.headers.set('Authorization', `Bearer ${session.accessToken}`);
@@ -53,7 +46,6 @@ export async function GET(request: NextRequest) {
 
   } catch (error: any) {
     console.error('Passkey start error:', error);
-    // Redirect back to the security page with an error
     const securityUrl = new URL(pathnames['/security'], request.url);
     securityUrl.searchParams.set('error', 'passkey_start_failed');
     securityUrl.searchParams.set('error_description', error.message || 'Could not start the passkey setup process.');

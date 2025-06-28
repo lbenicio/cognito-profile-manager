@@ -1,4 +1,3 @@
-
 'use server';
 
 import { authenticator } from 'otplib';
@@ -31,7 +30,7 @@ export async function generateMfaSetup() {
     throw new Error('Failed to get secret code from Cognito.');
   }
 
-  const serviceName = 'Outpost'; // Should match your app name
+  const serviceName = 'Outpost';
   const otpauth = authenticator.keyuri(
     user.email,
     serviceName,

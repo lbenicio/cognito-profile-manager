@@ -1,9 +1,9 @@
-
 'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
 import type { JWTPayload } from 'jose';
+import { createSession } from '@/lib/session';
 
 function createErrorResponse(origin: string, error: string, description?: string): NextResponse {
   const loginUrl = new URL('/login', origin);
@@ -14,7 +14,6 @@ function createErrorResponse(origin: string, error: string, description?: string
 
   const response = NextResponse.redirect(loginUrl);
   
-  // Ensure state cookie is always cleared on error
   response.cookies.set('oauth_state', '', { 
     expires: new Date(0), 
     path: '/',
@@ -29,14 +28,11 @@ export async function GET(request: NextRequest) {
   const errorDescription = searchParams.get('error_description');
   const state = searchParams.get('state');
   const storedState = request.cookies.get('oauth_state')?.value;
-  const isSecure = new URL(request.url).protocol === 'https:';
 
-  // --- Handle explicit errors from OIDC provider first ---
   if (errorParam) {
     return createErrorResponse(origin, errorParam, errorDescription || 'An error occurred during authentication.');
   }
   
-  // --- Perform pre-flight checks before the try...catch block ---
   if (!state || !storedState || state !== storedState) {
     return createErrorResponse(origin, 'invalid_state', 'Your session has expired or is invalid. Please try signing in again.');
   }
@@ -45,7 +41,6 @@ export async function GET(request: NextRequest) {
     return createErrorResponse(origin, 'auth_code_missing', 'The authorization code was not found in the callback. Please try again.');
   }
 
-  // --- Main token exchange logic ---
   try {
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     if (!wellknownUrl) throw new Error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
@@ -96,36 +91,24 @@ export async function GET(request: NextRequest) {
       throw new Error(errorDetails);
     }
     
-    // ** NEW: Verify the ID token on the server and extract claims **
     const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
     const { payload }: { payload: JWTPayload } = await jwtVerify(tokens.id_token, JWKS, {
         issuer: wellknown.issuer,
         audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
     });
 
+    // Create a single encrypted session
+    const sessionData = {
+        claims: payload,
+        accessToken: tokens.access_token,
+        refreshToken: tokens.refresh_token,
+    };
+    const expiresIn = tokens.expires_in && typeof tokens.expires_in === 'number' ? tokens.expires_in : 3600;
+    await createSession(sessionData, expiresIn);
+
+    // Clear the state cookie on the SAME response object before returning.
     const dashboardUrl = new URL('/', origin);
     const response = NextResponse.redirect(dashboardUrl);
-    
-    const maxAge = tokens.expires_in && typeof tokens.expires_in === 'number'
-        ? tokens.expires_in
-        : 3600;
-
-    const cookieOptions = {
-        httpOnly: true,
-        secure: isSecure,
-        maxAge: maxAge,
-        path: '/',
-        sameSite: 'lax' as const,
-    };
-
-    // ** NEW: Split session data into multiple, smaller cookies **
-    response.cookies.set('id_token_claims', JSON.stringify(payload), cookieOptions);
-    response.cookies.set('access_token', tokens.access_token, cookieOptions);
-    if (tokens.refresh_token) {
-        response.cookies.set('refresh_token', tokens.refresh_token, cookieOptions);
-    }
-    
-    // Clear the state cookie on the SAME response object before returning.
     response.cookies.set('oauth_state', '', { 
         expires: new Date(0), 
         path: '/',

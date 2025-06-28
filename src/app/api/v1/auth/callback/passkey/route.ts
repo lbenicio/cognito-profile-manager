@@ -1,4 +1,3 @@
-
 'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -21,14 +20,12 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
   const result = searchParams.get('result');
   const errorParam = searchParams.get('error');
-  const errorDescription = search_params.get('error_description');
+  const errorDescription = searchParams.get('error_description');
   
-  // --- Security Checks ---
   if (errorParam) {
     return createErrorResponse(origin, errorParam, errorDescription);
   }
   
-  // --- Main Logic ---
   if (result !== 'success') {
     return createErrorResponse(origin, 'result_missing', 'The passkey registration was not successful. Please try again.');
   }
@@ -39,7 +36,6 @@ export async function GET(request: NextRequest) {
       throw new Error('No active session found. Please log in again.');
     }
     
-    // If the result is "success", update the user attribute in Cognito to reflect that passkeys are enabled.
     const updateUserAttrCommand = new UpdateUserAttributesCommand({
         AccessToken: session.accessToken,
         UserAttributes: [{
@@ -53,9 +49,8 @@ export async function GET(request: NextRequest) {
     securityUrl.searchParams.set('result', 'success');
     const response = NextResponse.redirect(securityUrl);
     
-    // Revalidate paths to reflect the new security status
     revalidatePath(pathnames['/security']);
-    revalidatePath('/'); // For the security health widget on the dashboard
+    revalidatePath('/');
     
     return response;
 

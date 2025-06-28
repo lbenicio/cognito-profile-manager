@@ -1,12 +1,10 @@
-
 import 'server-only';
 import { cache } from 'react';
-import { cookies } from 'next/headers';
-import { jwtVerify, createRemoteJWKSet, type JWTPayload } from 'jose';
 import { cognitoClient, GetUserCommand, ListWebAuthnCredentialsCommand } from '@/lib/cognito';
+import { getSession as getEncryptedSession } from '@/lib/session';
 
+export { getSession } from '@/lib/session';
 
-// Define the User type, which should match what the components expect.
 export type UserPreferences = {
   theme: 'light' | 'dark' | 'system';
   language: 'en' | 'es';
@@ -85,18 +83,13 @@ export type User = {
   sessionExpiresAt: number; // Unix timestamp (seconds)
 };
 
-export type Session = ({
-  claims: JWTPayload;
-  accessToken: string;
-  refreshToken: string;
-} | {
-  // For dev mode
-  username: string;
-  claims?: never;
-  accessToken?: never;
-  refreshToken?: never;
-}) & {
-  // Common properties for both session types
+export type Session = {
+    accessToken: string;
+    refreshToken: string;
+    claims: import('jose').JWTPayload;
+    expires: string;
+    isMock?: boolean;
+    username?: string;
 } | null;
 
 
@@ -135,8 +128,7 @@ const defaultPublicProfilePreferences: PublicProfilePreferences = {
 
 const nowInSeconds = Math.floor(Date.now() / 1000);
 
-// Mock user data for development environment
-const mockUser: User = {
+export const mockUser: User = {
   sub: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
   username: 'testuser_dev',
   email: 'dev@example.com',
@@ -178,7 +170,7 @@ const mockUser: User = {
   sessionExpiresAt: nowInSeconds + 3600, // Expires in 1 hour
 };
 
-const mockAdminUser: User = {
+export const mockAdminUser: User = {
   ...mockUser,
   username: 'adminuser_dev',
   name: 'Admin User',
@@ -190,50 +182,10 @@ const mockAdminUser: User = {
 };
 
 
-export const getSession = cache(async (): Promise<Session> => {
-  // Check for dev mode mock session first. It uses a single 'auth_session' cookie.
-  const mockSessionCookie = (await cookies()).get('auth_session')?.value;
-  if (mockSessionCookie) {
-    try {
-      const session = JSON.parse(mockSessionCookie);
-      if (session.username) {
-        return session;
-      }
-    } catch {
-      // Invalid JSON, fall through to regular session check
-    }
-  }
-
-  // Real session: read the three separate cookies.
-  const claimsCookie = (await cookies()).get('id_token_claims')?.value;
-  const accessTokenCookie = (await cookies()).get('access_token')?.value;
-  const refreshTokenCookie = (await cookies()).get('refresh_token')?.value;
-
-  // A valid session requires all three cookies.
-  if (!claimsCookie || !accessTokenCookie || !refreshTokenCookie) {
-    return null;
-  }
-
-  try {
-    const claims = JSON.parse(claimsCookie) as JWTPayload;
-    return {
-      claims,
-      accessToken: accessTokenCookie,
-      refreshToken: refreshTokenCookie,
-    };
-  } catch (error) {
-    console.error('Failed to parse session claims cookie:', error);
-    return null;
-  }
-});
-
-
-// This function is cached per request and retrieves the authenticated user's data.
 export const getUser = cache(async (): Promise<User | null> => {
-  const session = await getSession();
-
-  // Handle mock development session
-  if (session?.username) {
+  const session = await getEncryptedSession();
+  
+  if (session?.isMock) {
     console.log('Using mock user data for development.');
     const baseUser = session.username === 'admin' ? mockAdminUser : mockUser;
     return {
@@ -242,13 +194,11 @@ export const getUser = cache(async (): Promise<User | null> => {
     };
   }
 
-  // If there's no session or it's not a valid session structure, return null.
-  if (!session?.claims || !session.accessToken) {
+  if (!session?.accessToken || !session.claims) {
     return null;
   }
 
   try {
-    // Fetch the most up-to-date user attributes from Cognito using the access token.
     const getUserCommand = new GetUserCommand({
       AccessToken: session.accessToken,
     });
@@ -265,7 +215,6 @@ export const getUser = cache(async (): Promise<User | null> => {
         {} as Record<string, string>
       ) || {};
     
-    // Use claims from the session for data that doesn't change or is authoritative from the token.
     const { claims } = session;
     const adminGroupName = process.env.COGNITO_ADMIN_GROUP_NAME || 'admins';
     const groupsClaimKey = process.env.COGNITO_GROUPS_CLAIM_KEY || 'cognito:groups';
@@ -322,7 +271,6 @@ export const getUser = cache(async (): Promise<User | null> => {
       }
     }
 
-    // Fetch user's registered WebAuthn credentials (passkeys).
     let devices: Device[] = [];
     try {
       const listCredentialsCommand = new ListWebAuthnCredentialsCommand({
@@ -382,8 +330,13 @@ export const getUser = cache(async (): Promise<User | null> => {
     };
   } catch (error: any) {
     console.error('General error in getUser, likely during device list or user attribute fetch:', error);
-    // Clearing the cookie here is a safe fallback
-    (await cookies()).set('auth_session', '', { expires: new Date(0), path: '/' });
+    await deleteSession();
     return null;
   }
 });
+
+// Duplicating deleteSession here to avoid circular dependency
+async function deleteSession() {
+  const { deleteSession: deleteEncryptedSession } = await import('@/lib/session');
+  await deleteEncryptedSession();
+}

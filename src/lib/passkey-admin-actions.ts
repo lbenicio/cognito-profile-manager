@@ -1,11 +1,10 @@
-
 'use server';
 
 import {
   cognitoClient,
   ListWebAuthnCredentialsCommand,
 } from './cognito';
-import { getSession, getUser, Session } from './auth';
+import { getSession, getUser } from './auth';
 
 export async function listCognitoPasskeys(
   username: string
@@ -30,7 +29,7 @@ export async function listCognitoPasskeys(
     };
   }
 
-  const session: Session = await getSession();
+  const session = await getSession();
 
   if (!session?.accessToken) {
     return {

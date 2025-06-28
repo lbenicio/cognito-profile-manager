@@ -1,4 +1,3 @@
-
 'use server';
 
 import { revalidatePath } from 'next/cache';
@@ -10,7 +9,7 @@ export async function updateNotificationPreferences(
 ): Promise<{ success: boolean; message: string }> {
   const session = await getSession();
 
-  if (!session || !session.accessToken) {
+  if (!session?.accessToken) {
     return { success: false, message: 'Not authenticated' };
   }
 

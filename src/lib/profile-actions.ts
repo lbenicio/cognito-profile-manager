@@ -1,4 +1,3 @@
-
 'use server';
 
 import { revalidatePath } from 'next/cache';
@@ -30,10 +29,8 @@ export async function updateUserProfile(data: Partial<UserProfileAttributes>): P
             return { Name: cognitoKey, Value: String(value) };
           });
         
-        // Ensure name attribute is always updated if given_name or family_name changes
         if(data.given_name || data.family_name) {
-            const user = await getSession();
-            const currentName = user?.claims?.name as string || '';
+            const currentName = session?.claims?.name as string || '';
             const [currentGiven, ...currentFamily] = currentName.split(' ');
             const newGiven = data.given_name || currentGiven;
             const newFamily = data.family_name || currentFamily.join(' ');
@@ -50,7 +47,6 @@ export async function updateUserProfile(data: Partial<UserProfileAttributes>): P
         });
         await cognitoClient.send(command);
 
-        // Revalidate paths that show user info to ensure data is fresh on subsequent navigations
         revalidatePath('/');
         revalidatePath('/account');
         revalidatePath('/profile');

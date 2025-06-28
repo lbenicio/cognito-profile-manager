@@ -1,4 +1,3 @@
-
 'use server';
 
 import { cookies } from 'next/headers';
@@ -29,14 +28,12 @@ export async function updateUserPreferences(
 
     await cognitoClient.send(command);
 
-    // If language was changed, set the cookie so next-intl picks it up on refresh
     if (newPreferences.language && locales.includes(newPreferences.language)) {
-      (await cookies()).set('NEXT_LOCALE', newPreferences.language);
+      cookies().set('NEXT_LOCALE', newPreferences.language);
     }
     
-    // Revalidate paths to reflect changes immediately
     revalidatePath('/settings');
-    revalidatePath('/', 'layout'); // Revalidate all pages using the root layout
+    revalidatePath('/', 'layout');
 
     return { success: true, message: 'Preferences updated successfully.' };
   } catch (error: any) {

@@ -1,4 +1,3 @@
-
 'use server';
 
 import { revalidatePath } from 'next/cache';
@@ -24,14 +23,12 @@ export async function deletePasskey(
     });
     await cognitoClient.send(deleteCommand);
 
-    // After deleting, check if any credentials remain.
     const listCredentialsCommand = new ListWebAuthnCredentialsCommand({
         AccessToken: session.accessToken,
     });
     const credentialsResponse = await cognitoClient.send(listCredentialsCommand);
 
     if (!credentialsResponse.Credentials || credentialsResponse.Credentials.length === 0) {
-        // If no credentials are left, update the custom attribute.
         const updateUserAttrCommand = new UpdateUserAttributesCommand({
             AccessToken: session.accessToken,
             UserAttributes: [{
@@ -42,9 +39,7 @@ export async function deletePasskey(
         await cognitoClient.send(updateUserAttrCommand);
     }
 
-    // Revalidate the security page to force a refetch of the device list.
     revalidatePath('/security');
-    // Also revalidate the main page since it shows security status.
     revalidatePath('/');
 
     return { success: true, message: 'Passkey deleted successfully.' };
