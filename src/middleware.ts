@@ -2,11 +2,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import createI18nMiddleware from 'next-intl/middleware';
 import { pathnames, locales, localePrefix } from '@/navigation';
-import { refreshAuthTokens } from '@/lib/session-actions';
-import { getSession, updateSession, deleteSession } from '@/lib/session';
 
 const publicPages = ['/login', '/terms', '/privacy'];
-const publicPathnameRegex = new RegExp(`^(/(${locales.join('|')}))?(${publicPages.join('|')})/?$`, 'i');
 
 const i18nMiddleware = createI18nMiddleware({
   locales,
@@ -15,76 +12,47 @@ const i18nMiddleware = createI18nMiddleware({
   defaultLocale: 'en',
 });
 
-
-async function handleAuth(request: NextRequest): Promise<NextResponse | undefined> {
-  const session = await getSession();
+export function middleware(request: NextRequest) {
+  // Create a regex that matches public pages, considering locales.
+  // Example: /login, /en/login, /es/terms
+  const publicPathnameRegex = RegExp(
+    `^(/(${locales.join('|')}))?(${publicPages.join('|')})/?$`,
+    'i'
+  );
   const isPublicPage = publicPathnameRegex.test(request.nextUrl.pathname);
-
-  // If there's no session and the user is on a protected page, redirect to login
-  if (!session && !isPublicPage) {
-    const loginUrl = new URL(pathnames['/login'], request.url);
-    const response = NextResponse.redirect(loginUrl);
-    response.cookies.set('session', '', { expires: new Date(0), path: '/' });
-    return response;
-  }
   
-  // If there is a session and the user is on a public page, redirect to the dashboard
-  if (session && isPublicPage) {
+  const sessionCookie = request.cookies.get('session');
+
+  // The core i18n logic runs on every request.
+  // It determines the locale and sets appropriate headers on the response.
+  const i18nResponse = i18nMiddleware(request);
+
+  // --- Authentication Logic ---
+
+  // If there's no session and the user is trying to access a protected page...
+  if (!sessionCookie && !isPublicPage) {
+    // ...redirect them to the login page.
+    // The `next-intl` middleware has already processed the request, so the
+    // locale is baked into the URL's `basePath`. Redirecting to `/login`
+    // will preserve the locale.
+    const loginUrl = new URL(pathnames['/login'], request.url)
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // If there IS a session and the user is on a public page (like /login)...
+  if (sessionCookie && isPublicPage) {
+    // ...redirect them to the main dashboard.
     const dashboardUrl = new URL(pathnames['/'], request.url);
     return NextResponse.redirect(dashboardUrl);
   }
-  
-  // If the session's access token is expired, try to refresh it
-  if (session && session.claims.exp * 1000 < Date.now()) {
-    try {
-      const refreshResult = await refreshAuthTokens(session.refreshToken);
-      if (refreshResult) {
-        const { newClaims, newAccessToken, newRefreshToken, newExpiresIn } = refreshResult;
-        
-        const newSessionPayload = {
-          ...session,
-          claims: newClaims,
-          accessToken: newAccessToken,
-          refreshToken: newRefreshToken,
-        };
-        const { sessionId, ...dataToStore } = newSessionPayload;
 
-        await updateSession(session.sessionId, dataToStore, newExpiresIn);
-
-      } else {
-        // Refresh failed, redirect to login and clear the cookie
-        const loginUrl = new URL(pathnames['/login'], request.url);
-        const response = NextResponse.redirect(loginUrl);
-        response.cookies.set('session', '', { expires: new Date(0), path: '/' });
-        // We don't need to call deleteSession from Redis here because the session has already expired and will be cleaned up.
-        return response;
-      }
-    } catch(e) {
-      console.error("Middleware refresh token error:", e);
-      const loginUrl = new URL(pathnames['/login'], request.url);
-      const response = NextResponse.redirect(loginUrl);
-      response.cookies.set('session', '', { expires: new Date(0), path: '/' });
-      return response;
-    }
-  }
-
-  // If we get here, the session is valid or the page is public, so we don't need to do anything.
-  // Return undefined to allow the i18n middleware to run.
-  return undefined;
-}
-
-
-export async function middleware(request: NextRequest) {
-  const authResponse = await handleAuth(request);
-  // If the authentication logic returned a response (e.g., a redirect), return it.
-  if (authResponse) {
-    return authResponse;
-  }
-  
-  // Otherwise, proceed with the internationalization middleware.
-  return i18nMiddleware(request);
+  // If authentication checks pass, allow the request to proceed with the
+  // i18n-enhanced response.
+  return i18nResponse;
 }
 
 export const config = {
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
+  // Skip all paths that should not be internationalized. This example skips the
+  // folders "api", "_next" and all files with an extension (e.g. favicon.ico)
+  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)']
 };
