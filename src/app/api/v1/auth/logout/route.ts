@@ -40,22 +40,13 @@ export async function GET(request: NextRequest) {
   const response = NextResponse.redirect(cognitoLogoutUrl);
 
   // 3. Clear all session-related cookies on the response
-  const isProd = process.env.NODE_ENV === 'production';
-  let cookieDomain: string | undefined;
-  if (isProd && appUrl) {
-      const hostname = new URL(appUrl).hostname;
-      cookieDomain = hostname.startsWith('www.') ? hostname.substring(4) : hostname;
-  }
-
   response.cookies.set('auth_session', '', { 
       expires: new Date(0), 
       path: '/',
-      domain: cookieDomain
   });
   response.cookies.set('oauth_state', '', { 
       expires: new Date(0), 
       path: '/',
-      domain: cookieDomain
   });
 
   // 4. Return the response that redirects the user and clears cookies

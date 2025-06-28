@@ -64,13 +64,6 @@ async function checkAndRefreshSession(request: NextRequest): Promise<{ isValid: 
                 const newSessionData = await refreshAuthTokens(session.refresh_token);
                 if (newSessionData) {
                     const isSecure = new URL(request.url).protocol === 'https:';
-                    const appUrl = process.env.APP_URL?.replace(/\/$/, '');
-                    let cookieDomain: string | undefined;
-                    if (appUrl && new URL(appUrl).hostname !== 'localhost') {
-                        const hostname = new URL(appUrl).hostname;
-                        cookieDomain = hostname.startsWith('www.') ? hostname.substring(4) : hostname;
-                    }
-                    
                     const maxAge = newSessionData.expires_in ?? 3600;
 
                     return {
@@ -84,7 +77,6 @@ async function checkAndRefreshSession(request: NextRequest): Promise<{ isValid: 
                                 maxAge: maxAge,
                                 path: '/',
                                 sameSite: isSecure ? 'none' : 'lax',
-                                domain: cookieDomain,
                             }
                         }
                     };

@@ -12,20 +12,10 @@ function createErrorResponse(origin: string, error: string, description?: string
 
   const response = NextResponse.redirect(loginUrl);
   
-  const isProd = process.env.NODE_ENV === 'production';
-  const appUrl = process.env.APP_URL?.replace(/\/$/, '');
-
-  let cookieDomain: string | undefined;
-  if (isProd && appUrl) {
-      const hostname = new URL(appUrl).hostname;
-      cookieDomain = hostname.startsWith('www.') ? hostname.substring(4) : hostname;
-  }
-
   // Ensure state cookie is always cleared on error
   response.cookies.set('oauth_state', '', { 
     expires: new Date(0), 
     path: '/',
-    domain: cookieDomain
   });
   return response;
 }
@@ -114,14 +104,6 @@ export async function GET(request: NextRequest) {
     const dashboardUrl = new URL('/', origin);
     const response = NextResponse.redirect(dashboardUrl);
     
-    const isProd = process.env.NODE_ENV === 'production';
-    
-    let cookieDomain: string | undefined;
-    if (isProd && appUrl) {
-        const hostname = new URL(appUrl).hostname;
-        cookieDomain = hostname.startsWith('www.') ? hostname.substring(4) : hostname;
-    }
-    
     const maxAge = tokens.expires_in && typeof tokens.expires_in === 'number'
         ? tokens.expires_in
         : 3600;
@@ -133,13 +115,11 @@ export async function GET(request: NextRequest) {
       maxAge: maxAge,
       path: '/',
       sameSite: isSecure ? 'none' : 'lax',
-      domain: cookieDomain,
     });
     
     response.cookies.set('oauth_state', '', { 
         expires: new Date(0), 
         path: '/',
-        domain: cookieDomain,
     });
 
     return response;
