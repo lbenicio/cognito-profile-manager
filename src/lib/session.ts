@@ -84,6 +84,7 @@ export const getSession = cache(async () => {
   }
 
   const key = `${sessionPrefix}${payload.sessionId}`;
+  if (!redis) return;
   const sessionString = await redis.get(key);
   
   if (!sessionString) {
