@@ -31,7 +31,8 @@ async function checkAndRefreshSession(request: NextRequest): Promise<{ isValid: 
         return { isValid: true }; // Dev mode mock session
     }
 
-    if (!session.id_token || !session.refresh_token) {
+    // A session is invalid if it doesn't have an ID token.
+    if (!session.id_token) {
         return { isValid: false };
     }
 
@@ -56,41 +57,45 @@ async function checkAndRefreshSession(request: NextRequest): Promise<{ isValid: 
         return { isValid: true }; // Token is valid
 
     } catch (error: any) {
+        // If the token is expired, try to refresh it.
         if (error.code === 'ERR_JWT_EXPIRED') {
-            const newSessionData = await refreshAuthTokens(session.refresh_token);
-            if (newSessionData) {
-                const isSecure = new URL(request.url).protocol === 'https:';
-                const isProd = process.env.NODE_ENV === 'production';
-                const appUrl = process.env.APP_URL?.replace(/\/$/, '');
-                let cookieDomain: string | undefined;
-                if (isProd && appUrl) {
-                    const hostname = new URL(appUrl).hostname;
-                    cookieDomain = hostname.startsWith('www.') ? hostname.substring(4) : hostname;
-                }
-                
-                const maxAge = newSessionData.expires_in ?? 3600;
-
-                return {
-                    isValid: true,
-                    newCookie: {
-                        name: 'auth_session',
-                        value: JSON.stringify(newSessionData),
-                        options: {
-                            httpOnly: true,
-                            secure: isSecure,
-                            maxAge: maxAge,
-                            path: '/',
-                            sameSite: isSecure ? 'none' : 'lax',
-                            domain: cookieDomain,
-                        }
+            // We can only refresh if we have a refresh token.
+            if (session.refresh_token) {
+                const newSessionData = await refreshAuthTokens(session.refresh_token);
+                if (newSessionData) {
+                    const isSecure = new URL(request.url).protocol === 'https:';
+                    const appUrl = process.env.APP_URL?.replace(/\/$/, '');
+                    let cookieDomain: string | undefined;
+                    if (appUrl && new URL(appUrl).hostname !== 'localhost') {
+                        const hostname = new URL(appUrl).hostname;
+                        cookieDomain = hostname.startsWith('www.') ? hostname.substring(4) : hostname;
                     }
-                };
+                    
+                    const maxAge = newSessionData.expires_in ?? 3600;
+
+                    return {
+                        isValid: true,
+                        newCookie: {
+                            name: 'auth_session',
+                            value: JSON.stringify(newSessionData),
+                            options: {
+                                httpOnly: true,
+                                secure: isSecure,
+                                maxAge: maxAge,
+                                path: '/',
+                                sameSite: isSecure ? 'none' : 'lax',
+                                domain: cookieDomain,
+                            }
+                        }
+                    };
+                }
             }
         } else {
             console.error("Middleware JWT validation error:", error.message);
         }
         
-        return { isValid: false }; // Refresh failed or other JWT error
+        // If refresh fails or any other JWT error occurs, the session is invalid.
+        return { isValid: false };
     }
 }
 
