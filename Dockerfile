@@ -29,7 +29,7 @@ RUN sed -i "/output: \"standalone\"/d" next.config.ts
 # Run the build script. This will generate the production app in the `dist` directory.
 RUN npm run build:pkg
 
-FROM deps as productiondeps
+FROM deps AS productiondeps
 
 RUN npm ci --omit=dev
 
