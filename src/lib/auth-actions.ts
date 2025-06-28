@@ -10,7 +10,7 @@ export async function ssoLogin() {
 
 export async function devAdminLogin() {
   if (process.env.NODE_ENV !== 'development') {
-    return 'This action is only available in development.';
+    throw new Error('This action is only available in development.');
   }
 
   const now = Math.floor(Date.now() / 1000);
