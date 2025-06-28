@@ -27,7 +27,7 @@ COPY . .
 RUN sed -i "/output: \"standalone\"/d" next.config.ts
 
 # Run the build script. This will generate the production app in the `dist` directory.
-RUN npm run build
+RUN npm run build:pkg
 
 
 # Stage 3: Production Runner
