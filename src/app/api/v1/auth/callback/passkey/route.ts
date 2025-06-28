@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { pathnames } from '@/navigation';
 import { cognitoClient, UpdateUserAttributesCommand } from '@/lib/cognito';
+import { getSession, getUser } from '@/lib/auth';
 
 function createErrorResponse(origin: string, error: string, description?: string | null): NextResponse {
   const securityUrl = new URL(pathnames['/security'], origin);
@@ -33,69 +34,24 @@ function createErrorResponse(origin: string, error: string, description?: string
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
-  const code = searchParams.get('result');
+  const result = searchParams.get('result');
   const errorParam = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
-
-  const storedState = request.cookies.get('oauth_state')?.value;
 
   if (errorParam) {
     return createErrorResponse(origin, errorParam, errorDescription);
   }
-  
-  if (!state || !storedState || state !== storedState) {
-    return createErrorResponse(origin, 'invalid_state', 'Your session has expired or is invalid. Please try again.');
-  }
 
-  if (!code) {
-    return createErrorResponse(origin, 'auth_code_missing', 'The authorization code was not found in the callback.');
+  if (!result) {
+    return createErrorResponse(origin, 'result_missing', 'The authorization result was not found in the callback.');
   }
 
   try {
-    const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
-    if (!wellknownUrl) throw new Error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
-    
-    const appUrl = process.env.APP_URL?.replace(/\/$/, '');
-    if (!appUrl) {
-      throw new Error('Missing APP_URL env var.');
-    }
-    const callbackUrl = `${appUrl}/api/v1/auth/callback/passkey`;
-
-    const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
-    if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration from provider.');
-    const wellknown = await wellknownResponse.json();
-    
-    const tokenEndpoint = wellknown.token_endpoint;
-
-    const params = new URLSearchParams({
-      grant_type: 'authorization_code',
-      code: code,
-      redirect_uri: callbackUrl,
-      client_id: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
-    });
-
-    const headers: HeadersInit = { 'Content-Type': 'application/x-www-form-urlencoded' };
-    const clientSecret = process.env.COGNITO_CLIENT_SECRET;
-    if (clientSecret) {
-      headers['Authorization'] = `Basic ${Buffer.from(`${process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!}:${clientSecret}`).toString('base64')}`;
-    }
-
-    const tokenResponse = await fetch(tokenEndpoint, {
-      method: 'POST',
-      headers: headers,
-      body: params.toString(),
-      cache: 'no-store',
-    });
-
-    const tokens = await tokenResponse.json();
-
-    if (!tokenResponse.ok) {
-      const errorDetails = tokens.error_description || tokens.error || "Token exchange failed.";
-      throw new Error(errorDetails);
-    }
+    const session = await getSession();
+    if (!session) throw new Error('no session');
     
     const updateUserAttrCommand = new UpdateUserAttributesCommand({
-        AccessToken: tokens.access_token,
+        AccessToken: session.access_token,
         UserAttributes: [{
             Name: 'custom:pless',
             Value: 'true',
@@ -106,21 +62,7 @@ export async function GET(request: NextRequest) {
     const securityUrl = new URL(pathnames['/security'], origin);
     securityUrl.searchParams.set('result', 'success');
     const response = NextResponse.redirect(securityUrl);
-    
-    const isProd = process.env.NODE_ENV === 'production';
-    
-    let cookieDomain: string | undefined;
-    if (isProd && appUrl) {
-        const hostname = new URL(appUrl).hostname;
-        cookieDomain = hostname.startsWith('www.') ? hostname.substring(4) : hostname;
-    }
-    
-    response.cookies.set('oauth_state', '', { 
-      expires: new Date(0), 
-      path: '/',
-      domain: cookieDomain
-    });
-    
+
     revalidatePath(pathnames['/security']);
     revalidatePath('/');
     
