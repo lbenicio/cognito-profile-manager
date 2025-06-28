@@ -8,7 +8,7 @@ COPY package.json package-lock.json* ./
 
 # --- Dependency Purging ---
 # Install ONLY production dependencies. This is key to a smaller image.
-RUN npm ci --omit=dev
+RUN npm install
 
 
 # Stage 2: Build the application
