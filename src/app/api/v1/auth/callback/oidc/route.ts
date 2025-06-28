@@ -109,17 +109,21 @@ export async function GET(request: NextRequest) {
           }
       }
       
-      // Fetch IP from AWS service for reliability
+      // A more robust way to get the user's IP
       let ip = 'Unknown';
       try {
         const ipResponse = await fetch('https://checkip.amazonaws.com/', { cache: 'no-store' });
         if (ipResponse.ok) {
           ip = (await ipResponse.text()).trim();
         } else {
-           console.error(`checkip.amazonaws.com failed with status: ${ipResponse.status}`);
+           console.error(`checkip.amazonaws.com failed with status: ${ipResponse.status}. Falling back to headers.`);
+           const forwarded = request.headers.get('x-forwarded-for');
+           ip = forwarded ? forwarded.split(/, /)[0] : request.ip ?? 'Unknown';
         }
       } catch (ipError) {
-        console.error("Could not fetch user IP from checkip.amazonaws.com:", ipError);
+        console.error("Could not fetch user IP from checkip.amazonaws.com:", ipError, ". Falling back to headers.");
+        const forwarded = request.headers.get('x-forwarded-for');
+        ip = forwarded ? forwarded.split(/, /)[0] : request.ip ?? 'Unknown';
       }
 
       const newFingerprint = {
