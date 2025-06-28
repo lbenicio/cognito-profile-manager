@@ -90,7 +90,7 @@ export const getSession = cache(async () => {
   }
 
   const key = `${sessionPrefix}${payload.sessionId}`;
-  const session = await getCache<any>(key);
+  let session = await getCache<any>(key);
 
   if (!session) {
     // Session is not in Redis. The cookie is invalid. Return null.
