@@ -284,6 +284,12 @@
         "description": "You will be redirected to a secure page to register your device. You may be prompted to use your fingerprint, face, or a security key.",
         "continue": "Continue",
         "cancel": "Cancel"
+      },
+      "deleteDialog": {
+        "title": "Are you sure?",
+        "description": "This will permanently delete the passkey named \"{deviceName}\". This action cannot be undone.",
+        "confirm": "Delete",
+        "cancel": "Cancel"
       }
     }
   },

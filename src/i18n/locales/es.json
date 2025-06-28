@@ -284,6 +284,12 @@
         "description": "Serás redirigido a una página segura para registrar tu dispositivo. Es posible que se te pida usar tu huella digital, rostro o una llave de seguridad.",
         "continue": "Continuar",
         "cancel": "Cancelar"
+      },
+      "deleteDialog": {
+        "title": "¿Estás seguro?",
+        "description": "Esto eliminará permanentemente la passkey llamada \"{deviceName}\". Esta acción no se puede deshacer.",
+        "confirm": "Eliminar",
+        "cancel": "Cancelar"
       }
     }
   },

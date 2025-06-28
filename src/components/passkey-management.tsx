@@ -5,7 +5,7 @@ import { useState, useEffect, useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { KeyRound, Loader2, TestTube2, Trash2 } from 'lucide-react';
+import { KeyRound, Loader2, TestTube2, Trash2, Copy } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from 'next-intl';
 import type { User } from '@/lib/auth';
@@ -100,10 +100,35 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
     const handleTestListPasskeys = () => {
         startTestTransition(async () => {
             const result = await listCognitoPasskeys(user.username);
-            if (result.success) {
+            if (result.success && result.data) {
+                const formattedData = JSON.stringify(result.data, null, 2);
+
+                const copyToClipboard = () => {
+                    navigator.clipboard.writeText(formattedData);
+                    toast({
+                        title: "Copied!",
+                        description: "Passkey data has been copied to clipboard.",
+                    });
+                };
+
                 toast({
-                    title: 'Dev Test Success',
-                    description: result.message,
+                    title: "Passkey Credentials Found",
+                    description: (
+                        <div className="w-full mt-2">
+                             <p className="text-sm text-muted-foreground mb-2">
+                                Found {result.data?.length || 0} passkeys for user <span className="font-mono text-foreground">{user.username}</span>.
+                            </p>
+                            <div className="w-full max-w-full rounded-md bg-muted p-2">
+                                <pre className="text-xs overflow-x-auto max-h-60">
+                                    <code>{formattedData}</code>
+                                </pre>
+                            </div>
+                            <Button onClick={copyToClipboard} size="sm" className="mt-4 w-full">
+                                <Copy className="mr-2 h-4 w-4" />
+                                Copy JSON
+                            </Button>
+                        </div>
+                    ),
                 });
             } else {
                  toast({
@@ -152,19 +177,36 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
                                                         {isMounted && device.createDate ? format(new Date(device.createDate), "PPP") : '...'}
                                                     </TableCell>
                                                     <TableCell className="text-right">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => handleDeletePasskey(device.key)}
-                                                            disabled={isDeleting === device.key || isPending}
-                                                            aria-label={`Delete passkey ${device.name}`}
-                                                        >
-                                                            {isDeleting === device.key ? (
-                                                                <Loader2 className="h-4 w-4 animate-spin" />
-                                                            ) : (
-                                                                <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
-                                                            )}
-                                                        </Button>
+                                                        <AlertDialog>
+                                                            <AlertDialogTrigger asChild>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    disabled={isDeleting === device.key || isPending}
+                                                                    aria-label={`Delete passkey ${device.name}`}
+                                                                >
+                                                                    {isDeleting === device.key ? (
+                                                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                                                    ) : (
+                                                                        <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+                                                                    )}
+                                                                </Button>
+                                                            </AlertDialogTrigger>
+                                                            <AlertDialogContent>
+                                                                <AlertDialogHeader>
+                                                                    <AlertDialogTitle>{t('deleteDialog.title')}</AlertDialogTitle>
+                                                                    <AlertDialogDescription>
+                                                                        {t('deleteDialog.description', { deviceName: device.name })}
+                                                                    </AlertDialogDescription>
+                                                                </AlertDialogHeader>
+                                                                <AlertDialogFooter>
+                                                                    <AlertDialogCancel>{t('deleteDialog.cancel')}</AlertDialogCancel>
+                                                                    <AlertDialogAction onClick={() => handleDeletePasskey(device.key)}>
+                                                                        {t('deleteDialog.confirm')}
+                                                                    </AlertDialogAction>
+                                                                </AlertDialogFooter>
+                                                            </AlertDialogContent>
+                                                        </AlertDialog>
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
