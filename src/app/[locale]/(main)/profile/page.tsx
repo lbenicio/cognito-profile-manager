@@ -1,3 +1,4 @@
+import type { User } from '@/types/user/user.types';
 import { getUser } from '@/lib/auth';
 import { ProfileView } from '@/components/profile-view';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
@@ -5,12 +6,17 @@ import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { localLogout } from '@/lib/auth-actions';
 
-export default async function ProfilePage(props: {
-  params: Promise<{ locale: string }>;
-}) {
-  const params = await props.params;
+interface ProfilePageProps {
+  params: {
+    locale: string;
+  };
+}
+
+export default async function ProfilePage({
+  params,
+}: ProfilePageProps): Promise<JSX.Element> {
   unstable_setRequestLocale(params.locale);
-  const user = await getUser();
+  const user: User | null = await getUser();
 
   if (!user) {
     const t = await getTranslations('Header');

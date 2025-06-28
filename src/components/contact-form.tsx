@@ -1,7 +1,12 @@
 'use client';
 
+import type { ContactFormProps } from '@/interfaces/components/contact-form.interfaces';
+import type { ContactFormValues } from '@/types/forms/contact-form.types';
+import React, { useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
+import { Loader2, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -12,15 +17,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-} from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
-import { Loader2, Send } from 'lucide-react';
-import React, { useMemo } from 'react';
-import { Textarea } from './ui/textarea';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
@@ -28,15 +25,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { sendContactEmail } from '@/lib/contact-actions';
+import { Textarea } from './ui/textarea';
 import { Label } from './ui/label';
-import type { ContactFormProps } from '@/interfaces/components/contact-form.interfaces';
-import {
-  contactFormSchema,
-  type ContactFormValues,
-} from '@/types/forms/contact-form.types';
+import { useToast } from '@/hooks/use-toast';
+import { sendContactEmail } from '@/lib/contact-actions';
+import { contactFormSchema } from '@/types/forms/contact-form.types';
 
-export function ContactForm({ user, translations }: ContactFormProps) {
+export function ContactForm({
+  user,
+  translations,
+}: ContactFormProps): JSX.Element {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
 
@@ -123,7 +121,7 @@ export function ContactForm({ user, translations }: ContactFormProps) {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {categories.map((cat) => (
+                      {categories.map((cat: { value: string; label: string }) => (
                         <SelectItem key={cat.value} value={cat.value}>
                           {cat.label}
                         </SelectItem>

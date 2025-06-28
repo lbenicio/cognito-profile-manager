@@ -1,8 +1,12 @@
 'use client';
 
+import type { AddressFormProps } from '@/interfaces/forms/address-form.interfaces';
+import type { AddressFormValues } from '@/types/forms/address-form.types';
+import React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
+import { Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -22,21 +26,17 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Save } from 'lucide-react';
-import React from 'react';
 import { updateUserAddress } from '@/lib/profile-actions';
 import { addressFormSchema } from '@/types/forms/address-form.types';
-import type {
-  AddressFormProps,
-  AddressFormValues,
-} from '@/interfaces/forms/address-form.interfaces';
 
-export function AddressForm({ user, onUpdateAction }: AddressFormProps) {
-  // user: User is now imported from types/api/user.types
+export function AddressForm({
+  user,
+  onUpdateAction,
+}: AddressFormProps): JSX.Element {
   const { toast } = useToast();
   const t = useTranslations('Account.form');
   const tAddress = useTranslations('Account.addressForm');
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
 
   const form = useForm<AddressFormValues>({
     resolver: zodResolver(addressFormSchema(t)),
@@ -52,7 +52,7 @@ export function AddressForm({ user, onUpdateAction }: AddressFormProps) {
     mode: 'onChange',
   });
 
-  async function onSubmit(data: AddressFormValues) {
+  async function onSubmit(data: AddressFormValues): Promise<void> {
     setIsSubmitting(true);
 
     try {

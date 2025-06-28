@@ -15,5 +15,7 @@ export const addressFormSchema = (t: (key: string) => string) =>
     country: z.string().min(1, { message: t('address.countryRequired') }),
   });
 
-// Types and interfaces for AddressForm should be imported directly from
-// '@/interfaces/forms/address-form.interfaces' instead of this file.
+/**
+ * Type for Address Form values, inferred from the schema.
+ */
+export type AddressFormValues = z.infer<ReturnType<typeof addressFormSchema>>;

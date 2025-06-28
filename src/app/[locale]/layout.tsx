@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import type { User } from '@/types/user/user.types';
 import '../globals.css';
 import '../fonts.css';
 import { getMessages, unstable_setRequestLocale } from 'next-intl/server';
@@ -11,21 +12,24 @@ export const metadata: Metadata = {
   description: 'Manage your Outpost user profile',
 };
 
-// This is the root layout. It now includes the i18n and theme providers.
-export default async function LocaleLayout(props: {
+interface LocaleLayoutProps {
   children: React.ReactNode;
-  params: Promise<{ locale: string }>;
-}) {
-  const params = await props.params;
+  params: {
+    locale: string;
+  };
+}
 
-  const { children } = props;
-
+// This is the root layout. It now includes the i18n and theme providers.
+export default async function LocaleLayout({
+  children,
+  params,
+}: LocaleLayoutProps): Promise<JSX.Element> {
   unstable_setRequestLocale(params.locale);
   const messages = await getMessages();
-  const user = await getUser();
+  const user: User | null = await getUser();
 
-  const theme = user?.preferences?.theme || 'system';
-  const fontSize = user?.preferences?.fontSize || 12;
+  const theme: string = user?.preferences?.theme || 'system';
+  const fontSize: number = user?.preferences?.fontSize || 12;
 
   return (
     <html

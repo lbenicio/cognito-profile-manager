@@ -1,10 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 
-export default async function PrivacyPolicyPage(props: {
-  params: Promise<{ locale: string }>;
-}) {
-  const params = await props.params;
+interface PrivacyPolicyPageProps {
+  params: {
+    locale: string;
+  };
+}
+export default async function PrivacyPolicyPage({
+  params,
+}: PrivacyPolicyPageProps): Promise<JSX.Element> {
   unstable_setRequestLocale(params.locale);
   const t = await getTranslations('Privacy');
 

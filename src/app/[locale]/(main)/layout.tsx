@@ -1,18 +1,22 @@
+import type { User } from '@/types/user/user.types';
+import type { HeaderTranslations } from '@/interfaces/components/header.interfaces';
 import { getTranslations } from 'next-intl/server';
 import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { getUser } from '@/lib/auth';
 
+interface MainAppLayoutProps {
+  children: React.ReactNode;
+}
+
 export default async function MainAppLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
-  const user = await getUser();
+}: MainAppLayoutProps): Promise<JSX.Element> {
+  const user: User | null = await getUser();
   const t = await getTranslations('Header');
 
-  const headerTranslations = {
+  const headerTranslations: HeaderTranslations = {
     title: t('title'),
     userMenu: {
       profile: t('userMenu.profile'),
@@ -22,8 +26,8 @@ export default async function MainAppLayout({
       account: t('userMenu.account'),
       security: t('userMenu.security'),
     },
-    mobileMenuTrigger: t('mobileMenuTrigger'),
     mobileMenuTitle: t('mobileMenuTitle'),
+    mobileMenuTrigger: t('mobileMenuTrigger'),
     language: t('language'),
   };
 

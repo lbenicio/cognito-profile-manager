@@ -18,11 +18,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { timezones } from '@/lib/timezones';
+import { timezones, type Timezone } from '@/lib/timezones';
 import type { TimezoneSelectProps } from '@/interfaces/components/timezone-select.interfaces';
 
-export function TimezoneSelect({ value, onChange }: TimezoneSelectProps) {
-  const [open, setOpen] = React.useState(false);
+export function TimezoneSelect({
+  value,
+  onChange,
+}: TimezoneSelectProps): JSX.Element {
+  const [open, setOpen] = React.useState<boolean>(false);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -34,7 +37,8 @@ export function TimezoneSelect({ value, onChange }: TimezoneSelectProps) {
           className='w-full justify-between font-normal'
         >
           {value
-            ? timezones.find((timezone) => timezone.value === value)?.label
+            ? timezones.find((timezone: Timezone) => timezone.value === value)
+                ?.label
             : 'Select timezone...'}
           <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
         </Button>
@@ -45,11 +49,11 @@ export function TimezoneSelect({ value, onChange }: TimezoneSelectProps) {
           <CommandList>
             <CommandEmpty>No timezone found.</CommandEmpty>
             <CommandGroup>
-              {timezones.map((timezone) => (
+              {timezones.map((timezone: Timezone) => (
                 <CommandItem
                   key={timezone.value}
                   value={timezone.value}
-                  onSelect={(currentValue) => {
+                  onSelect={(currentValue: string) => {
                     onChange(currentValue === value ? '' : currentValue);
                     setOpen(false);
                   }}

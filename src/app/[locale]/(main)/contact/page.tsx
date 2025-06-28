@@ -1,3 +1,5 @@
+import type { User } from '@/types/user/user.types';
+import type { ContactFormTranslations } from '@/interfaces/components/contact-form.interfaces';
 import { getUser } from '@/lib/auth';
 import { ContactForm } from '@/components/contact-form';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
@@ -5,12 +7,17 @@ import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { localLogout } from '@/lib/auth-actions';
 
-export default async function ContactPage(props: {
-  params: Promise<{ locale: string }>;
-}) {
-  const params = await props.params;
+interface ContactPageProps {
+  params: {
+    locale: string;
+  };
+}
+
+export default async function ContactPage({
+  params,
+}: ContactPageProps): Promise<JSX.Element> {
   unstable_setRequestLocale(params.locale);
-  const user = await getUser();
+  const user: User | null = await getUser();
   const t = await getTranslations();
 
   if (!user) {
@@ -33,7 +40,7 @@ export default async function ContactPage(props: {
     );
   }
 
-  const translations = {
+  const translations: ContactFormTranslations = {
     title: t('Contact.title'),
     description: t('Contact.description'),
     form: {

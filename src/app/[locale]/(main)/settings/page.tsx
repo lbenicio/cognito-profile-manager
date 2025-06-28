@@ -1,3 +1,4 @@
+import type { User } from '@/types/user/user.types';
 import { AppearanceSettings } from '@/components/appearance-settings';
 import { NotificationSettings } from '@/components/notification-settings';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
@@ -6,12 +7,17 @@ import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { localLogout } from '@/lib/auth-actions';
 
-export default async function SettingsPage(props: {
-  params: Promise<{ locale: string }>;
-}) {
-  const params = await props.params;
+interface SettingsPageProps {
+  params: {
+    locale: string;
+  };
+}
+
+export default async function SettingsPage({
+  params,
+}: SettingsPageProps): Promise<JSX.Element> {
   unstable_setRequestLocale(params.locale);
-  const user = await getUser();
+  const user: User | null = await getUser();
   const t = await getTranslations();
 
   if (!user) {

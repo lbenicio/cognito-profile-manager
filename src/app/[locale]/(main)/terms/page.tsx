@@ -1,10 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 
-export default async function TermsOfServicePage(props: {
-  params: Promise<{ locale: string }>;
-}) {
-  const params = await props.params;
+interface TermsOfServicePageProps {
+  params: {
+    locale: string;
+  };
+}
+
+export default async function TermsOfServicePage({
+  params,
+}: TermsOfServicePageProps): Promise<JSX.Element> {
   unstable_setRequestLocale(params.locale);
   const t = await getTranslations('Terms');
 

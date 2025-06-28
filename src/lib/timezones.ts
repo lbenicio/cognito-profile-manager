@@ -1,4 +1,9 @@
-export const timezones = [
+export interface Timezone {
+  label: string;
+  value: string;
+}
+
+export const timezones: Timezone[] = [
   { label: 'Africa/Abidjan', value: 'Africa/Abidjan' },
   { label: 'Africa/Accra', value: 'Africa/Accra' },
   { label: 'Africa/Algiers', value: 'Africa/Algiers' },

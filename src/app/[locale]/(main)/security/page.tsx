@@ -1,3 +1,4 @@
+import type { User } from '@/types/user/user.types';
 import { getUser } from '@/lib/auth';
 import { SecurityView } from '@/components/security-view';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
@@ -6,12 +7,17 @@ import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { localLogout } from '@/lib/auth-actions';
 
-export default async function SecurityPage(props: {
-  params: Promise<{ locale: string }>;
-}) {
-  const params = await props.params;
+interface SecurityPageProps {
+  params: {
+    locale: string;
+  };
+}
+
+export default async function SecurityPage({
+  params,
+}: SecurityPageProps): Promise<JSX.Element> {
   unstable_setRequestLocale(params.locale);
-  let user = await getUser();
+  let user: User | null = await getUser();
   const t = await getTranslations();
 
   if (!user) {

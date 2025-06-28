@@ -1,3 +1,4 @@
+import type { User } from '@/types/user/user.types';
 import { getUser } from '@/lib/auth';
 import { DashboardView } from '@/components/dashboard-view';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
@@ -6,16 +7,18 @@ import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { localLogout } from '@/lib/auth-actions';
 
-// This is now a Server Component
-export default async function DashboardPage(props: {
-  params: Promise<{ locale: string }>;
-}) {
-  unstable_setRequestLocale((await props.params).locale);
-  let user = await getUser();
+interface DashboardPageProps {
+  params: {
+    locale: string;
+  };
+}
 
-  // The middleware should protect this page. If user is null here, it indicates
-  // a session issue that the middleware couldn't catch, or a failed API call in getUser.
-  // We render an error instead of redirecting to prevent an infinite loop.
+export default async function DashboardPage({
+  params,
+}: DashboardPageProps): Promise<JSX.Element> {
+  unstable_setRequestLocale(params.locale);
+  let user: User | null = await getUser();
+
   if (!user) {
     const t = await getTranslations('Header');
     return (
