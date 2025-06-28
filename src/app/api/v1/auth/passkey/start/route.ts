@@ -35,16 +35,12 @@ export async function GET(request: NextRequest) {
     const wellknown = await wellknownResponse.json();
     const authorizationEndpoint = wellknown.authorization_endpoint;
     
-    // 3. CSRF protection
-    const state = Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('hex');
-    
     const params = new URLSearchParams({
       client_id: clientId,
       // The response_type is intentionally omitted for this specific flow.
       // Cognito will infer the passkey registration flow from the id_token_hint.
       scope: 'openid', // Minimal scope needed
       redirect_uri: callbackUrl,
-      state: state,
       id_token_hint: session.id_token, // Provide user context to Cognito
     });
   
@@ -52,24 +48,6 @@ export async function GET(request: NextRequest) {
     const passkeySetupUrl = `${authorizationEndpoint}?${params.toString()}`;
     const response = NextResponse.redirect(passkeySetupUrl);
     
-    const isProd = process.env.NODE_ENV === 'production';
-    
-    let cookieDomain: string | undefined;
-    if (isProd && appUrl) {
-        const hostname = new URL(appUrl).hostname;
-        cookieDomain = hostname.startsWith('www.') ? hostname.substring(4) : hostname;
-    }
-
-    // Set the state cookie for CSRF protection
-    response.cookies.set('oauth_state', state, {
-      path: '/',
-      maxAge: 600, // 10 minutes
-      httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? 'none' : 'lax',
-      domain: cookieDomain,
-    });
-
     return response;
 
   } catch (error: any) {
