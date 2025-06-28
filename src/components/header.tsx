@@ -47,30 +47,15 @@ type HeaderTranslations = {
 export function Header({ user, translations: t }: { user: UserType | null, translations: HeaderTranslations }) {
   const adminDashboardUrl = process.env.NEXT_PUBLIC_ADMIN_DASHBOARD_URL || '#';
   const currentLanguage = user?.preferences?.language || 'en';
-  const router = useRouter();
   const [isLoggingOut, startTransition] = useTransition();
   const { toast } = useToast();
 
   const handleLogout = () => {
-    startTransition(async () => {
-      try {
-        const response = await fetch('/api/v1/auth/logout', { method: 'POST' });
-        if (response.ok) {
-          router.push('/login');
-        } else {
-          toast({
-            variant: 'destructive',
-            title: 'Logout Failed',
-            description: 'Could not log out. Please try again.',
-          });
-        }
-      } catch (error) {
-        toast({
-            variant: 'destructive',
-            title: 'Logout Failed',
-            description: 'An error occurred during logout.',
-        });
-      }
+    startTransition(() => {
+      // For a full OIDC-compliant single-logout, we must navigate the browser
+      // to the logout endpoint. This endpoint will clear our local session
+      // and then redirect to the identity provider's logout page.
+      window.location.assign('/api/v1/auth/logout');
     });
   };
 
