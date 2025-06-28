@@ -4,6 +4,7 @@ import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { getUser } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
+import { localLogout } from '@/lib/auth-actions';
 
 export default async function SettingsPage(props: {
   params: Promise<{ locale: string }>;
@@ -11,6 +12,7 @@ export default async function SettingsPage(props: {
   const params = await props.params;
   unstable_setRequestLocale(params.locale);
   const user = await getUser();
+  const t = await getTranslations();
 
   if (!user) {
     return (
@@ -21,24 +23,24 @@ export default async function SettingsPage(props: {
             Could not load user data. Please try logging out and signing in
             again.
           </p>
-          <Button asChild>
-            <a href='/api/v1/auth/logout'>
+          <form action={localLogout}>
+            <Button type='submit'>
               <LogOut className='mr-2 h-4 w-4' />
-              Log Out
-            </a>
-          </Button>
+              {t('Header.userMenu.logout')}
+            </Button>
+          </form>
         </div>
       </div>
     );
   }
 
-  const t = await getTranslations('Settings');
-
   return (
     <div className='container mx-auto p-4 md:p-8'>
       <header className='mb-8'>
-        <h1 className='text-3xl font-bold tracking-tight'>{t('title')}</h1>
-        <p className='text-muted-foreground'>{t('description')}</p>
+        <h1 className='text-3xl font-bold tracking-tight'>
+          {t('Settings.title')}
+        </h1>
+        <p className='text-muted-foreground'>{t('Settings.description')}</p>
       </header>
       <div className='grid grid-cols-1 items-start gap-8 md:grid-cols-2'>
         <AppearanceSettings user={user} />

@@ -1,7 +1,7 @@
 'use server';
 
 import { redirect } from '@/navigation';
-import { createSession } from '@/lib/session';
+import { createSession, deleteSession } from '@/lib/session';
 import { mockAdminUser } from '@/lib/auth';
 
 export async function devAdminLogin() {
@@ -29,4 +29,9 @@ export async function devAdminLogin() {
 
   await createSession(sessionData, expiresIn);
   redirect('/');
+}
+
+export async function localLogout() {
+  await deleteSession();
+  redirect('/login');
 }

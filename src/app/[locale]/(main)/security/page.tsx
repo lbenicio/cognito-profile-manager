@@ -4,6 +4,7 @@ import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { syncPasskeysEnabledFlag } from '@/lib/passkey-actions';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
+import { localLogout } from '@/lib/auth-actions';
 
 export default async function SecurityPage(props: {
   params: Promise<{ locale: string }>;
@@ -11,6 +12,7 @@ export default async function SecurityPage(props: {
   const params = await props.params;
   unstable_setRequestLocale(params.locale);
   let user = await getUser();
+  const t = await getTranslations();
 
   if (!user) {
     return (
@@ -21,12 +23,12 @@ export default async function SecurityPage(props: {
             Could not load user data. Please try logging out and signing in
             again.
           </p>
-          <Button asChild>
-            <a href='/api/v1/auth/logout'>
+          <form action={localLogout}>
+            <Button type='submit'>
               <LogOut className='mr-2 h-4 w-4' />
-              Log Out
-            </a>
-          </Button>
+              {t('Header.userMenu.logout')}
+            </Button>
+          </form>
         </div>
       </div>
     );
@@ -40,11 +42,9 @@ export default async function SecurityPage(props: {
     user = { ...user, passkeysEnabled: true };
   }
 
-  const t = await getTranslations('Security');
-
   const securityPageTranslations = {
-    title: t('title'),
-    description: t('description'),
+    title: t('Security.title'),
+    description: t('Security.description'),
   };
 
   return (

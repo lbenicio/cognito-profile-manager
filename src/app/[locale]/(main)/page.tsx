@@ -1,9 +1,10 @@
 import { getUser } from '@/lib/auth';
 import { DashboardView } from '@/components/dashboard-view';
-import { unstable_setRequestLocale } from 'next-intl/server';
+import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { syncPasskeysEnabledFlag } from '@/lib/passkey-actions';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
+import { localLogout } from '@/lib/auth-actions';
 
 // This is now a Server Component
 export default async function DashboardPage(props: {
@@ -16,6 +17,7 @@ export default async function DashboardPage(props: {
   // a session issue that the middleware couldn't catch, or a failed API call in getUser.
   // We render an error instead of redirecting to prevent an infinite loop.
   if (!user) {
+    const t = await getTranslations('Header');
     return (
       <div className='flex h-screen items-center justify-center'>
         <div className='space-y-4 text-center'>
@@ -24,12 +26,12 @@ export default async function DashboardPage(props: {
             Could not load user data. Please try logging out and signing in
             again.
           </p>
-          <Button asChild>
-            <a href='/api/v1/auth/logout'>
+          <form action={localLogout}>
+            <Button type='submit'>
               <LogOut className='mr-2 h-4 w-4' />
-              Log Out
-            </a>
-          </Button>
+              {t('userMenu.logout')}
+            </Button>
+          </form>
         </div>
       </div>
     );

@@ -1,8 +1,9 @@
 import { getUser } from '@/lib/auth';
 import { ProfileView } from '@/components/profile-view';
-import { unstable_setRequestLocale } from 'next-intl/server';
+import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
+import { localLogout } from '@/lib/auth-actions';
 
 export default async function ProfilePage(props: {
   params: Promise<{ locale: string }>;
@@ -12,6 +13,7 @@ export default async function ProfilePage(props: {
   const user = await getUser();
 
   if (!user) {
+    const t = await getTranslations('Header');
     return (
       <div className='flex h-screen items-center justify-center'>
         <div className='space-y-4 text-center'>
@@ -20,12 +22,12 @@ export default async function ProfilePage(props: {
             Could not load user data. Please try logging out and signing in
             again.
           </p>
-          <Button asChild>
-            <a href='/api/v1/auth/logout'>
+          <form action={localLogout}>
+            <Button type='submit'>
               <LogOut className='mr-2 h-4 w-4' />
-              Log Out
-            </a>
-          </Button>
+              {t('userMenu.logout')}
+            </Button>
+          </form>
         </div>
       </div>
     );

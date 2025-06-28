@@ -3,6 +3,7 @@ import { ContactForm } from '@/components/contact-form';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
+import { localLogout } from '@/lib/auth-actions';
 
 export default async function ContactPage(props: {
   params: Promise<{ locale: string }>;
@@ -10,6 +11,7 @@ export default async function ContactPage(props: {
   const params = await props.params;
   unstable_setRequestLocale(params.locale);
   const user = await getUser();
+  const t = await getTranslations();
 
   if (!user) {
     return (
@@ -20,41 +22,40 @@ export default async function ContactPage(props: {
             Could not load user data. Please try logging out and signing in
             again.
           </p>
-          <Button asChild>
-            <a href='/api/v1/auth/logout'>
+          <form action={localLogout}>
+            <Button type='submit'>
               <LogOut className='mr-2 h-4 w-4' />
-              Log Out
-            </a>
-          </Button>
+              {t('Header.userMenu.logout')}
+            </Button>
+          </form>
         </div>
       </div>
     );
   }
 
-  const t = await getTranslations('Contact');
   const translations = {
-    title: t('title'),
-    description: t('description'),
+    title: t('Contact.title'),
+    description: t('Contact.description'),
     form: {
-      nameLabel: t('form.nameLabel'),
-      emailLabel: t('form.emailLabel'),
-      categoryLabel: t('form.categoryLabel'),
-      categoryPlaceholder: t('form.categoryPlaceholder'),
-      messageLabel: t('form.messageLabel'),
-      messagePlaceholder: t('form.messagePlaceholder'),
-      submitButton: t('form.submitButton'),
-      successTitle: t('form.successTitle'),
-      successDescription: t('form.successDescription'),
-      errorTitle: t('form.errorTitle'),
-      errorDescription: t('form.errorDescription'),
-      categoryRequired: t('form.categoryRequired'),
-      messageRequired: t('form.messageRequired'),
-      messageTooShort: t('form.messageTooShort'),
+      nameLabel: t('Contact.form.nameLabel'),
+      emailLabel: t('Contact.form.emailLabel'),
+      categoryLabel: t('Contact.form.categoryLabel'),
+      categoryPlaceholder: t('Contact.form.categoryPlaceholder'),
+      messageLabel: t('Contact.form.messageLabel'),
+      messagePlaceholder: t('Contact.form.messagePlaceholder'),
+      submitButton: t('Contact.form.submitButton'),
+      successTitle: t('Contact.form.successTitle'),
+      successDescription: t('Contact.form.successDescription'),
+      errorTitle: t('Contact.form.errorTitle'),
+      errorDescription: t('Contact.form.errorDescription'),
+      categoryRequired: t('Contact.form.categoryRequired'),
+      messageRequired: t('Contact.form.messageRequired'),
+      messageTooShort: t('Contact.form.messageTooShort'),
       categories: {
-        general: t('form.categories.general'),
-        billing: t('form.categories.billing'),
-        technical: t('form.categories.technical'),
-        feedback: t('form.categories.feedback'),
+        general: t('Contact.form.categories.general'),
+        billing: t('Contact.form.categories.billing'),
+        technical: t('Contact.form.categories.technical'),
+        feedback: t('Contact.form.categories.feedback'),
       },
     },
   };
