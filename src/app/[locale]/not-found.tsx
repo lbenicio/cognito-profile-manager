@@ -1,21 +1,12 @@
 import { Link } from '@/navigation';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { getLocale, getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { FileQuestion } from 'lucide-react';
 
-export default async function NotFoundPage({
-  params,
-}: {
-  params: { locale: string };
-}) {
-  unstable_setRequestLocale(params.locale);
+export default async function NotFoundPage() {
+  const locale = await getLocale();
+  unstable_setRequestLocale(locale);
   const t = await getTranslations('Errors.notFound');
 
   return (
