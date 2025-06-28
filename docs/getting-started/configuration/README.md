@@ -7,14 +7,17 @@ Create this file by copying the template: `cp .env.example .env.local`.
 ## Application Settings
 
 - `NODE_ENV`: The runtime environment. Set to `"development"` for local development.
+- `APP_URL`: The full base URL of your application (e.g., `http://localhost:3000` for local development, or `https://yourapp.com` for production). This is used to construct callback URLs for authentication.
 - `TOTP_SECRET_ENCRYPTION_KEY`: A 32-byte, base64-encoded key used to encrypt TOTP secrets before storing them. Generate one with: `openssl rand -base64 32`.
 
 ## Security (AWS Cognito & OAuth2)
 
 These variables connect the application to your AWS Cognito User Pool.
 
-- `NEXT_PUBLIC_OAUTH2_CALLBACK_URL`: The full URL where Cognito will redirect after a successful login. For local development, this is typically `http://localhost:3000/api/v1/auth/callback/oidc`. This must be added to the "Allowed callback URLs" in your Cognito App Client settings.
-- `NEXT_PUBLIC_PASSKEY_CALLBACK_URL`: The callback URL for Passkey operations.
+**Important**: You must add the following URLs to the "Allowed callback URLs" list in your Cognito App Client settings, replacing `{APP_URL}` with the value you set above:
+- `{APP_URL}/api/v1/auth/callback/oidc`
+- `{APP_URL}/api/v1/auth/callback/passkey`
+
 - `NEXT_PUBLIC_COGNITO_CLIENT_ID`: The App Client ID from your Cognito User Pool.
 - `COGNITO_CLIENT_SECRET`: The App Client Secret. This is required for the authorization code grant flow.
 - `NEXT_PUBLIC_COGNITO_WELLKNOWN`: The OpenID Connect discovery endpoint for your User Pool. It looks like: `https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/openid-configuration`.

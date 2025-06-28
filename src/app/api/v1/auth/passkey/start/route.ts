@@ -19,16 +19,17 @@ export async function GET(request: NextRequest) {
     // 2. Get Cognito configuration
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
-    const callbackUrl = process.env.NEXT_PUBLIC_PASSKEY_CALLBACK_URL;
+    const appUrl = process.env.APP_URL;
     const scope = 'openid email profile aws.cognito.signin.user.admin';
 
     if (!wellknownUrl || !clientId) {
       throw new Error('SSO client configuration is missing.');
     }
     
-    if (!callbackUrl) {
-      throw new Error('Missing NEXT_PUBLIC_PASSKEY_CALLBACK_URL env var.');
+    if (!appUrl) {
+      throw new Error('Missing APP_URL env var.');
     }
+    const callbackUrl = `${appUrl}/api/v1/auth/callback/passkey`;
 
     const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
     if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');

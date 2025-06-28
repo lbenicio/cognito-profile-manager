@@ -15,13 +15,12 @@ services:
       # --- Application Settings ---
       # Uses the host's NODE_ENV, or defaults to "development"
       NODE_ENV: ${NODE_ENV:-development}
+      # The base URL of your application.
+      APP_URL: ${APP_URL:-http://localhost:3000}
       # It's recommended to set this secret in your host environment for production
       TOTP_SECRET_ENCRYPTION_KEY: ${TOTP_SECRET_ENCRYPTION_KEY:-t0tvpe3jCyxyGODCIn6WmxQNYFStu+clqOWu0OkKQLo=}
 
       # --- Security - AWS Cognito & OAuth2 ---
-      # For development, these defaults point to localhost. Override if needed.
-      NEXT_PUBLIC_OAUTH2_CALLBACK_URL: ${NEXT_PUBLIC_OAUTH2_CALLBACK_URL:-http://localhost:3000/api/v1/auth/callback/oidc}
-      NEXT_PUBLIC_PASSKEY_CALLBACK_URL: ${NEXT_PUBLIC_PASSKEY_CALLBACK_URL:-http://localhost:3000/api/v1/auth/callback/passkey}
       NEXT_PUBLIC_OAUTH2_SCOPE: ${NEXT_PUBLIC_OAUTH2_SCOPE:-openid profile email aws.cognito.signin.user.admin}
 
       # !! These secrets MUST be set in your host environment !!
