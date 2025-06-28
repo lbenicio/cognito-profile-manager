@@ -3,9 +3,9 @@
 
 import { useState, useEffect, useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { KeyRound, Loader2, Trash2 } from 'lucide-react';
+import { KeyRound, Loader2, TestTube2, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from 'next-intl';
 import type { User } from '@/lib/auth';
@@ -23,6 +23,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { listCognitoPasskeys } from '@/lib/passkey-admin-actions';
+import { Separator } from './ui/separator';
 
 interface PasskeyManagementProps {
     user: User;
@@ -34,6 +36,7 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isPending, startTransition] = useTransition();
+    const [isTesting, startTestTransition] = useTransition();
 
     const [isAddingPasskey, setIsAddingPasskey] = useState(false);
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
@@ -91,6 +94,24 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
                 });
             }
             setIsDeleting(null);
+        });
+    };
+
+    const handleTestListPasskeys = () => {
+        startTestTransition(async () => {
+            const result = await listCognitoPasskeys(user.username);
+            if (result.success) {
+                toast({
+                    title: 'Dev Test Success',
+                    description: result.message,
+                });
+            } else {
+                 toast({
+                    variant: 'destructive',
+                    title: 'Dev Test Failed',
+                    description: result.message,
+                });
+            }
         });
     };
 
@@ -180,6 +201,19 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
                     </div>
                 </div>
             </CardContent>
+            {process.env.NODE_ENV === 'development' && user.isAdmin && (
+                <CardFooter className="flex-col items-start gap-4 !pt-0">
+                    <Separator className="mb-4" />
+                    <h4 className="text-sm font-semibold">Developer Tools</h4>
+                     <p className="text-xs text-muted-foreground -mt-2">
+                        This button tests the admin API for listing passkeys. It requires the correct IAM permissions on the server.
+                     </p>
+                    <Button variant="outline" size="sm" onClick={handleTestListPasskeys} disabled={isTesting}>
+                        {isTesting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <TestTube2 className="mr-2 h-4 w-4" />}
+                        Test List Passkeys (Admin)
+                    </Button>
+                </CardFooter>
+            )}
         </Card>
     );
 }
