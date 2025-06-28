@@ -24,7 +24,7 @@ export function LoginView() {
             toast({
                 variant: 'destructive',
                 title: t('errorTitle'),
-                description: errorDescription || (error === 'invalid_state' ? t('invalid_state') : error),
+                description: errorDescription || (error === 'invalid_state' ? t('invalid_state') : t('errorDescription')),
             });
             // Clean the URL to prevent the toast from re-appearing on refresh.
             window.history.replaceState(null, '', window.location.pathname);
