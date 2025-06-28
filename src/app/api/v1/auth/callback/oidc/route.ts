@@ -37,6 +37,7 @@ export async function GET(request: NextRequest) {
   const errorDescription = searchParams.get('error_description');
   const state = searchParams.get('state');
   const storedState = request.cookies.get('oauth_state')?.value;
+  const isSecure = new URL(request.url).protocol === 'https:';
 
   // --- Handle explicit errors from OIDC provider first ---
   if (errorParam) {
@@ -99,6 +100,7 @@ export async function GET(request: NextRequest) {
 
     if (!tokenResponse.ok) {
       const errorDetails = tokens.error_description || tokens.error || "Token exchange failed.";
+      console.error(`Token exchange failed with Cognito. Status: ${tokenResponse.status}. Details: ${errorDetails}. Check if the redirect_uri in your Cognito App Client settings matches: ${callbackUrl}`);
       throw new Error(errorDetails);
     }
 
@@ -127,10 +129,10 @@ export async function GET(request: NextRequest) {
     // Set auth cookie AND clear state cookie on the SAME response object before returning.
     response.cookies.set('auth_session', JSON.stringify(sessionData), {
       httpOnly: true,
-      secure: isProd,
+      secure: isSecure,
       maxAge: maxAge,
       path: '/',
-      sameSite: isProd ? 'none' : 'lax',
+      sameSite: isSecure ? 'none' : 'lax',
       domain: cookieDomain,
     });
     
@@ -144,6 +146,7 @@ export async function GET(request: NextRequest) {
 
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred during the login process.';
+    console.error(`Caught error in OIDC callback: ${errorMessage}`);
     return createErrorResponse(origin, 'callback_error', errorMessage);
   }
 }

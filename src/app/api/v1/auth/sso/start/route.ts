@@ -36,6 +36,7 @@ export async function GET(request: NextRequest) {
 
     const response = NextResponse.redirect(loginUrl);
     
+    const isSecure = new URL(request.url).protocol === 'https:';
     const isProd = process.env.NODE_ENV === 'production';
     
     let cookieDomain: string | undefined;
@@ -49,8 +50,8 @@ export async function GET(request: NextRequest) {
       path: '/',
       maxAge: 600, // 10 minutes
       httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? 'none' : 'lax',
+      secure: isSecure,
+      sameSite: isSecure ? 'none' : 'lax',
       domain: cookieDomain,
     });
 

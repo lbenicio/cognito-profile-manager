@@ -59,6 +59,7 @@ async function checkAndRefreshSession(request: NextRequest): Promise<{ isValid: 
         if (error.code === 'ERR_JWT_EXPIRED') {
             const newSessionData = await refreshAuthTokens(session.refresh_token);
             if (newSessionData) {
+                const isSecure = new URL(request.url).protocol === 'https:';
                 const isProd = process.env.NODE_ENV === 'production';
                 const appUrl = process.env.APP_URL?.replace(/\/$/, '');
                 let cookieDomain: string | undefined;
@@ -76,10 +77,10 @@ async function checkAndRefreshSession(request: NextRequest): Promise<{ isValid: 
                         value: JSON.stringify(newSessionData),
                         options: {
                             httpOnly: true,
-                            secure: isProd,
+                            secure: isSecure,
                             maxAge: maxAge,
                             path: '/',
-                            sameSite: isProd ? 'none' : 'lax',
+                            sameSite: isSecure ? 'none' : 'lax',
                             domain: cookieDomain,
                         }
                     }
