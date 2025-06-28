@@ -20,7 +20,6 @@ export async function GET(request: NextRequest) {
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
     const appUrl = process.env.APP_URL?.replace(/\/$/, '');
-    const scope = 'openid email profile aws.cognito.signin.user.admin';
 
     if (!wellknownUrl || !clientId) {
       throw new Error('SSO client configuration is missing.');
@@ -41,8 +40,9 @@ export async function GET(request: NextRequest) {
     
     const params = new URLSearchParams({
       client_id: clientId,
-      response_type: 'code',
-      scope: scope,
+      // The response_type is intentionally omitted for this specific flow.
+      // Cognito will infer the passkey registration flow from the id_token_hint.
+      scope: 'openid', // Minimal scope needed
       redirect_uri: callbackUrl,
       state: state,
       id_token_hint: session.id_token, // Provide user context to Cognito

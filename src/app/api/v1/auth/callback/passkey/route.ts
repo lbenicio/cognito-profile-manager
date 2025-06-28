@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { pathnames } from '@/navigation';
 import { cognitoClient, UpdateUserAttributesCommand } from '@/lib/cognito';
-import { getSession, getUser } from '@/lib/auth';
+import { getSession } from '@/lib/auth';
 
 function createErrorResponse(origin: string, error: string, description?: string | null): NextResponse {
   const securityUrl = new URL(pathnames['/security'], origin);
@@ -24,6 +24,7 @@ function createErrorResponse(origin: string, error: string, description?: string
       cookieDomain = hostname.startsWith('www.') ? hostname.substring(4) : hostname;
   }
 
+  // Ensure state cookie is always cleared on error
   response.cookies.set('oauth_state', '', { 
     expires: new Date(0), 
     path: '/',
@@ -37,19 +38,30 @@ export async function GET(request: NextRequest) {
   const result = searchParams.get('result');
   const errorParam = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
-
+  const state = searchParams.get('state');
+  const storedState = request.cookies.get('oauth_state')?.value;
+  
+  // --- Security Checks ---
   if (errorParam) {
     return createErrorResponse(origin, errorParam, errorDescription);
   }
+  
+  if (!state || !storedState || state !== storedState) {
+    return createErrorResponse(origin, 'invalid_state', 'Your session has expired or is invalid. Please try registering your passkey again.');
+  }
 
-  if (!result) {
-    return createErrorResponse(origin, 'result_missing', 'The authorization result was not found in the callback.');
+  // --- Main Logic ---
+  if (result !== 'success') {
+    return createErrorResponse(origin, 'result_missing', 'The passkey registration was not successful. Please try again.');
   }
 
   try {
     const session = await getSession();
-    if (!session) throw new Error('no session');
+    if (!session?.access_token) {
+      throw new Error('No active session found. Please log in again.');
+    }
     
+    // If the result is "success", update the user attribute in Cognito to reflect that passkeys are enabled.
     const updateUserAttrCommand = new UpdateUserAttributesCommand({
         AccessToken: session.access_token,
         UserAttributes: [{
@@ -62,9 +74,26 @@ export async function GET(request: NextRequest) {
     const securityUrl = new URL(pathnames['/security'], origin);
     securityUrl.searchParams.set('result', 'success');
     const response = NextResponse.redirect(securityUrl);
+    
+    const isProd = process.env.NODE_ENV === 'production';
+    const appUrl = process.env.APP_URL?.replace(/\/$/, '');
+    
+    let cookieDomain: string | undefined;
+    if (isProd && appUrl) {
+        const hostname = new URL(appUrl).hostname;
+        cookieDomain = hostname.startsWith('www.') ? hostname.substring(4) : hostname;
+    }
+    
+    // Clean up the state cookie on success
+    response.cookies.set('oauth_state', '', { 
+        expires: new Date(0), 
+        path: '/',
+        domain: cookieDomain
+    });
 
+    // Revalidate paths to reflect the new security status
     revalidatePath(pathnames['/security']);
-    revalidatePath('/');
+    revalidatePath('/'); // For the security health widget on the dashboard
     
     return response;
 
