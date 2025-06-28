@@ -187,7 +187,7 @@ export async function GET(request: NextRequest) {
     // Use the expires_in from Cognito for maxAge, defaulting to 1 hour.
     const maxAge = tokens.expires_in && typeof tokens.expires_in === 'number'
         ? tokens.expires_in
-        : 3600;
+        : tokens.expires_in && typeof tokens.expires_in === 'string' ? parseInt(tokens.expires_in) : 3600;
 
     // Set auth cookie AND clear state cookie on the SAME response object before returning.
     response.cookies.set('auth_session', JSON.stringify(sessionData), {
