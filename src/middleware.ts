@@ -23,10 +23,10 @@ const i18nMiddleware = createI18nMiddleware({
 
 // The main middleware function
 export async function middleware(request: NextRequest) {
-    const sessionCookie = request.cookies.get('auth_session');
-    const isPublicPage = publicPathnameRegex.test(request.nextUrl.pathname);
+    let sessionIsValid = false;
+    let newSessionCookieValue: string | null = null;
 
-    // Helper to create a redirect response to the login page
+    // Helper to create a redirect response to the login page, clearing cookies.
     const redirectToLogin = (): NextResponse => {
         const loginUrl = new URL(pathnames['/login'], request.url);
         const response = NextResponse.redirect(loginUrl);
@@ -35,100 +35,96 @@ export async function middleware(request: NextRequest) {
         const appUrl = process.env.APP_URL?.replace(/\/$/, '');
         const cookieDomain = isProd && appUrl ? new URL(appUrl).hostname : undefined;
 
-        response.cookies.set('auth_session', '', { 
-            expires: new Date(0), 
-            path: '/',
-            domain: cookieDomain
-        });
-        response.cookies.set('oauth_state', '', { 
-            expires: new Date(0), 
-            path: '/',
-            domain: cookieDomain
-        });
+        response.cookies.set('auth_session', '', { expires: new Date(0), path: '/', domain: cookieDomain });
+        response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/', domain: cookieDomain });
         return response;
     };
     
-    // --- Authentication Logic ---
-    if (!sessionCookie) {
-        if (!isPublicPage) {
-            return redirectToLogin(); // Protected page, no session -> redirect now
-        }
-        // Public page, no session -> proceed to i18n
-    } else {
-        // Session cookie exists, validate it.
+    // --- 1. Determine Session Validity ---
+    const sessionCookie = request.cookies.get('auth_session');
+    if (sessionCookie) {
         let session;
         try {
             session = JSON.parse(sessionCookie.value);
         } catch {
-            return redirectToLogin();
+            // Invalid cookie format, treat as no session
         }
 
-        // Dev mode mock session
-        if (session.username && !session.id_token) {
-            if (isPublicPage) {
-                return NextResponse.redirect(new URL(pathnames['/'], request.url));
-            }
-            // Dev user on protected page, proceed to i18n.
-        } else if (!session.id_token || !session.refresh_token) {
-            return redirectToLogin();
-        } else {
-            // It's a real OIDC session, validate JWT
-            const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
-            if (!wellknownUrl) {
-                console.error('Middleware: Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
-                return redirectToLogin();
-            }
+        if (session) {
+            // Handle dev mode mock session
+            if (session.username && !session.id_token) {
+                 sessionIsValid = true;
+            } 
+            // Handle real OIDC session
+            else if (session.id_token && session.refresh_token) {
+                 const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
+                 if (wellknownUrl) {
+                    try {
+                        const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
+                        if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
+                        const wellknown = await wellknownResponse.json();
+                        const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
+                        
+                        await jwtVerify(session.id_token, JWKS, {
+                            issuer: wellknown.issuer,
+                            audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
+                        });
+                        sessionIsValid = true;
 
-            try {
-                const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
-                if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
-                const wellknown = await wellknownResponse.json();
-                const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
-                await jwtVerify(session.id_token, JWKS, {
-                    issuer: wellknown.issuer,
-                    audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
-                });
-
-                // Token is valid. If on a public page, redirect to home.
-                if (isPublicPage) {
-                    return NextResponse.redirect(new URL(pathnames['/'], request.url));
-                }
-            } catch (error: any) {
-                if (error.code !== 'ERR_JWT_EXPIRED') {
-                    console.error("Middleware JWT validation error:", error.message);
-                    return redirectToLogin();
-                }
-                
-                // Token is expired, try to refresh.
-                const refreshed = await refreshAuthTokens(session.refresh_token);
-                if (!refreshed) {
-                    return redirectToLogin();
-                }
-                
-                // Refresh succeeded. Let the request continue to its original destination,
-                // but with the new session cookie set. This prevents a redirect loop.
-                const response = NextResponse.next();
-                
-                const isProd = process.env.NODE_ENV === 'production';
-                const appUrl = process.env.APP_URL?.replace(/\/$/, '');
-                const cookieDomain = isProd && appUrl ? new URL(appUrl).hostname : undefined;
-                
-                response.cookies.set('auth_session', JSON.stringify(refreshed), {
-                    httpOnly: true,
-                    secure: isProd,
-                    maxAge: 30 * 24 * 60 * 60, // 30 days
-                    path: '/',
-                    sameSite: isProd ? 'none' : 'lax',
-                    domain: cookieDomain,
-                });
-
-                return response; // Return the response to continue the request
+                    } catch (error: any) {
+                        if (error.code === 'ERR_JWT_EXPIRED') {
+                            const refreshedSession = await refreshAuthTokens(session.refresh_token);
+                            if (refreshedSession) {
+                                newSessionCookieValue = JSON.stringify(refreshedSession);
+                                sessionIsValid = true; // Session is now valid for this request
+                            }
+                        } else {
+                            console.error("Middleware JWT validation error:", error.message);
+                        }
+                    }
+                 }
             }
         }
     }
 
-    // --- I18n Logic ---
-    return i18nMiddleware(request);
+    // --- 2. Apply Routing Rules ---
+    const isPublicPage = publicPathnameRegex.test(request.nextUrl.pathname);
+
+    if (sessionIsValid) {
+        if (isPublicPage) {
+            // Logged-in user on a public page (like /login), redirect to dashboard
+            return NextResponse.redirect(new URL(pathnames['/'], request.url));
+        }
+    } else {
+        if (!isPublicPage) {
+            // Not logged-in and on a protected page, redirect to login
+            return redirectToLogin();
+        }
+    }
+
+    // --- 3. Pass to i18n Middleware ---
+    // At this point, the request is allowed to proceed.
+    // Let the i18n middleware handle locale detection and rewriting.
+    const response = i18nMiddleware(request);
+
+    // --- 4. Attach New Cookie if Refreshed ---
+    // If we refreshed the token, set the new cookie on the final response.
+    if (newSessionCookieValue) {
+        const isProd = process.env.NODE_ENV === 'production';
+        const appUrl = process.env.APP_URL?.replace(/\/$/, '');
+        const cookieDomain = isProd && appUrl ? new URL(appUrl).hostname : undefined;
+        
+        response.cookies.set('auth_session', newSessionCookieValue, {
+            httpOnly: true,
+            secure: isProd,
+            maxAge: 30 * 24 * 60 * 60, // 30 days
+            path: '/',
+            sameSite: isProd ? 'none' : 'lax',
+            domain: cookieDomain,
+        });
+    }
+    
+    return response;
 }
 
 export const config = {
