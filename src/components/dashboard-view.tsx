@@ -182,8 +182,6 @@ export function DashboardView({ user }: DashboardViewProps) {
                 </Table>
               </CardContent>
             </Card>
-
-            <LoginActivityChart fingerprint={user.fingerprint} />
         </div>
         
         <div className="lg:col-span-1 space-y-8">
@@ -277,6 +275,10 @@ export function DashboardView({ user }: DashboardViewProps) {
                 </CardContent>
             </Card>
         </div>
+      </div>
+
+      <div className="mt-8">
+        <LoginActivityChart fingerprint={user.fingerprint} />
       </div>
     </div>
   );
