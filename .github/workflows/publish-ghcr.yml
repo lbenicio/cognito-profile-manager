@@ -6,7 +6,7 @@ on:
       - master
 
 concurrency:
-  group: release-on-master-${{ github.ref }}
+  group: publish-ghcr-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:

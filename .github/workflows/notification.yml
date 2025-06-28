@@ -1,7 +1,7 @@
 name: Telegram notification
 
 concurrency:
-  group: release-on-master-${{ github.ref }}
+  group: notification-${{ github.ref }}
   cancel-in-progress: true
 
 on:
