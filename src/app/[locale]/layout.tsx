@@ -6,25 +6,19 @@ import { getMessages, unstable_setRequestLocale } from 'next-intl/server';
 import { NextIntlClientProvider } from 'next-intl';
 import { ThemeProvider } from '@/components/theme-provider';
 import { getUser } from '@/lib/auth';
+import type { LocaleLayoutProps } from '@/interfaces/app/locale-layout.interfaces';
 
 export const metadata: Metadata = {
   title: 'Outpost',
   description: 'Manage your Outpost user profile',
 };
 
-interface LocaleLayoutProps {
-  children: React.ReactNode;
-  params: {
-    locale: string;
-  };
-}
-
 // This is the root layout. It now includes the i18n and theme providers.
 export default async function LocaleLayout({
   children,
-  params,
+  params: { locale },
 }: LocaleLayoutProps): Promise<JSX.Element> {
-  unstable_setRequestLocale(params.locale);
+  unstable_setRequestLocale(locale);
   const messages = await getMessages();
   const user: User | null = await getUser();
 
@@ -33,7 +27,7 @@ export default async function LocaleLayout({
 
   return (
     <html
-      lang={params.locale}
+      lang={locale}
       className='h-full'
       style={{ fontSize: `${fontSize}pt` }}
       suppressHydrationWarning
@@ -53,7 +47,7 @@ export default async function LocaleLayout({
         />
       </head>
       <body className='flex min-h-screen flex-col font-body antialiased'>
-        <NextIntlClientProvider locale={params.locale} messages={messages}>
+        <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider
             attribute='class'
             defaultTheme={theme}
