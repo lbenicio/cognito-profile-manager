@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { pathnames } from '@/navigation';
 import { cognitoClient, UpdateUserAttributesCommand } from '@/lib/cognito';
 
-function createErrorResponse(origin: string, error: string, description?: string): NextResponse {
+function createErrorResponse(origin: string, error: string, description?: string | null): NextResponse {
   const securityUrl = new URL(pathnames['/security'], origin);
   securityUrl.searchParams.set('error', error);
   if (description) {
