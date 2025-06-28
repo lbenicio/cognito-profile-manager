@@ -1,6 +1,5 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import { cognitoClient, GetUserCommand, UpdateUserAttributesCommand } from '@/lib/cognito';
 
 function createErrorResponse(origin: string, error: string, description?: string): NextResponse {
   const loginUrl = new URL('/login', origin);
@@ -101,71 +100,6 @@ export async function GET(request: NextRequest) {
       throw new Error(errorDetails);
     }
 
-    // --- Update user fingerprint ---
-    try {
-      const { access_token } = tokens;
-
-      const getUserCommand = new GetUserCommand({ AccessToken: access_token });
-      const cognitoUser = await cognitoClient.send(getUserCommand);
-      const attributes = cognitoUser.UserAttributes?.reduce((acc, attr) => {
-          if (attr.Name && attr.Value) {
-              acc[attr.Name] = attr.Value;
-          }
-          return acc;
-      }, {} as Record<string, string>);
-
-      const existingFingerprintRaw = attributes?.['custom:fingerprint'];
-      let fingerprints = [];
-      if (existingFingerprintRaw) {
-          try {
-              fingerprints = JSON.parse(existingFingerprintRaw);
-          } catch {
-            // Ignore if parsing fails, start fresh
-          }
-      }
-      
-      // A more robust way to get the user's IP
-      let ip = 'Unknown';
-      try {
-        const ipResponse = await fetch('https://checkip.amazonaws.com/', { cache: 'no-store' });
-        if (ipResponse.ok) {
-          ip = (await ipResponse.text()).trim();
-        } else {
-           console.error(`checkip.amazonaws.com failed with status: ${ipResponse.status}. Falling back to headers.`);
-           const forwarded = request.headers.get('x-forwarded-for');
-           ip = forwarded ? forwarded.split(/, /)[0] : 'Unknown';
-        }
-      } catch (ipError) {
-        console.error("Could not fetch user IP from checkip.amazonaws.com:", ipError, ". Falling back to headers.");
-        const forwarded = request.headers.get('x-forwarded-for');
-        ip = forwarded ? forwarded.split(/, /)[0] : 'Unknown';
-      }
-
-      const newFingerprint = {
-          date: new Date().toISOString(),
-          ip: ip,
-          device: request.headers.get('user-agent') ?? 'Unknown',
-      };
-      fingerprints.unshift(newFingerprint);
-
-      // Keep only the last 10 entries
-      const updatedFingerprints = fingerprints.slice(0, 10);
-
-      const updateUserAttrCommand = new UpdateUserAttributesCommand({
-          AccessToken: access_token,
-          UserAttributes: [{
-              Name: 'custom:fingerprint',
-              Value: JSON.stringify(updatedFingerprints),
-          }],
-      });
-      await cognitoClient.send(updateUserAttrCommand);
-
-    } catch (e) {
-        // Log the error but don't block the login flow
-        console.error("Failed to update user fingerprint:", e);
-    }
-    // --- End fingerprint update ---
-
     const sessionData = {
         id_token: tokens.id_token,
         access_token: tokens.access_token,
@@ -184,10 +118,9 @@ export async function GET(request: NextRequest) {
         cookieDomain = hostname.startsWith('www.') ? hostname.substring(4) : hostname;
     }
     
-    // Use the expires_in from Cognito for maxAge, defaulting to 1 hour.
     const maxAge = tokens.expires_in && typeof tokens.expires_in === 'number'
         ? tokens.expires_in
-        : tokens.expires_in && typeof tokens.expires_in === 'string' ? parseInt(tokens.expires_in) : 3600;
+        : 3600;
 
     // Set auth cookie AND clear state cookie on the SAME response object before returning.
     response.cookies.set('auth_session', JSON.stringify(sessionData), {
