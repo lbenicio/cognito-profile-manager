@@ -13,7 +13,16 @@ function createErrorResponse(origin: string, error: string, description?: string
     securityUrl.searchParams.set('error_description', description);
   }
   const response = NextResponse.redirect(securityUrl);
-  response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
+  
+  const isProd = process.env.NODE_ENV === 'production';
+  const appUrl = process.env.APP_URL;
+  const cookieDomain = isProd && appUrl ? new URL(appUrl).hostname : undefined;
+
+  response.cookies.set('oauth_state', '', { 
+    expires: new Date(0), 
+    path: '/',
+    domain: cookieDomain
+  });
   return response;
 }
 
@@ -93,7 +102,15 @@ export async function GET(request: NextRequest) {
     securityUrl.searchParams.set('result', 'success');
     const response = NextResponse.redirect(securityUrl);
     
-    response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
+    const isProd = process.env.NODE_ENV === 'production';
+    const appUrlObject = new URL(appUrl);
+    const cookieDomain = isProd ? appUrlObject.hostname : undefined;
+    
+    response.cookies.set('oauth_state', '', { 
+      expires: new Date(0), 
+      path: '/',
+      domain: cookieDomain
+    });
     
     revalidatePath(pathnames['/security']);
     revalidatePath('/');

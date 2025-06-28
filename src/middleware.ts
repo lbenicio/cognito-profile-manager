@@ -32,8 +32,21 @@ export async function middleware(request: NextRequest) {
     const redirectToLogin = (): NextResponse => {
         const loginUrl = new URL(pathnames['/login'], request.url);
         const response = NextResponse.redirect(loginUrl);
-        response.cookies.set('auth_session', '', { expires: new Date(0), path: '/' });
-        response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
+        
+        const isProd = process.env.NODE_ENV === 'production';
+        const appUrl = process.env.APP_URL;
+        const cookieDomain = isProd && appUrl ? new URL(appUrl).hostname : undefined;
+
+        response.cookies.set('auth_session', '', { 
+            expires: new Date(0), 
+            path: '/',
+            domain: cookieDomain
+        });
+        response.cookies.set('oauth_state', '', { 
+            expires: new Date(0), 
+            path: '/',
+            domain: cookieDomain
+        });
         return response;
     };
     
@@ -105,12 +118,16 @@ export async function middleware(request: NextRequest) {
     // If we have new session data from a token refresh, set the cookie on the response.
     if (newSessionData) {
         const isProd = process.env.NODE_ENV === 'production';
+        const appUrl = process.env.APP_URL;
+        const cookieDomain = isProd && appUrl ? new URL(appUrl).hostname : undefined;
+
         response.cookies.set('auth_session', JSON.stringify(newSessionData), {
             httpOnly: true,
             secure: isProd,
             maxAge: 30 * 24 * 60 * 60,
             path: '/',
             sameSite: isProd ? 'none' : 'lax',
+            domain: cookieDomain,
         });
     }
 

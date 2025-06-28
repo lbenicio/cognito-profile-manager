@@ -37,6 +37,8 @@ export async function GET(request: NextRequest) {
     const response = NextResponse.redirect(loginUrl);
     
     const isProd = process.env.NODE_ENV === 'production';
+    const appUrlObject = new URL(appUrl);
+    const cookieDomain = isProd ? appUrlObject.hostname : undefined;
 
     // Set the cookie on the response that redirects the user
     response.cookies.set('oauth_state', state, {
@@ -45,6 +47,7 @@ export async function GET(request: NextRequest) {
       httpOnly: true,
       secure: isProd,
       sameSite: isProd ? 'none' : 'lax',
+      domain: cookieDomain,
     });
 
     return response;

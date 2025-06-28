@@ -47,7 +47,20 @@ export async function POST(request: NextRequest) {
 
   // Always clear local cookies and respond successfully.
   const response = NextResponse.json({ success: true });
-  response.cookies.set('auth_session', '', { expires: new Date(0), path: '/' });
-  response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
+  
+  const isProd = process.env.NODE_ENV === 'production';
+  const appUrl = process.env.APP_URL;
+  const cookieDomain = isProd && appUrl ? new URL(appUrl).hostname : undefined;
+
+  response.cookies.set('auth_session', '', { 
+      expires: new Date(0), 
+      path: '/',
+      domain: cookieDomain
+  });
+  response.cookies.set('oauth_state', '', { 
+      expires: new Date(0), 
+      path: '/',
+      domain: cookieDomain
+  });
   return response;
 }

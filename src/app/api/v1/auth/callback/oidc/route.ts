@@ -10,8 +10,17 @@ function createErrorResponse(origin: string, error: string, description?: string
   console.error(`OIDC Callback Error: Redirecting to login. Reason: ${errorMessage}`);
 
   const response = NextResponse.redirect(loginUrl);
+  
+  const isProd = process.env.NODE_ENV === 'production';
+  const appUrl = process.env.APP_URL;
+  const cookieDomain = isProd && appUrl ? new URL(appUrl).hostname : undefined;
+
   // Ensure state cookie is always cleared on error
-  response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
+  response.cookies.set('oauth_state', '', { 
+    expires: new Date(0), 
+    path: '/',
+    domain: cookieDomain
+  });
   return response;
 }
 
@@ -162,6 +171,8 @@ export async function GET(request: NextRequest) {
     const response = NextResponse.redirect(dashboardUrl);
     
     const isProd = process.env.NODE_ENV === 'production';
+    const appUrlObject = new URL(appUrl);
+    const cookieDomain = isProd ? appUrlObject.hostname : undefined;
 
     // Set auth cookie AND clear state cookie on the SAME response object before returning.
     response.cookies.set('auth_session', JSON.stringify(sessionData), {
@@ -170,11 +181,13 @@ export async function GET(request: NextRequest) {
       maxAge: 30 * 24 * 60 * 60, // 30 days
       path: '/',
       sameSite: isProd ? 'none' : 'lax',
+      domain: cookieDomain,
     });
     
     response.cookies.set('oauth_state', '', { 
         expires: new Date(0), 
-        path: '/' 
+        path: '/',
+        domain: cookieDomain,
     });
 
     return response;
