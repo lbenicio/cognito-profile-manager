@@ -11,16 +11,17 @@ services:
       - .:/app
       # Exclude node_modules from the mount to use the ones inside the container
       - /app/node_modules
-    depends_on:
-      - redis
     environment:
       # --- Application Settings ---
       NODE_ENV: ${NODE_ENV:-development}
       APP_URL: ${APP_URL:-http://localhost:3000}
       TOTP_SECRET_ENCRYPTION_KEY: ${TOTP_SECRET_ENCRYPTION_KEY:-t0tvpe3jCyxyGODCIn6WmxQNYFStu+clqOWu0OkKQLo=}
 
-      # --- Redis Session Store ---
-      REDIS_URL: 'redis://redis:6379'
+      # --- Vercel KV Session Store ---
+      KV_URL: ${KV_URL}
+      KV_REST_API_URL: ${KV_REST_API_URL}
+      KV_REST_API_TOKEN: ${KV_REST_API_TOKEN}
+      KV_REST_API_READ_ONLY_TOKEN: ${KV_REST_API_READ_ONLY_TOKEN}
 
       # --- Security - AWS Cognito & OAuth2 ---
       NEXT_PUBLIC_OAUTH2_SCOPE: ${NEXT_PUBLIC_OAUTH2_SCOPE:-openid profile email aws.cognito.signin.user.admin}
@@ -50,13 +51,3 @@ services:
       SMTP_PASS: ${SMTP_PASS}
       SMTP_FROM_EMAIL: ${SMTP_FROM_EMAIL}
       CONTACT_FORM_TO_EMAIL: ${CONTACT_FORM_TO_EMAIL}
-
-  redis:
-    image: 'redis:alpine'
-    ports:
-      - '6379:6379'
-    volumes:
-      - redis_data:/data
-
-volumes:
-  redis_data:

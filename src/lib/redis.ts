@@ -1,105 +1,24 @@
 import 'server-only';
-import { createClient, type RedisClientType } from 'redis';
+import { kv } from '@vercel/kv';
 
-const REDIS_URL = process.env.REDIS_URL;
-const LOG_CONTEXT = 'RedisService';
+const LOG_CONTEXT = 'VercelKVService';
 
-// Singleton pattern for the Redis client
-let redisClientInstance: RedisClientType | null = null;
+// Check if Vercel KV environment variables are set.
+const isKvEnabled =
+  process.env.KV_URL && process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN;
 
-function getRedisClient(): RedisClientType | null {
-  if (redisClientInstance) {
-    return redisClientInstance;
-  }
-
-  if (!REDIS_URL) {
-    console.warn('REDIS_URL not defined. Redis caching is disabled.');
-    return null;
-  }
-
-  try {
-    const client = createClient({
-      url: REDIS_URL,
-      socket: {
-        connectTimeout: 5000,
-        reconnectStrategy: (retries) => {
-          if (retries > 10) {
-            return new Error('Too many retries for Redis connection.');
-          }
-          return Math.min(retries * 200, 3000);
-        },
-      },
-    });
-
-    client.on('error', (err) => console.error(`${LOG_CONTEXT} Error:`, err));
-    client.on('connect', () => console.info(`${LOG_CONTEXT}: Connecting...`));
-    client.on('ready', () => console.info(`${LOG_CONTEXT}: Client is ready.`));
-    client.on('reconnecting', () =>
-      console.info(`${LOG_CONTEXT}: Reconnecting...`)
-    );
-
-    redisClientInstance = client;
-    return redisClientInstance;
-  } catch (error) {
-    console.error('Failed to initialize Redis client:', error);
-    return null;
-  }
-}
-
-// Initialize on module load
-const redis = getRedisClient();
-
-async function ensureConnected(): Promise<boolean> {
-  if (!redis) {
-    return false;
-  }
-
-  if (redis.isReady) {
-    return true;
-  }
-
-  // The redis client `connect` method throws an error if it's already connected.
-  // We should only call it if the client's socket is not open.
-  if (!redis.isOpen) {
-    try {
-      await redis.connect();
-    } catch (err) {
-      // This catch block handles errors during the initial connection attempt.
-      // It's possible another request initiated the connection in the meantime.
-      if (
-        err instanceof Error &&
-        (err.message.includes('Socket already opened') ||
-          err.message.includes('already connected'))
-      ) {
-        // This is a recoverable race condition. We can proceed.
-      } else {
-        console.error(
-          `${LOG_CONTEXT}: Connection failed on redis.connect():`,
-          err
-        );
-        return false;
-      }
-    }
-  }
-
-  // After attempting to connect (if needed), we return the current ready state.
-  // If it was already in the process of connecting, `isReady` will be false for this request.
-  // The functions using this will then fail gracefully (e.g., return null from cache).
-  return redis.isReady;
+if (!isKvEnabled) {
+  console.warn(`${LOG_CONTEXT}: Environment variables not found. KV is disabled.`);
 }
 
 export async function getCache<T>(key: string): Promise<T | null> {
-  const connected = await ensureConnected();
-  if (!connected) {
-    console.debug(`getCache(${key}): Redis not connected or disabled.`);
+  if (!isKvEnabled) {
+    console.debug(`getCache(${key}): KV is disabled.`);
     return null;
   }
   try {
-    const data = await redis!.get(key);
-    if (data) {
-      return JSON.parse(data) as T;
-    }
-    return null;
+    const data = await kv.get<T>(key);
+    return data;
   } catch (error) {
     console.error(`Error getting cache for key ${key}:`, error);
     return null;
@@ -111,34 +30,29 @@ export async function setCache<T>(
   value: T,
   ttlSeconds: number = 3600
 ): Promise<void> {
-  const connected = await ensureConnected();
-  if (!connected) {
-    console.debug(`setCache(${key}): Redis not connected or disabled.`);
+  if (!isKvEnabled) {
+    console.debug(`setCache(${key}): KV is disabled.`);
     return;
   }
   try {
-    await redis!.set(key, JSON.stringify(value), { EX: ttlSeconds });
+    await kv.set(key, value, { ex: ttlSeconds });
   } catch (error) {
     console.error(`Error setting cache for key ${key}:`, error);
   }
 }
 
 export async function deleteCache(key: string | string[]): Promise<void> {
-  const connected = await ensureConnected();
-  if (!connected) {
-    console.debug(
-      `deleteCache(${Array.isArray(key) ? key.join(', ') : key}): Redis not ready or disabled.`
-    );
+  if (!isKvEnabled) {
+    console.debug(`deleteCache(${Array.isArray(key) ? key.join(', ') : key}): KV is disabled.`);
     return;
   }
   try {
     const keysToDelete = Array.isArray(key) ? key : [key];
-    if (keysToDelete.length === 0) return;
-    await redis!.del(keysToDelete);
+    if (keysToDelete.length > 0) {
+      await kv.del(...keysToDelete);
+    }
   } catch (error) {
     const keysStr = Array.isArray(key) ? key.join(', ') : key;
     console.error(`Error deleting cache for key(s) ${keysStr}:`, error);
   }
 }
-
-export { redis };
