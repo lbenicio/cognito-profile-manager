@@ -1,4 +1,3 @@
-
 'use server';
 
 import { redirect } from '@/navigation';
@@ -17,15 +16,15 @@ export async function devAdminLogin() {
     isMock: true,
     username: mockAdminUser.username,
     claims: {
-        sub: mockAdminUser.sub,
-        email: mockAdminUser.email,
-        name: mockAdminUser.name,
-        // Mock claims need expiry for middleware to work
-        exp: now + expiresIn,
-        auth_time: now,
+      sub: mockAdminUser.sub,
+      email: mockAdminUser.email,
+      name: mockAdminUser.name,
+      // Mock claims need expiry for middleware to work
+      exp: now + expiresIn,
+      auth_time: now,
     },
     // Mock refresh token for consistency if middleware needs it
-    refreshToken: 'mock-refresh-token' 
+    refreshToken: 'mock-refresh-token',
   };
 
   await createSession(sessionData, expiresIn);

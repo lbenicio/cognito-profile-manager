@@ -1,5 +1,5 @@
 import { getTranslations } from 'next-intl/server';
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { getUser } from '@/lib/auth';
@@ -11,7 +11,7 @@ export default async function MainAppLayout({
 }) {
   const user = await getUser();
   const t = await getTranslations('Header');
-  
+
   const headerTranslations = {
     title: t('title'),
     userMenu: {
@@ -20,17 +20,17 @@ export default async function MainAppLayout({
       logout: t('userMenu.logout'),
       adminDashboard: t('userMenu.adminDashboard'),
       account: t('userMenu.account'),
-      security: t('userMenu.security')
+      security: t('userMenu.security'),
     },
     mobileMenuTrigger: t('mobileMenuTrigger'),
     mobileMenuTitle: t('mobileMenuTitle'),
-    language: t('language')
+    language: t('language'),
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className='flex min-h-screen flex-col'>
       <Header user={user} translations={headerTranslations} />
-      <main className="flex-1">{children}</main>
+      <main className='flex-1'>{children}</main>
       <Footer />
       <Toaster />
     </div>

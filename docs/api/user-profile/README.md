@@ -15,25 +15,25 @@ Retrieves the complete profile of the currently logged-in user. The data is sour
 
 - **Example Response Body**:
 
-    ```json
-    {
-      "sub": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-      "cognito:groups": ["admin", "beta-testers"],
-      "email_verified": true,
-      "iss": "https://cognito-idp.sa-east-1.amazonaws.com/sa-east-1_ZVyk86rX4",
-      "cognito:username": "lbenicio",
-      "given_name": "Luan",
-      "family_name": "Benicio",
-      "email": "hi@lbenicio.dev",
-      "picture": "https://outpost-users-assets.4686189.xyz/a1b2c3d4.jpg",
-      "custom:profession": "Software Engineer",
-      "custom:company": "ACME Corp",
-      "custom:country": "Brazil",
-      "custom:mfa": false,
-      "custom:pless": true,
-      "custom:balance": 500.75
-    }
-    ```
+  ```json
+  {
+    "sub": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    "cognito:groups": ["admin", "beta-testers"],
+    "email_verified": true,
+    "iss": "https://cognito-idp.sa-east-1.amazonaws.com/sa-east-1_ZVyk86rX4",
+    "cognito:username": "lbenicio",
+    "given_name": "Luan",
+    "family_name": "Benicio",
+    "email": "hi@lbenicio.dev",
+    "picture": "https://outpost-users-assets.4686189.xyz/a1b2c3d4.jpg",
+    "custom:profession": "Software Engineer",
+    "custom:company": "ACME Corp",
+    "custom:country": "Brazil",
+    "custom:mfa": false,
+    "custom:pless": true,
+    "custom:balance": 500.75
+  }
+  ```
 
 ---
 
@@ -45,14 +45,14 @@ Updates one or more attributes for the currently logged-in user in the AWS Cogni
 
 - **Example Request Body**:
 
-    ```json
-    {
-      "given_name": "Luan",
-      "family_name": "Benicio",
-      "custom:profession": "Lead Software Engineer",
-      "custom:aboutme": "A developer passionate about open source."
-    }
-    ```
+  ```json
+  {
+    "given_name": "Luan",
+    "family_name": "Benicio",
+    "custom:profession": "Lead Software Engineer",
+    "custom:aboutme": "A developer passionate about open source."
+  }
+  ```
 
 - **Response**:
   - `200 OK`: On success, returns a JSON object with a success message.

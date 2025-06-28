@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useRouter } from '@/navigation';
@@ -19,7 +18,10 @@ interface LanguageSwitcherProps {
   currentLanguage: UserPreferences['language'];
 }
 
-export function LanguageSwitcher({ languageLabel, currentLanguage }: LanguageSwitcherProps) {
+export function LanguageSwitcher({
+  languageLabel,
+  currentLanguage,
+}: LanguageSwitcherProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -33,16 +35,27 @@ export function LanguageSwitcher({ languageLabel, currentLanguage }: LanguageSwi
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-9 w-9" disabled={isPending}>
+        <Button
+          variant='ghost'
+          size='icon'
+          className='h-9 w-9'
+          disabled={isPending}
+        >
           <Languages />
-          <span className="sr-only">{languageLabel}</span>
+          <span className='sr-only'>{languageLabel}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => onSelectLocale('en')} disabled={currentLanguage === 'en'}>
+      <DropdownMenuContent align='end'>
+        <DropdownMenuItem
+          onClick={() => onSelectLocale('en')}
+          disabled={currentLanguage === 'en'}
+        >
           English
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => onSelectLocale('es')} disabled={currentLanguage === 'es'}>
+        <DropdownMenuItem
+          onClick={() => onSelectLocale('es')}
+          disabled={currentLanguage === 'es'}
+        >
           Español
         </DropdownMenuItem>
       </DropdownMenuContent>

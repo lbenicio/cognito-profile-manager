@@ -31,37 +31,37 @@ Follow these instructions to get a local copy up and running for development and
 
 1. **Clone the repository:**
 
-    ```sh
-    git clone https://github.com/lbenicio/cognito-profile-manager.git
-    cd cognito-profile-manager
-    ```
+   ```sh
+   git clone https://github.com/lbenicio/cognito-profile-manager.git
+   cd cognito-profile-manager
+   ```
 
 2. **Install dependencies:**
 
-    ```sh
-    npm install
-    # or
-    yarn install
-    # or
-    pnpm install
-    ```
+   ```sh
+   npm install
+   # or
+   yarn install
+   # or
+   pnpm install
+   ```
 
 3. **Set up environment variables:**
-    Create a `.env.local` file in the root of the project by copying the example file:
+   Create a `.env.local` file in the root of the project by copying the example file:
 
-    ```sh
-    cp .env.example .env.local
-    ```
+   ```sh
+   cp .env.example .env.local
+   ```
 
-    Now, fill in the values in `.env.local` with your specific configuration from AWS Cognito, R2, etc.
+   Now, fill in the values in `.env.local` with your specific configuration from AWS Cognito, R2, etc.
 
 4. **Run the development server:**
 
-    ```sh
-    npm run dev
-    ```
+   ```sh
+   npm run dev
+   ```
 
-    Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+   Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## ⚙️ Configuration
 

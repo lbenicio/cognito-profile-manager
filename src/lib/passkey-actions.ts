@@ -1,7 +1,12 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { cognitoClient, DeleteWebAuthnCredentialCommand, ListWebAuthnCredentialsCommand, UpdateUserAttributesCommand } from './cognito';
+import {
+  cognitoClient,
+  DeleteWebAuthnCredentialCommand,
+  ListWebAuthnCredentialsCommand,
+  UpdateUserAttributesCommand,
+} from './cognito';
 import { getSession } from './auth';
 
 export async function deletePasskey(
@@ -24,19 +29,26 @@ export async function deletePasskey(
     await cognitoClient.send(deleteCommand);
 
     const listCredentialsCommand = new ListWebAuthnCredentialsCommand({
-        AccessToken: session.accessToken,
+      AccessToken: session.accessToken,
     });
-    const credentialsResponse = await cognitoClient.send(listCredentialsCommand);
+    const credentialsResponse = await cognitoClient.send(
+      listCredentialsCommand
+    );
 
-    if (!credentialsResponse.Credentials || credentialsResponse.Credentials.length === 0) {
-        const updateUserAttrCommand = new UpdateUserAttributesCommand({
-            AccessToken: session.accessToken,
-            UserAttributes: [{
-                Name: 'custom:pless',
-                Value: 'false',
-            }],
-        });
-        await cognitoClient.send(updateUserAttrCommand);
+    if (
+      !credentialsResponse.Credentials ||
+      credentialsResponse.Credentials.length === 0
+    ) {
+      const updateUserAttrCommand = new UpdateUserAttributesCommand({
+        AccessToken: session.accessToken,
+        UserAttributes: [
+          {
+            Name: 'custom:pless',
+            Value: 'false',
+          },
+        ],
+      });
+      await cognitoClient.send(updateUserAttrCommand);
     }
 
     revalidatePath('/security');
@@ -52,7 +64,10 @@ export async function deletePasskey(
   }
 }
 
-export async function syncPasskeysEnabledFlag(): Promise<{ success: boolean; message: string }> {
+export async function syncPasskeysEnabledFlag(): Promise<{
+  success: boolean;
+  message: string;
+}> {
   const session = await getSession();
   if (!session?.accessToken) {
     return { success: false, message: 'Not authenticated' };
@@ -61,10 +76,12 @@ export async function syncPasskeysEnabledFlag(): Promise<{ success: boolean; mes
   try {
     const command = new UpdateUserAttributesCommand({
       AccessToken: session.accessToken,
-      UserAttributes: [{
-        Name: 'custom:pless',
-        Value: 'true',
-      }],
+      UserAttributes: [
+        {
+          Name: 'custom:pless',
+          Value: 'true',
+        },
+      ],
     });
     await cognitoClient.send(command);
 

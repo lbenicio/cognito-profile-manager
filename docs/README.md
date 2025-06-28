@@ -7,32 +7,32 @@ Whether you are a developer looking to contribute, or an administrator setting u
 ## Table of Contents
 
 1. **Getting Started**
-    - [Installation](./getting-started/installation.md)
-    - [Configuration](./getting-started/configuration.md)
+   - [Installation](./getting-started/installation.md)
+   - [Configuration](./getting-started/configuration.md)
 
 2. **Architecture**
-    - [Overview](./architecture/overview.md)
-    - [Authentication Flow](./architecture/authentication-flow.md)
-    - [Frontend Structure](./architecture/frontend.md)
-    - [Backend API](./architecture/backend-api.md)
+   - [Overview](./architecture/overview.md)
+   - [Authentication Flow](./architecture/authentication-flow.md)
+   - [Frontend Structure](./architecture/frontend.md)
+   - [Backend API](./architecture/backend-api.md)
 
 3. **Guides**
-    - [Setting up AWS Cognito](./guides/aws-cognito-setup.md)
-    - [Configuring Passkey (WebAuthn) Authentication](./guides/passkey-setup.md)
-    - [Enabling TOTP MFA](./guides/totp-setup.md)
-    - [Connecting to S3-Compatible Storage](./guides/storage-setup.md)
+   - [Setting up AWS Cognito](./guides/aws-cognito-setup.md)
+   - [Configuring Passkey (WebAuthn) Authentication](./guides/passkey-setup.md)
+   - [Enabling TOTP MFA](./guides/totp-setup.md)
+   - [Connecting to S3-Compatible Storage](./guides/storage-setup.md)
 
 4. **API Reference**
-    - [Authentication Endpoints](./api/auth-endpoints.md)
-    - [User Profile Endpoints](./api/user-endpoints.md)
+   - [Authentication Endpoints](./api/auth-endpoints.md)
+   - [User Profile Endpoints](./api/user-endpoints.md)
 
 5. **Deployment**
-    - [Deploying to Vercel](./deployment/vercel.md)
-    - [Deploying with Docker](./deployment/docker.md)
+   - [Deploying to Vercel](./deployment/vercel.md)
+   - [Deploying with Docker](./deployment/docker.md)
 
 6. **Contributing**
-    - [Development Workflow](../.github/pull_request_template.md)
-    - [Coding Standards](./contributing/coding-standards.md)
+   - [Development Workflow](../.github/pull_request_template.md)
+   - [Coding Standards](./contributing/coding-standards.md)
 
 ## How to Use This Documentation
 

@@ -1,9 +1,6 @@
 'use server';
 
-import {
-  cognitoClient,
-  ListWebAuthnCredentialsCommand,
-} from './cognito';
+import { cognitoClient, ListWebAuthnCredentialsCommand } from './cognito';
 import { getSession, getUser } from './auth';
 
 export async function listCognitoPasskeys(

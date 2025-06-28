@@ -31,11 +31,7 @@ export async function generateMfaSetup() {
   }
 
   const serviceName = 'Outpost';
-  const otpauth = authenticator.keyuri(
-    user.email,
-    serviceName,
-    secretCode
-  );
+  const otpauth = authenticator.keyuri(user.email, serviceName, secretCode);
   const qrCodeDataUrl = await QRCode.toDataURL(otpauth);
 
   return { qrCodeDataUrl, secretCode };
@@ -64,20 +60,26 @@ export async function verifyAndEnableMfa(
       },
     });
     await cognitoClient.send(setMfaCommand);
-    
+
     const updateUserAttrCommand = new UpdateUserAttributesCommand({
-        AccessToken: session.accessToken,
-        UserAttributes: [{ Name: 'custom:mfa', Value: 'true' }],
+      AccessToken: session.accessToken,
+      UserAttributes: [{ Name: 'custom:mfa', Value: 'true' }],
     });
     await cognitoClient.send(updateUserAttrCommand);
 
     revalidatePath('/security');
     revalidatePath('/');
 
-    return { success: true, message: 'Authenticator app enabled successfully.' };
+    return {
+      success: true,
+      message: 'Authenticator app enabled successfully.',
+    };
   } catch (error: any) {
     console.error('MFA Verification Error:', error);
-    if (error.name === 'EnableSoftwareTokenMFAException' || error.name === 'NotAuthorizedException') {
+    if (
+      error.name === 'EnableSoftwareTokenMFAException' ||
+      error.name === 'NotAuthorizedException'
+    ) {
       return {
         success: false,
         message: 'The code is incorrect or has expired. Please try again.',
@@ -90,7 +92,10 @@ export async function verifyAndEnableMfa(
   }
 }
 
-export async function disableMfa(): Promise<{ success: boolean; message: string }> {
+export async function disableMfa(): Promise<{
+  success: boolean;
+  message: string;
+}> {
   const session = await getSession();
   if (!session?.accessToken) {
     throw new Error('Not authenticated');
@@ -107,15 +112,18 @@ export async function disableMfa(): Promise<{ success: boolean; message: string 
     await cognitoClient.send(command);
 
     const updateUserAttrCommand = new UpdateUserAttributesCommand({
-        AccessToken: session.accessToken,
-        UserAttributes: [{ Name: 'custom:mfa', Value: 'false' }],
+      AccessToken: session.accessToken,
+      UserAttributes: [{ Name: 'custom:mfa', Value: 'false' }],
     });
     await cognitoClient.send(updateUserAttrCommand);
 
     revalidatePath('/security');
     revalidatePath('/');
 
-    return { success: true, message: 'Authenticator app disabled successfully.' };
+    return {
+      success: true,
+      message: 'Authenticator app disabled successfully.',
+    };
   } catch (error) {
     console.error('MFA Disable Error:', error);
     return {

@@ -31,7 +31,7 @@ export async function updateUserPreferences(
     if (newPreferences.language && locales.includes(newPreferences.language)) {
       (await cookies()).set('NEXT_LOCALE', newPreferences.language);
     }
-    
+
     revalidatePath('/settings');
     revalidatePath('/', 'layout');
 
@@ -40,8 +40,7 @@ export async function updateUserPreferences(
     console.error('Update Preferences Error:', error);
     return {
       success: false,
-      message:
-        'An unexpected error occurred while updating your preferences.',
+      message: 'An unexpected error occurred while updating your preferences.',
     };
   }
 }

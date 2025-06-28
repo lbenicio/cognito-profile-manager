@@ -24,7 +24,7 @@ export async function updatePublicProfilePreferences(
     });
 
     await cognitoClient.send(command);
-    
+
     revalidatePath('/profile');
 
     return { success: true, message: 'Profile settings updated successfully.' };
@@ -32,7 +32,8 @@ export async function updatePublicProfilePreferences(
     console.error('Update Public Profile Preferences Error:', error);
     return {
       success: false,
-      message: 'An unexpected error occurred while updating your profile settings.',
+      message:
+        'An unexpected error occurred while updating your profile settings.',
     };
   }
 }

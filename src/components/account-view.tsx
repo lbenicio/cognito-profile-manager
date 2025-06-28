@@ -7,7 +7,7 @@ import type { User as UserType } from '@/lib/auth';
 import { AddressForm } from './address-form';
 
 interface AccountViewProps {
-    initialUser: UserType;
+  initialUser: UserType;
 }
 
 export function AccountView({ initialUser }: AccountViewProps) {
@@ -23,18 +23,16 @@ export function AccountView({ initialUser }: AccountViewProps) {
   };
 
   return (
-    <div className="container mx-auto p-4 md:p-8">
-      <header className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
-          <p className="text-muted-foreground">
-              {t('description')}
-          </p>
+    <div className='container mx-auto p-4 md:p-8'>
+      <header className='mb-8'>
+        <h1 className='text-3xl font-bold tracking-tight'>{t('title')}</h1>
+        <p className='text-muted-foreground'>{t('description')}</p>
       </header>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-        <div className="flex flex-col gap-8">
+      <div className='grid grid-cols-1 items-start gap-8 md:grid-cols-2'>
+        <div className='flex flex-col gap-8'>
           <AccountDisplay user={user} onUpdate={handleProfileUpdate} />
         </div>
-        <div className="flex flex-col gap-8">
+        <div className='flex flex-col gap-8'>
           <AccountForm user={user} onUpdate={handleProfileUpdate} />
           <AddressForm user={user} onUpdate={handleProfileUpdate} />
         </div>

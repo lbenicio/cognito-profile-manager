@@ -42,7 +42,12 @@ export const countries: Country[] = [
   { name: 'Canada', dialCode: '+1', iso2: 'ca', flag: '🇨🇦' },
   { name: 'Cape Verde', dialCode: '+238', iso2: 'cv', flag: '🇨🇻' },
   { name: 'Cayman Islands', dialCode: '+1345', iso2: 'ky', flag: '🇰🇾' },
-  { name: 'Central African Republic', dialCode: '+236', iso2: 'cf', flag: '🇨🇫' },
+  {
+    name: 'Central African Republic',
+    dialCode: '+236',
+    iso2: 'cf',
+    flag: '🇨🇫',
+  },
   { name: 'Chad', dialCode: '+235', iso2: 'td', flag: '🇹🇩' },
   { name: 'Chile', dialCode: '+56', iso2: 'cl', flag: '🇨🇱' },
   { name: 'China', dialCode: '+86', iso2: 'cn', flag: '🇨🇳' },

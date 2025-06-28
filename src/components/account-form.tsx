@@ -15,7 +15,14 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Save } from 'lucide-react';
 import React from 'react';
@@ -24,35 +31,57 @@ import { updateUserProfile } from '@/lib/profile-actions';
 import { TimezoneSelect } from './timezone-select';
 import { PhoneInput } from './phone-input';
 import { Textarea } from './ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select';
 import { DatePicker } from './ui/date-picker';
 import { format } from 'date-fns';
 
-const accountFormSchema = (t: (key: string) => string) => z.object({
-  given_name: z.string().min(1, { message: t('givenNameRequired') }).max(50),
-  family_name: z.string().min(1, { message: t('familyNameRequired') }).max(50),
-  phone_number: z.string().refine((phone) => /^\+[1-9]\d{7,14}$/.test(phone), {
-    message: t('phoneInvalid'),
-  }),
-  birthdate: z.date().optional(),
-  website: z.string().url({ message: 'Please enter a valid URL.' }).or(z.literal('')).optional(),
-  zoneinfo: z.string().max(50).optional(),
-  gender: z.string().optional(),
-  aboutMe: z.string().max(250, { message: t('aboutMeTooLong') }).optional(),
-});
+const accountFormSchema = (t: (key: string) => string) =>
+  z.object({
+    given_name: z
+      .string()
+      .min(1, { message: t('givenNameRequired') })
+      .max(50),
+    family_name: z
+      .string()
+      .min(1, { message: t('familyNameRequired') })
+      .max(50),
+    phone_number: z
+      .string()
+      .refine((phone) => /^\+[1-9]\d{7,14}$/.test(phone), {
+        message: t('phoneInvalid'),
+      }),
+    birthdate: z.date().optional(),
+    website: z
+      .string()
+      .url({ message: 'Please enter a valid URL.' })
+      .or(z.literal(''))
+      .optional(),
+    zoneinfo: z.string().max(50).optional(),
+    gender: z.string().optional(),
+    aboutMe: z
+      .string()
+      .max(250, { message: t('aboutMeTooLong') })
+      .optional(),
+  });
 
 type AccountFormValues = z.infer<ReturnType<typeof accountFormSchema>>;
 
 interface AccountFormProps {
-    user: UserType;
-    onUpdate: (data: Partial<UserType>) => void;
+  user: UserType;
+  onUpdate: (data: Partial<UserType>) => void;
 }
 
 export function AccountForm({ user, onUpdate }: AccountFormProps) {
   const { toast } = useToast();
   const t = useTranslations('Account.form');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  
+
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountFormSchema(t)),
     defaultValues: {
@@ -74,59 +103,59 @@ export function AccountForm({ user, onUpdate }: AccountFormProps) {
     const family_name = nameParts.slice(1).join(' ');
 
     form.reset({
-        given_name,
-        family_name,
-        phone_number: user.phone_number,
-        birthdate: user.birthdate ? new Date(user.birthdate) : undefined,
-        website: user.website,
-        zoneinfo: user.zoneinfo,
-        gender: user.gender,
-        aboutMe: user.aboutMe,
+      given_name,
+      family_name,
+      phone_number: user.phone_number,
+      birthdate: user.birthdate ? new Date(user.birthdate) : undefined,
+      website: user.website,
+      zoneinfo: user.zoneinfo,
+      gender: user.gender,
+      aboutMe: user.aboutMe,
     });
   }, [user, form]);
 
   async function onSubmit(data: AccountFormValues) {
     setIsSubmitting(true);
-    
-    try {
-        const result = await updateUserProfile({
-            ...data,
-            birthdate: data.birthdate ? format(data.birthdate, 'yyyy-MM-dd') : '',
-            website: data.website || '',
-            zoneinfo: data.zoneinfo || '',
-            gender: data.gender || '',
-            aboutMe: data.aboutMe || '',
-        });
 
-        if (result.success) {
-            onUpdate({
-                name: `${data.given_name} ${data.family_name}`.trim(),
-                phone_number: data.phone_number,
-                birthdate: data.birthdate ? format(data.birthdate, 'yyyy-MM-dd') : '',
-                website: data.website,
-                zoneinfo: data.zoneinfo,
-                gender: data.gender,
-                aboutMe: data.aboutMe,
-            });
-            toast({
-                title: t('successTitle'),
-                description: t('successDescription'),
-            });
-        } else {
-            toast({
-                variant: 'destructive',
-                title: t('errorTitle'),
-                description: result.message,
-            });
-        }
-    } catch (error) {
-        toast({
-            variant: 'destructive',
-            title: t('errorTitle'),
-            description: t('errorDescription'),
+    try {
+      const result = await updateUserProfile({
+        ...data,
+        birthdate: data.birthdate ? format(data.birthdate, 'yyyy-MM-dd') : '',
+        website: data.website || '',
+        zoneinfo: data.zoneinfo || '',
+        gender: data.gender || '',
+        aboutMe: data.aboutMe || '',
+      });
+
+      if (result.success) {
+        onUpdate({
+          name: `${data.given_name} ${data.family_name}`.trim(),
+          phone_number: data.phone_number,
+          birthdate: data.birthdate ? format(data.birthdate, 'yyyy-MM-dd') : '',
+          website: data.website,
+          zoneinfo: data.zoneinfo,
+          gender: data.gender,
+          aboutMe: data.aboutMe,
         });
+        toast({
+          title: t('successTitle'),
+          description: t('successDescription'),
+        });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: t('errorTitle'),
+          description: result.message,
+        });
+      }
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: t('errorTitle'),
+        description: t('errorDescription'),
+      });
     } finally {
-        setIsSubmitting(false);
+      setIsSubmitting(false);
     }
   }
 
@@ -138,98 +167,103 @@ export function AccountForm({ user, onUpdate }: AccountFormProps) {
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="given_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('givenNameLabel')}</FormLabel>
-                      <FormControl>
-                        <Input placeholder="John" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="family_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('familyNameLabel')}</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Doe" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+          <CardContent className='space-y-6'>
+            <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
+              <FormField
+                control={form.control}
+                name='given_name'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('givenNameLabel')}</FormLabel>
+                    <FormControl>
+                      <Input placeholder='John' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='family_name'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('familyNameLabel')}</FormLabel>
+                    <FormControl>
+                      <Input placeholder='Doe' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
             <FormField
               control={form.control}
-              name="aboutMe"
+              name='aboutMe'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('aboutMeLabel')}</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder={t('aboutMePlaceholder')}
-                      className="resize-none"
+                      className='resize-none'
                       rows={10}
                       {...field}
                     />
                   </FormControl>
-                   <FormDescription>
-                    {t('aboutMeDescription')}
-                  </FormDescription>
+                  <FormDescription>{t('aboutMeDescription')}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="phone_number"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('phoneLabel')}</FormLabel>
+            <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
+              <FormField
+                control={form.control}
+                name='phone_number'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('phoneLabel')}</FormLabel>
+                    <FormControl>
+                      <PhoneInput {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='gender'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('genderLabel')}</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
-                        <PhoneInput {...field} />
+                        <SelectTrigger>
+                          <SelectValue placeholder={t('genderPlaceholder')} />
+                        </SelectTrigger>
                       </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                 <FormField
-                  control={form.control}
-                  name="gender"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('genderLabel')}</FormLabel>
-                       <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={t('genderPlaceholder')} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Male">{t('genderMale')}</SelectItem>
-                          <SelectItem value="Female">{t('genderFemale')}</SelectItem>
-                          <SelectItem value="Prefer not to say">{t('genderPreferNotToSay')}</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                      <SelectContent>
+                        <SelectItem value='Male'>{t('genderMale')}</SelectItem>
+                        <SelectItem value='Female'>
+                          {t('genderFemale')}
+                        </SelectItem>
+                        <SelectItem value='Prefer not to say'>
+                          {t('genderPreferNotToSay')}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
             <FormField
               control={form.control}
-              name="birthdate"
+              name='birthdate'
               render={({ field }) => (
-                <FormItem className="flex flex-col">
+                <FormItem className='flex flex-col'>
                   <FormLabel>{t('birthdateLabel')}</FormLabel>
                   <FormControl>
                     <DatePicker
@@ -244,12 +278,12 @@ export function AccountForm({ user, onUpdate }: AccountFormProps) {
             />
             <FormField
               control={form.control}
-              name="website"
+              name='website'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t('websiteLabel')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://example.com" {...field} />
+                    <Input placeholder='https://example.com' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -257,28 +291,26 @@ export function AccountForm({ user, onUpdate }: AccountFormProps) {
             />
             <FormField
               control={form.control}
-              name="zoneinfo"
+              name='zoneinfo'
               render={({ field }) => (
-                <FormItem className="flex flex-col">
+                <FormItem className='flex flex-col'>
                   <FormLabel>{t('zoneinfoLabel')}</FormLabel>
                   <FormControl>
-                    <TimezoneSelect 
-                      value={field.value || ''} 
-                      onChange={field.onChange} 
+                    <TimezoneSelect
+                      value={field.value || ''}
+                      onChange={field.onChange}
                     />
                   </FormControl>
-                  <FormDescription>
-                    {t('zoneinfoDescription')}
-                  </FormDescription>
+                  <FormDescription>{t('zoneinfoDescription')}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type='submit' disabled={isSubmitting}>
               {isSubmitting ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
+                <div className='h-4 w-4 animate-spin rounded-full border-b-2 border-primary-foreground'></div>
               ) : (
                 <Save />
               )}

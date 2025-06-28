@@ -1,4 +1,3 @@
-
 'use server';
 import 'server-only';
 import { cache } from 'react';
@@ -9,7 +8,9 @@ import { refreshAuthTokens } from './session-actions';
 
 const secretKey = process.env.TOTP_SECRET_ENCRYPTION_KEY;
 if (!secretKey) {
-  throw new Error('TOTP_SECRET_ENCRYPTION_KEY is not set in environment variables');
+  throw new Error(
+    'TOTP_SECRET_ENCRYPTION_KEY is not set in environment variables'
+  );
 }
 const encodedKey = Buffer.from(secretKey, 'base64');
 const cookieName = 'session';
@@ -34,14 +35,17 @@ async function decrypt(session: string | undefined = ''): Promise<any> {
   }
 }
 
-export async function createSession(sessionData: any, expiresInSeconds: number) {
+export async function createSession(
+  sessionData: any,
+  expiresInSeconds: number
+) {
   const sessionId = crypto.randomUUID();
   const key = `${sessionPrefix}${sessionId}`;
-  
+
   await setCache(key, sessionData, expiresInSeconds);
 
   const encryptedSessionId = await encrypt({ sessionId });
-  
+
   const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7-day cookie
 
   (await cookies()).set(cookieName, encryptedSessionId, {
@@ -53,21 +57,25 @@ export async function createSession(sessionData: any, expiresInSeconds: number) 
   });
 }
 
-export async function updateSession(sessionId: string, sessionData: any, expiresInSeconds: number) {
-    const key = `${sessionPrefix}${sessionId}`;
-    await setCache(key, sessionData, expiresInSeconds);
+export async function updateSession(
+  sessionId: string,
+  sessionData: any,
+  expiresInSeconds: number
+) {
+  const key = `${sessionPrefix}${sessionId}`;
+  await setCache(key, sessionData, expiresInSeconds);
 }
 
 export async function deleteSession() {
   const cookie = (await cookies()).get(cookieName)?.value;
   if (cookie) {
     try {
-        const payload = await decrypt(cookie);
-        if (payload?.sessionId) {
-            await deleteCache(`${sessionPrefix}${payload.sessionId}`);
-        }
+      const payload = await decrypt(cookie);
+      if (payload?.sessionId) {
+        await deleteCache(`${sessionPrefix}${payload.sessionId}`);
+      }
     } catch (e) {
-        console.error("Error deleting session from Redis:", e);
+      console.error('Error deleting session from Redis:', e);
     }
   }
   (await cookies()).set(cookieName, '', { expires: new Date(0), path: '/' });
@@ -83,20 +91,21 @@ export const getSession = cache(async () => {
 
   const key = `${sessionPrefix}${payload.sessionId}`;
   const session = await getCache<any>(key);
-  
+
   if (!session) {
     await deleteSession(); // Clean up invalid cookie
     return null;
   }
-  
+
   // Check if the token is expired and refresh if necessary
   if (session.claims.exp * 1000 < Date.now()) {
     console.log('Session token expired, attempting refresh...');
     const refreshResult = await refreshAuthTokens(session.refreshToken);
 
     if (refreshResult) {
-      const { newClaims, newAccessToken, newRefreshToken, newExpiresIn } = refreshResult;
-      
+      const { newClaims, newAccessToken, newRefreshToken, newExpiresIn } =
+        refreshResult;
+
       const newSessionData = {
         ...session,
         claims: newClaims,

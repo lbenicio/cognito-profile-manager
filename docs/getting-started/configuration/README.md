@@ -15,6 +15,7 @@ Create this file by copying the template: `cp .env.example .env.local`.
 These variables connect the application to your AWS Cognito User Pool.
 
 **Important**: You must add the following URLs to the "Allowed callback URLs" list in your Cognito App Client settings, replacing `{APP_URL}` with the value you set above:
+
 - `{APP_URL}/api/v1/auth/callback/oidc`
 - `{APP_URL}/api/v1/auth/callback/passkey`
 

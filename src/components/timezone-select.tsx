@@ -32,20 +32,20 @@ export function TimezoneSelect({ value, onChange }: TimezoneSelectProps) {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant="outline"
-          role="combobox"
+          variant='outline'
+          role='combobox'
           aria-expanded={open}
-          className="w-full justify-between font-normal"
+          className='w-full justify-between font-normal'
         >
           {value
             ? timezones.find((timezone) => timezone.value === value)?.label
             : 'Select timezone...'}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+      <PopoverContent className='w-[--radix-popover-trigger-width] p-0'>
         <Command>
-          <CommandInput placeholder="Search timezone..." />
+          <CommandInput placeholder='Search timezone...' />
           <CommandList>
             <CommandEmpty>No timezone found.</CommandEmpty>
             <CommandGroup>

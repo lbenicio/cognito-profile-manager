@@ -31,7 +31,9 @@ export function AvatarEditor({ user, onUpdate, onClose }: AvatarEditorProps) {
         setError(t('fileTooLarge'));
         return;
       }
-      if (!['image/jpeg', 'image/png', 'image/webp'].includes(selectedFile.type)) {
+      if (
+        !['image/jpeg', 'image/png', 'image/webp'].includes(selectedFile.type)
+      ) {
         setError(t('invalidFileType'));
         return;
       }
@@ -87,39 +89,39 @@ export function AvatarEditor({ user, onUpdate, onClose }: AvatarEditorProps) {
   };
 
   return (
-    <div className="flex flex-col items-center gap-6 p-4">
+    <div className='flex flex-col items-center gap-6 p-4'>
       <div
-        className="relative h-40 w-40 rounded-full group cursor-pointer"
+        className='group relative h-40 w-40 cursor-pointer rounded-full'
         onClick={() => fileInputRef.current?.click()}
       >
         <Image
           src={preview || `https://placehold.co/160x160.png`}
-          alt="Avatar preview"
+          alt='Avatar preview'
           width={160}
           height={160}
-          className="rounded-full object-cover"
+          className='rounded-full object-cover'
         />
-        <div className="absolute inset-0 rounded-full bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-          <UploadCloud className="h-8 w-8 text-white" />
-          <p className="text-white text-sm mt-1">{t('changePhoto')}</p>
+        <div className='absolute inset-0 flex flex-col items-center justify-center rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100'>
+          <UploadCloud className='h-8 w-8 text-white' />
+          <p className='mt-1 text-sm text-white'>{t('changePhoto')}</p>
         </div>
       </div>
       <input
-        type="file"
+        type='file'
         ref={fileInputRef}
         onChange={handleFileChange}
-        accept="image/png, image/jpeg, image/webp"
-        className="hidden"
+        accept='image/png, image/jpeg, image/webp'
+        className='hidden'
       />
 
-      {error && <p className="text-sm text-destructive">{error}</p>}
+      {error && <p className='text-sm text-destructive'>{error}</p>}
 
-      <div className="flex gap-4">
-        <Button variant="outline" onClick={onClose} disabled={isLoading}>
+      <div className='flex gap-4'>
+        <Button variant='outline' onClick={onClose} disabled={isLoading}>
           {t('cancel')}
         </Button>
         <Button onClick={handleUpload} disabled={!file || isLoading}>
-          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {isLoading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
           {t('uploadAndSave')}
         </Button>
       </div>

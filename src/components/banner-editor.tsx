@@ -7,7 +7,10 @@ import { UploadCloud, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import type { User as UserType } from '@/lib/auth';
-import { getBannerPresignedUploadUrl, updateUserBanner } from '@/lib/banner-actions';
+import {
+  getBannerPresignedUploadUrl,
+  updateUserBanner,
+} from '@/lib/banner-actions';
 
 interface BannerEditorProps {
   user: UserType;
@@ -31,7 +34,9 @@ export function BannerEditor({ user, onUpdate, onClose }: BannerEditorProps) {
         setError(t('fileTooLarge'));
         return;
       }
-      if (!['image/jpeg', 'image/png', 'image/webp'].includes(selectedFile.type)) {
+      if (
+        !['image/jpeg', 'image/png', 'image/webp'].includes(selectedFile.type)
+      ) {
         setError(t('invalidFileType'));
         return;
       }
@@ -87,40 +92,40 @@ export function BannerEditor({ user, onUpdate, onClose }: BannerEditorProps) {
   };
 
   return (
-    <div className="flex flex-col items-center gap-6 p-4">
+    <div className='flex flex-col items-center gap-6 p-4'>
       <div
-        className="relative w-full group cursor-pointer"
+        className='group relative w-full cursor-pointer'
         onClick={() => fileInputRef.current?.click()}
       >
         <Image
           src={preview || `https://placehold.co/800x200.png`}
-          alt="Banner preview"
+          alt='Banner preview'
           width={800}
           height={200}
-          className="w-full h-40 object-cover rounded-md bg-muted"
-          data-ai-hint="abstract banner"
+          className='h-40 w-full rounded-md bg-muted object-cover'
+          data-ai-hint='abstract banner'
         />
-        <div className="absolute inset-0 rounded-md bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-          <UploadCloud className="h-8 w-8 text-white" />
-          <p className="text-white text-sm mt-1">{t('changeBanner')}</p>
+        <div className='absolute inset-0 flex flex-col items-center justify-center rounded-md bg-black/50 opacity-0 transition-opacity group-hover:opacity-100'>
+          <UploadCloud className='h-8 w-8 text-white' />
+          <p className='mt-1 text-sm text-white'>{t('changeBanner')}</p>
         </div>
       </div>
       <input
-        type="file"
+        type='file'
         ref={fileInputRef}
         onChange={handleFileChange}
-        accept="image/png, image/jpeg, image/webp"
-        className="hidden"
+        accept='image/png, image/jpeg, image/webp'
+        className='hidden'
       />
 
-      {error && <p className="text-sm text-destructive">{error}</p>}
+      {error && <p className='text-sm text-destructive'>{error}</p>}
 
-      <div className="flex gap-4">
-        <Button variant="outline" onClick={onClose} disabled={isLoading}>
+      <div className='flex gap-4'>
+        <Button variant='outline' onClick={onClose} disabled={isLoading}>
           {t('cancel')}
         </Button>
         <Button onClick={handleUpload} disabled={!file || isLoading}>
-          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          {isLoading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
           {t('uploadAndSave')}
         </Button>
       </div>

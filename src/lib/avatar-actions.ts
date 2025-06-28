@@ -19,7 +19,10 @@ type GetPresignedUrlParams = {
   size: number;
 };
 
-export async function getPresignedUploadUrl({ type, size }: GetPresignedUrlParams) {
+export async function getPresignedUploadUrl({
+  type,
+  size,
+}: GetPresignedUrlParams) {
   if (!BUCKET_NAME || !PUBLIC_URL) {
     throw new Error('R2 bucket configuration is missing.');
   }
@@ -53,21 +56,21 @@ export async function getPresignedUploadUrl({ type, size }: GetPresignedUrlParam
 }
 
 export async function updateUserAvatar(pictureUrl: string) {
-    const session = await getSession();
-    if (!session?.accessToken) {
-        throw new Error('Not authenticated');
-    }
+  const session = await getSession();
+  if (!session?.accessToken) {
+    throw new Error('Not authenticated');
+  }
 
-    const command = new UpdateUserAttributesCommand({
-      AccessToken: session.accessToken,
-      UserAttributes: [{ Name: 'picture', Value: pictureUrl }],
-    });
-    
-    await cognitoClient.send(command);
-    
-    revalidatePath('/');
-    revalidatePath('/account');
-    revalidatePath('/profile');
+  const command = new UpdateUserAttributesCommand({
+    AccessToken: session.accessToken,
+    UserAttributes: [{ Name: 'picture', Value: pictureUrl }],
+  });
 
-    return { success: true };
+  await cognitoClient.send(command);
+
+  revalidatePath('/');
+  revalidatePath('/account');
+  revalidatePath('/profile');
+
+  return { success: true };
 }

@@ -14,32 +14,24 @@ if (REDIS_URL) {
         connectTimeout: 5000,
         reconnectStrategy: (retries: number) => {
           if (retries > 10) {
-            console.warn(
-              `Exceeded Redis connection retries (10). Stopping.`,
-            );
+            console.warn(`Exceeded Redis connection retries (10). Stopping.`);
             return new Error('Too many retries for Redis connection.');
           }
           const delay = Math.min(retries * 200, 3000);
           console.info(
             `Redis connection attempt ${retries + 1}. Retrying in ${delay}ms.`,
-            LOG_CONTEXT,
+            LOG_CONTEXT
           );
           return delay;
         },
       },
     });
 
-    redisClient.on('error', (err) =>
-      console.error('Redis client error:', err),
-    );
-    redisClient.on('connect', () =>
-      console.info('Connecting to Redis...'),
-    );
-    redisClient.on('ready', () =>
-      console.info('Redis client is ready.'),
-    );
+    redisClient.on('error', (err) => console.error('Redis client error:', err));
+    redisClient.on('connect', () => console.info('Connecting to Redis...'));
+    redisClient.on('ready', () => console.info('Redis client is ready.'));
     redisClient.on('reconnecting', () =>
-      console.info('Redis client is reconnecting...'),
+      console.info('Redis client is reconnecting...')
     );
 
     // Start connection process immediately and store the promise
@@ -79,7 +71,7 @@ export async function getCache<T>(key: string): Promise<T | null> {
 export async function setCache<T>(
   key: string,
   value: T,
-  ttlSeconds: number = 3600,
+  ttlSeconds: number = 3600
 ): Promise<void> {
   if (!isReady()) {
     console.debug(`setCache(${key}): Redis not ready or disabled.`);
@@ -89,7 +81,7 @@ export async function setCache<T>(
     await redisClient!.set(key, JSON.stringify(value), { EX: ttlSeconds });
     console.debug(
       `Cache SET for key: ${key} (TTL: ${ttlSeconds}s)`,
-      LOG_CONTEXT,
+      LOG_CONTEXT
     );
   } catch (error) {
     console.error(`Error setting cache for key ${key}:`, error);
@@ -100,7 +92,7 @@ export async function deleteCache(key: string | string[]): Promise<void> {
   if (!isReady()) {
     console.debug(
       `deleteCache(${Array.isArray(key) ? key.join(', ') : key}): Redis not ready or disabled.`,
-      LOG_CONTEXT,
+      LOG_CONTEXT
     );
     return;
   }
@@ -110,14 +102,14 @@ export async function deleteCache(key: string | string[]): Promise<void> {
     const result = await redisClient!.del(keysToDelete);
     console.debug(
       `Cache DELETED for key(s): ${keysToDelete.join(', ')}. Count: ${result}`,
-      LOG_CONTEXT,
+      LOG_CONTEXT
     );
   } catch (error) {
     const keysStr = Array.isArray(key) ? key.join(', ') : key;
     console.error(
       `Error deleting cache for key(s) ${keysStr}:`,
       LOG_CONTEXT,
-      error,
+      error
     );
   }
 }

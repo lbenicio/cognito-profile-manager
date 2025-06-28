@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import createI18nMiddleware from 'next-intl/middleware';
 import { pathnames, locales, localePrefix } from '@/navigation';
@@ -20,7 +19,7 @@ export function middleware(request: NextRequest) {
     'i'
   );
   const isPublicPage = publicPathnameRegex.test(request.nextUrl.pathname);
-  
+
   const sessionCookie = request.cookies.get('session');
 
   // The core i18n logic runs on every request.
@@ -35,7 +34,7 @@ export function middleware(request: NextRequest) {
     // The `next-intl` middleware has already processed the request, so the
     // locale is baked into the URL's `basePath`. Redirecting to `/login`
     // will preserve the locale.
-    const loginUrl = new URL(pathnames['/login'], request.url)
+    const loginUrl = new URL(pathnames['/login'], request.url);
     return NextResponse.redirect(loginUrl);
   }
 
@@ -54,5 +53,5 @@ export function middleware(request: NextRequest) {
 export const config = {
   // Skip all paths that should not be internationalized. This example skips the
   // folders "api", "_next" and all files with an extension (e.g. favicon.ico)
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)']
+  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
 };

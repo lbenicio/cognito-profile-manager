@@ -1,19 +1,53 @@
 'use client';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Mail, Home, Phone, CalendarDays, BadgeCheck, Shield, Users, Globe, Clock, Languages, Edit, PersonStanding, BookUser } from 'lucide-react';
+import {
+  Mail,
+  Home,
+  Phone,
+  CalendarDays,
+  BadgeCheck,
+  Shield,
+  Users,
+  Globe,
+  Clock,
+  Languages,
+  Edit,
+  PersonStanding,
+  BookUser,
+} from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { useTranslations } from 'next-intl';
 import type { User } from '@/lib/auth';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { useState, useEffect } from 'react';
 import { AvatarEditor } from './avatar-editor';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 
-export function ProfileDisplay({ user, onUpdate }: { user: User, onUpdate: (data: Partial<User>) => void }) {
+export function ProfileDisplay({
+  user,
+  onUpdate,
+}: {
+  user: User;
+  onUpdate: (data: Partial<User>) => void;
+}) {
   const t = useTranslations('Dashboard');
   const tProfile = useTranslations('Profile');
   const tDashboard = useTranslations('Dashboard.profileCard');
@@ -29,154 +63,223 @@ export function ProfileDisplay({ user, onUpdate }: { user: User, onUpdate: (data
     // This code runs only on the client, after the component has mounted,
     // ensuring the date is formatted using the client's locale and preventing a mismatch.
     if (user.creationDate) {
-        setMemberSince(format(parseISO(user.creationDate), "MMMM d, yyyy"));
+      setMemberSince(format(parseISO(user.creationDate), 'MMMM d, yyyy'));
     }
   }, [user.creationDate]);
 
   const handleSendVerificationEmail = async () => {
     setEmailLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     toast({
-        title: tProfile('verification.sentTitle'),
-        description: tProfile('verification.emailSentDescription', {email: user.email}),
+      title: tProfile('verification.sentTitle'),
+      description: tProfile('verification.emailSentDescription', {
+        email: user.email,
+      }),
     });
     setEmailLoading(false);
   };
-    
+
   const handleSendVerificationSms = async () => {
-      setPhoneLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast({
-          title: tProfile('verification.sentTitle'),
-          description: tProfile('verification.phoneSentDescription', {phone: user.phone_number}),
-      });
-      setPhoneLoading(false);
+    setPhoneLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    toast({
+      title: tProfile('verification.sentTitle'),
+      description: tProfile('verification.phoneSentDescription', {
+        phone: user.phone_number,
+      }),
+    });
+    setPhoneLoading(false);
   };
 
   return (
     <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
       <Card>
         <CardHeader>
-          <div className="flex items-center gap-4">
+          <div className='flex items-center gap-4'>
             <DialogTrigger asChild>
-                <div className="relative group cursor-pointer">
-                  <Avatar className="h-12 w-12 sm:h-16 sm:w-16">
-                    <AvatarImage src={user.picture || ''} alt={user.name} data-ai-hint="profile picture" />
-                    <AvatarFallback>{user.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                  </Avatar>
-                  <div className="absolute inset-0 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Edit className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-                  </div>
+              <div className='group relative cursor-pointer'>
+                <Avatar className='h-12 w-12 sm:h-16 sm:w-16'>
+                  <AvatarImage
+                    src={user.picture || ''}
+                    alt={user.name}
+                    data-ai-hint='profile picture'
+                  />
+                  <AvatarFallback>
+                    {user.name
+                      .split(' ')
+                      .map((n) => n[0])
+                      .join('')}
+                  </AvatarFallback>
+                </Avatar>
+                <div className='absolute inset-0 flex items-center justify-center rounded-full bg-black/60 opacity-0 transition-opacity group-hover:opacity-100'>
+                  <Edit className='h-5 w-5 text-white sm:h-6 sm:w-6' />
                 </div>
+              </div>
             </DialogTrigger>
             <div>
-              <div className="flex items-center gap-2">
-                  <CardTitle className="text-2xl font-headline">{user.name}</CardTitle>
-                  {user.isAdmin ? (
-                      <Badge><Shield className="w-3 h-3 mr-1"/>{tDashboard('adminBadge')}</Badge>
-                  ) : (
-                      <Badge variant="secondary">{tDashboard('userBadge')}</Badge>
-                  )}
+              <div className='flex items-center gap-2'>
+                <CardTitle className='font-headline text-2xl'>
+                  {user.name}
+                </CardTitle>
+                {user.isAdmin ? (
+                  <Badge>
+                    <Shield className='mr-1 h-3 w-3' />
+                    {tDashboard('adminBadge')}
+                  </Badge>
+                ) : (
+                  <Badge variant='secondary'>{tDashboard('userBadge')}</Badge>
+                )}
               </div>
               <CardDescription>@{user.username}</CardDescription>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4 text-sm">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3 min-w-0">
-              <Mail className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-              <span className="truncate">{user.email}</span>
+        <CardContent className='space-y-4 text-sm'>
+          <div className='flex items-center justify-between gap-4'>
+            <div className='flex min-w-0 items-center gap-3'>
+              <Mail className='h-5 w-5 flex-shrink-0 text-muted-foreground' />
+              <span className='truncate'>{user.email}</span>
             </div>
-              {user.email_verified ? (
-                <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 flex items-center gap-1 flex-shrink-0">
-                  <BadgeCheck className="w-3.5 h-3.5"/>
+            {user.email_verified ? (
+              <Badge
+                variant='secondary'
+                className='flex flex-shrink-0 items-center gap-1 bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300'
+              >
+                <BadgeCheck className='h-3.5 w-3.5' />
+                {t('verified')}
+              </Badge>
+            ) : (
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={handleSendVerificationEmail}
+                disabled={emailLoading}
+                className='flex-shrink-0'
+              >
+                {emailLoading ? (
+                  <div className='h-4 w-4 animate-spin rounded-full border-b-2 border-primary'></div>
+                ) : (
+                  tProfile('verification.resend')
+                )}
+              </Button>
+            )}
+          </div>
+          <div className='flex items-center justify-between gap-4'>
+            <div className='flex min-w-0 items-center gap-3'>
+              <Phone className='h-5 w-5 flex-shrink-0 text-muted-foreground' />
+              <span className='text-sm'>
+                {user.phone_number || tProfile('display.notSet')}
+              </span>
+            </div>
+            {user.phone_number &&
+              (user.phone_number_verified ? (
+                <Badge
+                  variant='secondary'
+                  className='flex flex-shrink-0 items-center gap-1 bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300'
+                >
+                  <BadgeCheck className='h-3.5 w-3.5' />
                   {t('verified')}
                 </Badge>
               ) : (
-                <Button variant="outline" size="sm" onClick={handleSendVerificationEmail} disabled={emailLoading} className='flex-shrink-0'>
-                  {emailLoading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div> : tProfile('verification.resend')}
+                <Button
+                  variant='outline'
+                  size='sm'
+                  onClick={handleSendVerificationSms}
+                  disabled={phoneLoading}
+                  className='flex-shrink-0'
+                >
+                  {phoneLoading ? (
+                    <div className='h-4 w-4 animate-spin rounded-full border-b-2 border-primary'></div>
+                  ) : (
+                    tProfile('verification.resend')
+                  )}
                 </Button>
-              )}
+              ))}
           </div>
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3 min-w-0">
-              <Phone className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-              <span className="text-sm">{user.phone_number || tProfile('display.notSet')}</span>
-            </div>
-              {user.phone_number && (
-                 user.phone_number_verified ? (
-                  <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 flex items-center gap-1 flex-shrink-0">
-                    <BadgeCheck className="w-3.5 h-3.5"/>
-                    {t('verified')}
-                  </Badge>
-                ) : (
-                  <Button variant="outline" size="sm" onClick={handleSendVerificationSms} disabled={phoneLoading} className='flex-shrink-0'>
-                    {phoneLoading ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div> : tProfile('verification.resend')}
-                  </Button>
-                )
-              )}
+          <div className='flex items-start gap-3'>
+            <Home className='mt-1 h-5 w-5 flex-shrink-0 text-muted-foreground' />
+            <span className='flex-1'>
+              {user.address || tProfile('display.notSet')}
+            </span>
           </div>
-          <div className="flex items-start gap-3">
-            <Home className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
-            <span className="flex-1">{user.address || tProfile('display.notSet')}</span>
-          </div>
-          <div className="flex items-start gap-3">
-            <PersonStanding className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
-            <span className="flex-1">{user.gender || tProfile('display.notSet')}</span>
+          <div className='flex items-start gap-3'>
+            <PersonStanding className='mt-1 h-5 w-5 flex-shrink-0 text-muted-foreground' />
+            <span className='flex-1'>
+              {user.gender || tProfile('display.notSet')}
+            </span>
           </div>
           {user.website && (
-              <div className="flex items-center gap-3">
-                  <Globe className="w-5 h-5 text-muted-foreground" />
-                  <a href={user.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                      {user.website}
-                  </a>
-              </div>
+            <div className='flex items-center gap-3'>
+              <Globe className='h-5 w-5 text-muted-foreground' />
+              <a
+                href={user.website}
+                target='_blank'
+                rel='noopener noreferrer'
+                className='text-primary hover:underline'
+              >
+                {user.website}
+              </a>
+            </div>
           )}
           {user.zoneinfo && (
-              <div className="flex items-center gap-3">
-                  <Clock className="w-5 h-5 text-muted-foreground" />
-                  <span>{user.zoneinfo}</span>
-              </div>
+            <div className='flex items-center gap-3'>
+              <Clock className='h-5 w-5 text-muted-foreground' />
+              <span>{user.zoneinfo}</span>
+            </div>
           )}
           {user.locale && (
-              <div className="flex items-center gap-3">
-                  <Languages className="w-5 h-5 text-muted-foreground" />
-                  <span>{user.locale}</span>
-              </div>
-          )}
-           <Separator className="my-4" />
-           <div className="space-y-2">
-                <h4 className="font-semibold">{tProfile('display.aboutMeTitle')}</h4>
-                <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                    {user.aboutMe || tProfile('display.notSet')}
-                </p>
+            <div className='flex items-center gap-3'>
+              <Languages className='h-5 w-5 text-muted-foreground' />
+              <span>{user.locale}</span>
             </div>
-           <Separator className="my-4" />
-          <div className="flex items-start gap-3">
-            <Users className="w-5 h-5 text-muted-foreground mt-1 flex-shrink-0" />
-            <div className="flex-1">
-              <span className="font-semibold">{tDashboard('groups')}</span>
-              <div className="flex flex-wrap gap-2 mt-2">
-                  {user.groups.length > 0 ? user.groups.map(group => (
-                      <Badge key={group} variant="outline">{group}</Badge>
-                  )) : (
-                      <span className="text-muted-foreground">{tDashboard('noGroups')}</span>
-                  )}
+          )}
+          <Separator className='my-4' />
+          <div className='space-y-2'>
+            <h4 className='font-semibold'>
+              {tProfile('display.aboutMeTitle')}
+            </h4>
+            <p className='whitespace-pre-wrap text-sm text-muted-foreground'>
+              {user.aboutMe || tProfile('display.notSet')}
+            </p>
+          </div>
+          <Separator className='my-4' />
+          <div className='flex items-start gap-3'>
+            <Users className='mt-1 h-5 w-5 flex-shrink-0 text-muted-foreground' />
+            <div className='flex-1'>
+              <span className='font-semibold'>{tDashboard('groups')}</span>
+              <div className='mt-2 flex flex-wrap gap-2'>
+                {user.groups.length > 0 ? (
+                  user.groups.map((group) => (
+                    <Badge key={group} variant='outline'>
+                      {group}
+                    </Badge>
+                  ))
+                ) : (
+                  <span className='text-muted-foreground'>
+                    {tDashboard('noGroups')}
+                  </span>
+                )}
               </div>
             </div>
           </div>
         </CardContent>
-        <CardFooter className="flex-col items-start gap-2 pt-4 border-t text-xs text-muted-foreground">
-          <div className="flex items-center gap-2">
-              <BadgeCheck className="w-4 h-4" />
-              <span>{tProfile('display.status', {status: user.userStatus})}</span>
+        <CardFooter className='flex-col items-start gap-2 border-t pt-4 text-xs text-muted-foreground'>
+          <div className='flex items-center gap-2'>
+            <BadgeCheck className='h-4 w-4' />
+            <span>
+              {tProfile('display.status', { status: user.userStatus })}
+            </span>
           </div>
-          <div className="flex items-center gap-2" style={{minHeight: '20px'}}>
-              <CalendarDays className="w-4 h-4" />
-              {memberSince && (
-                <span>{tProfile('display.memberSince', {date: memberSince})}</span>
-              )}
+          <div
+            className='flex items-center gap-2'
+            style={{ minHeight: '20px' }}
+          >
+            <CalendarDays className='h-4 w-4' />
+            {memberSince && (
+              <span>
+                {tProfile('display.memberSince', { date: memberSince })}
+              </span>
+            )}
           </div>
         </CardFooter>
       </Card>
@@ -187,7 +290,11 @@ export function ProfileDisplay({ user, onUpdate }: { user: User, onUpdate: (data
             {tProfile('editAvatarDescription')}
           </DialogDescription>
         </DialogHeader>
-        <AvatarEditor user={user} onUpdate={onUpdate} onClose={() => setIsEditorOpen(false)} />
+        <AvatarEditor
+          user={user}
+          onUpdate={onUpdate}
+          onClose={() => setIsEditorOpen(false)}
+        />
       </DialogContent>
     </Dialog>
   );
