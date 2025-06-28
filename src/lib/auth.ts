@@ -1,3 +1,4 @@
+
 import 'server-only';
 import { cache } from 'react';
 import {
@@ -5,10 +6,7 @@ import {
   GetUserCommand,
   ListWebAuthnCredentialsCommand,
 } from '@/lib/cognito';
-import {
-  getSession as getRedisSession,
-  deleteSession as deleteRedisSession,
-} from '@/lib/session';
+import { getSession } from '@/lib/session';
 
 export { getSession } from '@/lib/session';
 
@@ -199,7 +197,7 @@ export const mockAdminUser: User = {
 };
 
 export const getUser = cache(async (): Promise<User | null> => {
-  const session = await getRedisSession();
+  const session = await getSession();
 
   if (session?.isMock) {
     console.log('Using mock user data for development.');
@@ -371,7 +369,8 @@ export const getUser = cache(async (): Promise<User | null> => {
       'General error in getUser, likely during device list or user attribute fetch:',
       error
     );
-    await deleteRedisSession();
+    // Do not delete session here. A temporary Cognito error shouldn't log out the user.
+    // The session will be invalid for this request, and they can retry.
     return null;
   }
 });

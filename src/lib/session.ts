@@ -93,7 +93,9 @@ export const getSession = cache(async () => {
   const session = await getCache<any>(key);
 
   if (!session) {
-    await deleteSession(); // Clean up invalid cookie
+    // Session is not in Redis. The cookie is invalid. Return null.
+    // We cannot delete the cookie here. The user will be treated as logged out
+    // for this request. The invalid cookie will be overwritten on next successful login.
     return null;
   }
 
@@ -114,13 +116,12 @@ export const getSession = cache(async () => {
       };
 
       await updateSession(payload.sessionId, newSessionData, newExpiresIn);
-
-      // Return the newly refreshed session
-      return { ...newSessionData, sessionId: payload.sessionId };
+      session = newSessionData; // Update the session for the current request
     } else {
-      // Refresh failed, delete the session
-      console.log('Token refresh failed, deleting session.');
-      await deleteSession();
+      // Refresh failed. Delete the session data from Redis, but do not touch the cookie.
+      // This will cause subsequent requests with this cookie to also fail until a new login.
+      console.log('Token refresh failed, deleting session from Redis.');
+      await deleteCache(key);
       return null;
     }
   }
