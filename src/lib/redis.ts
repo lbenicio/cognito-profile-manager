@@ -1,7 +1,7 @@
 import 'server-only';
 import { createClient, RedisClientType } from 'redis';
 
-let redisClient: RedisClientType | null = null;
+let redisClient: RedisClientType;
 const REDIS_URL = process.env.REDIS_URL;
 let connectionPromise: Promise<void> | null = null;
 const LOG_CONTEXT = 'RedisService';
