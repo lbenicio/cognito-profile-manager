@@ -9,7 +9,8 @@ const secretKey = process.env.TOTP_SECRET_ENCRYPTION_KEY;
 if (!secretKey) {
   throw new Error('TOTP_SECRET_ENCRYPTION_KEY is not set in environment variables');
 }
-const encodedKey = new TextEncoder().encode(secretKey);
+// Correctly decode the Base64 key to get the raw bytes for encryption.
+const encodedKey = Buffer.from(secretKey, 'base64');
 const cookieName = 'session';
 
 export async function encrypt(payload: any) {
