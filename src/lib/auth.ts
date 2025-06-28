@@ -240,7 +240,6 @@ export const getSession = cache(async (): Promise<Session> => {
 // This function is cached per request and retrieves the authenticated user's data.
 export const getUser = cache(async (): Promise<User | null> => {
   const session = await getSession();
-  const user = await getUser();
 
   // Handle mock development session (which doesn't have an id_token)
   if (
@@ -252,7 +251,6 @@ export const getUser = cache(async (): Promise<User | null> => {
     const baseUser = session.username === 'admin' ? mockAdminUser : mockUser;
     return {
       ...baseUser,
-      email: user?.email || 'email@example.com',
       username: session.username,
     };
   }
