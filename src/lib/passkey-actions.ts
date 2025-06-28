@@ -51,3 +51,32 @@ export async function deletePasskey(
     };
   }
 }
+
+export async function syncPasskeysEnabledFlag(): Promise<{ success: boolean; message: string }> {
+  const session = await getSession();
+  if (!session?.accessToken) {
+    return { success: false, message: 'Not authenticated' };
+  }
+
+  try {
+    const command = new UpdateUserAttributesCommand({
+      AccessToken: session.accessToken,
+      UserAttributes: [{
+        Name: 'custom:pless',
+        Value: 'true',
+      }],
+    });
+    await cognitoClient.send(command);
+
+    revalidatePath('/security');
+    revalidatePath('/');
+
+    return { success: true, message: 'Passkey flag synced successfully.' };
+  } catch (error: any) {
+    console.error('Error syncing passkey flag:', error);
+    return {
+      success: false,
+      message: 'An unexpected error occurred while syncing the passkey flag.',
+    };
+  }
+}

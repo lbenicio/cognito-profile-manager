@@ -1,11 +1,14 @@
+
+'use client';
 import { getUser } from '@/lib/auth';
 import { SecurityView } from '@/components/security-view';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
+import { syncPasskeysEnabledFlag } from '@/lib/passkey-actions';
 
-export default async function SecurityPage(props: { params: Promise<{ locale: string }> }) {
-  const params = await props.params;
+export default async function SecurityPage(props: { params: { locale: string } }) {
+  const { params } = props;
   unstable_setRequestLocale(params.locale);
-  const user = await getUser();
+  let user = await getUser();
 
   if (!user) {
     return (
@@ -16,6 +19,14 @@ export default async function SecurityPage(props: { params: Promise<{ locale: st
             </div>
         </div>
     );
+  }
+
+  // If user has passkeys but the flag is not enabled, sync it.
+  if (user.devices.length >= 1 && !user.passkeysEnabled) {
+    await syncPasskeysEnabledFlag();
+    // Manually update the user object for this render to be consistent.
+    // Revalidation will handle future requests.
+    user = { ...user, passkeysEnabled: true };
   }
 
   const t = await getTranslations('Security');
