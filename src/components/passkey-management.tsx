@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { listCognitoPasskeys } from '@/lib/passkey-admin-actions';
 import { Separator } from './ui/separator';
+import { cn } from '@/lib/utils';
 
 interface PasskeyManagementProps {
     user: User;
@@ -166,7 +167,13 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
                                         </TableHeader>
                                         <TableBody>
                                             {user.devices.map((device) => (
-                                                <TableRow key={device.key}>
+                                                <TableRow 
+                                                    key={device.key}
+                                                    className={cn(
+                                                        "transition-opacity",
+                                                        isDeleting === device.key && "opacity-50"
+                                                    )}
+                                                >
                                                     <TableCell className="font-medium">
                                                         <div className="flex items-center gap-2">
                                                             <KeyRound className="h-4 w-4 text-muted-foreground" />
