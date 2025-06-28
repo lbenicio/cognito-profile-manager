@@ -33,6 +33,7 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  outDir: 'dist',
   images: {
     remotePatterns,
   },
