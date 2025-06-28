@@ -7,6 +7,7 @@ export type NewSessionData = {
   id_token: string;
   access_token: string;
   refresh_token: string;
+  expires_in?: number;
 };
 
 export async function refreshAuthTokens(refreshToken: string): Promise<NewSessionData | null> {
@@ -58,6 +59,7 @@ export async function refreshAuthTokens(refreshToken: string): Promise<NewSessio
       id_token: tokens.id_token,
       access_token: tokens.access_token,
       refresh_token: tokens.refresh_token || refreshToken,
+      expires_in: tokens.expires_in,
     };
 
     return newSessionData;

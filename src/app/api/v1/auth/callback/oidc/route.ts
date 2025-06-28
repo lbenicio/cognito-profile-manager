@@ -165,6 +165,7 @@ export async function GET(request: NextRequest) {
         id_token: tokens.id_token,
         access_token: tokens.access_token,
         refresh_token: tokens.refresh_token,
+        expires_in: tokens.expires_in,
     };
 
     const dashboardUrl = new URL('/', origin);
@@ -173,12 +174,17 @@ export async function GET(request: NextRequest) {
     const isProd = process.env.NODE_ENV === 'production';
     const appUrlObject = new URL(appUrl);
     const cookieDomain = isProd ? appUrlObject.hostname : undefined;
+    
+    // Use the expires_in from Cognito for maxAge, defaulting to 1 hour.
+    const maxAge = tokens.expires_in && typeof tokens.expires_in === 'number'
+        ? tokens.expires_in
+        : 3600;
 
     // Set auth cookie AND clear state cookie on the SAME response object before returning.
     response.cookies.set('auth_session', JSON.stringify(sessionData), {
       httpOnly: true,
       secure: isProd,
-      maxAge: 30 * 24 * 60 * 60, // 30 days
+      maxAge: maxAge,
       path: '/',
       sameSite: isProd ? 'none' : 'lax',
       domain: cookieDomain,

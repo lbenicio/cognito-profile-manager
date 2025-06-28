@@ -93,7 +93,21 @@ export async function middleware(request: NextRequest) {
     if (sessionIsValid) {
         if (isPublicPage) {
             // Logged-in user on a public page (like /login), redirect to dashboard
-            return NextResponse.redirect(new URL(pathnames['/'], request.url));
+            const dashboardResponse = NextResponse.redirect(new URL(pathnames['/'], request.url));
+             if (newSessionCookieValue) {
+                const isProd = process.env.NODE_ENV === 'production';
+                const appUrl = process.env.APP_URL?.replace(/\/$/, '');
+                const cookieDomain = isProd && appUrl ? new URL(appUrl).hostname : undefined;
+                const newSession = JSON.parse(newSessionCookieValue);
+                const maxAge = newSession.expires_in && typeof newSession.expires_in === 'number' 
+                    ? newSession.expires_in 
+                    : 3600;
+                
+                dashboardResponse.cookies.set('auth_session', newSessionCookieValue, {
+                    httpOnly: true, secure: isProd, maxAge: maxAge, path: '/', sameSite: isProd ? 'none' : 'lax', domain: cookieDomain,
+                });
+            }
+            return dashboardResponse;
         }
     } else {
         if (!isPublicPage) {
@@ -103,21 +117,23 @@ export async function middleware(request: NextRequest) {
     }
 
     // --- 3. Pass to i18n Middleware ---
-    // At this point, the request is allowed to proceed.
-    // Let the i18n middleware handle locale detection and rewriting.
     const response = i18nMiddleware(request);
 
     // --- 4. Attach New Cookie if Refreshed ---
-    // If we refreshed the token, set the new cookie on the final response.
     if (newSessionCookieValue) {
         const isProd = process.env.NODE_ENV === 'production';
         const appUrl = process.env.APP_URL?.replace(/\/$/, '');
         const cookieDomain = isProd && appUrl ? new URL(appUrl).hostname : undefined;
         
+        const newSession = JSON.parse(newSessionCookieValue);
+        const maxAge = newSession.expires_in && typeof newSession.expires_in === 'number' 
+            ? newSession.expires_in 
+            : 3600;
+        
         response.cookies.set('auth_session', newSessionCookieValue, {
             httpOnly: true,
             secure: isProd,
-            maxAge: 30 * 24 * 60 * 60, // 30 days
+            maxAge: maxAge,
             path: '/',
             sameSite: isProd ? 'none' : 'lax',
             domain: cookieDomain,
