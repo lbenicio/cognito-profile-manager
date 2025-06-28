@@ -4,7 +4,7 @@ import { SecurityView } from '@/components/security-view';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { syncPasskeysEnabledFlag } from '@/lib/passkey-actions';
 
-export default async function SecurityPage(props: { params: { locale: string } }) {
+export default async function SecurityPage(props: { params: Promise<{ locale: string }> }) {
   const { params } = props;
   unstable_setRequestLocale(params.locale);
   let user = await getUser();

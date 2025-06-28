@@ -5,8 +5,8 @@ import { unstable_setRequestLocale } from 'next-intl/server';
 import { syncPasskeysEnabledFlag } from '@/lib/passkey-actions';
 
 // This is now a Server Component
-export default async function DashboardPage(props: {params: {locale: string}}) {
-    unstable_setRequestLocale(props.params.locale);
+export default async function DashboardPage(props: {params: Promise<{locale: string}>}) {
+    unstable_setRequestLocale((await props.params).locale);
     let user = await getUser();
 
     // The middleware should protect this page. If user is null here, it indicates

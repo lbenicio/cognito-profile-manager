@@ -1,7 +1,14 @@
 import 'server-only';
 import { cache } from 'react';
-import { cognitoClient, GetUserCommand, ListWebAuthnCredentialsCommand } from '@/lib/cognito';
-import { getSession as getRedisSession, deleteSession as deleteRedisSession } from '@/lib/session';
+import {
+  cognitoClient,
+  GetUserCommand,
+  ListWebAuthnCredentialsCommand,
+} from '@/lib/cognito';
+import {
+  getSession as getRedisSession,
+  deleteSession as deleteRedisSession,
+} from '@/lib/session';
 
 export { getSession } from '@/lib/session';
 
@@ -84,14 +91,13 @@ export type User = {
 };
 
 export type Session = {
-    accessToken: string;
-    refreshToken: string;
-    claims: import('jose').JWTPayload;
-    isMock?: boolean;
-    username?: string;
-    sessionId: string;
+  accessToken: string;
+  refreshToken: string;
+  claims: import('jose').JWTPayload;
+  isMock?: boolean;
+  username?: string;
+  sessionId: string;
 } | null;
-
 
 const defaultPreferences: UserPreferences = {
   theme: 'system',
@@ -100,12 +106,12 @@ const defaultPreferences: UserPreferences = {
 };
 
 const defaultNotificationPreferences: NotificationPreferences = {
-    email: true,
-    app: true,
-    telegram: false,
-    user: true,
-    system: true,
-    marketing: false,
+  email: true,
+  app: true,
+  telegram: false,
+  user: true,
+  system: true,
+  marketing: false,
 };
 
 const defaultPublicProfilePreferences: PublicProfilePreferences = {
@@ -150,21 +156,32 @@ export const mockUser: User = {
   zoneinfo: 'America/New_York',
   website: 'https://example.com',
   gender: 'Prefer not to say',
-  aboutMe: 'This is a mock user bio for the development environment. I enjoy coding and building cool things with Next.js.',
+  aboutMe:
+    'This is a mock user bio for the development environment. I enjoy coding and building cool things with Next.js.',
   preferences: defaultPreferences,
   notificationPreferences: defaultNotificationPreferences,
   publicProfilePreferences: defaultPublicProfilePreferences,
   fingerprint: [
-    { date: new Date().toISOString(), ip: '127.0.0.1', device: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36' },
-    { date: new Date(Date.now() - 86400000).toISOString(), ip: '192.168.1.1', device: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1' },
+    {
+      date: new Date().toISOString(),
+      ip: '127.0.0.1',
+      device:
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    },
+    {
+      date: new Date(Date.now() - 86400000).toISOString(),
+      ip: '192.168.1.1',
+      device:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1',
+    },
   ],
   devices: [
     {
-        key: 'mock_device_1',
-        name: 'Passkey on macOS',
-        createDate: new Date(Date.now() - 86400000 * 2).toISOString(),
-        lastAuthDate: new Date(Date.now() - 86400000 * 2).toISOString(),
-    }
+      key: 'mock_device_1',
+      name: 'Passkey on macOS',
+      createDate: new Date(Date.now() - 86400000 * 2).toISOString(),
+      lastAuthDate: new Date(Date.now() - 86400000 * 2).toISOString(),
+    },
   ],
   sessionStartedAt: nowInSeconds,
   sessionExpiresAt: nowInSeconds + 3600, // Expires in 1 hour
@@ -181,13 +198,13 @@ export const mockAdminUser: User = {
   devices: mockUser.devices,
 };
 
-
 export const getUser = cache(async (): Promise<User | null> => {
   const session = await getRedisSession();
-  
+
   if (session?.isMock) {
     console.log('Using mock user data for development.');
-    const baseUser = session.username === mockAdminUser.username ? mockAdminUser : mockUser;
+    const baseUser =
+      session.username === mockAdminUser.username ? mockAdminUser : mockUser;
     return {
       ...baseUser,
       username: session.username,
@@ -216,10 +233,11 @@ export const getUser = cache(async (): Promise<User | null> => {
         },
         {} as Record<string, string>
       ) || {};
-    
+
     const { claims } = session;
     const adminGroupName = process.env.COGNITO_ADMIN_GROUP_NAME || 'admins';
-    const groupsClaimKey = process.env.COGNITO_GROUPS_CLAIM_KEY || 'cognito:groups';
+    const groupsClaimKey =
+      process.env.COGNITO_GROUPS_CLAIM_KEY || 'cognito:groups';
     const groups = (claims[groupsClaimKey] as string[]) || [];
     const isAdmin = groups.includes(adminGroupName);
 
@@ -234,24 +252,33 @@ export const getUser = cache(async (): Promise<User | null> => {
           ...JSON.parse(attributes['custom:session']),
         };
       } catch (e) {
-        console.error('Failed to parse user preferences from GetUser API call', e);
+        console.error(
+          'Failed to parse user preferences from GetUser API call',
+          e
+        );
       }
     }
 
-    let publicProfilePreferences: PublicProfilePreferences = { ...defaultPublicProfilePreferences };
+    let publicProfilePreferences: PublicProfilePreferences = {
+      ...defaultPublicProfilePreferences,
+    };
     const publicProfileClaim = attributes['custom:public-profile'];
     if (publicProfileClaim) {
       try {
         const parsedPrefs = JSON.parse(publicProfileClaim);
         publicProfilePreferences = {
-          isPublic: parsedPrefs.isPublic ?? defaultPublicProfilePreferences.isPublic,
+          isPublic:
+            parsedPrefs.isPublic ?? defaultPublicProfilePreferences.isPublic,
           publicFields: {
             ...defaultPublicProfilePreferences.publicFields,
             ...(parsedPrefs.publicFields || {}),
           },
         };
       } catch (e) {
-        console.error('Failed to parse public profile preferences from GetUser API call', e);
+        console.error(
+          'Failed to parse public profile preferences from GetUser API call',
+          e
+        );
       }
     }
 
@@ -269,44 +296,53 @@ export const getUser = cache(async (): Promise<User | null> => {
       try {
         fingerprintData = JSON.parse(attributes['custom:fingerprint']);
       } catch (e) {
-        console.error('Failed to parse user fingerprint from GetUser API call', e);
+        console.error(
+          'Failed to parse user fingerprint from GetUser API call',
+          e
+        );
       }
     }
 
-    let devices: Device[] = [];
+    let devices: (Device | null)[] = [];
     try {
       const listCredentialsCommand = new ListWebAuthnCredentialsCommand({
         AccessToken: session.accessToken,
       });
-      const credentialsResponse = await cognitoClient.send(listCredentialsCommand);
+      const credentialsResponse = await cognitoClient.send(
+        listCredentialsCommand
+      );
 
       devices = (credentialsResponse.Credentials || [])
         .map((credential) => {
           if (!credential.CredentialId) return null;
 
-          const name = `Passkey on ${credential.UserAgent ? credential.UserAgent.split(') ')[0].split(' (').pop() : 'Unknown Device'}`;
-          
+          const name = `Passkey on ${credential.FriendlyCredentialName ? credential.FriendlyCredentialName : 'Unknown Device'}`;
+
           return {
             key: credential.CredentialId,
             name: name,
-            createDate: credential.CreateDate?.toISOString(),
-            lastAuthDate: credential.LastUsedDate?.toISOString(),
-          };
+            createDate: credential.CreatedAt?.toISOString(),
+            lastAuthDate: undefined,
+          } as Device;
         })
         .filter((d): d is Device => d !== null);
-
     } catch (e: any) {
       console.error('Could not fetch WebAuthn credentials for user:', e);
     }
 
     return {
       sub: claims.sub as string,
-      username: cognitoUser.Username || (claims['cognito:username'] as string) || '',
+      username:
+        cognitoUser.Username || (claims['cognito:username'] as string) || '',
       email: attributes.email || (claims.email as string) || '',
       email_verified: attributes.email_verified === 'true',
-      name: [freshGivenName, freshFamilyName].filter(Boolean).join(' ') || (claims.name as string) || '',
+      name:
+        [freshGivenName, freshFamilyName].filter(Boolean).join(' ') ||
+        (claims.name as string) ||
+        '',
       address: attributes.address || '',
-      phone_number: attributes.phone_number || (claims.phone_number as string) || '',
+      phone_number:
+        attributes.phone_number || (claims.phone_number as string) || '',
       phone_number_verified: attributes.phone_number_verified === 'true',
       birthdate: attributes.birthdate || '',
       creationDate: new Date((claims.auth_time as number) * 1000).toISOString(),
@@ -331,7 +367,10 @@ export const getUser = cache(async (): Promise<User | null> => {
       sessionExpiresAt: claims.exp as number,
     };
   } catch (error: any) {
-    console.error('General error in getUser, likely during device list or user attribute fetch:', error);
+    console.error(
+      'General error in getUser, likely during device list or user attribute fetch:',
+      error
+    );
     await deleteRedisSession();
     return null;
   }

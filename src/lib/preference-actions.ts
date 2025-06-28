@@ -29,7 +29,7 @@ export async function updateUserPreferences(
     await cognitoClient.send(command);
 
     if (newPreferences.language && locales.includes(newPreferences.language)) {
-      cookies().set('NEXT_LOCALE', newPreferences.language);
+      (await cookies()).set('NEXT_LOCALE', newPreferences.language);
     }
     
     revalidatePath('/settings');
