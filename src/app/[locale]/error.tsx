@@ -11,6 +11,9 @@ import {
 } from '@/components/ui/card';
 import { useTranslations } from 'next-intl';
 import { AlertTriangle } from 'lucide-react';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('ERROR-PAGE');
 
 export default function ErrorPage({
   error,
@@ -23,7 +26,7 @@ export default function ErrorPage({
 
   useEffect(() => {
     // Log the error to an error reporting service
-    console.error(error);
+    logger.error('Application error occurred:', error);
   }, [error]);
 
   return (

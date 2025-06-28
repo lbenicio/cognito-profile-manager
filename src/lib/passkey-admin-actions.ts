@@ -1,9 +1,11 @@
-
 'use server';
 
 import { cognitoClient, ListWebAuthnCredentialsCommand } from './cognito';
 import { getUser } from './auth';
 import { getSession } from './session';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('PASSKEY-ADMIN');
 
 export async function listCognitoPasskeys(
   username: string
@@ -43,7 +45,7 @@ export async function listCognitoPasskeys(
     });
     const response = await cognitoClient.send(command);
 
-    console.log('[DEV] WebAuthn Credentials:', response.Credentials);
+    logger.info('[DEV] WebAuthn Credentials:', response.Credentials);
 
     return {
       success: true,
@@ -51,7 +53,7 @@ export async function listCognitoPasskeys(
       data: response.Credentials,
     };
   } catch (error: any) {
-    console.error('List WebAuthn Credentials Error:', error);
+    logger.error('List WebAuthn Credentials Error:', error);
     return {
       success: false,
       message: `Failed to list passkeys: ${error.name} - ${error.message}. Ensure your server's IAM role has 'cognito-idp:ListWebAuthnCredentials' permission.`,

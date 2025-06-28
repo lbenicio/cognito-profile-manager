@@ -2,6 +2,9 @@
 
 import { jwtVerify, createRemoteJWKSet } from 'jose';
 import type { JWTPayload } from 'jose';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('SESSION-ACTIONS');
 
 type NewTokenResponse = {
   id_token: string;
@@ -9,9 +12,7 @@ type NewTokenResponse = {
   expires_in?: number;
 };
 
-export async function refreshAuthTokens(
-  refreshToken: string
-): Promise<{
+export async function refreshAuthTokens(refreshToken: string): Promise<{
   newClaims: JWTPayload;
   newAccessToken: string;
   newRefreshToken: string;
@@ -58,7 +59,7 @@ export async function refreshAuthTokens(
       await tokenResponse.json();
 
     if (!tokenResponse.ok) {
-      console.error(
+      logger.error(
         'Failed to refresh tokens:',
         (tokens as any).error_description ||
           (tokens as any).error ||
@@ -85,7 +86,7 @@ export async function refreshAuthTokens(
       newExpiresIn,
     };
   } catch (error) {
-    console.error('Exception in refreshAuthTokens:', error);
+    logger.error('Exception in refreshAuthTokens:', error);
     return null;
   }
 }

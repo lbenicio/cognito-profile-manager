@@ -1,4 +1,3 @@
-
 'use server';
 
 import { cookies } from 'next/headers';
@@ -7,6 +6,9 @@ import { cognitoClient, UpdateUserAttributesCommand } from './cognito';
 import { getUser, type UserPreferences } from './auth';
 import { getSession } from './session';
 import { locales } from '@/navigation';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('PREFERENCE');
 
 export async function updateUserPreferences(
   newPreferences: Partial<UserPreferences>
@@ -39,7 +41,7 @@ export async function updateUserPreferences(
 
     return { success: true, message: 'Preferences updated successfully.' };
   } catch (error: any) {
-    console.error('Update Preferences Error:', error);
+    logger.error('Update Preferences Error:', error);
     return {
       success: false,
       message: 'An unexpected error occurred while updating your preferences.',

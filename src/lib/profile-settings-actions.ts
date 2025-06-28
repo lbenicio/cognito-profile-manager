@@ -1,10 +1,12 @@
-
 'use server';
 
 import { revalidatePath } from 'next/cache';
 import { cognitoClient, UpdateUserAttributesCommand } from './cognito';
 import { getSession } from './session';
 import type { PublicProfilePreferences } from './auth';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('PROFILE-SETTINGS');
 
 export async function updatePublicProfilePreferences(
   newPreferences: PublicProfilePreferences
@@ -31,7 +33,7 @@ export async function updatePublicProfilePreferences(
 
     return { success: true, message: 'Profile settings updated successfully.' };
   } catch (error: any) {
-    console.error('Update Public Profile Preferences Error:', error);
+    logger.error('Update Public Profile Preferences Error:', error);
     return {
       success: false,
       message:

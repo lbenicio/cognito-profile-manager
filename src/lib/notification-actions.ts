@@ -1,9 +1,11 @@
-
 'use server';
 
 import { revalidatePath } from 'next/cache';
 import { cognitoClient, UpdateUserAttributesCommand } from './cognito';
 import { getSession } from './session';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('NOTIFICATION');
 import type { NotificationPreferences } from './auth';
 
 export async function updateNotificationPreferences(
@@ -52,7 +54,7 @@ export async function updateNotificationPreferences(
       message: 'Notification preferences updated successfully.',
     };
   } catch (error: any) {
-    console.error('Update Notification Preferences Error:', error);
+    logger.error('Update Notification Preferences Error:', error);
     return {
       success: false,
       message:

@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { deleteSession } from '@/lib/session';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('LOGOUT');
 
 export async function GET(request: NextRequest) {
   const appUrl = process.env.APP_URL?.replace(/\/$/, '');
@@ -38,7 +41,7 @@ export async function GET(request: NextRequest) {
     url.searchParams.set('response_type', 'code');
     cognitoLogoutUrl = url.toString();
   } catch (error) {
-    console.error(
+    logger.error(
       'OIDC logout URL construction failed, will redirect to local login page.',
       error
     );

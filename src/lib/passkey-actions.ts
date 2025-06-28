@@ -1,14 +1,16 @@
-
 'use server';
 
 import { revalidatePath } from 'next/cache';
 import {
   cognitoClient,
+  UpdateUserAttributesCommand,
   DeleteWebAuthnCredentialCommand,
   ListWebAuthnCredentialsCommand,
-  UpdateUserAttributesCommand,
 } from './cognito';
 import { getSession } from './session';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('PASSKEY');
 
 export async function deletePasskey(
   credentialId: string
@@ -57,7 +59,7 @@ export async function deletePasskey(
 
     return { success: true, message: 'Passkey deleted successfully.' };
   } catch (error: any) {
-    console.error('Delete Passkey Error:', error);
+    logger.error('Delete Passkey Error:', error);
     return {
       success: false,
       message: 'An unexpected error occurred while deleting the passkey.',
@@ -91,7 +93,7 @@ export async function syncPasskeysEnabledFlag(): Promise<{
 
     return { success: true, message: 'Passkey flag synced successfully.' };
   } catch (error: any) {
-    console.error('Error syncing passkey flag:', error);
+    logger.error('Error syncing passkey flag:', error);
     return {
       success: false,
       message: 'An unexpected error occurred while syncing the passkey flag.',

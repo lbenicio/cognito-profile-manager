@@ -6,6 +6,9 @@ import { cookies } from 'next/headers';
 import { getCache, setCache, deleteCache } from './redis';
 import { refreshAuthTokens } from './session-actions';
 import type { Session } from '@/types/user/user.types';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('SESSION');
 
 const secretKey = process.env.TOTP_SECRET_ENCRYPTION_KEY;
 if (!secretKey) {
@@ -110,7 +113,7 @@ export async function deleteSession(): Promise<void> {
         await deleteCache(`${sessionPrefix}${payload.sessionId}`);
       }
     } catch (e) {
-      console.error('Error deleting session from Redis:', e);
+      logger.error('Error deleting session from Redis:', e);
     }
   }
   (await cookies()).set(cookieName, '', { expires: new Date(0), path: '/' });
@@ -156,7 +159,7 @@ export const getSession = cache(async (): Promise<Session | null> => {
 
     // Check if the token is expired and refresh if necessary
     if (sessionData.claims.exp && sessionData.claims.exp * 1000 < Date.now()) {
-      console.log('Session token expired, attempting refresh...');
+      logger.info('Session token expired, attempting refresh...');
       const refreshResult = await refreshAuthTokens(sessionData.refreshToken);
 
       if (refreshResult) {
@@ -172,7 +175,7 @@ export const getSession = cache(async (): Promise<Session | null> => {
         await updateSession(payload.sessionId, newSessionData, newExpiresIn);
         sessionData = newSessionData; // Update the session for the current request
       } else {
-        console.log('Token refresh failed, deleting session from Redis.');
+        logger.warn('Token refresh failed, deleting session from Redis.');
         await deleteCache(key);
         return null;
       }

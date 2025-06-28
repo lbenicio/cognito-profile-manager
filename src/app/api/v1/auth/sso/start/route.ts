@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('SSO-START');
 
 export async function GET(request: NextRequest) {
   try {
@@ -52,7 +55,7 @@ export async function GET(request: NextRequest) {
 
     return response;
   } catch (error: any) {
-    console.error('SSO start error:', error);
+    logger.error('SSO start error:', error);
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('error', 'sso_start_failed');
     loginUrl.searchParams.set(

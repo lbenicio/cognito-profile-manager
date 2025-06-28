@@ -4,6 +4,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
 import type { JWTPayload } from 'jose';
 import { createSession } from '@/lib/session';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('OIDC-CALLBACK');
 
 function createErrorResponse(
   origin: string,
@@ -14,7 +17,7 @@ function createErrorResponse(
   const errorMessage = description || error;
   loginUrl.searchParams.set('error', errorMessage);
 
-  console.error(
+  logger.error(
     `OIDC Callback Error: Redirecting to login. Reason: ${errorMessage}`
   );
 
@@ -108,7 +111,7 @@ export async function GET(request: NextRequest) {
     if (!tokenResponse.ok) {
       const errorDetails =
         tokens.error_description || tokens.error || 'Token exchange failed.';
-      console.error(
+      logger.error(
         `Token exchange failed with Cognito. Status: ${tokenResponse.status}. Details: ${errorDetails}. Check if the redirect_uri in your Cognito App Client settings matches: ${callbackUrl}`
       );
       throw new Error(errorDetails);
@@ -152,7 +155,7 @@ export async function GET(request: NextRequest) {
       e instanceof Error
         ? e.message
         : 'An unknown error occurred during the login process.';
-    console.error(`Caught error in OIDC callback: ${errorMessage}`);
+    logger.error(`Caught error in OIDC callback: ${errorMessage}`);
     return createErrorResponse(origin, 'callback_error', errorMessage);
   }
 }

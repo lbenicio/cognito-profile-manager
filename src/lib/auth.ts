@@ -6,6 +6,9 @@ import {
   ListWebAuthnCredentialsCommand,
 } from '@/lib/cognito';
 import { getSession } from '@/lib/session';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('AUTH');
 
 export type UserPreferences = {
   theme: 'light' | 'dark' | 'system';
@@ -197,7 +200,7 @@ export const getUser = cache(async (): Promise<User | null> => {
   const session = await getSession();
 
   if (session?.isMock) {
-    console.log('Using mock user data for development.');
+    logger.info('Using mock user data for development.');
     const baseUser =
       session.username === mockAdminUser.username ? mockAdminUser : mockUser;
     return {
@@ -247,7 +250,7 @@ export const getUser = cache(async (): Promise<User | null> => {
           ...JSON.parse(attributes['custom:session']),
         };
       } catch (e) {
-        console.error(
+        logger.error(
           'Failed to parse user preferences from GetUser API call',
           e
         );
@@ -270,7 +273,7 @@ export const getUser = cache(async (): Promise<User | null> => {
           },
         };
       } catch (e) {
-        console.error(
+        logger.error(
           'Failed to parse public profile preferences from GetUser API call',
           e
         );
@@ -291,7 +294,7 @@ export const getUser = cache(async (): Promise<User | null> => {
       try {
         fingerprintData = JSON.parse(attributes['custom:fingerprint']);
       } catch (e) {
-        console.error(
+        logger.error(
           'Failed to parse user fingerprint from GetUser API call',
           e
         );
@@ -322,7 +325,7 @@ export const getUser = cache(async (): Promise<User | null> => {
         })
         .filter((d): d is Device => d !== null);
     } catch (e: any) {
-      console.error('Could not fetch WebAuthn credentials for user:', e);
+      logger.error('Could not fetch WebAuthn credentials for user:', e);
     }
 
     return {
@@ -362,7 +365,7 @@ export const getUser = cache(async (): Promise<User | null> => {
       sessionExpiresAt: claims.exp as number,
     };
   } catch (error: any) {
-    console.error(
+    logger.error(
       'General error in getUser, likely during device list or user attribute fetch:',
       error
     );

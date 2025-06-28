@@ -1,9 +1,11 @@
-
 'use server';
 
 import { revalidatePath } from 'next/cache';
 import { cognitoClient, UpdateUserAttributesCommand } from './cognito';
 import { getSession } from './session';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('PROFILE');
 
 type UserProfileAttributes = {
   given_name: string;
@@ -59,7 +61,7 @@ export async function updateUserProfile(
 
     return { success: true, message: 'Profile updated successfully.' };
   } catch (error: any) {
-    console.error('Update Profile Error:', error);
+    logger.error('Update Profile Error:', error);
     return {
       success: false,
       message: 'An unexpected error occurred while updating the profile.',
@@ -87,7 +89,7 @@ export async function updateUserAddress(
 
     return { success: true, message: 'Address updated successfully.' };
   } catch (error: any) {
-    console.error('Update Address Error:', error);
+    logger.error('Update Address Error:', error);
     return {
       success: false,
       message: 'An unexpected error occurred while updating the address.',

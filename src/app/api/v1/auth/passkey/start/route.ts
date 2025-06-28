@@ -1,9 +1,11 @@
-
 'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/session';
 import { pathnames } from '@/navigation';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('PASSKEY-START');
 
 export async function GET(request: NextRequest) {
   try {
@@ -49,7 +51,7 @@ export async function GET(request: NextRequest) {
 
     return response;
   } catch (error: any) {
-    console.error('Passkey start error:', error);
+    logger.error('Passkey start error:', error);
     const securityUrl = new URL(pathnames['/security'], request.url);
     securityUrl.searchParams.set('error', 'passkey_start_failed');
     securityUrl.searchParams.set(

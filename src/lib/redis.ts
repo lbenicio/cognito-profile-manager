@@ -1,5 +1,8 @@
 import 'server-only';
 import Redis from 'ioredis';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('CACHE');
 
 const REDIS_URL = process.env.REDIS_URL;
 const LOG_CONTEXT = 'RedisService';
@@ -10,14 +13,14 @@ function getRedis(): Redis | null {
   if (redis) return redis;
 
   if (!REDIS_URL) {
-    console.warn('REDIS_URL not defined. Redis caching is disabled.');
+    logger.warn('REDIS_URL not defined. Redis caching is disabled.');
     return null;
   }
 
   try {
     redis = new Redis(REDIS_URL);
   } catch (err) {
-    console.error(`${LOG_CONTEXT}: Invalid REDIS_URL format.`, err);
+    logger.error(`${LOG_CONTEXT}: Invalid REDIS_URL format.`, err);
     return null;
   }
 
@@ -27,7 +30,7 @@ function getRedis(): Redis | null {
 export async function getCache<T>(key: string): Promise<T | null> {
   const client = getRedis();
   if (!client) {
-    console.debug(`getCache(${key}): Redis not connected or disabled.`);
+    logger.debug(`getCache(${key}): Redis not connected or disabled.`);
     return null;
   }
 
@@ -43,7 +46,7 @@ export async function setCache<T>(
 ): Promise<void> {
   const client = getRedis();
   if (!client) {
-    console.debug(`setCache(${key}): Redis not connected or disabled.`);
+    logger.debug(`setCache(${key}): Redis not connected or disabled.`);
     return;
   }
   await client.set(key, JSON.stringify(value), 'EX', ttlSeconds);
@@ -52,7 +55,7 @@ export async function setCache<T>(
 export async function deleteCache(key: string | string[]): Promise<void> {
   const client = getRedis();
   if (!client) {
-    console.debug(
+    logger.debug(
       `deleteCache(${Array.isArray(key) ? key.join(', ') : key}): Redis not ready or disabled.`
     );
     return;

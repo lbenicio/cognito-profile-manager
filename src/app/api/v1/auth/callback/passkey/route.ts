@@ -1,4 +1,3 @@
-
 'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -6,6 +5,9 @@ import { revalidatePath } from 'next/cache';
 import { pathnames } from '@/navigation';
 import { cognitoClient, UpdateUserAttributesCommand } from '@/lib/cognito';
 import { getSession } from '@/lib/session';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('PASSKEY-CALLBACK');
 
 function createErrorResponse(
   origin: string,
@@ -67,7 +69,7 @@ export async function GET(request: NextRequest) {
   } catch (e) {
     const errorMessage =
       e instanceof Error ? e.message : 'An unknown error occurred.';
-    console.error('Passkey callback handler error:', e);
+    logger.error('Passkey callback handler error:', e);
     return createErrorResponse(origin, 'passkey_update_failed', errorMessage);
   }
 }

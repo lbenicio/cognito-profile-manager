@@ -13,6 +13,9 @@ import { Clock, Computer, Globe, Timer } from 'lucide-react';
 import { format, formatDistanceToNowStrict } from 'date-fns';
 import type { User } from '@/types/user/user.types';
 import UAParser from 'ua-parser-js';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('SESSION-INFO-CARD');
 
 interface SessionInfoCardProps {
   user: User;
@@ -44,7 +47,7 @@ const formatUserAgent = (uaString: string): string => {
     const friendlyString = parts.join(' ');
     return friendlyString || uaString;
   } catch (e) {
-    console.error('Could not parse user agent:', e);
+    logger.error('Could not parse user agent:', e);
     return uaString;
   }
 };

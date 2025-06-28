@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtDecrypt } from 'jose';
 import { pathnames, locales } from '@/navigation';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('MIDDLEWARE-AUTH');
 
 // List of public pages that do not require authentication
 const publicPages = ['/login', '/terms', '/privacy'];
@@ -24,7 +27,7 @@ async function getSessionPayload(cookie: string | undefined) {
   try {
     const secretKey = process.env.TOTP_SECRET_ENCRYPTION_KEY;
     if (!secretKey) {
-      console.error('TOTP_SECRET_ENCRYPTION_KEY is not set for middleware.');
+      logger.error('TOTP_SECRET_ENCRYPTION_KEY is not set for middleware.');
       return null;
     }
     const encodedKey = Buffer.from(secretKey, 'base64');

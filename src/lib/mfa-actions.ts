@@ -1,4 +1,3 @@
-
 'use server';
 
 import { authenticator } from 'otplib';
@@ -13,6 +12,9 @@ import {
 } from './cognito';
 import { getUser } from './auth';
 import { getSession } from './session';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('MFA');
 
 export async function generateMfaSetup() {
   const user = await getUser();
@@ -77,7 +79,7 @@ export async function verifyAndEnableMfa(
       message: 'Authenticator app enabled successfully.',
     };
   } catch (error: any) {
-    console.error('MFA Verification Error:', error);
+    logger.error('MFA Verification Error:', error);
     if (
       error.name === 'EnableSoftwareTokenMFAException' ||
       error.name === 'NotAuthorizedException'
@@ -127,7 +129,7 @@ export async function disableMfa(): Promise<{
       message: 'Authenticator app disabled successfully.',
     };
   } catch (error) {
-    console.error('MFA Disable Error:', error);
+    logger.error('MFA Disable Error:', error);
     return {
       success: false,
       message: 'An unexpected error occurred while disabling MFA.',

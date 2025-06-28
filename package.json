@@ -1,12 +1,13 @@
 {
   "name": "outpost",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "private": true,
   "license": "GPL-3.0-only",
   "description": "Outpost is a platform for managing user profiles and authentication.",
   "scripts": {
     "dev": "next dev --port 9002",
     "start:dev": "next dev --port 9002",
+    "start:prod": "next start --port 3000",
     "build:pkg": "next build",
     "fmt:lint": "next lint --fix",
     "fmt:pretty": "prettier --write --ignore-path .gitignore .",
@@ -42,6 +43,7 @@
     "@tailwindcss/postcss": "^4.1.11",
     "@vercel/analytics": "^1.5.0",
     "@vercel/kv": "^2.0.0",
+    "chalk": "^4.1.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -71,6 +73,7 @@
     "zod": "^3.24.4"
   },
   "devDependencies": {
+    "@types/chalk": "^0.4.31",
     "@types/node": "^20",
     "@types/nodemailer": "^6.4.15",
     "@types/qrcode": "^1.5.5",

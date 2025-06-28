@@ -1,13 +1,16 @@
-
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import {
   cognitoClient,
   ChangePasswordCommand,
-  InvalidPasswordException,
   NotAuthorizedException,
+  InvalidPasswordException,
 } from './cognito';
 import { getSession } from './session';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('PASSWORD');
 
 export async function changePassword(
   currentPassword: string,
@@ -31,7 +34,7 @@ export async function changePassword(
     await cognitoClient.send(command);
     return { success: true, message: 'Password changed successfully.' };
   } catch (error: any) {
-    console.error('Change Password Error:', error);
+    logger.error('Change Password Error:', error);
     if (error instanceof NotAuthorizedException) {
       return {
         success: false,

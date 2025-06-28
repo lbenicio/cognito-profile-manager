@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from '@/navigation';
 import { Button } from '@/components/ui/button';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('DASHBOARD-VIEW');
 import {
   Card,
   CardContent,
@@ -74,7 +77,7 @@ const formatUserAgent = (uaString: string): string => {
     const friendlyString = parts.join(' ');
     return friendlyString || uaString;
   } catch (e) {
-    console.error('Could not parse user agent:', e);
+    logger.error('Could not parse user agent:', e);
     return uaString; // Fallback to raw string on error
   }
 };

@@ -1,8 +1,11 @@
 'use server';
 
-import { getUser } from '@/lib/auth';
-import * as z from 'zod';
+import { z } from 'zod';
 import nodemailer from 'nodemailer';
+import { Logger } from '@/lib/logger';
+import { getUser } from './auth';
+
+const logger = new Logger('CONTACT');
 
 const contactSchema = z.object({
   category: z.string(),
@@ -36,7 +39,7 @@ export async function sendContactEmail(
     !SMTP_FROM_EMAIL ||
     !CONTACT_FORM_TO_EMAIL
   ) {
-    console.error('SMTP configuration is missing from environment variables.');
+    logger.error('SMTP configuration is missing from environment variables.');
     return { success: false, message: 'Server configuration error.' };
   }
 
@@ -72,7 +75,7 @@ export async function sendContactEmail(
     await transporter.sendMail(mailOptions);
     return { success: true, message: 'Email sent successfully.' };
   } catch (error) {
-    console.error('Failed to send contact email:', error);
+    logger.error('Failed to send contact email:', error);
     return { success: false, message: 'Failed to send email.' };
   }
 }

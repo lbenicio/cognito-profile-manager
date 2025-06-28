@@ -8,7 +8,7 @@ COPY package.json package-lock.json* ./
 
 # --- Dependency Purging ---
 # Install ONLY production dependencies. This is key to a smaller image.
-RUN npm install
+RUN npm ci
 
 
 # Stage 2: Build the application
@@ -29,6 +29,9 @@ RUN sed -i "/output: \"standalone\"/d" next.config.ts
 # Run the build script. This will generate the production app in the `dist` directory.
 RUN npm run build:pkg
 
+FROM deps as productiondeps
+
+RUN npm ci --omit=dev
 
 # Stage 3: Production Runner
 # This is the final, minimal image. It's built from a clean base and only
@@ -46,7 +49,7 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 # Copy the essential files from previous stages
-COPY --from=deps /app/node_modules ./node_modules
+COPY --from=productiondeps /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.ts ./next.config.ts
@@ -69,4 +72,4 @@ EXPOSE 3000
 # It uses the `next start` command, which is the standard way to run a
 # Next.js app built without the standalone output.
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["npm", "start", "--", "-p", "3000"]
+CMD ["npm", "run", "start:prod"]
