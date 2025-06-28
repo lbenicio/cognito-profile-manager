@@ -11,7 +11,7 @@ export async function devAdminLogin() {
   }
   const sessionData = { username: 'admin', email: 'sso-admin-dev@example.com' };
   
-  cookies().set('auth_session', JSON.stringify(sessionData), {
+  (await cookies()).set('auth_session', JSON.stringify(sessionData), {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     maxAge: 60 * 60 * 24 * 7,

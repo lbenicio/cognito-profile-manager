@@ -30,7 +30,7 @@ export async function updateUserPreferences(
 
     // If language was changed, set the cookie so next-intl picks it up on refresh
     if (newPreferences.language && locales.includes(newPreferences.language)) {
-      cookies().set('NEXT_LOCALE', newPreferences.language);
+      (await cookies()).set('NEXT_LOCALE', newPreferences.language);
     }
     
     // Revalidate paths to reflect changes immediately

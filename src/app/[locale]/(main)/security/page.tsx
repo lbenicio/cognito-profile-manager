@@ -2,7 +2,8 @@ import { getUser } from '@/lib/auth';
 import { SecurityView } from '@/components/security-view';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 
-export default async function SecurityPage({ params }: { params: { locale: string } }) {
+export default async function SecurityPage(props: { params: Promise<{ locale: string }> }) {
+  const params = await props.params;
   unstable_setRequestLocale(params.locale);
   const user = await getUser();
 
@@ -18,7 +19,7 @@ export default async function SecurityPage({ params }: { params: { locale: strin
   }
 
   const t = await getTranslations('Security');
-  
+
   const securityPageTranslations = {
     title: t('title'),
     description: t('description')
