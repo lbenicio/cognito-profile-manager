@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
   const errorParam = searchParams.get('error');
-  const errorDescription = search_params.get('error_description');
+  const errorDescription = searchParams.get('error_description');
   const state = searchParams.get('state');
   const storedState = request.cookies.get('oauth_state')?.value;
   const isSecure = new URL(request.url).protocol === 'https:';
