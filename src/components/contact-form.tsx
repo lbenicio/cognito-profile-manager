@@ -38,7 +38,7 @@ import { Label } from './ui/label';
 import {
   ContactFormProps,
   ContactFormValues,
-} from '@/interfaces/components/contact-form.interfaces';
+} from '../interfaces/components/contact-form.interfaces';
 
 const contactFormSchema = (t: {
   categoryRequired: string;

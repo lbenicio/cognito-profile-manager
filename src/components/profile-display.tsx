@@ -40,7 +40,7 @@ import { AvatarEditor } from './avatar-editor';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
-import { ProfileDisplayProps } from '@/interfaces/components/profile-display.interfaces';
+import type { ProfileDisplayProps } from '../interfaces/components/profile-display.interfaces';
 
 export function ProfileDisplay({ user, onUpdateAction }: ProfileDisplayProps) {
   const t = useTranslations('Dashboard');
@@ -102,7 +102,7 @@ export function ProfileDisplay({ user, onUpdateAction }: ProfileDisplayProps) {
                   <AvatarFallback>
                     {user.name
                       .split(' ')
-                      .map((n) => n[0])
+                      .map((n: string) => n[0])
                       .join('')}
                   </AvatarFallback>
                 </Avatar>
@@ -244,7 +244,7 @@ export function ProfileDisplay({ user, onUpdateAction }: ProfileDisplayProps) {
               <span className='font-semibold'>{tDashboard('groups')}</span>
               <div className='mt-2 flex flex-wrap gap-2'>
                 {user.groups.length > 0 ? (
-                  user.groups.map((group) => (
+                  user.groups.map((group: string) => (
                     <Badge key={group} variant='outline'>
                       {group}
                     </Badge>

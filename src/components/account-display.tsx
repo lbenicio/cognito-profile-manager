@@ -44,7 +44,7 @@ import { BannerEditor } from './banner-editor';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
-import { AccountDisplayProps } from '@/interfaces/components/account-display.interfaces';
+import type { AccountDisplayProps } from '../interfaces/components/account-display.interfaces';
 
 export function AccountDisplay({ user, onUpdateAction }: AccountDisplayProps) {
   const t = useTranslations('Dashboard');
@@ -129,7 +129,7 @@ export function AccountDisplay({ user, onUpdateAction }: AccountDisplayProps) {
                     <AvatarFallback>
                       {user.name
                         .split(' ')
-                        .map((n) => n[0])
+                        .map((n: string) => n[0])
                         .join('')}
                     </AvatarFallback>
                   </Avatar>
@@ -294,7 +294,7 @@ export function AccountDisplay({ user, onUpdateAction }: AccountDisplayProps) {
               <span className='font-semibold'>{tDashboard('groups')}</span>
               <div className='mt-2 flex flex-wrap gap-2'>
                 {user.groups.length > 0 ? (
-                  user.groups.map((group) => (
+                  user.groups.map((group: string) => (
                     <Badge key={group} variant='outline'>
                       {group}
                     </Badge>
