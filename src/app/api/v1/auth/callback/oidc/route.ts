@@ -1,3 +1,4 @@
+
 'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -97,13 +98,15 @@ export async function GET(request: NextRequest) {
         audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
     });
 
-    // Create a single encrypted session
+    // Store the full token set in Redis, identified by a new session ID
     const sessionData = {
         claims: payload,
         accessToken: tokens.access_token,
         refreshToken: tokens.refresh_token,
     };
     const expiresIn = tokens.expires_in && typeof tokens.expires_in === 'number' ? tokens.expires_in : 3600;
+    
+    // This now stores data in Redis and sets a small cookie with the session ID
     await createSession(sessionData, expiresIn);
 
     // Clear the state cookie on the SAME response object before returning.

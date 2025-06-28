@@ -1,3 +1,4 @@
+
 'use server';
 
 import { redirect } from '@/navigation';
@@ -9,6 +10,9 @@ export async function devAdminLogin() {
     return 'This action is only available in development.';
   }
 
+  const now = Math.floor(Date.now() / 1000);
+  const expiresIn = 3600; // 1 hour
+
   const sessionData = {
     isMock: true,
     username: 'admin',
@@ -16,9 +20,14 @@ export async function devAdminLogin() {
         sub: mockAdminUser.sub,
         email: mockAdminUser.email,
         name: mockAdminUser.name,
-    }
+        // Mock claims need expiry for middleware to work
+        exp: now + expiresIn,
+        auth_time: now,
+    },
+    // Mock refresh token for consistency if middleware needs it
+    refreshToken: 'mock-refresh-token' 
   };
 
-  await createSession(sessionData, 3600); // Mock session for 1 hour
+  await createSession(sessionData, expiresIn);
   redirect('/');
 }

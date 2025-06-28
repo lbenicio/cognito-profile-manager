@@ -1,7 +1,7 @@
 import 'server-only';
 import { cache } from 'react';
 import { cognitoClient, GetUserCommand, ListWebAuthnCredentialsCommand } from '@/lib/cognito';
-import { getSession as getEncryptedSession } from '@/lib/session';
+import { getSession as getRedisSession } from '@/lib/session';
 
 export { getSession } from '@/lib/session';
 
@@ -87,9 +87,9 @@ export type Session = {
     accessToken: string;
     refreshToken: string;
     claims: import('jose').JWTPayload;
-    expires: string;
     isMock?: boolean;
     username?: string;
+    sessionId: string;
 } | null;
 
 
@@ -183,7 +183,7 @@ export const mockAdminUser: User = {
 
 
 export const getUser = cache(async (): Promise<User | null> => {
-  const session = await getEncryptedSession();
+  const session = await getRedisSession();
   
   if (session?.isMock) {
     console.log('Using mock user data for development.');
@@ -191,6 +191,8 @@ export const getUser = cache(async (): Promise<User | null> => {
     return {
       ...baseUser,
       username: session.username,
+      sessionStartedAt: session.claims.auth_time as number,
+      sessionExpiresAt: session.claims.exp as number,
     };
   }
 
@@ -337,6 +339,6 @@ export const getUser = cache(async (): Promise<User | null> => {
 
 // Duplicating deleteSession here to avoid circular dependency
 async function deleteSession() {
-  const { deleteSession: deleteEncryptedSession } = await import('@/lib/session');
-  await deleteEncryptedSession();
+  const { deleteSession: deleteRedisSession } = await import('@/lib/session');
+  await deleteRedisSession();
 }
