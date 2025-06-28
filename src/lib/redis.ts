@@ -3,7 +3,7 @@ import { createClient, RedisClientType } from 'redis';
 
 let redisClient: RedisClientType | null = null;
 const REDIS_URL = process.env.REDIS_URL;
-let connectionPromise = null;
+let connectionPromise: Promise<void> | null = null;
 const LOG_CONTEXT = 'RedisService';
 
 if (REDIS_URL) {
@@ -35,7 +35,11 @@ if (REDIS_URL) {
     );
 
     // Start connection process immediately and store the promise
-    connectionPromise = redisClient.connect().catch((err) => {
+    connectionPromise = (async () => {
+        if (!redisClient!.isOpen) {
+            await redisClient!.connect();
+        }
+    })().catch((err) => {
       console.error('Initial Redis connection failed:', err);
       // The client will attempt to reconnect based on the strategy.
     });
@@ -47,11 +51,23 @@ if (REDIS_URL) {
   console.warn('REDIS_URL not defined. Redis caching is disabled.');
 }
 
-const isReady = (): boolean => !!redisClient && redisClient.isReady;
+async function ensureConnected(): Promise<boolean> {
+    if (!redisClient || !connectionPromise) {
+        return false;
+    }
+    try {
+        await connectionPromise;
+        return redisClient.isReady;
+    } catch (err) {
+        console.error("Failed to ensure Redis connection:", err);
+        return false;
+    }
+}
 
 export async function getCache<T>(key: string): Promise<T | null> {
-  if (!isReady()) {
-    console.debug(`getCache(${key}): Redis not ready or disabled.`);
+  const connected = await ensureConnected();
+  if (!connected) {
+    console.debug(`getCache(${key}): Redis not connected or disabled.`);
     return null;
   }
   try {
@@ -73,8 +89,9 @@ export async function setCache<T>(
   value: T,
   ttlSeconds: number = 3600
 ): Promise<void> {
-  if (!isReady()) {
-    console.debug(`setCache(${key}): Redis not ready or disabled.`);
+  const connected = await ensureConnected();
+  if (!connected) {
+    console.debug(`setCache(${key}): Redis not connected or disabled.`);
     return;
   }
   try {
@@ -89,7 +106,8 @@ export async function setCache<T>(
 }
 
 export async function deleteCache(key: string | string[]): Promise<void> {
-  if (!isReady()) {
+  const connected = await ensureConnected();
+  if (!connected) {
     console.debug(
       `deleteCache(${Array.isArray(key) ? key.join(', ') : key}): Redis not ready or disabled.`,
       LOG_CONTEXT
