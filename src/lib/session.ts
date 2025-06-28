@@ -62,7 +62,7 @@ export async function createSession(
 
   const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7-day cookie
 
-  cookies().set(cookieName, encryptedSessionId, {
+  (await cookies()).set(cookieName, encryptedSessionId, {
     expires,
     httpOnly: true,
     secure: true,
@@ -83,7 +83,7 @@ export async function createMockSession(
 
   const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7-day cookie
 
-  cookies().set(cookieName, encryptedSession, {
+  (await cookies()).set(cookieName, encryptedSession, {
     expires,
     httpOnly: true,
     secure: true,
@@ -102,7 +102,7 @@ export async function updateSession(
 }
 
 export async function deleteSession(): Promise<void> {
-  const cookie = cookies().get(cookieName)?.value;
+  const cookie = (await cookies()).get(cookieName)?.value;
   if (cookie) {
     try {
       const payload = await decrypt(cookie);
@@ -113,11 +113,11 @@ export async function deleteSession(): Promise<void> {
       console.error('Error deleting session from Redis:', e);
     }
   }
-  cookies().set(cookieName, '', { expires: new Date(0), path: '/' });
+  (await cookies()).set(cookieName, '', { expires: new Date(0), path: '/' });
 }
 
 export const getSession = cache(async (): Promise<Session | null> => {
-  const cookie = cookies().get(cookieName)?.value;
+  const cookie = (await cookies()).get(cookieName)?.value;
   const payload = await decrypt(cookie);
 
   if (!payload) {
@@ -136,7 +136,7 @@ export const getSession = cache(async (): Promise<Session | null> => {
       return {
         accessToken: payload.accessToken,
         refreshToken: payload.refreshToken,
-        claims: payload.claims,
+        claims: payload.claims as JWTPayload,
         username: payload.username,
         isMock: true,
         sessionId: 'mock-session',
@@ -155,10 +155,7 @@ export const getSession = cache(async (): Promise<Session | null> => {
     }
 
     // Check if the token is expired and refresh if necessary
-    if (
-      sessionData.claims.exp &&
-      sessionData.claims.exp * 1000 < Date.now()
-    ) {
+    if (sessionData.claims.exp && sessionData.claims.exp * 1000 < Date.now()) {
       console.log('Session token expired, attempting refresh...');
       const refreshResult = await refreshAuthTokens(sessionData.refreshToken);
 

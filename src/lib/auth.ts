@@ -1,4 +1,3 @@
-
 import 'server-only';
 import { cache } from 'react';
 import {
@@ -203,7 +202,7 @@ export const getUser = cache(async (): Promise<User | null> => {
       session.username === mockAdminUser.username ? mockAdminUser : mockUser;
     return {
       ...baseUser,
-      username: session.username,
+      username: session.username || 'mockuser_dev',
       sessionStartedAt: session.claims.auth_time as number,
       sessionExpiresAt: session.claims.exp as number,
     };
