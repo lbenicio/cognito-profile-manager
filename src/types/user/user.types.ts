@@ -9,7 +9,7 @@ import type { JWTPayload } from 'jose';
  */
 export type UserPreferences = {
   theme: 'light' | 'dark' | 'system';
-  language: 'en' | 'es';
+  language: 'en' | 'es' | 'fr' | 'de' | 'pt';
   fontSize: number;
 };
 

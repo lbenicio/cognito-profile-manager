@@ -340,6 +340,9 @@
       "language": "Idioma",
       "english": "Inglés",
       "spanish": "Español",
+      "french": "Francés",
+      "german": "Alemán",
+      "portuguese": "Portugués",
       "updateErrorTitle": "Error al Actualizar",
       "updateErrorDescription": "No se pudieron guardar tus preferencias. Inténtalo de nuevo."
     },

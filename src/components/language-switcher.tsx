@@ -58,6 +58,24 @@ export function LanguageSwitcher({
         >
           Español
         </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => onSelectLocale('fr')}
+          disabled={currentLanguage === 'fr'}
+        >
+          Français
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => onSelectLocale('de')}
+          disabled={currentLanguage === 'de'}
+        >
+          Deutsch
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => onSelectLocale('pt')}
+          disabled={currentLanguage === 'pt'}
+        >
+          Português
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

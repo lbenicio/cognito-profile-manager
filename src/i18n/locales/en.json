@@ -340,6 +340,9 @@
       "language": "Language",
       "english": "English",
       "spanish": "Spanish",
+      "french": "French",
+      "german": "German",
+      "portuguese": "Portuguese",
       "updateErrorTitle": "Update Failed",
       "updateErrorDescription": "Could not save your preferences. Please try again."
     },

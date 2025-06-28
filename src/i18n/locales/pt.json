@@ -1,0 +1,432 @@
+{
+  "Header": {
+    "title": "Outpost",
+    "userMenu": {
+      "profile": "Perfil",
+      "settings": "Configurações",
+      "logout": "Sair",
+      "adminDashboard": "Painel do Administrador",
+      "account": "Conta",
+      "security": "Segurança"
+    },
+    "mobileMenuTitle": "Menu Principal",
+    "mobileMenuTrigger": "Abrir menu principal",
+    "language": "Idioma"
+  },
+  "Footer": {
+    "copyright": "© {year} Outpost. Todos os direitos reservados.",
+    "sitemap": {
+      "accountColumnTitle": "Conta",
+      "companyColumnTitle": "Empresa",
+      "dashboard": "Painel",
+      "account": "Conta",
+      "profile": "Perfil",
+      "settings": "Configurações",
+      "security": "Segurança",
+      "contact": "Contato"
+    },
+    "legal": {
+      "title": "Legal",
+      "terms": "Termos de Serviço",
+      "privacy": "Política de Privacidade"
+    }
+  },
+  "Dashboard": {
+    "welcome": "Bem-vindo de volta, {name}!",
+    "description": "Aqui está uma visão geral rápida da sua conta Outpost.",
+    "id": "ID",
+    "lastLogin": "Último login",
+    "profileCard": {
+      "title": "Perfil",
+      "email": "E-mail",
+      "twoFactorStatus": "Status 2FA",
+      "passkeyStatus": "Status da Chave de Acesso",
+      "groups": "Grupos",
+      "adminBadge": "Admin",
+      "userBadge": "Usuário",
+      "noGroups": "Nenhum grupo atribuído."
+    },
+    "editProfileButton": "Editar Perfil",
+    "securityHealth": {
+      "title": "Saúde da Segurança",
+      "description": "Revise o status de segurança da sua conta.",
+      "score": "{score}% seguro",
+      "manageButton": "Gerenciar Segurança",
+      "checks": {
+        "email": "E-mail Verificado",
+        "phone": "Telefone Verificado",
+        "twoFactor": "App Autenticador (2FA)",
+        "passkeys": "Chaves de Acesso Ativadas"
+      }
+    },
+    "profileCompletion": {
+      "title": "Conclusão do Perfil",
+      "description": "Complete seu perfil para aproveitar ao máximo o Outpost.",
+      "percentage": "{percentage}% completo",
+      "completeProfileButton": "Complete Seu Perfil",
+      "tasks": {
+        "picture": "Adicionar uma foto de perfil",
+        "banner": "Adicionar uma imagem de banner",
+        "aboutMe": "Escrever biografia 'Sobre mim'",
+        "address": "Definir seu endereço",
+        "phone": "Adicionar um número de telefone",
+        "website": "Adicionar seu site"
+      }
+    },
+    "quickActions": {
+      "title": "Ações Rápidas",
+      "description": "Configurações e ações usadas com frequência.",
+      "changePassword": "Alterar Senha",
+      "manageSecurity": "Gerenciar Segurança",
+      "appearanceSettings": "Configurações de Aparência"
+    },
+    "loginHistory": {
+      "title": "Histórico de Login",
+      "description": "Aqui estão os logins mais recentes na sua conta.",
+      "date": "Data",
+      "device": "Dispositivo",
+      "ipAddress": "Endereço IP",
+      "noHistory": "Nenhum histórico de login disponível."
+    },
+    "loginActivity": {
+      "title": "Atividade de Login Recente",
+      "description": "Logins nos últimos 7 dias.",
+      "logins": "Logins"
+    },
+    "sessionInfo": {
+      "title": "Informações da Sessão",
+      "description": "Detalhes sobre sua sessão de login atual.",
+      "startedAt": "Sessão Iniciada",
+      "expiresIn": "Tempo até a atualização",
+      "currentDevice": "Dispositivo Atual",
+      "ipAddress": "Endereço IP",
+      "expired": "Expirada"
+    },
+    "verified": "Verificado",
+    "unverified": "Não verificado",
+    "enabled": "Ativado",
+    "disabled": "Desativado"
+  },
+  "Account": {
+    "title": "Conta",
+    "description": "Gerencie suas informações pessoais, configurações e segurança da conta.",
+    "editAvatarTitle": "Editar Avatar",
+    "editAvatarDescription": "Carregue uma nova foto de perfil. O tamanho recomendado é 200x200px.",
+    "avatar": {
+      "changePhoto": "Mudar Foto",
+      "uploadAndSave": "Carregar e Salvar",
+      "cancel": "Cancelar",
+      "fileTooLarge": "O arquivo é muito grande. O tamanho máximo é de 2MB.",
+      "invalidFileType": "Tipo de arquivo inválido. Use PNG, JPG ou WEBP.",
+      "genericError": "Ocorreu um erro desconhecido. Por favor, tente novamente.",
+      "successTitle": "Avatar Atualizado",
+      "successDescription": "Seu avatar foi atualizado com sucesso.",
+      "errorTitle": "Falha no Upload"
+    },
+    "banner": {
+      "editBannerTitle": "Editar Banner",
+      "editBannerDescription": "Carregue uma nova imagem de banner. Tamanho recomendado 1500x500px.",
+      "changeBanner": "Mudar Banner",
+      "uploadAndSave": "Carregar e Salvar",
+      "cancel": "Cancelar",
+      "fileTooLarge": "O arquivo é muito grande. O tamanho máximo é de 2MB.",
+      "invalidFileType": "Tipo de arquivo inválido. Use PNG, JPG ou WEBP.",
+      "genericError": "Ocorreu um erro desconhecido. Por favor, tente novamente.",
+      "successTitle": "Banner Atualizado",
+      "successDescription": "Seu banner foi atualizado com sucesso.",
+      "errorTitle": "Falha no Upload"
+    },
+    "display": {
+      "status": "Status: {status}",
+      "memberSince": "Membro desde: {date}",
+      "aboutMeTitle": "Sobre mim",
+      "notSet": "Não definido"
+    },
+    "addressForm": {
+      "title": "Endereço",
+      "description": "Atualize seu endereço residencial.",
+      "successTitle": "Endereço Atualizado",
+      "successDescription": "Seu endereço foi atualizado com sucesso.",
+      "errorTitle": "Falha na Atualização",
+      "errorDescription": "Não foi possível atualizar seu endereço. Por favor, tente novamente."
+    },
+    "form": {
+      "title": "Editar Conta",
+      "description": "Atualize suas informações pessoais.",
+      "givenNameLabel": "Nome",
+      "familyNameLabel": "Sobrenome",
+      "givenNameRequired": "O nome é obrigatório.",
+      "familyNameRequired": "O sobrenome é obrigatório.",
+      "address": {
+        "streetLabel": "Nome da Rua",
+        "numberLabel": "Número",
+        "complementLabel": "Apto, etc. (opcional)",
+        "cityLabel": "Cidade",
+        "stateLabel": "Estado / Província",
+        "zipCodeLabel": "CEP",
+        "countryLabel": "País",
+        "streetPlaceholder": "Rua Principal",
+        "numberPlaceholder": "123",
+        "complementPlaceholder": "Apto 4B",
+        "cityPlaceholder": "Qualquer Cidade",
+        "statePlaceholder": "SP",
+        "zipCodePlaceholder": "12345-678",
+        "countryPlaceholder": "Brasil",
+        "streetRequired": "O nome da rua é obrigatório.",
+        "numberRequired": "O número é obrigatório.",
+        "cityRequired": "A cidade é obrigatória.",
+        "stateRequired": "O estado ou província é obrigatório.",
+        "zipCodeRequired": "O CEP é obrigatório.",
+        "countryRequired": "O país é obrigatório."
+      },
+      "phoneLabel": "Número de Telefone",
+      "phonePlaceholder": "555 123 4567",
+      "phoneDescription": "Selecione seu país e insira seu número de telefone.",
+      "phoneInvalid": "Por favor, insira um número de telefone válido.",
+      "birthdateLabel": "Data de Nascimento",
+      "birthdatePlaceholder": "Escolha uma data",
+      "websiteLabel": "Site",
+      "zoneinfoLabel": "Fuso Horário",
+      "zoneinfoDescription": "Selecione o fuso horário em que você está.",
+      "aboutMeLabel": "Sobre Mim",
+      "aboutMePlaceholder": "Conte-nos um pouco sobre você...",
+      "aboutMeDescription": "Escreva uma breve biografia sobre você (máx. 250 caracteres).",
+      "aboutMeTooLong": "Sua biografia não pode ter mais de 250 caracteres.",
+      "genderLabel": "Gênero",
+      "genderPlaceholder": "Selecione seu gênero",
+      "genderMale": "Masculino",
+      "genderFemale": "Feminino",
+      "genderPreferNotToSay": "Prefiro não dizer",
+      "save": "Salvar Alterações",
+      "successTitle": "Conta Atualizada",
+      "successDescription": "Sua conta foi atualizada com sucesso.",
+      "errorTitle": "Falha na Atualização",
+      "errorDescription": "Não foi possível atualizar sua conta. Por favor, tente novamente."
+    },
+    "verification": {
+      "title": "Verificar Atributos",
+      "description": "Verifique suas informações de contato para proteger sua conta.",
+      "resend": "Reenviar",
+      "sentTitle": "Verificação Enviada",
+      "emailSentDescription": "Um e-mail de verificação foi enviado para {email}.",
+      "phoneSentDescription": "Um SMS de verificação foi enviado para {phone}."
+    }
+  },
+  "Security": {
+    "title": "Configurações de Segurança",
+    "description": "Gerencie sua senha, autenticação de dois fatores e outras configurações de segurança.",
+    "passwordForm": {
+      "title": "Alterar Senha",
+      "description": "Escolha uma nova senha forte para manter sua conta segura.",
+      "currentPasswordLabel": "Senha Atual",
+      "newPasswordLabel": "Nova Senha",
+      "confirmPasswordLabel": "Confirmar Nova Senha",
+      "passwordMismatch": "As novas senhas não coincidem.",
+      "successTitle": "Senha Alterada",
+      "successDescription": "Sua senha foi alterada com sucesso.",
+      "errorTitle": "Erro",
+      "errorDescription": "Sua senha atual está incorreta.",
+      "incorrectPassword": "Senha incorreta"
+    },
+    "twoFactor": {
+      "title": "Autenticação de Dois Fatores",
+      "description": "Adicione uma camada extra de segurança à sua conta com um aplicativo autenticador.",
+      "authenticatorApp": "Aplicativo Autenticador",
+      "statusEnabled": "O aplicativo autenticador está ativado.",
+      "statusDisabled": "Aumente a segurança da sua conta ativando a autenticação de dois fatores.",
+      "enableButton": "Ativar Aplicativo Autenticador",
+      "disableButton": "Desativar",
+      "cancelButton": "Cancelar",
+      "qrInstructions": "Escaneie o código QR com seu aplicativo autenticador.",
+      "manualEntryInstructions": "Ou, insira esta chave secreta manualmente em seu aplicativo autenticador.",
+      "copyKeyLabel": "Copiar chave secreta",
+      "secretCopiedTitle": "Segredo Copiado",
+      "secretCopiedDescription": "A chave de configuração manual foi copiada para a sua área de transferência.",
+      "verifyTitle": "Verificar Código",
+      "codeInputPlaceholder": "código de 6 dígitos",
+      "verify": "Verificar",
+      "otpSuccessTitle": "Aplicativo Autenticador Ativado",
+      "otpSuccessDescription": "A 2FA via aplicativo autenticador foi ativada com sucesso.",
+      "mfaDisabledTitle": "Aplicativo Autenticador Desativado",
+      "mfaDisabledDescription": "A 2FA via aplicativo autenticador foi desativada.",
+      "verificationFailedTitle": "Falha na Verificação",
+      "smsMessagingTitle": "Mensagens SMS",
+      "smsMessagingDescription": "Receba códigos de verificação por mensagem de texto. Este método é menos seguro que um aplicativo autenticador ou chaves de acesso.",
+      "smsMessagingDisabled": "Este recurso está indisponível no momento."
+    },
+    "passkeys": {
+      "title": "Chaves de Acesso / Chaves de Segurança",
+      "description": "Use uma chave de acesso para um login seguro e sem senha. Esta é a maneira mais segura de proteger sua conta.",
+      "statusEnabled": "As chaves de acesso estão ativadas na sua conta.",
+      "statusDisabled": "As chaves de acesso ainda não estão ativadas na sua conta.",
+      "addButton": "Adicionar Chave de Acesso",
+      "deleteSuccessTitle": "Chave de Acesso Excluída",
+      "deleteSuccessDescription": "A chave de acesso selecionada foi removida da sua conta.",
+      "deleteErrorTitle": "Falha na Exclusão",
+      "deleteNotSupported": "A exclusão de chaves de acesso ainda não é suportada por esta interface.",
+      "success": {
+        "title": "Chave de Acesso Atualizada",
+        "description": "Suas chaves de acesso foram gerenciadas com sucesso."
+      },
+      "error": {
+        "title": "Ação Falhou",
+        "generic": "Algo deu errado. Por favor, tente novamente.",
+        "configMissing": "A configuração do cliente da Chave de Acesso está ausente. Por favor, contate o suporte."
+      },
+      "table": {
+        "name": "Nome",
+        "addedOn": "Adicionado em",
+        "actions": "Ações"
+      },
+      "addPasskeyDialog": {
+        "title": "Adicionar uma Nova Chave de Acesso?",
+        "description": "Você será redirecionado para uma página segura para registrar seu dispositivo. Pode ser solicitado que você use sua impressão digital, rosto ou uma chave de segurança.",
+        "continue": "Continuar",
+        "cancel": "Cancelar"
+      },
+      "deleteDialog": {
+        "title": "Você tem certeza?",
+        "description": "Isso excluirá permanentemente a chave de acesso chamada \"{deviceName}\". Esta ação não pode ser desfeita.",
+        "confirm": "Excluir",
+        "cancel": "Cancelar"
+      },
+      "updatingList": "Atualizando lista..."
+    }
+  },
+  "Profile": {
+    "title": "Perfil Público",
+    "description": "Gerencie como seu perfil aparece para os outros.",
+    "preview": {
+      "title": "Visualização ao Vivo",
+      "description": "É assim que outros usuários verão seu perfil.",
+      "isPrivate": "Seu perfil está atualmente privado."
+    },
+    "settings": {
+      "title": "Configurações do Perfil",
+      "description": "Controle quais informações são visíveis em seu perfil público.",
+      "isPublicLabel": "Tornar perfil público",
+      "isPublicDescription": "Permitir que outros vejam seu perfil.",
+      "visibleFieldsTitle": "Campos Visíveis",
+      "showPictureLabel": "Mostrar foto do perfil",
+      "showBannerLabel": "Mostrar imagem do banner",
+      "showNameLabel": "Mostrar nome",
+      "showGroupsLabel": "Mostrar grupos",
+      "showEmailLabel": "Mostrar e-mail",
+      "showWebsiteLabel": "Mostrar site",
+      "showAboutMeLabel": "Mostrar 'Sobre mim'",
+      "showPhoneLabel": "Mostrar número de telefone",
+      "showGenderLabel": "Mostrar gênero",
+      "showBirthdateLabel": "Mostrar data de nascimento",
+      "showZoneinfoLabel": "Mostrar fuso horário",
+      "showLocaleLabel": "Mostrar idioma/localidade",
+      "saveButton": "Salvar Configurações",
+      "successTitle": "Configurações Salvas",
+      "successDescription": "As configurações do seu perfil foram atualizadas.",
+      "errorTitle": "Falha na Atualização",
+      "errorDescription": "Não foi possível salvar suas configurações. Por favor, tente novamente."
+    }
+  },
+  "Settings": {
+    "title": "Configurações",
+    "description": "Gerencie as configurações da sua conta e aparência.",
+    "appearance": {
+      "title": "Aparência",
+      "description": "Personalize a aparência da sua conta.",
+      "theme": "Tema",
+      "light": "Claro",
+      "dark": "Escuro",
+      "system": "Sistema",
+      "textSize": "Tamanho do texto",
+      "language": "Idioma",
+      "english": "Inglês",
+      "spanish": "Espanhol",
+      "french": "Francês",
+      "german": "Alemão",
+      "portuguese": "Português",
+      "updateErrorTitle": "Falha na Atualização",
+      "updateErrorDescription": "Não foi possível salvar suas preferências. Por favor, tente novamente."
+    },
+    "notifications": {
+      "title": "Notificações",
+      "description": "Escolha como você deseja ser notificado.",
+      "save": "Salvar Preferências",
+      "successTitle": "Preferências Salvas",
+      "successDescription": "Suas configurações de notificação foram atualizadas.",
+      "errorTitle": "Falha na Atualização",
+      "channels": {
+        "title": "Canais",
+        "email": "E-mail",
+        "app": "Notificações no App",
+        "telegram": "Telegram"
+      },
+      "types": {
+        "title": "Tipos de Notificação",
+        "user": {
+          "label": "Interações do Usuário",
+          "description": "Notificações sobre menções, respostas e mensagens diretas."
+        },
+        "system": {
+          "label": "Sistema e Segurança",
+          "description": "Notificações sobre alertas de segurança e alterações na conta."
+        },
+        "marketing": {
+          "label": "Marketing e Ofertas",
+          "description": "Receba notícias, atualizações e ofertas especiais."
+        }
+      }
+    }
+  },
+  "Contact": {
+    "title": "Fale Conosco",
+    "description": "Tem alguma pergunta ou feedback? Preencha o formulário abaixo e entraremos em contato o mais breve possível.",
+    "form": {
+      "nameLabel": "Nome Completo",
+      "emailLabel": "Endereço de E-mail",
+      "categoryLabel": "Categoria",
+      "categoryPlaceholder": "Selecione uma categoria...",
+      "messageLabel": "Mensagem",
+      "messagePlaceholder": "Por favor, descreva sua pergunta em detalhes...",
+      "submitButton": "Enviar Mensagem",
+      "successTitle": "Mensagem Enviada!",
+      "successDescription": "Obrigado por nos contatar. Retornaremos em breve.",
+      "errorTitle": "Falha no Envio",
+      "errorDescription": "Não foi possível enviar sua mensagem. Por favor, tente mais tarde.",
+      "categoryRequired": "Por favor, selecione uma categoria.",
+      "messageRequired": "A mensagem é obrigatória.",
+      "messageTooShort": "A mensagem deve ter pelo menos 10 caracteres.",
+      "categories": {
+        "general": "Consulta Geral",
+        "billing": "Faturamento e Pagamentos",
+        "technical": "Suporte Técnico",
+        "feedback": "Feedback e Sugestões"
+      }
+    }
+  },
+  "Login": {
+    "title": "Entrar no Outpost",
+    "description": "Use o single sign-on (SSO) da sua empresa para continuar.",
+    "signInButton": "Entrar com SSO",
+    "signInAdminButton": "Entrar como Admin (Dev)",
+    "errorTitle": "Falha no Login",
+    "errorDescription": "Não foi possível fazer login. Por favor, tente novamente ou contate o suporte.",
+    "invalid_state": "A sessão expirou ou é inválida. Por favor, tente fazer login novamente."
+  },
+  "Terms": {
+    "title": "Termos de Serviço"
+  },
+  "Privacy": {
+    "title": "Política de Privacidade"
+  },
+  "Errors": {
+    "notFound": {
+      "title": "404 - Página Não Encontrada",
+      "description": "Desculpe, a página que você está procurando não existe ou foi movida.",
+      "goHome": "Ir para a Página Inicial"
+    },
+    "generic": {
+      "title": "Oops! Algo deu errado",
+      "description": "Encontramos um erro inesperado. Por favor, tente novamente. Se o problema persistir, contate o suporte.",
+      "tryAgain": "Tentar Novamente"
+    }
+  }
+}

@@ -1,0 +1,432 @@
+{
+  "Header": {
+    "title": "Outpost",
+    "userMenu": {
+      "profile": "Profil",
+      "settings": "Einstellungen",
+      "logout": "Abmelden",
+      "adminDashboard": "Admin-Dashboard",
+      "account": "Konto",
+      "security": "Sicherheit"
+    },
+    "mobileMenuTitle": "Hauptmenü",
+    "mobileMenuTrigger": "Hauptmenü öffnen",
+    "language": "Sprache"
+  },
+  "Footer": {
+    "copyright": "© {year} Outpost. Alle Rechte vorbehalten.",
+    "sitemap": {
+      "accountColumnTitle": "Konto",
+      "companyColumnTitle": "Unternehmen",
+      "dashboard": "Dashboard",
+      "account": "Konto",
+      "profile": "Profil",
+      "settings": "Einstellungen",
+      "security": "Sicherheit",
+      "contact": "Kontakt"
+    },
+    "legal": {
+      "title": "Rechtliches",
+      "terms": "Nutzungsbedingungen",
+      "privacy": "Datenschutzrichtlinie"
+    }
+  },
+  "Dashboard": {
+    "welcome": "Willkommen zurück, {name}!",
+    "description": "Hier ist eine schnelle Übersicht über Ihr Outpost-Konto.",
+    "id": "ID",
+    "lastLogin": "Letzte Anmeldung",
+    "profileCard": {
+      "title": "Profil",
+      "email": "E-Mail",
+      "twoFactorStatus": "2FA-Status",
+      "passkeyStatus": "Passkey-Status",
+      "groups": "Gruppen",
+      "adminBadge": "Admin",
+      "userBadge": "Benutzer",
+      "noGroups": "Keine Gruppen zugewiesen."
+    },
+    "editProfileButton": "Profil bearbeiten",
+    "securityHealth": {
+      "title": "Sicherheitszustand",
+      "description": "Überprüfen Sie den Sicherheitsstatus Ihres Kontos.",
+      "score": "{score}% sicher",
+      "manageButton": "Sicherheit verwalten",
+      "checks": {
+        "email": "E-Mail verifiziert",
+        "phone": "Telefon verifiziert",
+        "twoFactor": "Authenticator-App (2FA)",
+        "passkeys": "Passkeys aktiviert"
+      }
+    },
+    "profileCompletion": {
+      "title": "Profil-Vervollständigung",
+      "description": "Vervollständigen Sie Ihr Profil, um Outpost optimal zu nutzen.",
+      "percentage": "{percentage}% vollständig",
+      "completeProfileButton": "Vervollständigen Sie Ihr Profil",
+      "tasks": {
+        "picture": "Profilbild hinzufügen",
+        "banner": "Bannerbild hinzufügen",
+        "aboutMe": "Bio 'Über mich' schreiben",
+        "address": "Adresse festlegen",
+        "phone": "Telefonnummer hinzufügen",
+        "website": "Ihre Webseite hinzufügen"
+      }
+    },
+    "quickActions": {
+      "title": "Schnellaktionen",
+      "description": "Häufig verwendete Einstellungen und Aktionen.",
+      "changePassword": "Passwort ändern",
+      "manageSecurity": "Sicherheit verwalten",
+      "appearanceSettings": "Darstellungseinstellungen"
+    },
+    "loginHistory": {
+      "title": "Anmeldeverlauf",
+      "description": "Hier sind die letzten Anmeldungen bei Ihrem Konto.",
+      "date": "Datum",
+      "device": "Gerät",
+      "ipAddress": "IP-Adresse",
+      "noHistory": "Kein Anmeldeverlauf verfügbar."
+    },
+    "loginActivity": {
+      "title": "Letzte Anmeldeaktivität",
+      "description": "Anmeldungen in den letzten 7 Tagen.",
+      "logins": "Anmeldungen"
+    },
+    "sessionInfo": {
+      "title": "Sitzungsinformationen",
+      "description": "Details zu Ihrer aktuellen Anmeldesitzung.",
+      "startedAt": "Sitzung gestartet",
+      "expiresIn": "Zeit bis zur Aktualisierung",
+      "currentDevice": "Aktuelles Gerät",
+      "ipAddress": "IP-Adresse",
+      "expired": "Abgelaufen"
+    },
+    "verified": "Verifiziert",
+    "unverified": "Nicht verifiziert",
+    "enabled": "Aktiviert",
+    "disabled": "Deaktiviert"
+  },
+  "Account": {
+    "title": "Konto",
+    "description": "Verwalten Sie Ihre persönlichen Informationen, Einstellungen und die Kontosicherheit.",
+    "editAvatarTitle": "Avatar bearbeiten",
+    "editAvatarDescription": "Laden Sie ein neues Profilbild hoch. Empfohlene Größe ist 200x200px.",
+    "avatar": {
+      "changePhoto": "Foto ändern",
+      "uploadAndSave": "Hochladen & Speichern",
+      "cancel": "Abbrechen",
+      "fileTooLarge": "Datei ist zu groß. Maximale Größe ist 2MB.",
+      "invalidFileType": "Ungültiger Dateityp. Bitte verwenden Sie PNG, JPG oder WEBP.",
+      "genericError": "Ein unbekannter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+      "successTitle": "Avatar aktualisiert",
+      "successDescription": "Ihr Avatar wurde erfolgreich aktualisiert.",
+      "errorTitle": "Hochladen fehlgeschlagen"
+    },
+    "banner": {
+      "editBannerTitle": "Banner bearbeiten",
+      "editBannerDescription": "Laden Sie ein neues Bannerbild hoch. Empfohlene Größe 1500x500px.",
+      "changeBanner": "Banner ändern",
+      "uploadAndSave": "Hochladen & Speichern",
+      "cancel": "Abbrechen",
+      "fileTooLarge": "Datei ist zu groß. Maximale Größe ist 2MB.",
+      "invalidFileType": "Ungültiger Dateityp. Bitte verwenden Sie PNG, JPG oder WEBP.",
+      "genericError": "Ein unbekannter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+      "successTitle": "Banner aktualisiert",
+      "successDescription": "Ihr Banner wurde erfolgreich aktualisiert.",
+      "errorTitle": "Hochladen fehlgeschlagen"
+    },
+    "display": {
+      "status": "Status: {status}",
+      "memberSince": "Mitglied seit: {date}",
+      "aboutMeTitle": "Über mich",
+      "notSet": "Nicht festgelegt"
+    },
+    "addressForm": {
+      "title": "Adresse",
+      "description": "Aktualisieren Sie Ihre Wohnadresse.",
+      "successTitle": "Adresse aktualisiert",
+      "successDescription": "Ihre Adresse wurde erfolgreich aktualisiert.",
+      "errorTitle": "Aktualisierung fehlgeschlagen",
+      "errorDescription": "Ihre Adresse konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut."
+    },
+    "form": {
+      "title": "Konto bearbeiten",
+      "description": "Aktualisieren Sie Ihre persönlichen Informationen.",
+      "givenNameLabel": "Vorname",
+      "familyNameLabel": "Nachname",
+      "givenNameRequired": "Vorname ist erforderlich.",
+      "familyNameRequired": "Nachname ist erforderlich.",
+      "address": {
+        "streetLabel": "Straßenname",
+        "numberLabel": "Nummer",
+        "complementLabel": "Wohnung, Suite, etc. (optional)",
+        "cityLabel": "Stadt",
+        "stateLabel": "Bundesland / Provinz",
+        "zipCodeLabel": "Postleitzahl",
+        "countryLabel": "Land",
+        "streetPlaceholder": "Hauptstraße",
+        "numberPlaceholder": "123",
+        "complementPlaceholder": "Wohnung 4B",
+        "cityPlaceholder": "Musterstadt",
+        "statePlaceholder": "BE",
+        "zipCodePlaceholder": "12345",
+        "countryPlaceholder": "Deutschland",
+        "streetRequired": "Straßenname ist erforderlich.",
+        "numberRequired": "Hausnummer ist erforderlich.",
+        "cityRequired": "Stadt ist erforderlich.",
+        "stateRequired": "Bundesland oder Provinz ist erforderlich.",
+        "zipCodeRequired": "Postleitzahl ist erforderlich.",
+        "countryRequired": "Land ist erforderlich."
+      },
+      "phoneLabel": "Telefonnummer",
+      "phonePlaceholder": "555 123 4567",
+      "phoneDescription": "Wählen Sie Ihr Land und geben Sie Ihre Telefonnummer ein.",
+      "phoneInvalid": "Bitte geben Sie eine gültige Telefonnummer ein.",
+      "birthdateLabel": "Geburtsdatum",
+      "birthdatePlaceholder": "Datum auswählen",
+      "websiteLabel": "Webseite",
+      "zoneinfoLabel": "Zeitzone",
+      "zoneinfoDescription": "Wählen Sie die Zeitzone, in der Sie sich befinden.",
+      "aboutMeLabel": "Über mich",
+      "aboutMePlaceholder": "Erzählen Sie uns ein wenig über sich...",
+      "aboutMeDescription": "Schreiben Sie eine kurze Biografie über sich (max. 250 Zeichen).",
+      "aboutMeTooLong": "Ihre Biografie darf nicht länger als 250 Zeichen sein.",
+      "genderLabel": "Geschlecht",
+      "genderPlaceholder": "Wählen Sie Ihr Geschlecht",
+      "genderMale": "Männlich",
+      "genderFemale": "Weiblich",
+      "genderPreferNotToSay": "Möchte ich nicht sagen",
+      "save": "Änderungen speichern",
+      "successTitle": "Konto aktualisiert",
+      "successDescription": "Ihr Konto wurde erfolgreich aktualisiert.",
+      "errorTitle": "Aktualisierung fehlgeschlagen",
+      "errorDescription": "Ihr Konto konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut."
+    },
+    "verification": {
+      "title": "Attribute verifizieren",
+      "description": "Verifizieren Sie Ihre Kontaktinformationen, um Ihr Konto zu sichern.",
+      "resend": "Erneut senden",
+      "sentTitle": "Verifizierung gesendet",
+      "emailSentDescription": "Eine Verifizierungs-E-Mail wurde an {email} gesendet.",
+      "phoneSentDescription": "Eine Verifizierungs-SMS wurde an {phone} gesendet."
+    }
+  },
+  "Security": {
+    "title": "Sicherheitseinstellungen",
+    "description": "Verwalten Sie Ihr Passwort, die Zwei-Faktor-Authentifizierung und andere Sicherheitseinstellungen.",
+    "passwordForm": {
+      "title": "Passwort ändern",
+      "description": "Wählen Sie ein starkes neues Passwort, um Ihr Konto zu schützen.",
+      "currentPasswordLabel": "Aktuelles Passwort",
+      "newPasswordLabel": "Neues Passwort",
+      "confirmPasswordLabel": "Neues Passwort bestätigen",
+      "passwordMismatch": "Die neuen Passwörter stimmen nicht überein.",
+      "successTitle": "Passwort geändert",
+      "successDescription": "Ihr Passwort wurde erfolgreich geändert.",
+      "errorTitle": "Fehler",
+      "errorDescription": "Ihr aktuelles Passwort ist falsch.",
+      "incorrectPassword": "Falsches Passwort"
+    },
+    "twoFactor": {
+      "title": "Zwei-Faktor-Authentifizierung",
+      "description": "Fügen Sie Ihrem Konto mit einer Authenticator-App eine zusätzliche Sicherheitsebene hinzu.",
+      "authenticatorApp": "Authenticator-App",
+      "statusEnabled": "Die Authenticator-App ist aktiviert.",
+      "statusDisabled": "Erhöhen Sie die Sicherheit Ihres Kontos, indem Sie die Zwei-Faktor-Authentifizierung aktivieren.",
+      "enableButton": "Authenticator-App aktivieren",
+      "disableButton": "Deaktivieren",
+      "cancelButton": "Abbrechen",
+      "qrInstructions": "Scannen Sie den QR-Code mit Ihrer Authenticator-App.",
+      "manualEntryInstructions": "Oder geben Sie diesen geheimen Schlüssel manuell in Ihre Authenticator-App ein.",
+      "copyKeyLabel": "Geheimen Schlüssel kopieren",
+      "secretCopiedTitle": "Geheimnis kopiert",
+      "secretCopiedDescription": "Der manuelle Einrichtungsschlüssel wurde in Ihre Zwischenablage kopiert.",
+      "verifyTitle": "Code überprüfen",
+      "codeInputPlaceholder": "6-stelliger Code",
+      "verify": "Überprüfen",
+      "otpSuccessTitle": "Authenticator-App aktiviert",
+      "otpSuccessDescription": "2FA über Authenticator-App wurde erfolgreich aktiviert.",
+      "mfaDisabledTitle": "Authenticator-App deaktiviert",
+      "mfaDisabledDescription": "2FA über Authenticator-App wurde deaktiviert.",
+      "verificationFailedTitle": "Verifizierung fehlgeschlagen",
+      "smsMessagingTitle": "SMS-Nachrichten",
+      "smsMessagingDescription": "Erhalten Sie Verifizierungscodes per SMS. Diese Methode ist weniger sicher als eine Authenticator-App oder Passkeys.",
+      "smsMessagingDisabled": "Diese Funktion ist derzeit nicht verfügbar."
+    },
+    "passkeys": {
+      "title": "Passkeys / Sicherheitsschlüssel",
+      "description": "Verwenden Sie einen Passkey für eine sichere, passwortlose Anmeldung. Dies ist der sicherste Weg, Ihr Konto zu schützen.",
+      "statusEnabled": "Passkeys sind für Ihr Konto aktiviert.",
+      "statusDisabled": "Passkeys sind für Ihr Konto noch nicht aktiviert.",
+      "addButton": "Passkey hinzufügen",
+      "deleteSuccessTitle": "Passkey gelöscht",
+      "deleteSuccessDescription": "Der ausgewählte Passkey wurde von Ihrem Konto entfernt.",
+      "deleteErrorTitle": "Löschen fehlgeschlagen",
+      "deleteNotSupported": "Das Löschen von Passkeys wird von dieser Oberfläche noch nicht unterstützt.",
+      "success": {
+        "title": "Passkey aktualisiert",
+        "description": "Ihre Passkeys wurden erfolgreich verwaltet."
+      },
+      "error": {
+        "title": "Aktion fehlgeschlagen",
+        "generic": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.",
+        "configMissing": "Die Konfiguration des Passkey-Clients fehlt. Bitte kontaktieren Sie den Support."
+      },
+      "table": {
+        "name": "Name",
+        "addedOn": "Hinzugefügt am",
+        "actions": "Aktionen"
+      },
+      "addPasskeyDialog": {
+        "title": "Einen neuen Passkey hinzufügen?",
+        "description": "Sie werden zu einer sicheren Seite weitergeleitet, um Ihr Gerät zu registrieren. Möglicherweise werden Sie aufgefordert, Ihren Fingerabdruck, Ihr Gesicht oder einen Sicherheitsschlüssel zu verwenden.",
+        "continue": "Weiter",
+        "cancel": "Abbrechen"
+      },
+      "deleteDialog": {
+        "title": "Sind Sie sicher?",
+        "description": "Dadurch wird der Passkey mit dem Namen \"{deviceName}\" dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "confirm": "Löschen",
+        "cancel": "Abbrechen"
+      },
+      "updatingList": "Liste wird aktualisiert..."
+    }
+  },
+  "Profile": {
+    "title": "Öffentliches Profil",
+    "description": "Verwalten Sie, wie Ihr Profil für andere angezeigt wird.",
+    "preview": {
+      "title": "Live-Vorschau",
+      "description": "So sehen andere Benutzer Ihr Profil.",
+      "isPrivate": "Ihr Profil ist derzeit privat."
+    },
+    "settings": {
+      "title": "Profileinstellungen",
+      "description": "Steuern Sie, welche Informationen in Ihrem öffentlichen Profil sichtbar sind.",
+      "isPublicLabel": "Profil öffentlich machen",
+      "isPublicDescription": "Anderen erlauben, Ihr Profil anzuzeigen.",
+      "visibleFieldsTitle": "Sichtbare Felder",
+      "showPictureLabel": "Profilbild anzeigen",
+      "showBannerLabel": "Bannerbild anzeigen",
+      "showNameLabel": "Namen anzeigen",
+      "showGroupsLabel": "Gruppen anzeigen",
+      "showEmailLabel": "E-Mail anzeigen",
+      "showWebsiteLabel": "Webseite anzeigen",
+      "showAboutMeLabel": "'Über mich' anzeigen",
+      "showPhoneLabel": "Telefonnummer anzeigen",
+      "showGenderLabel": "Geschlecht anzeigen",
+      "showBirthdateLabel": "Geburtsdatum anzeigen",
+      "showZoneinfoLabel": "Zeitzone anzeigen",
+      "showLocaleLabel": "Sprache/Region anzeigen",
+      "saveButton": "Einstellungen speichern",
+      "successTitle": "Einstellungen gespeichert",
+      "successDescription": "Ihre Profileinstellungen wurden aktualisiert.",
+      "errorTitle": "Aktualisierung fehlgeschlagen",
+      "errorDescription": "Ihre Einstellungen konnten nicht gespeichert werden. Bitte versuchen Sie es erneut."
+    }
+  },
+  "Settings": {
+    "title": "Einstellungen",
+    "description": "Verwalten Sie Ihre Konto- und Darstellungseinstellungen.",
+    "appearance": {
+      "title": "Darstellung",
+      "description": "Passen Sie das Aussehen Ihres Kontos an.",
+      "theme": "Thema",
+      "light": "Hell",
+      "dark": "Dunkel",
+      "system": "System",
+      "textSize": "Textgröße",
+      "language": "Sprache",
+      "english": "Englisch",
+      "spanish": "Spanisch",
+      "french": "Französisch",
+      "german": "Deutsch",
+      "portuguese": "Portugiesisch",
+      "updateErrorTitle": "Aktualisierung fehlgeschlagen",
+      "updateErrorDescription": "Ihre Einstellungen konnten nicht gespeichert werden. Bitte versuchen Sie es erneut."
+    },
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "description": "Wählen Sie, wie Sie benachrichtigt werden möchten.",
+      "save": "Einstellungen speichern",
+      "successTitle": "Einstellungen gespeichert",
+      "successDescription": "Ihre Benachrichtigungseinstellungen wurden aktualisiert.",
+      "errorTitle": "Aktualisierung fehlgeschlagen",
+      "channels": {
+        "title": "Kanäle",
+        "email": "E-Mail",
+        "app": "In-App-Benachrichtigungen",
+        "telegram": "Telegram"
+      },
+      "types": {
+        "title": "Benachrichtigungstypen",
+        "user": {
+          "label": "Benutzerinteraktionen",
+          "description": "Benachrichtigungen über Erwähnungen, Antworten und Direktnachrichten."
+        },
+        "system": {
+          "label": "System & Sicherheit",
+          "description": "Benachrichtigungen über Sicherheitswarnungen und Kontoänderungen."
+        },
+        "marketing": {
+          "label": "Marketing & Angebote",
+          "description": "Erhalten Sie Nachrichten, Updates und Sonderangebote."
+        }
+      }
+    }
+  },
+  "Contact": {
+    "title": "Kontaktieren Sie uns",
+    "description": "Haben Sie eine Frage oder Feedback? Füllen Sie das folgende Formular aus und wir werden uns so schnell wie möglich bei Ihnen melden.",
+    "form": {
+      "nameLabel": "Vollständiger Name",
+      "emailLabel": "E-Mail-Adresse",
+      "categoryLabel": "Kategorie",
+      "categoryPlaceholder": "Wählen Sie eine Kategorie...",
+      "messageLabel": "Nachricht",
+      "messagePlaceholder": "Bitte beschreiben Sie Ihre Anfrage im Detail...",
+      "submitButton": "Nachricht senden",
+      "successTitle": "Nachricht gesendet!",
+      "successDescription": "Vielen Dank für Ihre Kontaktaufnahme. Wir werden uns in Kürze bei Ihnen melden.",
+      "errorTitle": "Senden fehlgeschlagen",
+      "errorDescription": "Ihre Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es später erneut.",
+      "categoryRequired": "Bitte wählen Sie eine Kategorie.",
+      "messageRequired": "Nachricht ist erforderlich.",
+      "messageTooShort": "Die Nachricht muss mindestens 10 Zeichen lang sein.",
+      "categories": {
+        "general": "Allgemeine Anfrage",
+        "billing": "Abrechnung & Zahlungen",
+        "technical": "Technischer Support",
+        "feedback": "Feedback & Vorschläge"
+      }
+    }
+  },
+  "Login": {
+    "title": "Bei Outpost anmelden",
+    "description": "Verwenden Sie das Single Sign-On (SSO) Ihres Unternehmens, um fortzufahren.",
+    "signInButton": "Mit SSO anmelden",
+    "signInAdminButton": "Als Admin anmelden (Entwicklung)",
+    "errorTitle": "Anmeldung fehlgeschlagen",
+    "errorDescription": "Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut oder wenden Sie sich an den Support.",
+    "invalid_state": "Die Sitzung ist abgelaufen oder ungültig. Bitte versuchen Sie erneut, sich anzumelden."
+  },
+  "Terms": {
+    "title": "Nutzungsbedingungen"
+  },
+  "Privacy": {
+    "title": "Datenschutzrichtlinie"
+  },
+  "Errors": {
+    "notFound": {
+      "title": "404 - Seite nicht gefunden",
+      "description": "Entschuldigung, die von Ihnen gesuchte Seite existiert nicht oder wurde verschoben.",
+      "goHome": "Zur Startseite"
+    },
+    "generic": {
+      "title": "Hoppla! Etwas ist schief gelaufen",
+      "description": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut. Wenn das Problem weiterhin besteht, wenden Sie sich an den Support.",
+      "tryAgain": "Erneut versuchen"
+    }
+  }
+}

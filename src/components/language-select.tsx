@@ -38,6 +38,9 @@ export function LanguageSelect({
       <SelectContent>
         <SelectItem value='en'>{t('english')}</SelectItem>
         <SelectItem value='es'>{t('spanish')}</SelectItem>
+        <SelectItem value='fr'>{t('french')}</SelectItem>
+        <SelectItem value='de'>{t('german')}</SelectItem>
+        <SelectItem value='pt'>{t('portuguese')}</SelectItem>
       </SelectContent>
     </Select>
   );
