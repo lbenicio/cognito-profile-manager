@@ -1,5 +1,8 @@
 import * as z from 'zod';
-import type { User } from '@/types/api/user.types';
+import type {
+  AccountFormProps,
+  AccountFormValues,
+} from '@/interfaces/forms/account-form.interfaces';
 
 /**
  * Schema for the Account Form using zod.
@@ -33,16 +36,3 @@ export const accountFormSchema = (t: (key: string) => string) =>
       .max(250, { message: t('aboutMeTooLong') })
       .optional(),
   });
-
-/**
- * Type for Account Form values, inferred from the schema.
- */
-export type AccountFormValues = z.infer<ReturnType<typeof accountFormSchema>>;
-
-/**
- * Props for the AccountForm component.
- */
-export interface AccountFormProps {
-  user: User;
-  onUpdate: (data: Partial<User>) => void;
-}

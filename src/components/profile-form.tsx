@@ -3,11 +3,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import {
-  profileFormSchema,
-  ProfileFormValues,
+import { profileFormSchema } from '@/types/forms/profile-form.types';
+import type {
   ProfileFormProps,
-} from '@/types/forms/profile-form.types';
+  ProfileFormValues,
+} from '@/interfaces/forms/profile-form.interfaces';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import {
@@ -31,7 +31,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Save } from 'lucide-react';
 import React from 'react';
-import type { User as UserType } from '@/types/api/user.types';
+
 import { updateUserProfile } from '@/lib/profile-actions';
 import { TimezoneSelect } from './timezone-select';
 import { PhoneInput } from './phone-input';
@@ -46,7 +46,7 @@ import {
 import { DatePicker } from './ui/date-picker';
 import { format } from 'date-fns';
 
-export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
+export function ProfileForm({ user, onUpdateAction }: ProfileFormProps) {
   const { toast } = useToast();
   const t = useTranslations('Profile.form');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -99,7 +99,7 @@ export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
       });
 
       if (result.success) {
-        onUpdate({
+        onUpdateAction({
           name: `${data.given_name} ${data.family_name}`.trim(),
           address: data.address,
           phone_number: data.phone_number,

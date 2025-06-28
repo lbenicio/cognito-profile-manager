@@ -25,14 +25,13 @@ import { useToast } from '@/hooks/use-toast';
 import { Save } from 'lucide-react';
 import React from 'react';
 import { updateUserAddress } from '@/lib/profile-actions';
-import type { User } from '@/types/api/user.types';
-import {
-  addressFormSchema,
-  AddressFormValues,
+import { addressFormSchema } from '@/types/forms/address-form.types';
+import type {
   AddressFormProps,
-} from '@/types/forms/address-form.types';
+  AddressFormValues,
+} from '@/interfaces/forms/address-form.interfaces';
 
-export function AddressForm({ user, onUpdate }: AddressFormProps) {
+export function AddressForm({ user, onUpdateAction }: AddressFormProps) {
   // user: User is now imported from types/api/user.types
   const { toast } = useToast();
   const t = useTranslations('Account.form');
@@ -63,7 +62,7 @@ export function AddressForm({ user, onUpdate }: AddressFormProps) {
       const result = await updateUserAddress(fullAddress);
 
       if (result.success) {
-        onUpdate({ address: fullAddress });
+        onUpdateAction({ address: fullAddress });
         toast({
           title: tAddress('successTitle'),
           description: tAddress('successDescription'),

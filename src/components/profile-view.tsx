@@ -33,7 +33,7 @@ export function ProfileView({ user: initialUser }: ProfileViewProps) {
         <div>
           <ProfileSettingsForm
             initialPreferences={user.publicProfilePreferences}
-            onUpdate={handleUpdate}
+            onUpdateAction={handleUpdate}
           />
         </div>
       </div>

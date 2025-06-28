@@ -21,12 +21,12 @@ import { updatePublicProfilePreferences } from '@/lib/profile-settings-actions';
 
 interface ProfileSettingsFormProps {
   initialPreferences: PublicProfilePreferences;
-  onUpdate: (newPrefs: PublicProfilePreferences) => void;
+  onUpdateAction: (newPrefs: PublicProfilePreferences) => void;
 }
 
 export function ProfileSettingsForm({
   initialPreferences,
-  onUpdate,
+  onUpdateAction,
 }: ProfileSettingsFormProps) {
   const t = useTranslations('Profile.settings');
   const { toast } = useToast();
@@ -54,7 +54,7 @@ export function ProfileSettingsForm({
     startTransition(async () => {
       const result = await updatePublicProfilePreferences(prefs);
       if (result.success) {
-        onUpdate(prefs);
+        onUpdateAction(prefs);
         toast({
           title: t('successTitle'),
           description: t('successDescription'),

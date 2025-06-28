@@ -42,10 +42,10 @@ import { format } from 'date-fns';
 import type {
   AccountFormProps,
   AccountFormValues,
-} from '@/types/forms/account-form.types';
+} from '@/interfaces/forms/account-form.interfaces';
 import { accountFormSchema } from '@/types/forms/account-form.types';
 
-export function AccountForm({ user, onUpdate }: AccountFormProps) {
+export function AccountForm({ user, onUpdateAction }: AccountFormProps) {
   const { toast } = useToast();
   const t = useTranslations('Account.form');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -96,7 +96,7 @@ export function AccountForm({ user, onUpdate }: AccountFormProps) {
       });
 
       if (result.success) {
-        onUpdate({
+        onUpdateAction({
           name: `${data.given_name} ${data.family_name}`.trim(),
           phone_number: data.phone_number,
           birthdate: data.birthdate ? format(data.birthdate, 'yyyy-MM-dd') : '',

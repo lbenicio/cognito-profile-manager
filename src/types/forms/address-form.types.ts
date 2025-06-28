@@ -1,5 +1,4 @@
 import * as z from 'zod';
-import type { User } from '@/types/api/user.types';
 
 /**
  * Schema for the Address Form using zod.
@@ -16,15 +15,5 @@ export const addressFormSchema = (t: (key: string) => string) =>
     country: z.string().min(1, { message: t('address.countryRequired') }),
   });
 
-/**
- * Type for Address Form values, inferred from the schema.
- */
-export type AddressFormValues = z.infer<ReturnType<typeof addressFormSchema>>;
-
-/**
- * Props for the AddressForm component.
- */
-export interface AddressFormProps {
-  user: User;
-  onUpdate: (data: Partial<User>) => void;
-}
+// Types and interfaces for AddressForm should be imported directly from
+// '@/interfaces/forms/address-form.interfaces' instead of this file.

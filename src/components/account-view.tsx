@@ -30,11 +30,11 @@ export function AccountView({ initialUser }: AccountViewProps) {
       </header>
       <div className='grid grid-cols-1 items-start gap-8 md:grid-cols-2'>
         <div className='flex flex-col gap-8'>
-          <AccountDisplay user={user} onUpdate={handleProfileUpdate} />
+          <AccountDisplay user={user} onUpdateAction={handleProfileUpdate} />
         </div>
         <div className='flex flex-col gap-8'>
-          <AccountForm user={user} onUpdate={handleProfileUpdate} />
-          <AddressForm user={user} onUpdate={handleProfileUpdate} />
+          <AccountForm user={user} onUpdateAction={handleProfileUpdate} />
+          <AddressForm user={user} onUpdateAction={handleProfileUpdate} />
         </div>
       </div>
     </div>

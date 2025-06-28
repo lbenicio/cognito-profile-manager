@@ -47,10 +47,10 @@ import { Separator } from '@/components/ui/separator';
 
 export function AccountDisplay({
   user,
-  onUpdate,
+  onUpdateAction,
 }: {
   user: User;
-  onUpdate: (data: Partial<User>) => void;
+  onUpdateAction: (data: Partial<User>) => void;
 }) {
   const t = useTranslations('Dashboard');
   const tAccount = useTranslations('Account');
@@ -152,7 +152,7 @@ export function AccountDisplay({
                 </DialogHeader>
                 <AvatarEditor
                   user={user}
-                  onUpdate={onUpdate}
+                  onUpdate={onUpdateAction}
                   onClose={() => setIsAvatarEditorOpen(false)}
                 />
               </DialogContent>
@@ -342,7 +342,7 @@ export function AccountDisplay({
         </DialogHeader>
         <BannerEditor
           user={user}
-          onUpdate={onUpdate}
+          onUpdate={onUpdateAction}
           onClose={() => setIsBannerEditorOpen(false)}
         />
       </DialogContent>
