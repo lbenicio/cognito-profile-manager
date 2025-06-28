@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from '@/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { KeyRound, Loader2, Trash2 } from 'lucide-react';
