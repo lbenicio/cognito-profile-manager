@@ -1,9 +1,9 @@
 'use client';
 
-import { useTransition, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { devAdminLogin } from '@/lib/auth-actions';
+import { devAdminLogin, ssoLogin } from '@/lib/auth-actions';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -19,8 +19,6 @@ export function LoginView() {
   const t = useTranslations('Login');
   const searchParams = useSearchParams();
   const { toast } = useToast();
-  const [isSsoPending, startSsoTransition] = useTransition();
-  const [isAdminPending, startAdminTransition] = useTransition();
 
   useEffect(() => {
     const error = searchParams.get('error');
@@ -41,18 +39,6 @@ export function LoginView() {
     }
   }, [searchParams, t, toast]);
 
-  const handleSsoLogin = () => {
-    startSsoTransition(() => {
-      window.location.href = '/api/v1/auth/sso/start';
-    });
-  };
-
-  const handleAdminLogin = () => {
-    startAdminTransition(() => {
-      devAdminLogin();
-    });
-  };
-
   return (
     <div className='flex min-h-screen items-center justify-center bg-background'>
       <Card className='mx-4 w-full max-w-md'>
@@ -62,33 +48,20 @@ export function LoginView() {
         </CardHeader>
         <CardContent>
           <div className='space-y-4'>
-            <Button
-              onClick={handleSsoLogin}
-              disabled={isSsoPending}
-              className='w-full'
-            >
-              {isSsoPending ? (
-                <div className='h-4 w-4 animate-spin rounded-full border-b-2 border-primary-foreground'></div>
-              ) : (
+            <form action={ssoLogin}>
+              <Button type='submit' className='w-full'>
                 <LogIn />
-              )}
-              <span className='ml-2'>{t('signInButton')}</span>
-            </Button>
+                <span className='ml-2'>{t('signInButton')}</span>
+              </Button>
+            </form>
 
             {process.env.NODE_ENV === 'development' && (
-              <Button
-                onClick={handleAdminLogin}
-                disabled={isAdminPending}
-                className='w-full'
-                variant='secondary'
-              >
-                {isAdminPending ? (
-                  <div className='h-4 w-4 animate-spin rounded-full border-b-2 border-primary-foreground'></div>
-                ) : (
+              <form action={devAdminLogin}>
+                <Button type='submit' className='w-full' variant='secondary'>
                   <LogIn />
-                )}
-                <span className='ml-2'>{t('signInAdminButton')}</span>
-              </Button>
+                  <span className='ml-2'>{t('signInAdminButton')}</span>
+                </Button>
+              </form>
             )}
           </div>
         </CardContent>

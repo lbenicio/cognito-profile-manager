@@ -4,6 +4,10 @@ import { redirect } from 'next/navigation';
 import { createMockSession, deleteSession } from '@/lib/session';
 import { mockAdminUser } from '@/lib/auth';
 
+export async function ssoLogin() {
+  redirect('/api/v1/auth/sso/start');
+}
+
 export async function devAdminLogin() {
   if (process.env.NODE_ENV !== 'development') {
     return 'This action is only available in development.';
