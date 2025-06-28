@@ -1,4 +1,9 @@
 name: Telegram notification
+
+concurrency:
+  group: release-on-master-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   workflow_run:
     workflows:
@@ -9,7 +14,6 @@ on:
       - master
     types:
       - completed
-  workflow_dispatch:
 jobs:
   notification:
     runs-on: ubuntu-latest

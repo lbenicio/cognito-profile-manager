@@ -2,8 +2,9 @@
 
 import { revalidatePath } from 'next/cache';
 import { cognitoClient, UpdateUserAttributesCommand } from './cognito';
-import { getSession } from './session';
+import { getSession } from '@/lib/session';
 import { Logger } from '@/lib/logger';
+import type { ProfileUpdateResult } from '@/interfaces/actions/action.interfaces';
 
 const logger = new Logger('PROFILE');
 
@@ -20,10 +21,13 @@ type UserProfileAttributes = {
 
 export async function updateUserProfile(
   data: Partial<UserProfileAttributes>
-): Promise<{ success: boolean; message: string }> {
+): Promise<ProfileUpdateResult> {
   const session = await getSession();
   if (!session?.accessToken) {
-    return { success: false, message: 'Not authenticated' };
+    return {
+      success: false,
+      message: 'Not authenticated',
+    };
   }
 
   try {
@@ -46,7 +50,10 @@ export async function updateUserProfile(
     }
 
     if (attributesToUpdate.length === 0) {
-      return { success: true, message: 'No changes to update.' };
+      return {
+        success: true,
+        message: 'No changes to update.',
+      };
     }
 
     const command = new UpdateUserAttributesCommand({
@@ -59,22 +66,31 @@ export async function updateUserProfile(
     revalidatePath('/account');
     revalidatePath('/profile');
 
-    return { success: true, message: 'Profile updated successfully.' };
+    return {
+      success: true,
+      message: 'Profile updated successfully.',
+      updatedFields: Object.keys(data).filter(
+        (key) => data[key as keyof typeof data] !== undefined
+      ),
+    };
   } catch (error: any) {
     logger.error('Update Profile Error:', error);
     return {
       success: false,
-      message: 'An unexpected error occurred while updating the profile.',
+      message: 'Failed to update profile',
     };
   }
 }
 
 export async function updateUserAddress(
   address: string
-): Promise<{ success: boolean; message: string }> {
+): Promise<ProfileUpdateResult> {
   const session = await getSession();
   if (!session?.accessToken) {
-    return { success: false, message: 'Not authenticated' };
+    return {
+      success: false,
+      message: 'Not authenticated',
+    };
   }
 
   try {
@@ -82,17 +98,22 @@ export async function updateUserAddress(
       AccessToken: session.accessToken,
       UserAttributes: [{ Name: 'address', Value: address }],
     });
+
     await cognitoClient.send(command);
 
-    revalidatePath('/account');
+    revalidatePath('/');
     revalidatePath('/profile');
 
-    return { success: true, message: 'Address updated successfully.' };
+    return {
+      success: true,
+      message: 'Address updated successfully.',
+      updatedFields: ['address'],
+    };
   } catch (error: any) {
-    logger.error('Update Address Error:', error);
+    logger.error('Update Profile Error:', error);
     return {
       success: false,
-      message: 'An unexpected error occurred while updating the address.',
+      message: 'An unexpected error occurred while updating the profile.',
     };
   }
 }

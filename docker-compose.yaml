@@ -1,53 +1,124 @@
 version: '3.8'
+
 services:
-  web:
+  # Development service with hot-reload
+  web-dev:
     build:
       context: .
       dockerfile: Dockerfile.dev
     ports:
       - '3000:3000'
     volumes:
-      # Mount local source code into the container for hot-reloading
+      # Mount local source code for hot-reloading
       - .:/app
-      # Exclude node_modules from the mount to use the ones inside the container
+      # Exclude node_modules to use container's version
       - /app/node_modules
     environment:
-      # --- Application Settings ---
-      NODE_ENV: ${NODE_ENV:-development}
+      NODE_ENV: development
       APP_URL: ${APP_URL:-http://localhost:3000}
       TOTP_SECRET_ENCRYPTION_KEY: ${TOTP_SECRET_ENCRYPTION_KEY:-t0tvpe3jCyxyGODCIn6WmxQNYFStu+clqOWu0OkKQLo=}
 
-      # --- Vercel KV Session Store ---
-      KV_URL: ${KV_URL}
-      KV_REST_API_URL: ${KV_REST_API_URL}
-      KV_REST_API_TOKEN: ${KV_REST_API_TOKEN}
-      KV_REST_API_READ_ONLY_TOKEN: ${KV_REST_API_READ_ONLY_TOKEN}
-
-      # --- Security - AWS Cognito & OAuth2 ---
-      NEXT_PUBLIC_OAUTH2_SCOPE: ${NEXT_PUBLIC_OAUTH2_SCOPE:-openid profile email aws.cognito.signin.user.admin}
+      # Cognito & OAuth2
       NEXT_PUBLIC_COGNITO_CLIENT_ID: ${NEXT_PUBLIC_COGNITO_CLIENT_ID}
       COGNITO_CLIENT_SECRET: ${COGNITO_CLIENT_SECRET}
       NEXT_PUBLIC_COGNITO_WELLKNOWN: ${NEXT_PUBLIC_COGNITO_WELLKNOWN}
+      NEXT_PUBLIC_OAUTH2_SCOPE: ${NEXT_PUBLIC_OAUTH2_SCOPE:-openid profile email aws.cognito.signin.user.admin}
 
-      # --- Admin Settings ---
-      NEXT_PUBLIC_ADMIN_DASHBOARD_URL: ${NEXT_PUBLIC_ADMIN_DASHBOARD_URL}
-      COGNITO_ADMIN_GROUP_NAME: ${COGNITO_ADMIN_GROUP_NAME:-admin}
+      # Admin settings
+      COGNITO_ADMIN_GROUP_NAME: ${COGNITO_ADMIN_GROUP_NAME:-admins}
       COGNITO_GROUPS_CLAIM_KEY: ${COGNITO_GROUPS_CLAIM_KEY:-cognito:groups}
+      NEXT_PUBLIC_ADMIN_DASHBOARD_URL: ${NEXT_PUBLIC_ADMIN_DASHBOARD_URL}
 
-      # --- Cloudflare R2 / S3-compatible storage ---
+      # AWS & R2 Storage
+      AWS_REGION: ${AWS_REGION:-us-east-1}
       R2_ACCOUNT_ID: ${R2_ACCOUNT_ID}
       R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
       R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
       R2_BUCKET_NAME: ${R2_BUCKET_NAME}
       NEXT_PUBLIC_R2_PUBLIC_URL: ${NEXT_PUBLIC_R2_PUBLIC_URL}
 
-      # --- AWS General ---
-      AWS_REGION: ${AWS_REGION:-sa-east-1}
-
-      # --- Email (for Contact Form) ---
+      # Email settings
       SMTP_HOST: ${SMTP_HOST}
-      SMTP_PORT: ${SMTP_PORT}
+      SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_USER: ${SMTP_USER}
       SMTP_PASS: ${SMTP_PASS}
       SMTP_FROM_EMAIL: ${SMTP_FROM_EMAIL}
       CONTACT_FORM_TO_EMAIL: ${CONTACT_FORM_TO_EMAIL}
+
+      # Optional services
+      REDIS_URL: ${REDIS_URL}
+      LOG_LEVEL: ${LOG_LEVEL:-DEBUG}
+    restart: unless-stopped
+    profiles: ['dev']
+
+  # Production service
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      NODE_ENV: production
+      APP_URL: ${APP_URL}
+      TOTP_SECRET_ENCRYPTION_KEY: ${TOTP_SECRET_ENCRYPTION_KEY}
+
+      # Cognito & OAuth2 (REQUIRED)
+      NEXT_PUBLIC_COGNITO_CLIENT_ID: ${NEXT_PUBLIC_COGNITO_CLIENT_ID}
+      COGNITO_CLIENT_SECRET: ${COGNITO_CLIENT_SECRET}
+      NEXT_PUBLIC_COGNITO_WELLKNOWN: ${NEXT_PUBLIC_COGNITO_WELLKNOWN}
+      NEXT_PUBLIC_OAUTH2_SCOPE: ${NEXT_PUBLIC_OAUTH2_SCOPE:-openid profile email aws.cognito.signin.user.admin}
+
+      # Admin settings
+      COGNITO_ADMIN_GROUP_NAME: ${COGNITO_ADMIN_GROUP_NAME:-admins}
+      COGNITO_GROUPS_CLAIM_KEY: ${COGNITO_GROUPS_CLAIM_KEY:-cognito:groups}
+      NEXT_PUBLIC_ADMIN_DASHBOARD_URL: ${NEXT_PUBLIC_ADMIN_DASHBOARD_URL}
+
+      # AWS & R2 Storage (REQUIRED)
+      AWS_REGION: ${AWS_REGION}
+      R2_ACCOUNT_ID: ${R2_ACCOUNT_ID}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
+      R2_BUCKET_NAME: ${R2_BUCKET_NAME}
+      NEXT_PUBLIC_R2_PUBLIC_URL: ${NEXT_PUBLIC_R2_PUBLIC_URL}
+
+      # Email settings
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM_EMAIL: ${SMTP_FROM_EMAIL}
+      CONTACT_FORM_TO_EMAIL: ${CONTACT_FORM_TO_EMAIL}
+
+      # Optional services
+      REDIS_URL: ${REDIS_URL}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      NEXT_TELEMETRY_DISABLED: 1
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "const http = require('http'); const options = { host: 'localhost', port: 3000, path: '/', timeout: 2000 }; const req = http.request(options, (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.end();",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    profiles: ['prod']
+
+  # Optional Redis service for caching
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    profiles: ['redis', 'dev', 'prod']
+
+volumes:
+  redis_data:

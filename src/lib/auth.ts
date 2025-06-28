@@ -7,86 +7,26 @@ import {
 } from '@/lib/cognito';
 import { getSession } from '@/lib/session';
 import { Logger } from '@/lib/logger';
+import type {
+  User,
+  UserPreferences,
+  NotificationPreferences,
+  PublicProfilePreferences,
+  Device,
+  Fingerprint,
+} from '@/types/user/user.types';
 
 const logger = new Logger('AUTH');
 
-export type UserPreferences = {
-  theme: 'light' | 'dark' | 'system';
-  language: 'en' | 'es' | 'fr' | 'de' | 'pt';
-  fontSize: number;
-};
-
-export type NotificationPreferences = {
-  email: boolean;
-  app: boolean;
-  telegram: boolean;
-  user: boolean;
-  system: boolean;
-  marketing: boolean;
-};
-
-export type PublicProfilePreferences = {
-  isPublic: boolean;
-  publicFields: {
-    picture: boolean;
-    banner: boolean;
-    name: boolean;
-    groups: boolean;
-    email: boolean;
-    website: boolean;
-    aboutMe: boolean;
-    phone_number: boolean;
-    gender: boolean;
-    birthdate: boolean;
-    zoneinfo: boolean;
-    locale: boolean;
-  };
-};
-
-export type Fingerprint = {
-  date: string; // ISO string
-  ip: string;
-  device: string;
-};
-
-export type Device = {
-  key: string;
-  name: string;
-  createDate?: string;
-  lastAuthDate?: string;
-};
-
-export type User = {
-  sub: string;
-  username: string;
-  email: string;
-  email_verified: boolean;
-  name: string;
-  address: string;
-  phone_number: string;
-  phone_number_verified: boolean;
-  birthdate: string;
-  creationDate: string; // ISO string
-  userStatus: string;
-  twoFactorEnabled: boolean;
-  passkeysEnabled: boolean;
-  groups: string[];
-  isAdmin: boolean;
-  picture: string;
-  banner: string;
-  locale: string;
-  zoneinfo: string;
-  website: string;
-  gender: string;
-  aboutMe: string;
-  preferences: UserPreferences;
-  notificationPreferences: NotificationPreferences;
-  publicProfilePreferences: PublicProfilePreferences;
-  fingerprint: Fingerprint[];
-  devices: Device[];
-  sessionStartedAt: number; // Unix timestamp (seconds)
-  sessionExpiresAt: number; // Unix timestamp (seconds)
-};
+// Re-export types for backward compatibility
+export type {
+  User,
+  UserPreferences,
+  NotificationPreferences,
+  PublicProfilePreferences,
+  Device,
+  Fingerprint,
+} from '@/types/user/user.types';
 
 export type Session = {
   accessToken: string;

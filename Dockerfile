@@ -1,75 +1,96 @@
 # Stage 1: Install production dependencies
-# This stage creates a minimal node_modules directory with only production dependencies.
 FROM node:20-alpine AS deps
 WORKDIR /app
 
 # Copy package manager files
 COPY package.json package-lock.json* ./
 
-# --- Dependency Purging ---
-# Install ONLY production dependencies. This is key to a smaller image.
-RUN npm ci
+# Install ONLY production dependencies
+RUN npm ci --only=production
 
-
-# Stage 2: Build the application
-# This stage builds the Next.js app without the standalone output.
+# Stage 2: Build the application with placeholder environment variables
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Copy the pruned node_modules from the 'deps' stage
-COPY --from=deps /app/node_modules ./node_modules
+# Copy package files and install all dependencies (including dev)
+COPY package.json package-lock.json* ./
+RUN npm ci
+
 # Copy the rest of the application source code
 COPY . .
 
-# --- Modify next.config.ts ---
-# Remove the 'output: "standalone"' line from the config file.
-# This ensures the build runs in the standard mode.
-RUN sed -i "/output: \"standalone\"/d" next.config.ts
+# Set placeholder values for NEXT_PUBLIC_ variables during build
+# These will be replaced at runtime by the entrypoint script
+ENV NEXT_PUBLIC_COGNITO_CLIENT_ID=__NEXT_PUBLIC_COGNITO_CLIENT_ID__
+ENV NEXT_PUBLIC_COGNITO_WELLKNOWN=__NEXT_PUBLIC_COGNITO_WELLKNOWN__
+ENV NEXT_PUBLIC_R2_PUBLIC_URL=__NEXT_PUBLIC_R2_PUBLIC_URL__
+ENV NEXT_PUBLIC_OAUTH2_SCOPE=__NEXT_PUBLIC_OAUTH2_SCOPE__
+ENV NEXT_PUBLIC_ADMIN_DASHBOARD_URL=__NEXT_PUBLIC_ADMIN_DASHBOARD_URL__
 
-# Run the build script. This will generate the production app in the `dist` directory.
+# Set placeholder values for server-side variables required during build
+ENV TOTP_SECRET_ENCRYPTION_KEY=__TOTP_SECRET_ENCRYPTION_KEY__
+ENV APP_URL=__APP_URL__
+ENV COGNITO_CLIENT_SECRET=__COGNITO_CLIENT_SECRET__
+ENV AWS_REGION=__AWS_REGION__
+ENV R2_ACCOUNT_ID=__R2_ACCOUNT_ID__
+ENV R2_ACCESS_KEY_ID=__R2_ACCESS_KEY_ID__
+ENV R2_SECRET_ACCESS_KEY=__R2_SECRET_ACCESS_KEY__
+ENV R2_BUCKET_NAME=__R2_BUCKET_NAME__
+ENV COGNITO_ADMIN_GROUP_NAME=__COGNITO_ADMIN_GROUP_NAME__
+ENV COGNITO_GROUPS_CLAIM_KEY=__COGNITO_GROUPS_CLAIM_KEY__
+
+# Build the application
 RUN npm run build:pkg
 
-FROM deps AS productiondeps
+# Stage 3: Production dependencies only
+FROM node:20-alpine AS production-deps
+WORKDIR /app
 
-RUN npm ci --omit=dev
+# Copy package files
+COPY package.json package-lock.json* ./
 
-# Stage 3: Production Runner
-# This is the final, minimal image. It's built from a clean base and only
-# includes the essential files needed to run the app.
+# Install only production dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Stage 4: Production runner
 FROM node:20-alpine AS runner
 WORKDIR /app
 
-# Set environment to production for performance and security
+# Set environment to production
 ENV NODE_ENV=production
-# Disable Next.js telemetry
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Create a non-root user and group for security best practices
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Create non-root user for security
+RUN addgroup --system --gid 1001 nodejs && \
+  adduser --system --uid 1001 nextjs
 
-# Copy the essential files from previous stages
-COPY --from=productiondeps /app/node_modules ./node_modules
+# Copy production dependencies
+COPY --from=production-deps /app/node_modules ./node_modules
+
+# Copy built application
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.ts ./next.config.ts
-COPY package.json .
+COPY --from=builder /app/src/i18n ./src/i18n
+COPY package.json ./
 
-# Copy entrypoint script for runtime env injection
+# Copy and setup entrypoint script
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Change ownership of the application files to the non-root user
-RUN chown -R nextjs:nodejs .
+# Change ownership to non-root user
+RUN chown -R nextjs:nodejs /app
 
-# Switch to the non-root user
+# Switch to non-root user
 USER nextjs
 
-# Expose the port the app will run on
+# Expose port
 EXPOSE 3000
 
-# The command to start the Next.js production server.
-# It uses the `next start` command, which is the standard way to run a
-# Next.js app built without the standalone output.
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "const http = require('http'); const options = { host: 'localhost', port: 3000, path: '/', timeout: 2000 }; const req = http.request(options, (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.end();"
+
+# Use entrypoint script to handle environment variable injection
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["npm", "run", "start:prod"]
