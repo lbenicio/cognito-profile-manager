@@ -1,67 +1,77 @@
 import 'server-only';
-import { createClient, RedisClientType } from 'redis';
+import { createClient, type RedisClientType } from 'redis';
 
-let redisClient: RedisClientType | null = null;
 const REDIS_URL = process.env.REDIS_URL;
-let connectionPromise: Promise<void> | null = null;
 const LOG_CONTEXT = 'RedisService';
 
-if (REDIS_URL) {
+// Singleton pattern for the Redis client
+let redisClientInstance: RedisClientType | null = null;
+
+function getRedisClient(): RedisClientType | null {
+  if (redisClientInstance) {
+    return redisClientInstance;
+  }
+
+  if (!REDIS_URL) {
+    console.warn('REDIS_URL not defined. Redis caching is disabled.');
+    return null;
+  }
+
   try {
-    redisClient = createClient({
+    const client = createClient({
       url: REDIS_URL,
       socket: {
         connectTimeout: 5000,
-        reconnectStrategy: (retries: number) => {
+        reconnectStrategy: (retries) => {
           if (retries > 10) {
-            console.warn(`Exceeded Redis connection retries (10). Stopping.`);
             return new Error('Too many retries for Redis connection.');
           }
-          const delay = Math.min(retries * 200, 3000);
-          console.info(
-            `Redis connection attempt ${retries + 1}. Retrying in ${delay}ms.`,
-            LOG_CONTEXT
-          );
-          return delay;
+          return Math.min(retries * 200, 3000);
         },
       },
     });
 
-    redisClient.on('error', (err) => console.error('Redis client error:', err));
-    redisClient.on('connect', () => console.info('Connecting to Redis...'));
-    redisClient.on('ready', () => console.info('Redis client is ready.'));
-    redisClient.on('reconnecting', () =>
-      console.info('Redis client is reconnecting...')
+    client.on('error', (err) => console.error(`${LOG_CONTEXT} Error:`, err));
+    client.on('connect', () => console.info(`${LOG_CONTEXT}: Connecting...`));
+    client.on('ready', () => console.info(`${LOG_CONTEXT}: Client is ready.`));
+    client.on('reconnecting', () =>
+      console.info(`${LOG_CONTEXT}: Reconnecting...`)
     );
 
-    // Start connection process immediately and store the promise
-    connectionPromise = (async () => {
-        if (!redisClient!.isOpen) {
-            await redisClient!.connect();
-        }
-    })().catch((err) => {
-      console.error('Initial Redis connection failed:', err);
-      // The client will attempt to reconnect based on the strategy.
-    });
+    redisClientInstance = client;
+    return redisClientInstance;
   } catch (error) {
     console.error('Failed to initialize Redis client:', error);
-    redisClient = null;
+    return null;
   }
-} else {
-  console.warn('REDIS_URL not defined. Redis caching is disabled.');
 }
 
+// Initialize on module load
+const redis = getRedisClient();
+
 async function ensureConnected(): Promise<boolean> {
-    if (!redisClient || !connectionPromise) {
-        return false;
+  if (!redis) {
+    return false;
+  }
+  if (redis.isReady) {
+    return true;
+  }
+  // If the client is created but not connected, try to connect.
+  // The client handles the case where it's already connecting or connected.
+  try {
+    await redis.connect();
+    return true;
+  } catch (err) {
+    // This might catch errors if connect() is called while it's already trying
+    // and failing in the background. We can treat this as a failed connection.
+    if ((err as Error).message.includes('already connecting')) {
+      // Give it a moment to see if it becomes ready
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      return redis.isReady;
     }
-    try {
-        await connectionPromise;
-        return redisClient.isReady;
-    } catch (err) {
-        console.error("Failed to ensure Redis connection:", err);
-        return false;
-    }
+    console.error(`${LOG_CONTEXT}: Connection failed:`, err);
+    return false;
+  }
 }
 
 export async function getCache<T>(key: string): Promise<T | null> {
@@ -71,12 +81,10 @@ export async function getCache<T>(key: string): Promise<T | null> {
     return null;
   }
   try {
-    const data = await redisClient!.get(key);
+    const data = await redis!.get(key);
     if (data) {
-      console.debug(`Cache HIT for key: ${key}`);
       return JSON.parse(data) as T;
     }
-    console.debug(`Cache MISS for key: ${key}`);
     return null;
   } catch (error) {
     console.error(`Error getting cache for key ${key}:`, error);
@@ -95,11 +103,7 @@ export async function setCache<T>(
     return;
   }
   try {
-    await redisClient!.set(key, JSON.stringify(value), { EX: ttlSeconds });
-    console.debug(
-      `Cache SET for key: ${key} (TTL: ${ttlSeconds}s)`,
-      LOG_CONTEXT
-    );
+    await redis!.set(key, JSON.stringify(value), { EX: ttlSeconds });
   } catch (error) {
     console.error(`Error setting cache for key ${key}:`, error);
   }
@@ -109,28 +113,18 @@ export async function deleteCache(key: string | string[]): Promise<void> {
   const connected = await ensureConnected();
   if (!connected) {
     console.debug(
-      `deleteCache(${Array.isArray(key) ? key.join(', ') : key}): Redis not ready or disabled.`,
-      LOG_CONTEXT
+      `deleteCache(${Array.isArray(key) ? key.join(', ') : key}): Redis not ready or disabled.`
     );
     return;
   }
   try {
     const keysToDelete = Array.isArray(key) ? key : [key];
     if (keysToDelete.length === 0) return;
-    const result = await redisClient!.del(keysToDelete);
-    console.debug(
-      `Cache DELETED for key(s): ${keysToDelete.join(', ')}. Count: ${result}`,
-      LOG_CONTEXT
-    );
+    await redis!.del(keysToDelete);
   } catch (error) {
     const keysStr = Array.isArray(key) ? key.join(', ') : key;
-    console.error(
-      `Error deleting cache for key(s) ${keysStr}:`,
-      LOG_CONTEXT,
-      error
-    );
+    console.error(`Error deleting cache for key(s) ${keysStr}:`, error);
   }
 }
 
-// Export the client for use in other parts of the application.
-export const redis = redisClient;
+export { redis };
