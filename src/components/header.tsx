@@ -36,6 +36,7 @@ import type { User as UserType } from '@/lib/auth';
 import { Separator } from '@/components/ui/separator';
 import { useTransition } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { localLogout } from '@/lib/auth-actions';
 
 type HeaderTranslations = {
   title: string;
@@ -66,10 +67,9 @@ export function Header({
 
   const handleLogout = () => {
     startTransition(() => {
-      // For a full OIDC-compliant single-logout, we must navigate the browser
-      // to the logout endpoint. This endpoint will clear our local session
-      // and then redirect to the identity provider's logout page.
-      window.location.assign('/api/v1/auth/logout');
+      // This is a local logout. It clears the session and redirects to /login.
+      // It does not perform a full OIDC single-logout.
+      localLogout();
     });
   };
 
