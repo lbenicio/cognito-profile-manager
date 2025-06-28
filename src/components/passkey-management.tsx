@@ -11,8 +11,18 @@ import { useTranslations } from 'next-intl';
 import type { User } from '@/lib/auth';
 import { deletePasskey } from '@/lib/passkey-actions';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { format } from 'date-fns';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface PasskeyManagementProps {
     user: User;
@@ -145,10 +155,28 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
                             <p className="text-sm text-muted-foreground">{t('statusDisabled')}</p>
                         )}
 
-                        <Button variant="outline" size="sm" onClick={handleAddPasskey} disabled={isAddingPasskey || isPending}>
-                            {(isAddingPasskey || isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            {t('addButton')}
-                        </Button>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="outline" size="sm" disabled={isAddingPasskey || isPending}>
+                                    {(isAddingPasskey || isPending) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                    {t('addButton')}
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>{t('addPasskeyDialog.title')}</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        {t('addPasskeyDialog.description')}
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>{t('addPasskeyDialog.cancel')}</AlertDialogCancel>
+                                    <AlertDialogAction onClick={handleAddPasskey}>
+                                        {t('addPasskeyDialog.continue')}
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </div>
                 </div>
             </CardContent>

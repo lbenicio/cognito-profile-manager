@@ -278,6 +278,12 @@
         "name": "Nombre",
         "addedOn": "Añadido el",
         "actions": "Acciones"
+      },
+      "addPasskeyDialog": {
+        "title": "¿Añadir una Nueva Passkey?",
+        "description": "Serás redirigido a una página segura para registrar tu dispositivo. Es posible que se te pida usar tu huella digital, rostro o una llave de seguridad.",
+        "continue": "Continuar",
+        "cancel": "Cancelar"
       }
     }
   },

@@ -278,6 +278,12 @@
         "name": "Name",
         "addedOn": "Added On",
         "actions": "Actions"
+      },
+      "addPasskeyDialog": {
+        "title": "Add a New Passkey?",
+        "description": "You will be redirected to a secure page to register your device. You may be prompted to use your fingerprint, face, or a security key.",
+        "continue": "Continue",
+        "cancel": "Cancel"
       }
     }
   },
