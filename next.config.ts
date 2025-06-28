@@ -8,10 +8,6 @@ const r2Hostname = process.env.NEXT_PUBLIC_R2_PUBLIC_URL
   : undefined;
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   eslint: {
     ignoreDuringBuilds: true,
   },

@@ -2,7 +2,6 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,28 +24,16 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Save } from 'lucide-react';
 import React from 'react';
-import type { User as UserType } from '@/lib/auth';
 import { updateUserAddress } from '@/lib/profile-actions';
-
-const addressFormSchema = (t: (key: string) => string) =>
-  z.object({
-    street: z.string().min(1, { message: t('address.streetRequired') }),
-    number: z.string().min(1, { message: t('address.numberRequired') }),
-    complement: z.string().optional(),
-    city: z.string().min(1, { message: t('address.cityRequired') }),
-    state: z.string().min(1, { message: t('address.stateRequired') }),
-    zipCode: z.string().min(1, { message: t('address.zipCodeRequired') }),
-    country: z.string().min(1, { message: t('address.countryRequired') }),
-  });
-
-type AddressFormValues = z.infer<ReturnType<typeof addressFormSchema>>;
-
-interface AddressFormProps {
-  user: UserType;
-  onUpdate: (data: Partial<UserType>) => void;
-}
+import type { User } from '@/types/api/user.types';
+import {
+  addressFormSchema,
+  AddressFormValues,
+  AddressFormProps,
+} from '@/types/forms/address-form.types';
 
 export function AddressForm({ user, onUpdate }: AddressFormProps) {
+  // user: User is now imported from types/api/user.types
   const { toast } = useToast();
   const t = useTranslations('Account.form');
   const tAddress = useTranslations('Account.addressForm');

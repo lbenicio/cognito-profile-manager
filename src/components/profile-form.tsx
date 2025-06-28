@@ -3,6 +3,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
+import {
+  profileFormSchema,
+  ProfileFormValues,
+  ProfileFormProps,
+} from '@/types/forms/profile-form.types';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,7 +31,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Save } from 'lucide-react';
 import React from 'react';
-import type { User as UserType } from '@/lib/auth';
+import type { User as UserType } from '@/types/api/user.types';
 import { updateUserProfile } from '@/lib/profile-actions';
 import { TimezoneSelect } from './timezone-select';
 import { PhoneInput } from './phone-input';
@@ -40,46 +45,6 @@ import {
 } from './ui/select';
 import { DatePicker } from './ui/date-picker';
 import { format } from 'date-fns';
-
-const profileFormSchema = (t: (key: string) => string) =>
-  z.object({
-    given_name: z
-      .string()
-      .min(1, { message: t('givenNameRequired') })
-      .max(50),
-    family_name: z
-      .string()
-      .min(1, { message: t('familyNameRequired') })
-      .max(50),
-    address: z
-      .string()
-      .min(10, { message: 'Please enter a full address.' })
-      .max(100),
-    phone_number: z
-      .string()
-      .refine((phone) => /^\+[1-9]\d{7,14}$/.test(phone), {
-        message: t('phoneInvalid'),
-      }),
-    birthdate: z.date().optional(),
-    website: z
-      .string()
-      .url({ message: 'Please enter a valid URL.' })
-      .or(z.literal(''))
-      .optional(),
-    zoneinfo: z.string().max(50).optional(),
-    gender: z.string().optional(),
-    aboutMe: z
-      .string()
-      .max(250, { message: t('aboutMeTooLong') })
-      .optional(),
-  });
-
-type ProfileFormValues = z.infer<ReturnType<typeof profileFormSchema>>;
-
-interface ProfileFormProps {
-  user: UserType;
-  onUpdate: (data: Partial<UserType>) => void;
-}
 
 export function ProfileForm({ user, onUpdate }: ProfileFormProps) {
   const { toast } = useToast();
