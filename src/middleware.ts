@@ -25,16 +25,19 @@ const i18nMiddleware = createI18nMiddleware({
 export async function middleware(request: NextRequest) {
     let sessionIsValid = false;
     let newSessionCookieValue: string | null = null;
+    const isProd = process.env.NODE_ENV === 'production';
+    const appUrl = process.env.APP_URL?.replace(/\/$/, '');
+    
+    let cookieDomain: string | undefined;
+    if (isProd && appUrl) {
+        const hostname = new URL(appUrl).hostname;
+        cookieDomain = hostname.startsWith('www.') ? hostname.substring(4) : hostname;
+    }
 
     // Helper to create a redirect response to the login page, clearing cookies.
     const redirectToLogin = (): NextResponse => {
         const loginUrl = new URL(pathnames['/login'], request.url);
         const response = NextResponse.redirect(loginUrl);
-        
-        const isProd = process.env.NODE_ENV === 'production';
-        const appUrl = process.env.APP_URL?.replace(/\/$/, '');
-        const cookieDomain = isProd && appUrl ? new URL(appUrl).hostname : undefined;
-
         response.cookies.set('auth_session', '', { expires: new Date(0), path: '/', domain: cookieDomain });
         response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/', domain: cookieDomain });
         return response;
@@ -87,7 +90,11 @@ export async function middleware(request: NextRequest) {
         }
     }
 
-    // --- 2. Apply Routing Rules ---
+    // --- 2. Pass to i18n Middleware FIRST ---
+    // This ensures the correct locale is applied before we make decisions based on the path.
+    const i18nResponse = i18nMiddleware(request);
+
+    // --- 3. Apply Routing Rules ---
     const isPublicPage = publicPathnameRegex.test(request.nextUrl.pathname);
 
     if (sessionIsValid) {
@@ -95,14 +102,10 @@ export async function middleware(request: NextRequest) {
             // Logged-in user on a public page (like /login), redirect to dashboard
             const dashboardResponse = NextResponse.redirect(new URL(pathnames['/'], request.url));
              if (newSessionCookieValue) {
-                const isProd = process.env.NODE_ENV === 'production';
-                const appUrl = process.env.APP_URL?.replace(/\/$/, '');
-                const cookieDomain = isProd && appUrl ? new URL(appUrl).hostname : undefined;
                 const newSession = JSON.parse(newSessionCookieValue);
                 const maxAge = newSession.expires_in && typeof newSession.expires_in === 'number' 
                     ? newSession.expires_in 
                     : 3600;
-                
                 dashboardResponse.cookies.set('auth_session', newSessionCookieValue, {
                     httpOnly: true, secure: isProd, maxAge: maxAge, path: '/', sameSite: isProd ? 'none' : 'lax', domain: cookieDomain,
                 });
@@ -115,22 +118,15 @@ export async function middleware(request: NextRequest) {
             return redirectToLogin();
         }
     }
-
-    // --- 3. Pass to i18n Middleware ---
-    const response = i18nMiddleware(request);
-
+    
     // --- 4. Attach New Cookie if Refreshed ---
     if (newSessionCookieValue) {
-        const isProd = process.env.NODE_ENV === 'production';
-        const appUrl = process.env.APP_URL?.replace(/\/$/, '');
-        const cookieDomain = isProd && appUrl ? new URL(appUrl).hostname : undefined;
-        
         const newSession = JSON.parse(newSessionCookieValue);
         const maxAge = newSession.expires_in && typeof newSession.expires_in === 'number' 
             ? newSession.expires_in 
             : 3600;
         
-        response.cookies.set('auth_session', newSessionCookieValue, {
+        i18nResponse.cookies.set('auth_session', newSessionCookieValue, {
             httpOnly: true,
             secure: isProd,
             maxAge: maxAge,
@@ -140,7 +136,7 @@ export async function middleware(request: NextRequest) {
         });
     }
     
-    return response;
+    return i18nResponse;
 }
 
 export const config = {

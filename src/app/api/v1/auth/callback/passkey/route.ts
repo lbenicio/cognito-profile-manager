@@ -16,7 +16,12 @@ function createErrorResponse(origin: string, error: string, description?: string
   
   const isProd = process.env.NODE_ENV === 'production';
   const appUrl = process.env.APP_URL?.replace(/\/$/, '');
-  const cookieDomain = isProd && appUrl ? new URL(appUrl).hostname : undefined;
+  
+  let cookieDomain: string | undefined;
+  if (isProd && appUrl) {
+      const hostname = new URL(appUrl).hostname;
+      cookieDomain = hostname.startsWith('www.') ? hostname.substring(4) : hostname;
+  }
 
   response.cookies.set('oauth_state', '', { 
     expires: new Date(0), 
@@ -52,7 +57,7 @@ export async function GET(request: NextRequest) {
     
     const appUrl = process.env.APP_URL?.replace(/\/$/, '');
     if (!appUrl) {
-      throw new Error('Missing APP_URL env var');
+      throw new Error('Missing APP_URL env var.');
     }
     const callbackUrl = `${appUrl}/api/v1/auth/callback/passkey`;
 
@@ -103,8 +108,12 @@ export async function GET(request: NextRequest) {
     const response = NextResponse.redirect(securityUrl);
     
     const isProd = process.env.NODE_ENV === 'production';
-    const appUrlObject = new URL(appUrl);
-    const cookieDomain = isProd ? appUrlObject.hostname : undefined;
+    
+    let cookieDomain: string | undefined;
+    if (isProd && appUrl) {
+        const hostname = new URL(appUrl).hostname;
+        cookieDomain = hostname.startsWith('www.') ? hostname.substring(4) : hostname;
+    }
     
     response.cookies.set('oauth_state', '', { 
       expires: new Date(0), 

@@ -45,7 +45,12 @@ export async function GET(request: NextRequest) {
 
   // On that same response, clear the local session cookies.
   const isProd = process.env.NODE_ENV === 'production';
-  const cookieDomain = isProd && appUrl ? new URL(appUrl).hostname : undefined;
+  
+  let cookieDomain: string | undefined;
+  if (isProd && appUrl) {
+      const hostname = new URL(appUrl).hostname;
+      cookieDomain = hostname.startsWith('www.') ? hostname.substring(4) : hostname;
+  }
 
   response.cookies.set('auth_session', '', { 
       expires: new Date(0), 

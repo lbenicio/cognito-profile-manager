@@ -13,7 +13,12 @@ function createErrorResponse(origin: string, error: string, description?: string
   
   const isProd = process.env.NODE_ENV === 'production';
   const appUrl = process.env.APP_URL?.replace(/\/$/, '');
-  const cookieDomain = isProd && appUrl ? new URL(appUrl).hostname : undefined;
+
+  let cookieDomain: string | undefined;
+  if (isProd && appUrl) {
+      const hostname = new URL(appUrl).hostname;
+      cookieDomain = hostname.startsWith('www.') ? hostname.substring(4) : hostname;
+  }
 
   // Ensure state cookie is always cleared on error
   response.cookies.set('oauth_state', '', { 
@@ -172,8 +177,12 @@ export async function GET(request: NextRequest) {
     const response = NextResponse.redirect(dashboardUrl);
     
     const isProd = process.env.NODE_ENV === 'production';
-    const appUrlObject = new URL(appUrl);
-    const cookieDomain = isProd ? appUrlObject.hostname : undefined;
+    
+    let cookieDomain: string | undefined;
+    if (isProd && appUrl) {
+        const hostname = new URL(appUrl).hostname;
+        cookieDomain = hostname.startsWith('www.') ? hostname.substring(4) : hostname;
+    }
     
     // Use the expires_in from Cognito for maxAge, defaulting to 1 hour.
     const maxAge = tokens.expires_in && typeof tokens.expires_in === 'number'

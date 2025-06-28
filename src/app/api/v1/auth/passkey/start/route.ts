@@ -53,8 +53,12 @@ export async function GET(request: NextRequest) {
     const response = NextResponse.redirect(passkeySetupUrl);
     
     const isProd = process.env.NODE_ENV === 'production';
-    const appUrlObject = new URL(appUrl);
-    const cookieDomain = isProd ? appUrlObject.hostname : undefined;
+    
+    let cookieDomain: string | undefined;
+    if (isProd && appUrl) {
+        const hostname = new URL(appUrl).hostname;
+        cookieDomain = hostname.startsWith('www.') ? hostname.substring(4) : hostname;
+    }
 
     // Set the state cookie for CSRF protection
     response.cookies.set('oauth_state', state, {
