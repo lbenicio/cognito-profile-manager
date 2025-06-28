@@ -33,10 +33,10 @@ function createErrorResponse(origin: string, error: string, description?: string
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
-  const code = searchParams.get('code');
+  const code = searchParams.get('result');
   const errorParam = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
-  const state = searchParams.get('state');
+
   const storedState = request.cookies.get('oauth_state')?.value;
 
   if (errorParam) {

@@ -3,17 +3,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import createI18nMiddleware from 'next-intl/middleware';
 import { pathnames, locales, localePrefix } from '@/navigation';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
-import { refreshAuthTokens } from '@/lib/session-actions';
+import { refreshAuthTokens, type NewSessionData } from '@/lib/session-actions';
 
-// Define public pages
-const publicPages = [
-    pathnames['/login'],
-    pathnames['/terms'],
-    pathnames['/privacy']
-]; 
-const publicPathnameRegex = new RegExp(`^(${publicPages.join('|')})/?$`, 'i');
+const publicPages = ['/login', '/terms', '/privacy'];
+const publicPathnameRegex = new RegExp(`^(/(${locales.join('|')}))?(${publicPages.join('|')})/?$`, 'i');
 
-// Create the i18n middleware instance
 const i18nMiddleware = createI18nMiddleware({
   locales,
   localePrefix,
@@ -21,124 +15,125 @@ const i18nMiddleware = createI18nMiddleware({
   defaultLocale: 'en',
 });
 
-// The main middleware function
-export async function middleware(request: NextRequest) {
-    let sessionIsValid = false;
-    let newSessionCookieValue: string | null = null;
-    const isProd = process.env.NODE_ENV === 'production';
-    const appUrl = process.env.APP_URL?.replace(/\/$/, '');
-    
-    let cookieDomain: string | undefined;
-    if (isProd && appUrl) {
-        const hostname = new URL(appUrl).hostname;
-        cookieDomain = hostname.startsWith('www.') ? hostname.substring(4) : hostname;
+// Helper function to check and refresh the session
+async function checkAndRefreshSession(request: NextRequest): Promise<{ isValid: boolean, newCookie?: { name: string, value: string, options: any } }> {
+    const sessionCookie = request.cookies.get('auth_session');
+    if (!sessionCookie) return { isValid: false };
+
+    let session;
+    try {
+        session = JSON.parse(sessionCookie.value);
+    } catch {
+        return { isValid: false }; // Invalid cookie format
     }
 
-    // Helper to create a redirect response to the login page, clearing cookies.
-    const redirectToLogin = (): NextResponse => {
-        const loginUrl = new URL(pathnames['/login'], request.url);
-        const response = NextResponse.redirect(loginUrl);
-        response.cookies.set('auth_session', '', { expires: new Date(0), path: '/', domain: cookieDomain });
-        response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/', domain: cookieDomain });
-        return response;
-    };
+    if (session.username && !session.id_token && process.env.NODE_ENV === 'development') {
+        return { isValid: true }; // Dev mode mock session
+    }
+
+    if (!session.id_token || !session.refresh_token) {
+        return { isValid: false };
+    }
+
+    const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
+    if (!wellknownUrl) {
+        console.error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
+        return { isValid: false };
+    }
     
-    // --- 1. Determine Session Validity ---
-    const sessionCookie = request.cookies.get('auth_session');
-    if (sessionCookie) {
-        let session;
-        try {
-            session = JSON.parse(sessionCookie.value);
-        } catch {
-            // Invalid cookie format, treat as no session
-        }
+    try {
+        const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
+        if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
+        const wellknown = await wellknownResponse.json();
+        const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
+        
+        await jwtVerify(session.id_token, JWKS, {
+            issuer: wellknown.issuer,
+            audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
+        });
+        
+        return { isValid: true }; // Token is valid
 
-        if (session) {
-            // Handle dev mode mock session
-            if (session.username && !session.id_token) {
-                 sessionIsValid = true;
-            } 
-            // Handle real OIDC session
-            else if (session.id_token && session.refresh_token) {
-                 const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
-                 if (wellknownUrl) {
-                    try {
-                        const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
-                        if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration');
-                        const wellknown = await wellknownResponse.json();
-                        const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
-                        
-                        await jwtVerify(session.id_token, JWKS, {
-                            issuer: wellknown.issuer,
-                            audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
-                        });
-                        sessionIsValid = true;
+    } catch (error: any) {
+        if (error.code === 'ERR_JWT_EXPIRED') {
+            const newSessionData = await refreshAuthTokens(session.refresh_token);
+            if (newSessionData) {
+                const isProd = process.env.NODE_ENV === 'production';
+                const appUrl = process.env.APP_URL?.replace(/\/$/, '');
+                let cookieDomain: string | undefined;
+                if (isProd && appUrl) {
+                    const hostname = new URL(appUrl).hostname;
+                    cookieDomain = hostname.startsWith('www.') ? hostname.substring(4) : hostname;
+                }
+                
+                const maxAge = newSessionData.expires_in ?? 3600;
 
-                    } catch (error: any) {
-                        if (error.code === 'ERR_JWT_EXPIRED') {
-                            const refreshedSession = await refreshAuthTokens(session.refresh_token);
-                            if (refreshedSession) {
-                                newSessionCookieValue = JSON.stringify(refreshedSession);
-                                sessionIsValid = true; // Session is now valid for this request
-                            }
-                        } else {
-                            console.error("Middleware JWT validation error:", error.message);
+                return {
+                    isValid: true,
+                    newCookie: {
+                        name: 'auth_session',
+                        value: JSON.stringify(newSessionData),
+                        options: {
+                            httpOnly: true,
+                            secure: isProd,
+                            maxAge: maxAge,
+                            path: '/',
+                            sameSite: isProd ? 'none' : 'lax',
+                            domain: cookieDomain,
                         }
                     }
-                 }
+                };
             }
+        } else {
+            console.error("Middleware JWT validation error:", error.message);
         }
+        
+        return { isValid: false }; // Refresh failed or other JWT error
     }
+}
 
-    // --- 2. Pass to i18n Middleware FIRST ---
-    // This ensures the correct locale is applied before we make decisions based on the path.
-    const i18nResponse = i18nMiddleware(request);
+// The main middleware function
+export async function middleware(request: NextRequest) {
+    const { isValid, newCookie } = await checkAndRefreshSession(request);
+    
+    const pathname = request.nextUrl.pathname;
+    const isPublicPage = publicPathnameRegex.test(pathname);
 
-    // --- 3. Apply Routing Rules ---
-    const isPublicPage = publicPathnameRegex.test(request.nextUrl.pathname);
-
-    if (sessionIsValid) {
+    // First, handle authentication logic and potential redirects
+    if (isValid) {
         if (isPublicPage) {
             // Logged-in user on a public page (like /login), redirect to dashboard
-            const dashboardResponse = NextResponse.redirect(new URL(pathnames['/'], request.url));
-             if (newSessionCookieValue) {
-                const newSession = JSON.parse(newSessionCookieValue);
-                const maxAge = newSession.expires_in && typeof newSession.expires_in === 'number' 
-                    ? newSession.expires_in 
-                    : 3600;
-                dashboardResponse.cookies.set('auth_session', newSessionCookieValue, {
-                    httpOnly: true, secure: isProd, maxAge: maxAge, path: '/', sameSite: isProd ? 'none' : 'lax', domain: cookieDomain,
-                });
+            const dashboardUrl = new URL(pathnames['/'], request.url);
+            const response = NextResponse.redirect(dashboardUrl);
+            if (newCookie) {
+                response.cookies.set(newCookie.name, newCookie.value, newCookie.options);
             }
-            return dashboardResponse;
+            return response;
         }
     } else {
         if (!isPublicPage) {
             // Not logged-in and on a protected page, redirect to login
-            return redirectToLogin();
+            const loginUrl = new URL(pathnames['/login'], request.url);
+            const response = NextResponse.redirect(loginUrl);
+            // Clear any potentially invalid cookies on the way out
+            response.cookies.set('auth_session', '', { expires: new Date(0), path: '/' });
+            return response;
         }
     }
-    
-    // --- 4. Attach New Cookie if Refreshed ---
-    if (newSessionCookieValue) {
-        const newSession = JSON.parse(newSessionCookieValue);
-        const maxAge = newSession.expires_in && typeof newSession.expires_in === 'number' 
-            ? newSession.expires_in 
-            : 3600;
-        
-        i18nResponse.cookies.set('auth_session', newSessionCookieValue, {
-            httpOnly: true,
-            secure: isProd,
-            maxAge: maxAge,
-            path: '/',
-            sameSite: isProd ? 'none' : 'lax',
-            domain: cookieDomain,
-        });
+
+    // If no auth redirect is needed, proceed with i18n
+    const i18nResponse = i18nMiddleware(request);
+
+    // Attach new cookie if a refresh happened
+    if (newCookie) {
+        i18nResponse.cookies.set(newCookie.name, newCookie.value, newCookie.options);
     }
-    
+
     return i18nResponse;
 }
 
 export const config = {
+  // Skip all paths that should not be internationalized. This example skips the
+  // folders "api", "_next" and all files with an extension (e.g. favicon.ico)
   matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
 };
