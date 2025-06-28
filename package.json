@@ -5,8 +5,8 @@
   "license": "GPL-3.0-only",
   "description": "Outpost is a platform for managing user profiles and authentication.",
   "scripts": {
-    "dev": "next dev --turbopack --port 3000",
-    "start:dev": "next dev --turbopack --port 3000",
+    "dev": "next dev --port 3000",
+    "start:dev": "next dev --port 3000",
     "build:pkg": "next build",
     "fmt:lint": "next lint --fix",
     "fmt:pretty": "prettier --write --ignore-path .gitignore .",
