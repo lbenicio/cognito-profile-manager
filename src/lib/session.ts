@@ -37,7 +37,7 @@ export async function createSession(sessionData: any, expiresInSeconds: number) 
   const sessionId = crypto.randomUUID();
   const key = `${sessionPrefix}${sessionId}`;
 
-  await redis.set(key, JSON.stringify(sessionData), { EX: expiresInSeconds });
+  await redis.set(key, sessionData, { ex: expiresInSeconds });
 
   const encryptedSessionId = await encrypt({ sessionId });
   
@@ -55,7 +55,7 @@ export async function createSession(sessionData: any, expiresInSeconds: number) 
 
 export async function updateSession(sessionId: string, sessionData: any, expiresInSeconds: number) {
     const key = `${sessionPrefix}${sessionId}`;
-    await redis.set(key, JSON.stringify(sessionData), { EX: expiresInSeconds });
+    await redis.set(key, sessionData, { ex: expiresInSeconds });
 }
 
 export async function deleteSession() {
@@ -81,18 +81,11 @@ export const getSession = cache(async () => {
     return null;
   }
 
-  const sessionData = await redis.get(`${sessionPrefix}${payload.sessionId}`);
-  if (!sessionData) {
+  const session = await redis.get<any>(`${sessionPrefix}${payload.sessionId}`);
+  if (!session) {
     await deleteSession(); // Clean up the invalid cookie
     return null;
   }
-
-  try {
-    const session = JSON.parse(sessionData);
-    return { ...session, sessionId: payload.sessionId };
-  } catch (error) {
-    console.error("Error parsing session data from Redis:", error);
-    await deleteSession();
-    return null;
-  }
+  
+  return { ...session, sessionId: payload.sessionId };
 });
