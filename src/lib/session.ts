@@ -37,7 +37,7 @@ export async function createSession(sessionData: any, expiresInSeconds: number) 
   const sessionId = crypto.randomUUID();
   const key = `${sessionPrefix}${sessionId}`;
 
-  await redis.set(key, JSON.stringify(sessionData), 'EX', expiresInSeconds);
+  await redis.set(key, JSON.stringify(sessionData), { EX: expiresInSeconds });
 
   const encryptedSessionId = await encrypt({ sessionId });
   
@@ -55,7 +55,7 @@ export async function createSession(sessionData: any, expiresInSeconds: number) 
 
 export async function updateSession(sessionId: string, sessionData: any, expiresInSeconds: number) {
     const key = `${sessionPrefix}${sessionId}`;
-    await redis.set(key, JSON.stringify(sessionData), 'EX', expiresInSeconds);
+    await redis.set(key, JSON.stringify(sessionData), { EX: expiresInSeconds });
 }
 
 export async function deleteSession() {

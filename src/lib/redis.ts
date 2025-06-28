@@ -1,18 +1,22 @@
 import 'server-only';
-import Redis from 'ioredis';
+import { createClient } from 'redis';
 
 if (!process.env.REDIS_URL) {
   throw new Error('REDIS_URL is not set in environment variables');
 }
 
 // Create a new Redis client instance.
-const redis = new Redis(process.env.REDIS_URL, {
-    // Adding a maxRetriesPerRequest of null is important to prevent ioredis
-    // from infinitely retrying a command and hanging the server response.
-    maxRetriesPerRequest: null,
+const redisClient = createClient({
+    url: process.env.REDIS_URL
 });
 
-redis.on('error', (err) => console.error('Redis Client Error', err));
+redisClient.on('error', (err) => console.error('Redis Client Error', err));
+
+// The client automatically queues commands until the connection is established.
+// We initiate the connection here and log any potential connection errors.
+if (!redisClient.isOpen) {
+    redisClient.connect().catch(console.error);
+}
 
 // Export the client for use in other parts of the application.
-export { redis };
+export const redis = redisClient;
