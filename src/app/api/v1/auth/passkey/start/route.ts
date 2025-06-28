@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     // 2. Get Cognito configuration
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
-    const appUrl = process.env.APP_URL;
+    const appUrl = process.env.APP_URL?.replace(/\/$/, '');
     const scope = 'openid email profile aws.cognito.signin.user.admin';
 
     if (!wellknownUrl || !clientId) {

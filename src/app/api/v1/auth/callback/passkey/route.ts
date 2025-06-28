@@ -15,7 +15,7 @@ function createErrorResponse(origin: string, error: string, description?: string
   const response = NextResponse.redirect(securityUrl);
   
   const isProd = process.env.NODE_ENV === 'production';
-  const appUrl = process.env.APP_URL;
+  const appUrl = process.env.APP_URL?.replace(/\/$/, '');
   const cookieDomain = isProd && appUrl ? new URL(appUrl).hostname : undefined;
 
   response.cookies.set('oauth_state', '', { 
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     if (!wellknownUrl) throw new Error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
     
-    const appUrl = process.env.APP_URL;
+    const appUrl = process.env.APP_URL?.replace(/\/$/, '');
     if (!appUrl) {
       throw new Error('Missing APP_URL env var');
     }
