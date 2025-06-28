@@ -2,11 +2,11 @@ name: Telegram notification
 on:
   workflow_run:
     workflows:
-      - Build new image and push to registry
-      - Release new version
+      - Publish Docker image to GHCR
+      - Release on master
       - Auto merge dependabot PRs
     branches:
-      - main
+      - master
     types:
       - completed
   workflow_dispatch:
