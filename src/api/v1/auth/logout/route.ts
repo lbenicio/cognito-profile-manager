@@ -2,11 +2,45 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
-  // Clear local cookies first, regardless of what happens next.
-  const response = NextResponse.next(); // Start with a response object to modify
-
-  const isProd = process.env.NODE_ENV === 'production';
+  // This route handles logging the user out from both the application and the OIDC provider.
   const appUrl = process.env.APP_URL?.replace(/\/$/, '');
+  const loginUrl = new URL('/login', request.url);
+
+  // 1. Build the full OIDC logout URL
+  let cognitoLogoutUrl = loginUrl.toString(); // Default fallback
+  try {
+    const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
+    const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
+
+    if (!wellknownUrl || !clientId || !appUrl) {
+      throw new Error('Logout configuration is missing in environment variables.');
+    }
+
+    const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
+    if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration.');
+    
+    const wellknown = await wellknownResponse.json();
+    const logoutEndpoint = wellknown.logout_endpoint || wellknown.end_session_endpoint;
+
+    if (!logoutEndpoint) {
+      throw new Error('Logout endpoint not found in OpenID configuration.');
+    }
+    
+    const url = new URL(logoutEndpoint);
+    url.searchParams.set('client_id', clientId);
+    url.searchParams.set('logout_uri', `${appUrl}/login`);
+    url.searchParams.set('response_type', 'code'); // Recommended for some OIDC providers
+    cognitoLogoutUrl = url.toString();
+
+  } catch (error) {
+    console.error('OIDC logout URL construction failed, will redirect to local login page.', error);
+  }
+
+  // 2. Create the redirect response to the OIDC provider's logout URL
+  const response = NextResponse.redirect(cognitoLogoutUrl);
+
+  // 3. Clear all session-related cookies on the response
+  const isProd = process.env.NODE_ENV === 'production';
   let cookieDomain: string | undefined;
   if (isProd && appUrl) {
       const hostname = new URL(appUrl).hostname;
@@ -24,41 +58,6 @@ export async function GET(request: NextRequest) {
       domain: cookieDomain
   });
 
-  // Now, try to perform a full OIDC logout by redirecting the user.
-  try {
-    const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
-    const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
-
-    if (!wellknownUrl || !clientId || !appUrl) {
-      throw new Error('Logout configuration is missing.');
-    }
-
-    const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
-    if (!wellknownResponse.ok) throw new Error('Failed to fetch OpenID configuration.');
-    
-    const wellknown = await wellknownResponse.json();
-    const logoutEndpoint = wellknown.logout_endpoint || wellknown.end_session_endpoint;
-
-    if (!logoutEndpoint) {
-      throw new Error('Logout endpoint not found in OpenID configuration.');
-    }
-    
-    const logoutUrl = new URL(logoutEndpoint);
-    logoutUrl.searchParams.set('client_id', clientId);
-    logoutUrl.searchParams.set('logout_uri', `${appUrl}/login`);
-
-    // Redirect the user's browser to the Cognito logout page
-    return NextResponse.redirect(logoutUrl.toString(), {
-      headers: response.headers, // Carry over the cookie-clearing headers
-    });
-
-  } catch (error) {
-    console.error('OIDC logout failed:', error);
-    // If the OIDC logout fails, we still want to redirect to the login page
-    // with the local session cleared.
-    const loginUrl = new URL('/login', request.url);
-    return NextResponse.redirect(loginUrl, {
-        headers: response.headers, // Carry over the cookie-clearing headers
-    });
-  }
+  // 4. Return the response that redirects the user and clears cookies
+  return response;
 }

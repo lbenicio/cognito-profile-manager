@@ -198,15 +198,9 @@ export async function GET(request: NextRequest) {
       sameSite: isProd ? 'none' : 'lax',
       domain: cookieDomain,
     });
-
-    const addHours = function(h: number) {
-      const date = new Date();
-      date.setTime(date.getTime() + (h*60*60*1000));
-      return date;
-    }
     
     response.cookies.set('oauth_state', '', { 
-        expires: addHours(maxAge), 
+        expires: new Date(0), 
         path: '/',
         domain: cookieDomain,
     });
