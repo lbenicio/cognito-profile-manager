@@ -1,11 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
-
-interface TermsOfServicePageProps {
-  params: {
-    locale: string;
-  };
-}
+import type { TermsOfServicePageProps } from '@/interfaces/app/page-props.interfaces';
 
 export default async function TermsOfServicePage({
   params,

@@ -1,3 +1,4 @@
+import type { AccountPageProps } from '@/interfaces/app/page-props.interfaces';
 import type { User } from '@/types/user/user.types';
 import { getUser } from '@/lib/auth';
 import { AccountView } from '@/components/account-view';
@@ -5,12 +6,6 @@ import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { localLogout } from '@/lib/auth-actions';
-
-interface AccountPageProps {
-  params: {
-    locale: string;
-  };
-}
 
 export default async function AccountPage({
   params,

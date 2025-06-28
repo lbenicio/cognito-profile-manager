@@ -1,4 +1,5 @@
 import type { User } from '@/types/user/user.types';
+import type { ContactPageProps } from '@/interfaces/app/page-props.interfaces';
 import type { ContactFormTranslations } from '@/interfaces/components/contact-form.interfaces';
 import { getUser } from '@/lib/auth';
 import { ContactForm } from '@/components/contact-form';
@@ -6,12 +7,6 @@ import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { localLogout } from '@/lib/auth-actions';
-
-interface ContactPageProps {
-  params: {
-    locale: string;
-  };
-}
 
 export default async function ContactPage({
   params,

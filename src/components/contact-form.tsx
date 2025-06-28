@@ -5,7 +5,6 @@ import type { ContactFormValues } from '@/types/forms/contact-form.types';
 import React, { useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useTranslations } from 'next-intl';
 import { Loader2, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -47,7 +46,7 @@ export function ContactForm({
     mode: 'onChange',
   });
 
-  const categories = useMemo(
+  const categories: { value: string; label: string }[] = useMemo(
     () => [
       { value: 'general', label: translations.categories.general },
       { value: 'billing', label: translations.categories.billing },

@@ -1,4 +1,5 @@
 import type { User } from '@/types/user/user.types';
+import type { SecurityPageProps } from '@/interfaces/app/page-props.interfaces';
 import { getUser } from '@/lib/auth';
 import { SecurityView } from '@/components/security-view';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
@@ -6,12 +7,6 @@ import { syncPasskeysEnabledFlag } from '@/lib/passkey-actions';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { localLogout } from '@/lib/auth-actions';
-
-interface SecurityPageProps {
-  params: {
-    locale: string;
-  };
-}
 
 export default async function SecurityPage({
   params,

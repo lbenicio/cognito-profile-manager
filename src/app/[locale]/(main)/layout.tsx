@@ -1,14 +1,11 @@
 import type { User } from '@/types/user/user.types';
+import type { MainAppLayoutProps } from '@/interfaces/app/page-props.interfaces';
 import type { HeaderTranslations } from '@/interfaces/components/header.interfaces';
 import { getTranslations } from 'next-intl/server';
 import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { getUser } from '@/lib/auth';
-
-interface MainAppLayoutProps {
-  children: React.ReactNode;
-}
 
 export default async function MainAppLayout({
   children,

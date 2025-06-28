@@ -1,8 +1,8 @@
+import type { Session } from '@/interfaces/lib/session.interfaces';
+
 /**
  * User-related types for the application.
  */
-
-import type { JWTPayload } from 'jose';
 
 /**
  * User Preferences
@@ -101,13 +101,6 @@ export type User = {
 };
 
 /**
- * Session type for authentication/session management
+ * Re-exporting the Session type for use in other parts of the application.
  */
-export type Session = {
-  accessToken: string;
-  refreshToken: string;
-  claims: JWTPayload;
-  isMock?: boolean;
-  username?: string;
-  sessionId: string;
-} | null;
+export type { Session };

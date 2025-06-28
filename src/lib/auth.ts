@@ -1,4 +1,3 @@
-
 import 'server-only';
 import { cache } from 'react';
 import {
@@ -75,7 +74,7 @@ export const getUser = cache(async (): Promise<User | null> => {
     });
     const cognitoUser = await cognitoClient.send(getUserCommand);
 
-    const attributes =
+    const attributes: Record<string, string> =
       cognitoUser.UserAttributes?.reduce(
         (acc, attr) => {
           if (attr.Name && attr.Value) {
@@ -87,14 +86,15 @@ export const getUser = cache(async (): Promise<User | null> => {
       ) || {};
 
     const { claims } = session;
-    const adminGroupName = process.env.COGNITO_ADMIN_GROUP_NAME || 'admins';
-    const groupsClaimKey =
+    const adminGroupName: string =
+      process.env.COGNITO_ADMIN_GROUP_NAME || 'admins';
+    const groupsClaimKey: string =
       process.env.COGNITO_GROUPS_CLAIM_KEY || 'cognito:groups';
-    const groups = (claims[groupsClaimKey] as string[]) || [];
-    const isAdmin = groups.includes(adminGroupName);
+    const groups: string[] = (claims[groupsClaimKey] as string[]) || [];
+    const isAdmin: boolean = groups.includes(adminGroupName);
 
-    const freshGivenName = attributes.given_name || '';
-    const freshFamilyName = attributes.family_name || '';
+    const freshGivenName: string = attributes.given_name || '';
+    const freshFamilyName: string = attributes.family_name || '';
 
     let preferences: UserPreferences = { ...defaultPreferences };
     if (attributes['custom:session']) {
@@ -168,7 +168,7 @@ export const getUser = cache(async (): Promise<User | null> => {
         .map((credential) => {
           if (!credential.CredentialId) return null;
 
-          const name = `Passkey on ${credential.FriendlyCredentialName ? credential.FriendlyCredentialName : 'Unknown Device'}`;
+          const name: string = `Passkey on ${credential.FriendlyCredentialName ? credential.FriendlyCredentialName : 'Unknown Device'}`;
 
           return {
             key: credential.CredentialId,
@@ -223,8 +223,6 @@ export const getUser = cache(async (): Promise<User | null> => {
       'General error in getUser, likely during device list or user attribute fetch:',
       error
     );
-    // Do not delete session here. A temporary Cognito error shouldn't log out the user.
-    // The session will be invalid for this request, and they can retry.
     return null;
   }
 });

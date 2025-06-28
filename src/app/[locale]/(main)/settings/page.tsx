@@ -1,4 +1,5 @@
 import type { User } from '@/types/user/user.types';
+import type { SettingsPageProps } from '@/interfaces/app/page-props.interfaces';
 import { AppearanceSettings } from '@/components/appearance-settings';
 import { NotificationSettings } from '@/components/notification-settings';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
@@ -6,12 +7,6 @@ import { getUser } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { localLogout } from '@/lib/auth-actions';
-
-interface SettingsPageProps {
-  params: {
-    locale: string;
-  };
-}
 
 export default async function SettingsPage({
   params,

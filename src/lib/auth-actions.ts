@@ -4,11 +4,11 @@ import { redirect } from 'next/navigation';
 import { createMockSession, deleteSession } from '@/lib/session';
 import { mockAdminUser } from '@/lib/mock-data';
 
-export async function ssoLogin() {
+export async function ssoLogin(): Promise<void> {
   redirect('/api/v1/auth/sso/start');
 }
 
-export async function devAdminLogin() {
+export async function devAdminLogin(): Promise<void> {
   if (process.env.NODE_ENV !== 'development') {
     throw new Error('This action is only available in development.');
   }
@@ -22,11 +22,9 @@ export async function devAdminLogin() {
       sub: mockAdminUser.sub,
       email: mockAdminUser.email,
       name: mockAdminUser.name,
-      // Mock claims need expiry for middleware to work
       exp: now + expiresIn,
       auth_time: now,
     },
-    // Mock refresh token for consistency if middleware needs it
     refreshToken: 'mock-refresh-token',
   };
 
@@ -34,7 +32,7 @@ export async function devAdminLogin() {
   redirect('/');
 }
 
-export async function localLogout() {
+export async function localLogout(): Promise<void> {
   await deleteSession();
   redirect('/login');
 }

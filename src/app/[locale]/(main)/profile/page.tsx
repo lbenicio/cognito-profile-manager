@@ -1,16 +1,11 @@
 import type { User } from '@/types/user/user.types';
+import type { ProfilePageProps } from '@/interfaces/app/page-props.interfaces';
 import { getUser } from '@/lib/auth';
 import { ProfileView } from '@/components/profile-view';
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { localLogout } from '@/lib/auth-actions';
-
-interface ProfilePageProps {
-  params: {
-    locale: string;
-  };
-}
 
 export default async function ProfilePage({
   params,
