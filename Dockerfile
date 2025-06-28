@@ -52,6 +52,10 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.ts ./next.config.ts
 COPY package.json .
 
+# Copy entrypoint script for runtime env injection
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Change ownership of the application files to the non-root user
 RUN chown -R nextjs:nodejs .
 
@@ -64,4 +68,5 @@ EXPOSE 3000
 # The command to start the Next.js production server.
 # It uses the `next start` command, which is the standard way to run a
 # Next.js app built without the standalone output.
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["npm", "start", "--", "-p", "3000"]
