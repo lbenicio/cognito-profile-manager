@@ -1,9 +1,11 @@
+
 'use server';
 
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'crypto';
-import { getUser, getSession } from '@/lib/auth';
+import { getUser } from '@/lib/auth';
+import { getSession } from '@/lib/session';
 import { r2 } from '@/lib/r2';
 import { revalidatePath } from 'next/cache';
 import { cognitoClient, UpdateUserAttributesCommand } from './cognito';

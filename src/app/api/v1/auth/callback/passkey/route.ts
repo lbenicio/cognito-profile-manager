@@ -1,10 +1,11 @@
+
 'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import { pathnames } from '@/navigation';
 import { cognitoClient, UpdateUserAttributesCommand } from '@/lib/cognito';
-import { getSession } from '@/lib/auth';
+import { getSession } from '@/lib/session';
 
 function createErrorResponse(
   origin: string,

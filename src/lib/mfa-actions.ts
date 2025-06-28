@@ -1,3 +1,4 @@
+
 'use server';
 
 import { authenticator } from 'otplib';
@@ -10,7 +11,8 @@ import {
   SetUserMFAPreferenceCommand,
   UpdateUserAttributesCommand,
 } from './cognito';
-import { getUser, getSession } from './auth';
+import { getUser } from './auth';
+import { getSession } from './session';
 
 export async function generateMfaSetup() {
   const user = await getUser();

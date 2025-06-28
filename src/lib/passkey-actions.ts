@@ -1,3 +1,4 @@
+
 'use server';
 
 import { revalidatePath } from 'next/cache';
@@ -7,7 +8,7 @@ import {
   ListWebAuthnCredentialsCommand,
   UpdateUserAttributesCommand,
 } from './cognito';
-import { getSession } from './auth';
+import { getSession } from './session';
 
 export async function deletePasskey(
   credentialId: string

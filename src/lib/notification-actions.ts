@@ -1,8 +1,10 @@
+
 'use server';
 
 import { revalidatePath } from 'next/cache';
 import { cognitoClient, UpdateUserAttributesCommand } from './cognito';
-import { getSession, type NotificationPreferences } from './auth';
+import { getSession } from './session';
+import type { NotificationPreferences } from './auth';
 
 export async function updateNotificationPreferences(
   newPreferences: NotificationPreferences

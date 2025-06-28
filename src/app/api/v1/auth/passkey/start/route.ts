@@ -1,7 +1,8 @@
+
 'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
+import { getSession } from '@/lib/session';
 import { pathnames } from '@/navigation';
 
 export async function GET(request: NextRequest) {

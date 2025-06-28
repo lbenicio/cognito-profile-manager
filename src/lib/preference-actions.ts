@@ -1,9 +1,11 @@
+
 'use server';
 
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { cognitoClient, UpdateUserAttributesCommand } from './cognito';
-import { getSession, getUser, type UserPreferences } from './auth';
+import { getUser, type UserPreferences } from './auth';
+import { getSession } from './session';
 import { locales } from '@/navigation';
 
 export async function updateUserPreferences(

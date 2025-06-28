@@ -1,3 +1,4 @@
+
 'use server';
 
 import {
@@ -6,7 +7,7 @@ import {
   InvalidPasswordException,
   NotAuthorizedException,
 } from './cognito';
-import { getSession } from './auth';
+import { getSession } from './session';
 
 export async function changePassword(
   currentPassword: string,

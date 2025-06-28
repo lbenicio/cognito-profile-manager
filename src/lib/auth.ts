@@ -8,8 +8,6 @@ import {
 } from '@/lib/cognito';
 import { getSession } from '@/lib/session';
 
-export { getSession } from '@/lib/session';
-
 export type UserPreferences = {
   theme: 'light' | 'dark' | 'system';
   language: 'en' | 'es';

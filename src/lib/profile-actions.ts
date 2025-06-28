@@ -1,8 +1,9 @@
+
 'use server';
 
 import { revalidatePath } from 'next/cache';
 import { cognitoClient, UpdateUserAttributesCommand } from './cognito';
-import { getSession } from './auth';
+import { getSession } from './session';
 
 type UserProfileAttributes = {
   given_name: string;
