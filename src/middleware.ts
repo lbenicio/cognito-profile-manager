@@ -50,6 +50,7 @@ async function checkAndRefreshSession(request: NextRequest): Promise<{ isValid: 
         await jwtVerify(session.id_token, JWKS, {
             issuer: wellknown.issuer,
             audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
+            clockTolerance: '10 seconds', // Add tolerance for clock skew
         });
         
         return { isValid: true }; // Token is valid
@@ -95,41 +96,31 @@ async function checkAndRefreshSession(request: NextRequest): Promise<{ isValid: 
 // The main middleware function
 export async function middleware(request: NextRequest) {
     const { isValid, newCookie } = await checkAndRefreshSession(request);
-    
-    const pathname = request.nextUrl.pathname;
-    const isPublicPage = publicPathnameRegex.test(pathname);
+    const isPublicPage = publicPathnameRegex.test(request.nextUrl.pathname);
 
-    // First, handle authentication logic and potential redirects
-    if (isValid) {
-        if (isPublicPage) {
-            // Logged-in user on a public page (like /login), redirect to dashboard
-            const dashboardUrl = new URL(pathnames['/'], request.url);
-            const response = NextResponse.redirect(dashboardUrl);
-            if (newCookie) {
-                response.cookies.set(newCookie.name, newCookie.value, newCookie.options);
-            }
-            return response;
-        }
+    let response: NextResponse;
+
+    if (isValid && isPublicPage) {
+        // Logged-in user on a public page, redirect to dashboard
+        const dashboardUrl = new URL(pathnames['/'], request.url);
+        response = NextResponse.redirect(dashboardUrl);
+    } else if (!isValid && !isPublicPage) {
+        // Not logged-in on a protected page, redirect to login
+        const loginUrl = new URL(pathnames['/login'], request.url);
+        response = NextResponse.redirect(loginUrl);
+        // Clear any potentially invalid cookies on the way out
+        response.cookies.set('auth_session', '', { expires: new Date(0), path: '/' });
     } else {
-        if (!isPublicPage) {
-            // Not logged-in and on a protected page, redirect to login
-            const loginUrl = new URL(pathnames['/login'], request.url);
-            const response = NextResponse.redirect(loginUrl);
-            // Clear any potentially invalid cookies on the way out
-            response.cookies.set('auth_session', '', { expires: new Date(0), path: '/' });
-            return response;
-        }
+        // No auth redirect needed, proceed with i18n
+        response = i18nMiddleware(request);
     }
-
-    // If no auth redirect is needed, proceed with i18n
-    const i18nResponse = i18nMiddleware(request);
 
     // Attach new cookie if a refresh happened
     if (newCookie) {
-        i18nResponse.cookies.set(newCookie.name, newCookie.value, newCookie.options);
+        response.cookies.set(newCookie.name, newCookie.value, newCookie.options);
     }
 
-    return i18nResponse;
+    return response;
 }
 
 export const config = {
