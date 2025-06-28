@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
         const response = NextResponse.redirect(loginUrl);
         
         const isProd = process.env.NODE_ENV === 'production';
-        const appUrl = process.env.APP_URL;
+        const appUrl = process.env.APP_URL?.replace(/\/$/, '');
         const cookieDomain = isProd && appUrl ? new URL(appUrl).hostname : undefined;
 
         response.cookies.set('auth_session', '', { 
@@ -105,12 +105,12 @@ export async function middleware(request: NextRequest) {
                     return redirectToLogin();
                 }
                 
-                // Refresh succeeded. Redirect to the same URL with the new cookie set.
-                // This ensures the next request has the valid token.
-                const response = NextResponse.redirect(request.url);
+                // Refresh succeeded. Let the request continue to its original destination,
+                // but with the new session cookie set. This prevents a redirect loop.
+                const response = NextResponse.next();
                 
                 const isProd = process.env.NODE_ENV === 'production';
-                const appUrl = process.env.APP_URL;
+                const appUrl = process.env.APP_URL?.replace(/\/$/, '');
                 const cookieDomain = isProd && appUrl ? new URL(appUrl).hostname : undefined;
                 
                 response.cookies.set('auth_session', JSON.stringify(refreshed), {
@@ -122,7 +122,7 @@ export async function middleware(request: NextRequest) {
                     domain: cookieDomain,
                 });
 
-                return response; // Return the redirect response
+                return response; // Return the response to continue the request
             }
         }
     }
