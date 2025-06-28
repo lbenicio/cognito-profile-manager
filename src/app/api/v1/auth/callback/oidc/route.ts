@@ -1,4 +1,6 @@
 
+'use server';
+
 import { NextRequest, NextResponse } from 'next/server';
 
 function createErrorResponse(origin: string, error: string, description?: string): NextResponse {
