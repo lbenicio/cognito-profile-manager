@@ -109,7 +109,18 @@ export async function GET(request: NextRequest) {
           }
       }
       
-      const ip = request.ip ?? request.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'Unknown';
+      // Fetch IP from AWS service for reliability
+      let ip = 'Unknown';
+      try {
+        const ipResponse = await fetch('https://checkip.amazonaws.com/', { cache: 'no-store' });
+        if (ipResponse.ok) {
+          ip = (await ipResponse.text()).trim();
+        } else {
+           console.error(`checkip.amazonaws.com failed with status: ${ipResponse.status}`);
+        }
+      } catch (ipError) {
+        console.error("Could not fetch user IP from checkip.amazonaws.com:", ipError);
+      }
 
       const newFingerprint = {
           date: new Date().toISOString(),
