@@ -32,7 +32,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from './theme-toggle';
 import { LanguageSwitcher } from './language-switcher';
-import type { User as UserType } from '@/lib/auth';
+import type { User as UserType } from '@/types/user/user.types';
 import { Separator } from '@/components/ui/separator';
 import { useTransition } from 'react';
 import { useToast } from '@/hooks/use-toast';

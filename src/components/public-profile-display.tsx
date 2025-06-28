@@ -21,10 +21,10 @@ import {
   Languages,
   Cake,
 } from 'lucide-react';
-import type { User } from '@/lib/auth';
+import type { User } from '@/types/user/user.types';
 import { format, parseISO } from 'date-fns';
 
-interface PublicProfileDisplayProps {
+export interface PublicProfileDisplayProps {
   user: User;
 }
 

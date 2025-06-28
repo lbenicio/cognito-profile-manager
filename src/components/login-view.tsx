@@ -14,7 +14,8 @@ import {
 } from '@/components/ui/card';
 import { Loader2, LogIn } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import type { LoginViewProps } from '@/interfaces/views/login-view.interfaces';
+
+export interface LoginViewProps {}
 
 export function LoginView({}: LoginViewProps) {
   const t = useTranslations('Login');

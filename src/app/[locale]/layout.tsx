@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import '../globals.css';
 import '../fonts.css';
-import { getMessages, unstable_setRequestLocale } from 'next-intl/server';
+import { getMessages, setRequestLocale } from 'next-intl/server';
 import { NextIntlClientProvider } from 'next-intl';
 import { ThemeProvider } from '@/components/theme-provider';
 import { getUser } from '@/lib/auth';
@@ -20,7 +20,7 @@ export default async function LocaleLayout(props: {
 
   const { children } = props;
 
-  unstable_setRequestLocale(params.locale);
+  setRequestLocale(params.locale);
   const messages = await getMessages();
   const user = await getUser();
 
@@ -48,7 +48,7 @@ export default async function LocaleLayout(props: {
           crossOrigin='anonymous'
         />
       </head>
-      <body className='flex min-h-screen flex-col font-body antialiased'>
+      <body className='font-body flex min-h-screen flex-col antialiased'>
         <NextIntlClientProvider locale={params.locale} messages={messages}>
           <ThemeProvider
             attribute='class'

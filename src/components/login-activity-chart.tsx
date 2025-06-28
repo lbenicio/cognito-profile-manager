@@ -14,7 +14,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
-import type { Fingerprint } from '@/lib/auth';
+import type { Fingerprint } from '@/types/user/user.types';
 import { useTranslations } from 'next-intl';
 import { format, subDays, startOfDay } from 'date-fns';
 

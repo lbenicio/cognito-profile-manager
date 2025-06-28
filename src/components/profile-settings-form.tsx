@@ -16,10 +16,10 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Save, Loader2 } from 'lucide-react';
-import type { PublicProfilePreferences } from '@/lib/auth';
+import type { PublicProfilePreferences } from '@/types/user/user.types';
 import { updatePublicProfilePreferences } from '@/lib/profile-settings-actions';
 
-interface ProfileSettingsFormProps {
+export interface ProfileSettingsFormProps {
   initialPreferences: PublicProfilePreferences;
   onUpdateAction: (newPrefs: PublicProfilePreferences) => void;
 }

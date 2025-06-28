@@ -15,7 +15,7 @@ import { Smartphone, Loader2, Copy } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from 'next-intl';
-import type { User } from '@/lib/auth';
+import type { User } from '@/types/user/user.types';
 import {
   generateMfaSetup,
   verifyAndEnableMfa,

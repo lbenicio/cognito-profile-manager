@@ -36,7 +36,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import type { User as UserType } from '@/lib/auth';
+import type { User as UserType } from '@/types/user/user.types';
 import { useTranslations } from 'next-intl';
 import { format } from 'date-fns';
 import UAParser from 'ua-parser-js';

@@ -1,6 +1,6 @@
 import { getUser } from '@/lib/auth';
 import { AccountView } from '@/components/account-view';
-import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { localLogout } from '@/lib/auth-actions';
@@ -9,7 +9,7 @@ export default async function AccountPage(props: {
   params: Promise<{ locale: string }>;
 }) {
   const params = await props.params;
-  unstable_setRequestLocale(params.locale);
+  setRequestLocale(params.locale);
   const user = await getUser();
 
   if (!user) {

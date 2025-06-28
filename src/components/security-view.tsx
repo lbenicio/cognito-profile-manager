@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import type { User as UserType } from '@/lib/auth';
+import type { User as UserType } from '@/types/user/user.types';
 import { PasswordForm } from '@/components/password-form';
 import { TwoFactorAuth } from '@/components/two-factor-auth';
 import { PasskeyManagement } from './passkey-management';

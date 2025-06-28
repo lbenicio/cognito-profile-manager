@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { useTranslations } from 'next-intl';
-import type { User } from '@/lib/auth';
+import type { User } from '@/types/user/user.types';
 import {
   Dialog,
   DialogContent,

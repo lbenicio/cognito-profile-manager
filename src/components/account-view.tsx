@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { AccountDisplay } from '@/components/account-display';
 import { AccountForm } from '@/components/account-form';
-import type { User as UserType } from '@/lib/auth';
+import type { User as UserType } from '@/types/user/user.types';
 import { AddressForm } from './address-form';
 
 interface AccountViewProps {

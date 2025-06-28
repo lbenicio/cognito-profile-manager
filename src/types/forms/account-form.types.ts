@@ -1,8 +1,4 @@
 import * as z from 'zod';
-import type {
-  AccountFormProps,
-  AccountFormValues,
-} from '@/interfaces/forms/account-form.interfaces';
 
 /**
  * Schema for the Account Form using zod.

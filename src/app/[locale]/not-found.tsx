@@ -1,12 +1,18 @@
 import { Link } from '@/navigation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { getLocale, getTranslations, unstable_setRequestLocale } from 'next-intl/server';
-import { FileQuestion } from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { getLocale, getTranslations, setRequestLocale } from 'next-intl/server';
+import { AlertCircle } from 'lucide-react';
 
 export default async function NotFoundPage() {
   const locale = await getLocale();
-  unstable_setRequestLocale(locale);
+  setRequestLocale(locale);
   const t = await getTranslations('Errors.notFound');
 
   return (
@@ -14,7 +20,7 @@ export default async function NotFoundPage() {
       <Card className='mx-4 w-full max-w-md text-center'>
         <CardHeader>
           <div className='mx-auto w-fit rounded-full bg-secondary p-3'>
-            <FileQuestion className='h-10 w-10 text-muted-foreground' />
+            <AlertCircle className='h-10 w-10 text-muted-foreground' />
           </div>
           <CardTitle className='mt-4 text-3xl font-bold'>
             {t('title')}

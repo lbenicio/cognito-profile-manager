@@ -24,7 +24,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Send } from 'lucide-react';
 import React, { useMemo } from 'react';
-import type { User as UserType } from '@/lib/auth';
+import type { User } from '@/types/user/user.types';
 import { Textarea } from './ui/textarea';
 import {
   Select,
@@ -36,16 +36,19 @@ import {
 import { sendContactEmail } from '@/lib/contact-actions';
 import { Label } from './ui/label';
 
-const contactFormSchema = (t: any) =>
+const contactFormSchema = (t: {
+  categoryRequired: string;
+  messageTooShort: string;
+}) =>
   z.object({
     category: z.string().min(1, { message: t.categoryRequired }),
     message: z.string().min(10, { message: t.messageTooShort }),
   });
 
-type ContactFormValues = z.infer<ReturnType<typeof contactFormSchema>>;
+export type ContactFormValues = z.infer<ReturnType<typeof contactFormSchema>>;
 
-interface ContactFormProps {
-  user: UserType;
+export interface ContactFormProps {
+  user: User;
   translations: {
     nameLabel: string;
     emailLabel: string;

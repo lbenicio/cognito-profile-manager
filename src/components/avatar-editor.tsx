@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { UploadCloud, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import type { User as UserType } from '@/lib/auth';
+import type { User as UserType } from '@/types/user/user.types';
 import { getPresignedUploadUrl, updateUserAvatar } from '@/lib/avatar-actions';
 
 interface AvatarEditorProps {

@@ -16,7 +16,10 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Save, Loader2 } from 'lucide-react';
-import type { User as UserType, NotificationPreferences } from '@/lib/auth';
+import type {
+  User as UserType,
+  NotificationPreferences,
+} from '@/types/user/user.types';
 import { updateNotificationPreferences } from '@/lib/notification-actions';
 
 interface NotificationSettingsProps {

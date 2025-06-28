@@ -1,6 +1,6 @@
 import { getUser } from '@/lib/auth';
 import { DashboardView } from '@/components/dashboard-view';
-import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { syncPasskeysEnabledFlag } from '@/lib/passkey-actions';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
@@ -10,7 +10,7 @@ import { localLogout } from '@/lib/auth-actions';
 export default async function DashboardPage(props: {
   params: Promise<{ locale: string }>;
 }) {
-  unstable_setRequestLocale((await props.params).locale);
+  setRequestLocale((await props.params).locale);
   let user = await getUser();
 
   // The middleware should protect this page. If user is null here, it indicates

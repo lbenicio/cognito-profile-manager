@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/card';
 import { Clock, Computer, Globe, Timer } from 'lucide-react';
 import { format, formatDistanceToNowStrict } from 'date-fns';
-import type { User } from '@/lib/auth';
+import type { User } from '@/types/user/user.types';
 import UAParser from 'ua-parser-js';
 
 interface SessionInfoCardProps {

@@ -1,7 +1,10 @@
 'use client';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import type { User as UserType, PublicProfilePreferences } from '@/lib/auth';
+import type {
+  User as UserType,
+  PublicProfilePreferences,
+} from '@/types/user/user.types';
 import { PublicProfileDisplay } from './public-profile-display';
 import { ProfileSettingsForm } from './profile-settings-form';
 

@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { updateUserPreferences } from '@/lib/preference-actions';
-import type { UserPreferences } from '@/lib/auth';
+import type { UserPreferences } from '@/types/user/user.types';
 
 interface LanguageSwitcherProps {
   languageLabel: string;

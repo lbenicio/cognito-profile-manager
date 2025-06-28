@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { UserPreferences } from '@/lib/auth';
+import type { UserPreferences } from '@/types/user/user.types';
 
 interface LanguageSelectProps {
   currentLanguage: UserPreferences['language'];

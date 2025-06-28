@@ -36,8 +36,10 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
-import type { PasskeyManagementProps } from '@/interfaces/props/passkey-management.interfaces';
-import type { User } from '@/types/user/user.types';
+
+export interface PasskeyManagementProps {
+  user: import('@/types/user/user.types').User;
+}
 
 export function PasskeyManagement({ user }: PasskeyManagementProps) {
   const { toast } = useToast();
