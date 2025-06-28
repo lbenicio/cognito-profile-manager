@@ -1,3 +1,4 @@
+
 import 'server-only';
 import { cache } from 'react';
 import { cookies } from 'next/headers';
@@ -48,8 +49,8 @@ export type Fingerprint = {
 export type Device = {
   key: string;
   name: string;
-  createDate?: Date;
-  lastAuthDate?: Date;
+  createDate?: string;
+  lastAuthDate?: string;
 };
 
 export type User = {
@@ -161,8 +162,8 @@ const mockUser: User = {
     {
         key: 'mock_device_1',
         name: 'Chrome on macOS',
-        createDate: new Date(Date.now() - 86400000 * 2),
-        lastAuthDate: new Date(Date.now() - 86400000 * 2),
+        createDate: new Date(Date.now() - 86400000 * 2).toISOString(),
+        lastAuthDate: new Date(Date.now() - 86400000 * 2).toISOString(),
     }
   ],
   sessionStartedAt: nowInSeconds,
@@ -345,8 +346,8 @@ export const getUser = cache(async (): Promise<User | null> => {
             return {
                 key: device.DeviceKey || '',
                 name: name,
-                createDate: device.DeviceCreateDate,
-                lastAuthDate: device.DeviceLastAuthenticatedDate,
+                createDate: device.DeviceCreateDate?.toISOString(),
+                lastAuthDate: device.DeviceLastAuthenticatedDate?.toISOString(),
             };
         }).filter(d => d.key);
     } catch(e: any) {
