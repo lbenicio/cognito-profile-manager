@@ -4,7 +4,8 @@
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { cognitoClient, UpdateUserAttributesCommand } from './cognito';
-import { getUser, type UserPreferences } from './auth';
+import { getUser } from './auth';
+import type { UserPreferences } from '@/types/user/user.types';
 import { getSession } from './session';
 import { locales } from '@/navigation';
 

@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { createMockSession, deleteSession } from '@/lib/session';
-import { mockAdminUser } from '@/lib/auth';
+import { mockAdminUser } from '@/lib/mock-data';
 
 export async function ssoLogin() {
   redirect('/api/v1/auth/sso/start');

@@ -7,93 +7,15 @@ import {
   ListWebAuthnCredentialsCommand,
 } from '@/lib/cognito';
 import { getSession } from '@/lib/session';
-
-export type UserPreferences = {
-  theme: 'light' | 'dark' | 'system';
-  language: 'en' | 'es';
-  fontSize: number;
-};
-
-export type NotificationPreferences = {
-  email: boolean;
-  app: boolean;
-  telegram: boolean;
-  user: boolean;
-  system: boolean;
-  marketing: boolean;
-};
-
-export type PublicProfilePreferences = {
-  isPublic: boolean;
-  publicFields: {
-    picture: boolean;
-    banner: boolean;
-    name: boolean;
-    groups: boolean;
-    email: boolean;
-    website: boolean;
-    aboutMe: boolean;
-    phone_number: boolean;
-    gender: boolean;
-    birthdate: boolean;
-    zoneinfo: boolean;
-    locale: boolean;
-  };
-};
-
-export type Fingerprint = {
-  date: string; // ISO string
-  ip: string;
-  device: string;
-};
-
-export type Device = {
-  key: string;
-  name: string;
-  createDate?: string;
-  lastAuthDate?: string;
-};
-
-export type User = {
-  sub: string;
-  username: string;
-  email: string;
-  email_verified: boolean;
-  name: string;
-  address: string;
-  phone_number: string;
-  phone_number_verified: boolean;
-  birthdate: string;
-  creationDate: string; // ISO string
-  userStatus: string;
-  twoFactorEnabled: boolean;
-  passkeysEnabled: boolean;
-  groups: string[];
-  isAdmin: boolean;
-  picture: string;
-  banner: string;
-  locale: string;
-  zoneinfo: string;
-  website: string;
-  gender: string;
-  aboutMe: string;
-  preferences: UserPreferences;
-  notificationPreferences: NotificationPreferences;
-  publicProfilePreferences: PublicProfilePreferences;
-  fingerprint: Fingerprint[];
-  devices: Device[];
-  sessionStartedAt: number; // Unix timestamp (seconds)
-  sessionExpiresAt: number; // Unix timestamp (seconds)
-};
-
-export type Session = {
-  accessToken: string;
-  refreshToken: string;
-  claims: import('jose').JWTPayload;
-  isMock?: boolean;
-  username?: string;
-  sessionId: string;
-} | null;
+import type {
+  User,
+  UserPreferences,
+  NotificationPreferences,
+  PublicProfilePreferences,
+  Fingerprint,
+  Device,
+} from '@/types/user/user.types';
+import { mockUser, mockAdminUser } from '@/lib/mock-data';
 
 const defaultPreferences: UserPreferences = {
   theme: 'system',
@@ -128,72 +50,6 @@ const defaultPublicProfilePreferences: PublicProfilePreferences = {
   },
 };
 
-const nowInSeconds = Math.floor(Date.now() / 1000);
-
-export const mockUser: User = {
-  sub: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
-  username: 'testuser_dev',
-  email: 'dev@example.com',
-  email_verified: true,
-  name: 'Dev User',
-  address: '123 Dev Lane, Developer City, DS',
-  phone_number: '+10000000000',
-  phone_number_verified: true,
-  birthdate: '1990-01-15',
-  creationDate: new Date().toISOString(),
-  userStatus: 'CONFIRMED',
-  twoFactorEnabled: false,
-  passkeysEnabled: true,
-  groups: ['users', 'beta-testers'],
-  isAdmin: false,
-  picture: `https://placehold.co/128x128.png`,
-  banner: `https://placehold.co/1500x500.png`,
-  locale: 'en-US',
-  zoneinfo: 'America/New_York',
-  website: 'https://example.com',
-  gender: 'Prefer not to say',
-  aboutMe:
-    'This is a mock user bio for the development environment. I enjoy coding and building cool things with Next.js.',
-  preferences: defaultPreferences,
-  notificationPreferences: defaultNotificationPreferences,
-  publicProfilePreferences: defaultPublicProfilePreferences,
-  fingerprint: [
-    {
-      date: new Date().toISOString(),
-      ip: '127.0.0.1',
-      device:
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    },
-    {
-      date: new Date(Date.now() - 86400000).toISOString(),
-      ip: '192.168.1.1',
-      device:
-        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1',
-    },
-  ],
-  devices: [
-    {
-      key: 'mock_device_1',
-      name: 'Passkey on macOS',
-      createDate: new Date(Date.now() - 86400000 * 2).toISOString(),
-      lastAuthDate: new Date(Date.now() - 86400000 * 2).toISOString(),
-    },
-  ],
-  sessionStartedAt: nowInSeconds,
-  sessionExpiresAt: nowInSeconds + 3600, // Expires in 1 hour
-};
-
-export const mockAdminUser: User = {
-  ...mockUser,
-  username: 'adminuser_dev',
-  name: 'Admin User',
-  groups: ['users', process.env.COGNITO_ADMIN_GROUP_NAME || 'admins'],
-  isAdmin: true,
-  twoFactorEnabled: true,
-  passkeysEnabled: true,
-  devices: mockUser.devices,
-};
-
 export const getUser = cache(async (): Promise<User | null> => {
   const session = await getSession();
 
@@ -204,8 +60,8 @@ export const getUser = cache(async (): Promise<User | null> => {
     return {
       ...baseUser,
       username: session.username,
-      sessionStartedAt: session.claims.auth_time as number,
-      sessionExpiresAt: session.claims.exp as number,
+      sessionStartedAt: (session.claims.auth_time as number) || 0,
+      sessionExpiresAt: (session.claims.exp as number) || 0,
     };
   }
 

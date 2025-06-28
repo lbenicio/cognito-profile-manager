@@ -4,7 +4,7 @@
 import { revalidatePath } from 'next/cache';
 import { cognitoClient, UpdateUserAttributesCommand } from './cognito';
 import { getSession } from './session';
-import type { PublicProfilePreferences } from './auth';
+import type { PublicProfilePreferences } from '@/types/user/user.types';
 
 export async function updatePublicProfilePreferences(
   newPreferences: PublicProfilePreferences
