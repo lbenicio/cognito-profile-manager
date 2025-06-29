@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { Link } from '@/navigation';
 import { Button } from '@/components/ui/button';
 import { Logger } from '@/lib/logger';
-import { MarkdownWidget } from './markdown-widget';
 
 const logger = new Logger('DASHBOARD-VIEW');
 import {
@@ -53,6 +52,7 @@ import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 
 interface DashboardViewProps {
   user: UserType;
+  infoWidget: ReactNode;
 }
 
 const formatUserAgent = (uaString: string): string => {
@@ -86,7 +86,7 @@ const formatUserAgent = (uaString: string): string => {
   }
 };
 
-export function DashboardView({ user }: DashboardViewProps) {
+export function DashboardView({ user, infoWidget }: DashboardViewProps) {
   const t = useTranslations('Dashboard');
   const tMessages = useTranslations('Messages');
   const [isMounted, setIsMounted] = useState(false);
@@ -445,12 +445,7 @@ export function DashboardView({ user }: DashboardViewProps) {
       <div className='mt-8'>
         <LoginActivityChart fingerprint={user.fingerprint} />
       </div>
-      <div className='mt-8'>
-        <MarkdownWidget
-          filePath='src/content/dashboard-widget.md'
-          title={t('dashboardInfo.title')}
-        />
-      </div>
+      <div className='mt-8'>{infoWidget}</div>
     </div>
   );
 }

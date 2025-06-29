@@ -5,12 +5,14 @@ import { syncPasskeysEnabledFlag } from '@/lib/passkey-actions';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { localLogout } from '@/lib/auth-actions';
+import { MarkdownWidget } from '@/components/markdown-widget';
 
 // This is now a Server Component
 export default async function DashboardPage(props: {
   params: Promise<{ locale: string }>;
 }) {
   setRequestLocale((await props.params).locale);
+  const tDashboard = await getTranslations('Dashboard');
   let user = await getUser();
 
   // The middleware should protect this page. If user is null here, it indicates
@@ -45,5 +47,15 @@ export default async function DashboardPage(props: {
     user = { ...user, passkeysEnabled: true };
   }
 
-  return <DashboardView user={user} />;
+  return (
+    <DashboardView
+      user={user}
+      infoWidget={
+        <MarkdownWidget
+          filePath='src/content/dashboard-widget.md'
+          title={tDashboard('dashboardInfo.title')}
+        />
+      }
+    />
+  );
 }
