@@ -30,6 +30,8 @@ import {
   Users,
   Mail,
   Palette,
+  Bell,
+  AlertCircle,
 } from 'lucide-react';
 import {
   Table,
@@ -46,6 +48,7 @@ import UAParser from 'ua-parser-js';
 import { Progress } from '@/components/ui/progress';
 import { SessionInfoCard } from './session-info-card';
 import { LoginActivityChart } from './login-activity-chart';
+import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 
 interface DashboardViewProps {
   user: UserType;
@@ -84,6 +87,7 @@ const formatUserAgent = (uaString: string): string => {
 
 export function DashboardView({ user }: DashboardViewProps) {
   const t = useTranslations('Dashboard');
+  const tMessages = useTranslations('Messages');
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -260,6 +264,50 @@ export function DashboardView({ user }: DashboardViewProps) {
         </div>
 
         <div className='space-y-8 lg:col-span-1'>
+          {/* Messages Preview Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className='flex items-center gap-2'>
+                <Bell className='text-primary' />
+                {t('messagesPreview.title')}
+              </CardTitle>
+              <CardDescription>
+                {t('messagesPreview.description')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {user.messages.length > 0 ? (
+                <div className='space-y-3'>
+                  {user.messages.slice(0, 2).map((message, index) => (
+                    <Alert key={index} variant='default'>
+                      <AlertCircle className='h-4 w-4' />
+                      <AlertTitle className='text-xs font-semibold'>
+                        {tMessages('alertTitle')}
+                      </AlertTitle>
+                      <AlertDescription className='text-xs'>
+                        {message}
+                      </AlertDescription>
+                    </Alert>
+                  ))}
+                </div>
+              ) : (
+                <p className='text-sm text-muted-foreground'>
+                  {t('messagesPreview.noMessages')}
+                </p>
+              )}
+            </CardContent>
+            {user.messages.length > 0 && (
+              <CardFooter>
+                <Button asChild className='w-full' variant='secondary'>
+                  <Link href='/messages'>
+                    {t('messagesPreview.viewAllButton')}
+                    <ArrowRight className='ml-2 h-4 w-4' />
+                  </Link>
+                </Button>
+              </CardFooter>
+            )}
+          </Card>
+
           <SessionInfoCard user={user} />
 
           {/* Security Health Card */}

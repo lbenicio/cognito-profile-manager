@@ -103,6 +103,12 @@
       "ipAddress": "Adresse IP",
       "expired": "Expirée"
     },
+    "messagesPreview": {
+      "title": "Messages Récents",
+      "description": "Vos alertes et notifications importantes les plus récentes.",
+      "noMessages": "Vous n'avez aucun nouveau message.",
+      "viewAllButton": "Voir tous les messages"
+    },
     "verified": "Vérifié",
     "unverified": "Non vérifié",
     "enabled": "Activé",
