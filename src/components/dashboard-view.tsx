@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Link } from '@/navigation';
 import { Button } from '@/components/ui/button';
 import { Logger } from '@/lib/logger';
+import { MarkdownWidget } from './markdown-widget';
 
 const logger = new Logger('DASHBOARD-VIEW');
 import {
@@ -443,6 +444,12 @@ export function DashboardView({ user }: DashboardViewProps) {
 
       <div className='mt-8'>
         <LoginActivityChart fingerprint={user.fingerprint} />
+      </div>
+      <div className='mt-8'>
+        <MarkdownWidget
+          filePath='src/content/dashboard-widget.md'
+          title={t('dashboardInfo.title')}
+        />
       </div>
     </div>
   );

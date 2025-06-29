@@ -109,6 +109,9 @@
       "noMessages": "Vous n'avez aucun nouveau message.",
       "viewAllButton": "Voir tous les messages"
     },
+    "dashboardInfo": {
+      "title": "Une Note de l'Équipe"
+    },
     "verified": "Vérifié",
     "unverified": "Non vérifié",
     "enabled": "Activé",

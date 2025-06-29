@@ -109,6 +109,9 @@
       "noMessages": "Sie haben keine neuen Nachrichten.",
       "viewAllButton": "Alle Nachrichten anzeigen"
     },
+    "dashboardInfo": {
+      "title": "Eine Nachricht vom Team"
+    },
     "verified": "Verifiziert",
     "unverified": "Nicht verifiziert",
     "enabled": "Aktiviert",
