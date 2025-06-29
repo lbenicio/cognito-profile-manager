@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { cognitoClient, UpdateUserAttributesCommand } from './cognito';
-import { getSession } from './session-cookie';
+import { getSession } from './session';
 import { Logger } from '@/lib/logger';
 
 const logger = new Logger('MESSAGES');
