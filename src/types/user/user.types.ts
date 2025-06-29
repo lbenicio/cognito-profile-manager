@@ -98,6 +98,7 @@ export type User = {
   devices: Device[];
   sessionStartedAt: number; // Unix timestamp (seconds)
   sessionExpiresAt: number; // Unix timestamp (seconds)
+  messages: string[];
 };
 
 /**

@@ -7,7 +7,8 @@
       "logout": "Se déconnecter",
       "adminDashboard": "Tableau de bord admin",
       "account": "Compte",
-      "security": "Sécurité"
+      "security": "Sécurité",
+      "messages": "Messages"
     },
     "mobileMenuTitle": "Menu principal",
     "mobileMenuTrigger": "Ouvrir le menu principal",
@@ -427,6 +428,18 @@
       "title": "Oups ! Quelque chose s'est mal passé",
       "description": "Nous avons rencontré une erreur inattendue. Veuillez réessayer. Si le problème persiste, contactez le support.",
       "tryAgain": "Réessayer"
+    }
+  },
+  "Messages": {
+    "title": "Vos Messages",
+    "description": "Vous trouverez ici les notifications et alertes importantes concernant votre compte.",
+    "allMessages": "Tous les Messages",
+    "messagesCount": "Vous avez {count, plural, =0 {aucun nouveau message} one {# nouveau message} other {# nouveaux messages}}.",
+    "alertTitle": "Message Important",
+    "clearAllButton": "Tout Effacer",
+    "noMessages": {
+      "title": "Vous êtes à jour !",
+      "description": "Il n'y a pas de nouveaux messages pour vous pour le moment."
     }
   }
 }

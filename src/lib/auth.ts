@@ -6,6 +6,7 @@ import {
   ListWebAuthnCredentialsCommand,
 } from '@/lib/cognito';
 import { getSession } from '@/lib/session';
+import { getMockUser } from '@/lib/mock-data';
 import { Logger } from '@/lib/logger';
 import type {
   User,
@@ -70,84 +71,17 @@ const defaultPublicProfilePreferences: PublicProfilePreferences = {
   },
 };
 
-const nowInSeconds = Math.floor(Date.now() / 1000);
-
-export const mockUser: User = {
-  sub: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
-  username: 'testuser_dev',
-  email: 'dev@example.com',
-  email_verified: true,
-  name: 'Dev User',
-  address: '123 Dev Lane, Developer City, DS',
-  phone_number: '+10000000000',
-  phone_number_verified: true,
-  birthdate: '1990-01-15',
-  creationDate: new Date().toISOString(),
-  userStatus: 'CONFIRMED',
-  twoFactorEnabled: false,
-  passkeysEnabled: true,
-  groups: ['users', 'beta-testers'],
-  isAdmin: false,
-  picture: `https://placehold.co/128x128.png`,
-  banner: `https://placehold.co/1500x500.png`,
-  locale: 'en-US',
-  zoneinfo: 'America/New_York',
-  website: 'https://example.com',
-  gender: 'Prefer not to say',
-  aboutMe:
-    'This is a mock user bio for the development environment. I enjoy coding and building cool things with Next.js.',
-  preferences: defaultPreferences,
-  notificationPreferences: defaultNotificationPreferences,
-  publicProfilePreferences: defaultPublicProfilePreferences,
-  fingerprint: [
-    {
-      date: new Date().toISOString(),
-      ip: '127.0.0.1',
-      device:
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    },
-    {
-      date: new Date(Date.now() - 86400000).toISOString(),
-      ip: '192.168.1.1',
-      device:
-        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1',
-    },
-  ],
-  devices: [
-    {
-      key: 'mock_device_1',
-      name: 'Passkey on macOS',
-      createDate: new Date(Date.now() - 86400000 * 2).toISOString(),
-      lastAuthDate: new Date(Date.now() - 86400000 * 2).toISOString(),
-    },
-  ],
-  sessionStartedAt: nowInSeconds,
-  sessionExpiresAt: nowInSeconds + 3600, // Expires in 1 hour
-};
-
-export const mockAdminUser: User = {
-  ...mockUser,
-  username: 'adminuser_dev',
-  name: 'Admin User',
-  groups: ['users', process.env.COGNITO_ADMIN_GROUP_NAME || 'admins'],
-  isAdmin: true,
-  twoFactorEnabled: true,
-  passkeysEnabled: true,
-  devices: mockUser.devices,
-};
-
 export const getUser = cache(async (): Promise<User | null> => {
   const session = await getSession();
 
   if (session?.isMock) {
     logger.info('Using mock user data for development.');
-    const baseUser =
-      session.username === mockAdminUser.username ? mockAdminUser : mockUser;
+    const mockUser = getMockUser(session.username);
     return {
-      ...baseUser,
+      ...mockUser,
       username: session.username || 'mockuser_dev',
-      sessionStartedAt: session.claims.auth_time as number,
-      sessionExpiresAt: session.claims.exp as number,
+      sessionStartedAt: (session.claims.auth_time as number) || 0,
+      sessionExpiresAt: (session.claims.exp as number) || 0,
     };
   }
 
@@ -268,6 +202,25 @@ export const getUser = cache(async (): Promise<User | null> => {
       logger.error('Could not fetch WebAuthn credentials for user:', e);
     }
 
+    let messages: string[] = [];
+    const warningsClaim = attributes['custom:warnings'];
+    if (warningsClaim) {
+      try {
+        const parsedWarnings = JSON.parse(warningsClaim);
+        if (
+          Array.isArray(parsedWarnings) &&
+          parsedWarnings.every((item) => typeof item === 'string')
+        ) {
+          messages = parsedWarnings;
+        }
+      } catch (e) {
+        logger.error(
+          'Failed to parse user messages from "custom:warnings" attribute',
+          e
+        );
+      }
+    }
+
     return {
       sub: claims.sub as string,
       username:
@@ -293,7 +246,6 @@ export const getUser = cache(async (): Promise<User | null> => {
       banner: attributes['custom:banner'] || '',
       locale: attributes.locale || (claims.locale as string) || '',
       zoneinfo: attributes.zoneinfo || (claims.zoneinfo as string) || '',
-      website: attributes.website || (claims.website as string) || '',
       gender: attributes.gender || (claims.gender as string) || '',
       aboutMe: attributes['custom:aboutme'] || '',
       preferences: preferences,
@@ -301,8 +253,9 @@ export const getUser = cache(async (): Promise<User | null> => {
       publicProfilePreferences: publicProfilePreferences,
       fingerprint: fingerprintData,
       devices: devices,
-      sessionStartedAt: claims.auth_time as number,
-      sessionExpiresAt: claims.exp as number,
+      sessionStartedAt: (claims.auth_time as number) || 0,
+      sessionExpiresAt: (claims.exp as number) || 0,
+      messages: messages,
     };
   } catch (error: any) {
     logger.error(

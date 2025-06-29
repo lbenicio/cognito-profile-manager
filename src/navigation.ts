@@ -16,6 +16,7 @@ export const pathnames = {
   '/contact': '/contact',
   '/terms': '/terms',
   '/privacy': '/privacy',
+  '/messages': '/messages',
 } satisfies Pathnames<typeof locales>;
 
 export const { Link, redirect, usePathname, useRouter } =

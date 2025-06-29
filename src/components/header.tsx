@@ -11,6 +11,7 @@ import {
   CircleUserRound,
   ShieldCheck,
   Loader2,
+  Bell,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -37,6 +38,7 @@ import { Separator } from '@/components/ui/separator';
 import { useTransition } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { localLogout } from '@/lib/auth-actions';
+import { Badge } from '@/components/ui/badge';
 
 type HeaderTranslations = {
   title: string;
@@ -47,6 +49,7 @@ type HeaderTranslations = {
     adminDashboard: string;
     account: string;
     security: string;
+    messages: string;
   };
   mobileMenuTitle: string;
   mobileMenuTrigger: string;
@@ -92,7 +95,22 @@ export function Header({
           {user && (
             <>
               {/* Desktop: User Avatar Dropdown */}
-              <div className='hidden md:block'>
+              <div className='hidden items-center gap-2 md:flex'>
+                <Link href='/messages' className='relative'>
+                  <Button variant='ghost' size='icon'>
+                    <Bell className='h-5 w-5' />
+                    {user.messages.length > 0 && (
+                      <Badge
+                        variant='destructive'
+                        className='absolute -right-1 -top-1 h-5 w-5 justify-center rounded-full p-0 text-xs'
+                      >
+                        {user.messages.length}
+                      </Badge>
+                    )}
+                    <span className='sr-only'>{t.userMenu.messages}</span>
+                  </Button>
+                </Link>
+
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -246,6 +264,20 @@ export function Header({
                           </a>
                         </SheetClose>
                       )}
+                      <SheetClose asChild>
+                        <Link
+                          href='/messages'
+                          className='relative flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary'
+                        >
+                          <Bell className='h-5 w-5' />
+                          {t.userMenu.messages}
+                          {user.messages.length > 0 && (
+                            <Badge variant='destructive' className='ml-auto'>
+                              {user.messages.length}
+                            </Badge>
+                          )}
+                        </Link>
+                      </SheetClose>
                       <SheetClose asChild>
                         <Link
                           href='/profile'

@@ -7,7 +7,8 @@
       "logout": "Log out",
       "adminDashboard": "Admin Dashboard",
       "account": "Account",
-      "security": "Security"
+      "security": "Security",
+      "messages": "Messages"
     },
     "mobileMenuTitle": "Main Menu",
     "mobileMenuTrigger": "Open main menu",
@@ -427,6 +428,18 @@
       "title": "Oops! Something Went Wrong",
       "description": "We encountered an unexpected error. Please try again. If the problem persists, contact support.",
       "tryAgain": "Try Again"
+    }
+  },
+  "Messages": {
+    "title": "Your Messages",
+    "description": "Here you can find important notifications and alerts about your account.",
+    "allMessages": "All Messages",
+    "messagesCount": "You have {count, plural, =0 {no new messages} one {# new message} other {# new messages}}.",
+    "alertTitle": "Important Message",
+    "clearAllButton": "Clear All Messages",
+    "noMessages": {
+      "title": "You're all caught up!",
+      "description": "There are no new messages for you at this time."
     }
   }
 }
