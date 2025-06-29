@@ -1,6 +1,6 @@
 {
   "name": "outpost",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "private": true,
   "license": "GPL-3.0-only",
   "description": "Outpost is a platform for managing user profiles and authentication.",
@@ -41,6 +41,7 @@
     "@radix-ui/react-toast": "^1.2.14",
     "@radix-ui/react-tooltip": "^1.1.8",
     "@tailwindcss/postcss": "^4.1.11",
+    "@tailwindcss/typography": "^0.5.13",
     "@vercel/analytics": "^1.5.0",
     "@vercel/kv": "^2.0.0",
     "chalk": "^4.1.2",
@@ -74,7 +75,6 @@
     "zod": "^3.24.4"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.13",
     "@types/chalk": "^0.4.31",
     "@types/marked": "^6.0.0",
     "@types/node": "^20",
