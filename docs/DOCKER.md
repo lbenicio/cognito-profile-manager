@@ -55,26 +55,26 @@ NEXT_PUBLIC_R2_PUBLIC_URL=https://your-bucket.your-account.r2.cloudflarestorage.
 
 ### 3. Using the Helper Script
 
-The included `docker-run.sh` script simplifies Docker operations:
+The included `scripts/docker-run.sh` script simplifies Docker operations:
 
 ```bash
 # Build the image
-./docker-run.sh build
+./scripts/docker-run.sh build
 
 # Run in development mode
-./docker-run.sh dev
+./scripts/docker-run.sh dev
 
 # Run in production mode
-./docker-run.sh prod
+./scripts/docker-run.sh prod
 
 # Run standalone container
-./docker-run.sh run
+./scripts/docker-run.sh run
 
 # View logs
-./docker-run.sh logs
+./scripts/docker-run.sh logs
 
 # Stop container
-./docker-run.sh stop
+./scripts/docker-run.sh stop
 ```
 
 ### 4. Manual Docker Commands
@@ -117,7 +117,7 @@ The Docker setup handles two types of environment variables differently:
 These variables are embedded in the client-side JavaScript bundle and need special handling:
 
 - **Build time**: Placeholder values are used (e.g., `__NEXT_PUBLIC_COGNITO_CLIENT_ID__`)
-- **Runtime**: The `entrypoint.sh` script replaces placeholders with actual values
+- **Runtime**: The `scripts/entrypoint.sh` script replaces placeholders with actual values
 
 **Supported variables:**
 - `NEXT_PUBLIC_COGNITO_CLIENT_ID`

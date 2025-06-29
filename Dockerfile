@@ -75,7 +75,7 @@ COPY --from=builder /app/src/i18n ./src/i18n
 COPY package.json ./
 
 # Copy and setup entrypoint script
-COPY entrypoint.sh /entrypoint.sh
+COPY scripts/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Change ownership to non-root user

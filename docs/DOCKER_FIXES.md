@@ -38,7 +38,8 @@ ENV COGNITO_CLIENT_SECRET=__COGNITO_CLIENT_SECRET__
 
 ### 2. Robust Environment Variable Injection Script
 
-**File**: `entrypoint.sh`
+**File**: `scripts/entrypoint.sh`
+
 
 **Improvements**:
 - **Safer Replacement**: Uses proper escaping for special characters in environment values
@@ -118,7 +119,7 @@ const r2Hostname = (() => {
 **Files Created**:
 - `.dockerignore` - Optimized build context
 - `.env.example` - Complete environment variable template
-- `docker-run.sh` - Helper script for Docker operations
+- `scripts/docker-run.sh` - Helper script for Docker operations
 - `docs/DOCKER.md` - Comprehensive deployment guide
 
 ## How It Works
@@ -129,7 +130,7 @@ const r2Hostname = (() => {
 3. **Multi-stage Build**: Production dependencies and built application are copied to final image
 
 ### Runtime Process
-1. **Container Startup**: `entrypoint.sh` script executes before the main application
+1. **Container Startup**: `scripts/entrypoint.sh` script executes before the main application
 2. **Variable Injection**: Script finds all JavaScript/CSS files and replaces placeholders with real values
 3. **Validation**: Critical environment variables are validated
 4. **Application Start**: Next.js application starts with properly injected variables
@@ -166,11 +167,11 @@ cp .env.example .env.local
 nano .env.local
 
 # Build and run production
-./docker-run.sh build
-./docker-run.sh run
+./scripts/docker-run.sh build
+./scripts/docker-run.sh run
 
 # Or use docker-compose
-./docker-run.sh prod
+./scripts/docker-run.sh prod
 ```
 
 ### Docker Compose
