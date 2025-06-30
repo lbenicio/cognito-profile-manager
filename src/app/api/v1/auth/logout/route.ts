@@ -8,10 +8,10 @@ export async function GET(request: NextRequest) {
   const appUrl = process.env.APP_URL?.replace(/\/$/, '');
   const loginUrl = new URL('/login', request.url);
 
-  // 1. Clear the local session cookie
+  // 1. Clear the local session cookie first
   await deleteSession();
 
-  // 2. Build the full OIDC logout URL
+  // 2. Build the full OIDC logout URL to redirect the user to the provider
   let cognitoLogoutUrl = loginUrl.toString(); // Default fallback
   try {
     const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
@@ -38,7 +38,6 @@ export async function GET(request: NextRequest) {
     const url = new URL(logoutEndpoint);
     url.searchParams.set('client_id', clientId);
     url.searchParams.set('logout_uri', `${appUrl}/login`);
-    url.searchParams.set('response_type', 'code');
     cognitoLogoutUrl = url.toString();
   } catch (error) {
     logger.error(
@@ -50,7 +49,7 @@ export async function GET(request: NextRequest) {
   // 3. Create the redirect response to the OIDC provider's logout URL
   const response = NextResponse.redirect(cognitoLogoutUrl);
 
-  // 4. Ensure any other auth-related cookies are also cleared
+  // 4. Ensure any other auth-related cookies are also cleared for good measure
   response.cookies.set('oauth_state', '', { expires: new Date(0), path: '/' });
 
   return response;

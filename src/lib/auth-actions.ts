@@ -1,9 +1,8 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { createMockSession, deleteSession } from '@/lib/session';
+import { createMockSession } from '@/lib/session';
 import { mockAdminUser } from '@/lib/mock-data';
-import type { AuthActionResponse } from '@/types/api/response.types';
 
 export async function ssoLogin() {
   redirect('/api/v1/auth/sso/start');
@@ -34,6 +33,7 @@ export async function devAdminLogin() {
 }
 
 export async function localLogout() {
-  await deleteSession();
-  redirect('/login');
+  // This action will now initiate a full logout by redirecting
+  // to the API route that handles clearing both local and provider sessions.
+  redirect('/api/v1/auth/logout');
 }
