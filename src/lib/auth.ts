@@ -237,7 +237,8 @@ export const getUser = cache(async (): Promise<User | null> => {
       phone_number_verified: attributes.phone_number_verified === 'true',
       birthdate: attributes.birthdate || '',
       creationDate: new Date((claims.auth_time as number) * 1000).toISOString(),
-      userStatus: attributes.email_verified || 'CONFIRMED',
+      userStatus:
+        attributes.email_verified === 'true' ? 'CONFIRMED' : 'UNCONFIRMED',
       twoFactorEnabled: attributes['custom:mfa'] === 'true',
       passkeysEnabled: attributes['custom:pless'] === 'true',
       groups: groups,
