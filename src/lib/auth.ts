@@ -246,6 +246,7 @@ export const getUser = cache(async (): Promise<User | null> => {
       banner: attributes['custom:banner'] || '',
       locale: attributes.locale || (claims.locale as string) || '',
       zoneinfo: attributes.zoneinfo || (claims.zoneinfo as string) || '',
+      website: attributes.website || (claims.website as string) || '',
       gender: attributes.gender || (claims.gender as string) || '',
       aboutMe: attributes['custom:aboutme'] || '',
       preferences: preferences,
