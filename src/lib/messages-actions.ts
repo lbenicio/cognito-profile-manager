@@ -7,13 +7,11 @@ import { Logger } from '@/lib/logger';
 
 const logger = new Logger('MESSAGES');
 
-export async function clearMessages(): Promise<{
-  success: boolean;
-  message: string;
-}> {
+export async function clearMessages(): Promise<void> {
   const session = await getSession();
   if (!session?.accessToken) {
-    return { success: false, message: 'Not authenticated' };
+    logger.error('Attempted to clear messages without an active session.');
+    return;
   }
 
   try {
@@ -26,13 +24,9 @@ export async function clearMessages(): Promise<{
 
     // Revalidate all relevant paths to reflect the change immediately
     revalidatePath('/', 'layout');
-
-    return { success: true, message: 'Messages cleared successfully.' };
   } catch (error: any) {
     logger.error('Clear Messages Error:', error);
-    return {
-      success: false,
-      message: 'An unexpected error occurred while clearing messages.',
-    };
+    // The action will fail, but the user will see the old state.
+    // In a real app, you might want to throw an error to be caught by an error boundary.
   }
 }
