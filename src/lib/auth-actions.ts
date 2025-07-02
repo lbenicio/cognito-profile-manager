@@ -81,7 +81,8 @@ export async function devUserLogin() {
 }
 
 export async function localLogout() {
-  // This action will now initiate a full logout by redirecting
-  // to the API route that handles clearing both local and provider sessions.
+  // This action clears the local session and performs logout.
+  // For real OAuth2 sessions: also calls Cognito logout endpoint.
+  // For mock sessions: only clears local session.
   redirect('/api/v1/auth/logout');
 }

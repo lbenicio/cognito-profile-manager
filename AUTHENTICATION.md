@@ -153,6 +153,29 @@ Login Page → SSO Start → Cognito → Callback → Home Page
 
 Production sessions automatically refresh access tokens when they expire (5 minutes before expiry) using the refresh token.
 
+### Logout Behavior
+
+The application performs **full logout** for both mock and real sessions:
+
+**Mock Sessions (Development)**:
+- Clears local session cookies only
+- Redirects directly to login page
+- No external API calls
+
+**Real OAuth2 Sessions (Production)**:
+- Clears local session cookies first
+- Redirects to AWS Cognito logout endpoint
+- Uses `post_logout_redirect_uri` parameter
+- Cognito then redirects back to login page
+- Ensures complete session termination on both client and server
+
+**Logout Flow**:
+```
+User clicks logout → Clear local session → Redirect to Cognito logout → Cognito clears session → Redirect to login page
+```
+
+**Important Configuration**: Ensure `http://localhost:9002/login` (or your production URL) is configured as an allowed **Sign out URL** in your Cognito App Client settings.
+
 ## Security Features
 
 ### CSRF Protection
