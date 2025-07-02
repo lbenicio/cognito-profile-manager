@@ -5,6 +5,7 @@ import { jwtVerify, createRemoteJWKSet } from 'jose';
 import type { JWTPayload } from 'jose';
 import { createSession } from '@/lib/session';
 import { Logger } from '@/lib/logger';
+import { getWellKnownConfig } from '@/lib/well-known';
 
 const logger = new Logger('OIDC-CALLBACK');
 
@@ -63,21 +64,13 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
-    if (!wellknownUrl)
-      throw new Error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
-
     const appUrl = process.env.APP_URL?.replace(/\/$/, '');
     if (!appUrl) {
       throw new Error('Missing APP_URL env var');
     }
     const callbackUrl = `${appUrl}/api/v1/auth/callback/oidc`;
 
-    const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
-    if (!wellknownResponse.ok)
-      throw new Error('Failed to fetch OpenID configuration from provider.');
-    const wellknown = await wellknownResponse.json();
-
+    const wellknown = await getWellKnownConfig();
     const tokenEndpoint = wellknown.token_endpoint;
 
     const params = new URLSearchParams({

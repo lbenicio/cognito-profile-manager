@@ -3,6 +3,7 @@
 import { jwtVerify, createRemoteJWKSet } from 'jose';
 import type { JWTPayload } from 'jose';
 import { Logger } from '@/lib/logger';
+import { getWellKnownConfig } from './well-known';
 
 const logger = new Logger('SESSION-ACTIONS');
 
@@ -19,15 +20,7 @@ export async function refreshAuthTokens(refreshToken: string): Promise<{
   newExpiresIn: number;
 } | null> {
   try {
-    const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
-    if (!wellknownUrl)
-      throw new Error('Missing NEXT_PUBLIC_COGNITO_WELLKNOWN env var');
-
-    const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
-    if (!wellknownResponse.ok)
-      throw new Error('Failed to fetch OpenID configuration from provider.');
-    const wellknown = await wellknownResponse.json();
-
+    const wellknown = await getWellKnownConfig();
     const tokenEndpoint = wellknown.token_endpoint;
 
     const params = new URLSearchParams({

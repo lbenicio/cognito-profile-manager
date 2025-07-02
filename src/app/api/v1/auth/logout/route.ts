@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { deleteSession } from '@/lib/session';
 import { Logger } from '@/lib/logger';
+import { getWellKnownConfig } from '@/lib/well-known';
 
 const logger = new Logger('LOGOUT');
 
@@ -14,20 +15,15 @@ export async function GET(request: NextRequest) {
   // 2. Build the full OIDC logout URL to redirect the user to the provider
   let cognitoLogoutUrl = loginUrl.toString(); // Default fallback
   try {
-    const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
     const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
 
-    if (!wellknownUrl || !clientId || !appUrl) {
+    if (!appUrl || !clientId) {
       throw new Error(
         'Logout configuration is missing in environment variables.'
       );
     }
 
-    const wellknownResponse = await fetch(wellknownUrl, { cache: 'no-store' });
-    if (!wellknownResponse.ok)
-      throw new Error('Failed to fetch OpenID configuration.');
-
-    const wellknown = await wellknownResponse.json();
+    const wellknown = await getWellKnownConfig();
     const logoutEndpoint =
       wellknown.logout_endpoint || wellknown.end_session_endpoint;
 
