@@ -12,10 +12,12 @@ export default async function DashboardPage(props: {
   params: Promise<{ locale: string }>;
 }) {
   setRequestLocale((await props.params).locale);
+  let user = await getUser();
+
   // Specifically load the namespaces we need for this page
   const tDashboard = await getTranslations('Dashboard');
+  const tMessages = await getTranslations('Messages');
   const tHeader = await getTranslations('Header');
-  let user = await getUser();
 
   // The middleware should protect this page. If user is null here, it indicates
   // a session issue that the middleware couldn't catch, or a failed API call in getUser.
@@ -48,6 +50,80 @@ export default async function DashboardPage(props: {
     user = { ...user, passkeysEnabled: true };
   }
 
+  // Assemble all translations needed by the client component
+  const dashboardTranslations = {
+    welcome: tDashboard('welcome', { name: user.name }),
+    description: tDashboard('description'),
+    id: tDashboard('id'),
+    lastLogin: tDashboard('lastLogin'),
+    verified: tDashboard('verified'),
+    profileCard: {
+      email: tDashboard('profileCard.email'),
+      groups: tDashboard('profileCard.groups'),
+      noGroups: tDashboard('profileCard.noGroups'),
+    },
+    editProfileButton: tDashboard('editProfileButton'),
+    securityHealth: {
+      title: tDashboard('securityHealth.title'),
+      description: tDashboard('securityHealth.description'),
+      score: tDashboard('securityHealth.score'),
+      manageButton: tDashboard('securityHealth.manageButton'),
+      checks: {
+        email: tDashboard('securityHealth.checks.email'),
+        phone: tDashboard('securityHealth.checks.phone'),
+        twoFactor: tDashboard('securityHealth.checks.twoFactor'),
+        passkeys: tDashboard('securityHealth.checks.passkeys'),
+      },
+    },
+    profileCompletion: {
+      title: tDashboard('profileCompletion.title'),
+      description: tDashboard('profileCompletion.description'),
+      percentage: tDashboard('profileCompletion.percentage'),
+      completeProfileButton: tDashboard('profileCompletion.completeProfileButton'),
+      tasks: {
+        picture: tDashboard('profileCompletion.tasks.picture'),
+        banner: tDashboard('profileCompletion.tasks.banner'),
+        aboutMe: tDashboard('profileCompletion.tasks.aboutMe'),
+        address: tDashboard('profileCompletion.tasks.address'),
+        phone: tDashboard('profileCompletion.tasks.phone'),
+        website: tDashboard('profileCompletion.tasks.website'),
+      },
+    },
+    quickActions: {
+      title: tDashboard('quickActions.title'),
+      description: tDashboard('quickActions.description'),
+      changePassword: tDashboard('quickActions.changePassword'),
+      manageSecurity: tDashboard('quickActions.manageSecurity'),
+      appearanceSettings: tDashboard('quickActions.appearanceSettings'),
+    },
+    loginHistory: {
+      title: tDashboard('loginHistory.title'),
+      description: tDashboard('loginHistory.description'),
+      date: tDashboard('loginHistory.date'),
+      device: tDashboard('loginHistory.device'),
+      ipAddress: tDashboard('loginHistory.ipAddress'),
+      noHistory: tDashboard('loginHistory.noHistory'),
+    },
+    sessionInfo: {
+      title: tDashboard('sessionInfo.title'),
+      description: tDashboard('sessionInfo.description'),
+      startedAt: tDashboard('sessionInfo.startedAt'),
+      expiresIn: tDashboard('sessionInfo.expiresIn'),
+      currentDevice: tDashboard('sessionInfo.currentDevice'),
+      ipAddress: tDashboard('sessionInfo.ipAddress'),
+      expired: tDashboard('sessionInfo.expired'),
+    },
+    messagesPreview: {
+      title: tDashboard('messagesPreview.title'),
+      description: tDashboard('messagesPreview.description'),
+      noMessages: tDashboard('messagesPreview.noMessages'),
+      viewAllButton: tDashboard('messagesPreview.viewAllButton'),
+    },
+    messages: {
+      alertTitle: tMessages('alertTitle'),
+    },
+  };
+
   return (
     <DashboardView
       user={user}
@@ -57,6 +133,7 @@ export default async function DashboardPage(props: {
           title={tDashboard('dashboardInfo.title')}
         />
       }
+      translations={dashboardTranslations}
     />
   );
 }

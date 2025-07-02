@@ -4,8 +4,6 @@ import { useState, useEffect, type ReactNode } from 'react';
 import { Link } from '@/navigation';
 import { Button } from '@/components/ui/button';
 import { Logger } from '@/lib/logger';
-
-const logger = new Logger('DASHBOARD-VIEW');
 import {
   Card,
   CardContent,
@@ -42,7 +40,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import type { User as UserType } from '@/types/user/user.types';
-import { useTranslations } from 'next-intl';
 import { format } from 'date-fns';
 import UAParser from 'ua-parser-js';
 import { Progress } from '@/components/ui/progress';
@@ -50,9 +47,84 @@ import { SessionInfoCard } from './session-info-card';
 import { LoginActivityChart } from './login-activity-chart';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 
+const logger = new Logger('DASHBOARD-VIEW');
+
+interface DashboardTranslations {
+  welcome: string;
+  description: string;
+  id: string;
+  lastLogin: string;
+  verified: string;
+  profileCard: {
+    email: string;
+    groups: string;
+    noGroups: string;
+  };
+  editProfileButton: string;
+  securityHealth: {
+    title: string;
+    description: string;
+    score: string;
+    manageButton: string;
+    checks: {
+      email: string;
+      phone: string;
+      twoFactor: string;
+      passkeys: string;
+    };
+  };
+  profileCompletion: {
+    title: string;
+    description: string;
+    percentage: string;
+    completeProfileButton: string;
+    tasks: {
+      picture: string;
+      banner: string;
+      aboutMe: string;
+      address: string;
+      phone: string;
+      website: string;
+    };
+  };
+  quickActions: {
+    title: string;
+    description: string;
+    changePassword: string;
+    manageSecurity: string;
+    appearanceSettings: string;
+  };
+  loginHistory: {
+    title: string;
+    description: string;
+    date: string;
+    device: string;
+    ipAddress: string;
+    noHistory: string;
+  };
+  sessionInfo: {
+    title: string;
+    description: string;
+    startedAt: string;
+    expiresIn: string;
+    currentDevice: string;
+    ipAddress: string;
+    expired: string;
+  };
+  messagesPreview: {
+    title: string;
+    description: string;
+    noMessages: string;
+    viewAllButton: string;
+  };
+  messages: {
+    alertTitle: string;
+  };
+}
 interface DashboardViewProps {
   user: UserType;
   infoWidget: ReactNode;
+  translations: DashboardTranslations;
 }
 
 const formatUserAgent = (uaString: string): string => {
@@ -86,9 +158,11 @@ const formatUserAgent = (uaString: string): string => {
   }
 };
 
-export function DashboardView({ user, infoWidget }: DashboardViewProps) {
-  const t = useTranslations('Dashboard');
-  const tMessages = useTranslations('Messages');
+export function DashboardView({
+  user,
+  infoWidget,
+  translations,
+}: DashboardViewProps) {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -127,9 +201,11 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
     <div className='container mx-auto space-y-8 p-4 md:p-8'>
       <header className='space-y-2'>
         <h1 className='text-3xl font-bold tracking-tight md:text-4xl'>
-          {t('welcome', { name: user.name })}
+          {translations.welcome}
         </h1>
-        <p className='text-lg text-muted-foreground'>{t('description')}</p>
+        <p className='text-lg text-muted-foreground'>
+          {translations.description}
+        </p>
       </header>
 
       <div className='grid grid-cols-1 gap-8 lg:grid-cols-3'>
@@ -156,7 +232,7 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
                 <div className='flex items-center pt-1 text-xs text-muted-foreground'>
                   <UserIcon className='mr-1.5 h-3 w-3' />
                   <span>
-                    {t('id')}: {user.sub}
+                    {translations.id}: {user.sub}
                   </span>
                 </div>
               </div>
@@ -166,7 +242,7 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
                 <Mail className='h-5 w-5 flex-shrink-0 text-muted-foreground' />
                 <div>
                   <h4 className='text-sm font-semibold'>
-                    {t('profileCard.email')}
+                    {translations.profileCard.email}
                   </h4>
                   <p className='truncate text-sm text-muted-foreground'>
                     {user.email}
@@ -177,7 +253,7 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
                 <Users className='h-5 w-5 flex-shrink-0 text-muted-foreground' />
                 <div>
                   <h4 className='text-sm font-semibold'>
-                    {t('profileCard.groups')}
+                    {translations.profileCard.groups}
                   </h4>
                   <div className='mt-1 flex flex-wrap gap-2'>
                     {user.groups.length > 0 ? (
@@ -188,7 +264,7 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
                       ))
                     ) : (
                       <p className='text-sm text-muted-foreground'>
-                        {t('profileCard.noGroups')}
+                        {translations.profileCard.noGroups}
                       </p>
                     )}
                   </div>
@@ -198,7 +274,7 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
             <CardFooter>
               <Button asChild>
                 <Link href='/account'>
-                  {t('editProfileButton')}{' '}
+                  {translations.editProfileButton}{' '}
                   <ArrowRight className='ml-2 h-4 w-4' />
                 </Link>
               </Button>
@@ -208,11 +284,11 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
           {/* Login History Card */}
           <Card>
             <CardHeader>
-              <CardTitle>{t('loginHistory.title')}</CardTitle>
+              <CardTitle>{translations.loginHistory.title}</CardTitle>
               <CardDescription>
-                {t('loginHistory.description')}{' '}
+                {translations.loginHistory.description}{' '}
                 {user.fingerprint?.[0]?.date &&
-                  `(${t('lastLogin')}: ${isMounted ? format(new Date(user.fingerprint[0].date), 'PPP p') : '...'})`}
+                  `(${translations.lastLogin}: ${isMounted ? format(new Date(user.fingerprint[0].date), 'PPP p') : '...'})`}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -221,15 +297,15 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
                   <TableRow>
                     <TableHead>
                       <Calendar className='mr-2 inline-block h-4 w-4' />
-                      {t('loginHistory.date')}
+                      {translations.loginHistory.date}
                     </TableHead>
                     <TableHead>
                       <Smartphone className='mr-2 inline-block h-4 w-4' />
-                      {t('loginHistory.device')}
+                      {translations.loginHistory.device}
                     </TableHead>
                     <TableHead>
                       <Server className='mr-2 inline-block h-4 w-4' />
-                      {t('loginHistory.ipAddress')}
+                      {translations.loginHistory.ipAddress}
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -254,7 +330,7 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
                         colSpan={3}
                         className='text-center text-muted-foreground'
                       >
-                        {t('loginHistory.noHistory')}
+                        {translations.loginHistory.noHistory}
                       </TableCell>
                     </TableRow>
                   )}
@@ -270,10 +346,10 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
             <CardHeader>
               <CardTitle className='flex items-center gap-2'>
                 <Bell className='text-primary' />
-                {t('messagesPreview.title')}
+                {translations.messagesPreview.title}
               </CardTitle>
               <CardDescription>
-                {t('messagesPreview.description')}
+                {translations.messagesPreview.description}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -283,7 +359,7 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
                     <Alert key={index} variant='default'>
                       <AlertCircle className='h-4 w-4' />
                       <AlertTitle className='text-xs font-semibold'>
-                        {tMessages('alertTitle')}
+                        {translations.messages.alertTitle}
                       </AlertTitle>
                       <AlertDescription className='text-xs'>
                         {message}
@@ -293,7 +369,7 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
                 </div>
               ) : (
                 <p className='text-sm text-muted-foreground'>
-                  {t('messagesPreview.noMessages')}
+                  {translations.messagesPreview.noMessages}
                 </p>
               )}
             </CardContent>
@@ -301,7 +377,7 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
               <CardFooter>
                 <Button asChild className='w-full' variant='secondary'>
                   <Link href='/messages'>
-                    {t('messagesPreview.viewAllButton')}
+                    {translations.messagesPreview.viewAllButton}
                     <ArrowRight className='ml-2 h-4 w-4' />
                   </Link>
                 </Button>
@@ -316,10 +392,10 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
             <CardHeader>
               <CardTitle className='flex items-center gap-2'>
                 <ShieldCheck className='text-primary' />
-                {t('securityHealth.title')}
+                {translations.securityHealth.title}
               </CardTitle>
               <CardDescription>
-                {t('securityHealth.description')}
+                {translations.securityHealth.description}
               </CardDescription>
             </CardHeader>
             <CardContent className='flex-grow space-y-3'>
@@ -335,7 +411,11 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
                       isComplete ? 'text-foreground' : 'text-muted-foreground'
                     }
                   >
-                    {t(`securityHealth.checks.${key}`)}
+                    {
+                      translations.securityHealth.checks[
+                        key as keyof typeof translations.securityHealth.checks
+                      ]
+                    }
                   </span>
                 </div>
               ))}
@@ -343,11 +423,16 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
             <CardFooter className='flex-col items-start gap-4'>
               <div className='w-full text-center'>
                 <p className='text-2xl font-bold'>
-                  {t('securityHealth.score', { score: securityScore })}
+                  {translations.securityHealth.score.replace(
+                    '{score}',
+                    String(securityScore)
+                  )}
                 </p>
               </div>
               <Button asChild className='w-full'>
-                <Link href='/security'>{t('securityHealth.manageButton')}</Link>
+                <Link href='/security'>
+                  {translations.securityHealth.manageButton}
+                </Link>
               </Button>
             </CardFooter>
           </Card>
@@ -357,19 +442,20 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
             <CardHeader>
               <CardTitle className='flex items-center gap-2'>
                 <Target className='text-primary' />
-                {t('profileCompletion.title')}
+                {translations.profileCompletion.title}
               </CardTitle>
               <CardDescription>
-                {t('profileCompletion.description')}
+                {translations.profileCompletion.description}
               </CardDescription>
             </CardHeader>
             <CardContent className='flex-grow space-y-4'>
               <div className='flex items-center gap-4'>
                 <Progress value={profileCompletion} className='w-full' />
                 <span className='font-bold'>
-                  {t('profileCompletion.percentage', {
-                    percentage: profileCompletion,
-                  })}
+                  {translations.profileCompletion.percentage.replace(
+                    '{percentage}',
+                    String(profileCompletion)
+                  )}
                 </span>
               </div>
               <div className='space-y-2'>
@@ -385,7 +471,11 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
                         isComplete ? 'text-foreground' : 'text-muted-foreground'
                       }
                     >
-                      {t(`profileCompletion.tasks.${key}`)}
+                      {
+                        translations.profileCompletion.tasks[
+                          key as keyof typeof translations.profileCompletion.tasks
+                        ]
+                      }
                     </span>
                   </div>
                 ))}
@@ -394,7 +484,7 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
             <CardFooter>
               <Button asChild className='w-full' variant='outline'>
                 <Link href='/account'>
-                  {t('profileCompletion.completeProfileButton')}
+                  {translations.profileCompletion.completeProfileButton}
                 </Link>
               </Button>
             </CardFooter>
@@ -403,8 +493,10 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
           {/* Quick Actions Card */}
           <Card>
             <CardHeader>
-              <CardTitle>{t('quickActions.title')}</CardTitle>
-              <CardDescription>{t('quickActions.description')}</CardDescription>
+              <CardTitle>{translations.quickActions.title}</CardTitle>
+              <CardDescription>
+                {translations.quickActions.description}
+              </CardDescription>
             </CardHeader>
             <CardContent className='space-y-2'>
               <Button
@@ -414,7 +506,7 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
               >
                 <Link href='/security'>
                   <KeyRound className='mr-2 h-4 w-4' />
-                  {t('quickActions.changePassword')}
+                  {translations.quickActions.changePassword}
                 </Link>
               </Button>
               <Button
@@ -424,7 +516,7 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
               >
                 <Link href='/security'>
                   <ShieldCheck className='mr-2 h-4 w-4' />
-                  {t('quickActions.manageSecurity')}
+                  {translations.quickActions.manageSecurity}
                 </Link>
               </Button>
               <Button
@@ -434,7 +526,7 @@ export function DashboardView({ user, infoWidget }: DashboardViewProps) {
               >
                 <Link href='/settings'>
                   <Palette className='mr-2 h-4 w-4' />
-                  {t('quickActions.appearanceSettings')}
+                  {translations.quickActions.appearanceSettings}
                 </Link>
               </Button>
             </CardContent>
