@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const callbackUrl = getCognitoCallbackUrl('/api/v1/auth/callback/oidc');
+    const callbackUrl = await getCognitoCallbackUrl('/api/v1/auth/callback/oidc');
 
     const wellknown = await getWellKnownConfig();
     const tokenEndpoint = wellknown.token_endpoint;
