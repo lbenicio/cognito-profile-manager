@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import createNextIntlPlugin from 'next-intl/plugin';
 
 const r2Hostname = (() => {
   const r2Url = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
@@ -44,4 +45,6 @@ if (r2Hostname && nextConfig.images?.remotePatterns) {
   });
 }
 
-export default nextConfig;
+const withNextIntl = createNextIntlPlugin('./src/i18n/i18n.ts');
+
+export default withNextIntl(nextConfig);

@@ -4,6 +4,9 @@ import path from 'path';
 import { marked } from 'marked';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText } from 'lucide-react';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('MARKDOWN-WIDGET');
 
 async function getMarkdownContent(filePath: string): Promise<string> {
   try {
@@ -12,7 +15,7 @@ async function getMarkdownContent(filePath: string): Promise<string> {
     const htmlContent = await marked.parse(fileContents);
     return htmlContent;
   } catch (error) {
-    console.error('Error reading markdown file:', error);
+    logger.error('Error reading markdown file:', error);
     return '<p>Could not load content.</p>';
   }
 }
@@ -35,7 +38,7 @@ export async function MarkdownWidget({
         </CardTitle>
       </CardHeader>
       <CardContent
-        className='prose prose-sm dark:prose-invert max-w-none'
+        className='prose prose-sm max-w-none dark:prose-invert'
         dangerouslySetInnerHTML={{ __html: content }}
       />
     </Card>

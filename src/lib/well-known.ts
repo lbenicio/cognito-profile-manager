@@ -32,7 +32,14 @@ export const getWellKnownConfig = cache(async (): Promise<WellKnownConfig> => {
   const wellknownUrl = process.env.NEXT_PUBLIC_COGNITO_WELLKNOWN;
   if (!wellknownUrl) {
     logger.error('NEXT_PUBLIC_COGNITO_WELLKNOWN env var is not set.');
-    throw new Error('Missing OIDC well-known configuration URL.');
+    if (process.env.NODE_ENV === 'development') {
+      logger.warn(
+        'Development mode: SSO will not work without Cognito configuration. Use mock login instead.'
+      );
+    }
+    throw new Error(
+      'Missing OIDC well-known configuration URL. Configure NEXT_PUBLIC_COGNITO_WELLKNOWN or use mock login in development.'
+    );
   }
 
   const response = await fetch(wellknownUrl, {

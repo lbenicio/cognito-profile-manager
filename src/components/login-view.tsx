@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { devAdminLogin, ssoLogin } from '@/lib/auth-actions';
+import { devAdminLogin, devUserLogin, ssoLogin } from '@/lib/auth-actions';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -12,19 +12,21 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Loader2, LogIn } from 'lucide-react';
+import { Loader2, LogIn, Shield, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export interface LoginViewProps {}
 
 export function LoginView({}: LoginViewProps) {
   const t = useTranslations('Login');
+  const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const [isSsoLoading, setIsSsoLoading] = useState<boolean>(false);
   const [isAdminLoading, setIsAdminLoading] = useState<boolean>(false);
+  const [isUserLoading, setIsUserLoading] = useState<boolean>(false);
 
-  const isSubmitting = isSsoLoading || isAdminLoading;
+  const isSubmitting = isSsoLoading || isAdminLoading || isUserLoading;
 
   useEffect(() => {
     const error = searchParams.get('error');
@@ -45,6 +47,73 @@ export function LoginView({}: LoginViewProps) {
     }
   }, [searchParams, t, toast]);
 
+  const handleDevAdminLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsAdminLoading(true);
+
+    try {
+      const result = await devAdminLogin();
+      if (result.success) {
+        toast({
+          title: 'Development Login',
+          description: 'Logged in as Admin User (Mock Data)',
+        });
+        router.push(result.redirectTo);
+      }
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Login Failed',
+        description:
+          error instanceof Error ? error.message : 'An error occurred',
+      });
+    } finally {
+      setIsAdminLoading(false);
+    }
+  };
+
+  const handleDevUserLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsUserLoading(true);
+
+    try {
+      const result = await devUserLogin();
+      if (result.success) {
+        toast({
+          title: 'Development Login',
+          description: 'Logged in as Regular User (Mock Data)',
+        });
+        router.push(result.redirectTo);
+      }
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Login Failed',
+        description:
+          error instanceof Error ? error.message : 'An error occurred',
+      });
+    } finally {
+      setIsUserLoading(false);
+    }
+  };
+
+  const handleSsoLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSsoLoading(true);
+
+    try {
+      await ssoLogin();
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'SSO Login Failed',
+        description:
+          error instanceof Error ? error.message : 'An error occurred',
+      });
+      setIsSsoLoading(false);
+    }
+  };
+
   return (
     <div className='flex min-h-screen items-center justify-center bg-background'>
       <Card className='mx-4 w-full max-w-md'>
@@ -54,7 +123,8 @@ export function LoginView({}: LoginViewProps) {
         </CardHeader>
         <CardContent>
           <div className='space-y-4'>
-            <form action={ssoLogin} onSubmit={() => setIsSsoLoading(true)}>
+            {/* Production SSO Login */}
+            <form onSubmit={handleSsoLogin}>
               <Button type='submit' className='w-full' disabled={isSubmitting}>
                 {isSsoLoading ? (
                   <Loader2 className='animate-spin' />
@@ -65,25 +135,62 @@ export function LoginView({}: LoginViewProps) {
               </Button>
             </form>
 
+            {/* Development Mock Logins */}
             {process.env.NODE_ENV === 'development' && (
-              <form
-                action={devAdminLogin}
-                onSubmit={() => setIsAdminLoading(true)}
-              >
-                <Button
-                  type='submit'
-                  className='w-full'
-                  variant='secondary'
-                  disabled={isSubmitting}
-                >
-                  {isAdminLoading ? (
-                    <Loader2 className='animate-spin' />
-                  ) : (
-                    <LogIn />
-                  )}
-                  <span className='ml-2'>{t('signInAdminButton')}</span>
-                </Button>
-              </form>
+              <>
+                <div className='relative'>
+                  <div className='absolute inset-0 flex items-center'>
+                    <span className='w-full border-t' />
+                  </div>
+                  <div className='relative flex justify-center text-xs uppercase'>
+                    <span className='bg-background px-2 text-muted-foreground'>
+                      Development Only
+                    </span>
+                  </div>
+                </div>
+
+                <div className='grid grid-cols-2 gap-2'>
+                  {/* Mock Admin Login */}
+                  <form onSubmit={handleDevAdminLogin}>
+                    <Button
+                      type='submit'
+                      className='w-full'
+                      variant='secondary'
+                      disabled={isSubmitting}
+                      size='sm'
+                    >
+                      {isAdminLoading ? (
+                        <Loader2 className='h-4 w-4 animate-spin' />
+                      ) : (
+                        <Shield className='h-4 w-4' />
+                      )}
+                      <span className='ml-1 text-xs'>Admin</span>
+                    </Button>
+                  </form>
+
+                  {/* Mock User Login */}
+                  <form onSubmit={handleDevUserLogin}>
+                    <Button
+                      type='submit'
+                      className='w-full'
+                      variant='outline'
+                      disabled={isSubmitting}
+                      size='sm'
+                    >
+                      {isUserLoading ? (
+                        <Loader2 className='h-4 w-4 animate-spin' />
+                      ) : (
+                        <User className='h-4 w-4' />
+                      )}
+                      <span className='ml-1 text-xs'>User</span>
+                    </Button>
+                  </form>
+                </div>
+
+                <p className='text-center text-xs text-muted-foreground'>
+                  Mock logins use test data and skip authentication
+                </p>
+              </>
             )}
           </div>
         </CardContent>

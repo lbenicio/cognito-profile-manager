@@ -8,14 +8,18 @@ export async function GET(request: NextRequest) {
   try {
     const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
     const appUrl = process.env.APP_URL?.replace(/\/$/, '');
-    const scope = 'openid email profile aws.cognito.signin.user.admin';
+    const scope =
+      process.env.NEXT_PUBLIC_OAUTH2_SCOPE ||
+      'openid email profile aws.cognito.signin.user.admin';
 
     if (!clientId) {
-      throw new Error('SSO client configuration is missing.');
+      throw new Error(
+        'NEXT_PUBLIC_COGNITO_CLIENT_ID environment variable is required.'
+      );
     }
 
     if (!appUrl) {
-      throw new Error('Missing APP_URL env var.');
+      throw new Error('APP_URL environment variable is required.');
     }
     const callbackUrl = `${appUrl}/api/v1/auth/callback/oidc`;
 
@@ -57,7 +61,8 @@ export async function GET(request: NextRequest) {
     loginUrl.searchParams.set('error', 'sso_start_failed');
     loginUrl.searchParams.set(
       'error_description',
-      error.message || 'Could not start the SSO process.'
+      error.message ||
+        'Could not start the SSO process. Please check your OAuth2 configuration.'
     );
     return NextResponse.redirect(loginUrl);
   }

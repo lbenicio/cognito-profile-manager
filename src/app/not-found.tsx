@@ -7,8 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { getTranslations } from 'next-intl/server';
-import { getLocale } from '@/i18n/i18n';
+import { getTranslations, getLocale } from 'next-intl/server';
 import { AlertCircle } from 'lucide-react';
 
 export default async function NotFoundPage() {

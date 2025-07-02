@@ -1,6 +1,6 @@
 {
   "name": "outpost",
-  "version": "0.3.15",
+  "version": "0.3.16",
   "private": true,
   "license": "GPL-3.0-only",
   "description": "Outpost is a platform for managing user profiles and authentication.",
@@ -12,7 +12,9 @@
     "fmt:lint": "next lint --fix",
     "fmt:pretty": "prettier --write --ignore-path .gitignore .",
     "update:all": "npm-check-updates -u && npm install",
-    "type:check": "tsc --noEmit"
+    "type:check": "tsc --noEmit",
+    "generate:key": "node scripts/generate-encryption-key.js",
+    "setup:dev": "node scripts/setup-dev.js"
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.588.0",

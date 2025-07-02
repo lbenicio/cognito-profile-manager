@@ -423,10 +423,7 @@ export function DashboardView({
             <CardFooter className='flex-col items-start gap-4'>
               <div className='w-full text-center'>
                 <p className='text-2xl font-bold'>
-                  {translations.securityHealth.score.replace(
-                    '{score}',
-                    String(securityScore)
-                  )}
+                  {translations.securityHealth.score}
                 </p>
               </div>
               <Button asChild className='w-full'>
@@ -452,10 +449,7 @@ export function DashboardView({
               <div className='flex items-center gap-4'>
                 <Progress value={profileCompletion} className='w-full' />
                 <span className='font-bold'>
-                  {translations.profileCompletion.percentage.replace(
-                    '{percentage}',
-                    String(profileCompletion)
-                  )}
+                  {translations.profileCompletion.percentage}
                 </span>
               </div>
               <div className='space-y-2'>

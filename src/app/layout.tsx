@@ -1,11 +1,10 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import './fonts.css';
-import { getMessages } from 'next-intl/server';
 import { NextIntlClientProvider } from 'next-intl';
+import { getMessages, getLocale } from 'next-intl/server';
 import { ThemeProvider } from '@/components/theme-provider';
 import { getUser } from '@/lib/auth';
-import { getLocale } from '@/i18n/i18n';
 
 export const metadata: Metadata = {
   title: 'Outpost',
@@ -46,7 +45,7 @@ export default async function RootLayout({
           crossOrigin='anonymous'
         />
       </head>
-      <body className='font-body flex min-h-screen flex-col antialiased'>
+      <body className='flex min-h-screen flex-col font-body antialiased'>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider
             attribute='class'

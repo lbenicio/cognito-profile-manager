@@ -6,6 +6,33 @@ import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { localLogout } from '@/lib/auth-actions';
 import { MarkdownWidget } from '@/components/markdown-widget';
+import type { User } from '@/types/user/user.types';
+
+// Helper function to calculate security score
+function calculateSecurityScore(user: User): number {
+  let score = 0;
+  if (user.email_verified) score += 25;
+  if (user.phone_number_verified) score += 25;
+  if (user.twoFactorEnabled) score += 25;
+  if (user.passkeysEnabled) score += 25;
+  return score;
+}
+
+// Helper function to calculate profile completion percentage
+function calculateProfileCompletion(user: User): number {
+  const fields = [
+    user.picture,
+    user.banner,
+    user.aboutMe,
+    user.address,
+    user.phone_number,
+    user.website,
+  ];
+  const completedFields = fields.filter(
+    (field) => field && field.trim() !== ''
+  ).length;
+  return Math.round((completedFields / fields.length) * 100);
+}
 
 // This is now a Server Component
 export default async function DashboardPage() {
@@ -63,7 +90,9 @@ export default async function DashboardPage() {
     securityHealth: {
       title: tDashboard('securityHealth.title'),
       description: tDashboard('securityHealth.description'),
-      score: tDashboard('securityHealth.score'),
+      score: tDashboard('securityHealth.score', {
+        score: calculateSecurityScore(user),
+      }),
       manageButton: tDashboard('securityHealth.manageButton'),
       checks: {
         email: tDashboard('securityHealth.checks.email'),
@@ -75,8 +104,12 @@ export default async function DashboardPage() {
     profileCompletion: {
       title: tDashboard('profileCompletion.title'),
       description: tDashboard('profileCompletion.description'),
-      percentage: tDashboard('profileCompletion.percentage'),
-      completeProfileButton: tDashboard('profileCompletion.completeProfileButton'),
+      percentage: tDashboard('profileCompletion.percentage', {
+        percentage: calculateProfileCompletion(user),
+      }),
+      completeProfileButton: tDashboard(
+        'profileCompletion.completeProfileButton'
+      ),
       tasks: {
         picture: tDashboard('profileCompletion.tasks.picture'),
         banner: tDashboard('profileCompletion.tasks.banner'),
