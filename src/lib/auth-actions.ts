@@ -1,7 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
-import { createMockSession } from '@/lib/session';
+import { createMockSession, getSession, deleteSession } from '@/lib/session';
 import { mockAdminUser, mockUser } from '@/lib/mock-data';
 import type { AuthTokenPayload } from '@/interfaces/auth/auth.interfaces';
 
@@ -82,5 +82,14 @@ export async function devUserLogin() {
 }
 
 export async function localLogout() {
-  redirect('/api/v1/auth/logout');
+  const session = await getSession();
+
+  // If the session is a mock session, handle logout directly.
+  if (session?.isMock) {
+    await deleteSession();
+    redirect('/login');
+  } else {
+    // For real sessions, redirect to the API route that handles Cognito logout.
+    redirect('/api/v1/auth/logout');
+  }
 }
