@@ -12,7 +12,9 @@ export default async function DashboardPage(props: {
   params: Promise<{ locale: string }>;
 }) {
   setRequestLocale((await props.params).locale);
-  const t = await getTranslations(); // Get all translations
+  // Specifically load the namespaces we need for this page
+  const tDashboard = await getTranslations('Dashboard');
+  const tHeader = await getTranslations('Header');
   let user = await getUser();
 
   // The middleware should protect this page. If user is null here, it indicates
@@ -30,7 +32,7 @@ export default async function DashboardPage(props: {
           <form action={localLogout}>
             <Button type='submit'>
               <LogOut className='mr-2 h-4 w-4' />
-              {t('Header.userMenu.logout')}
+              {tHeader('userMenu.logout')}
             </Button>
           </form>
         </div>
@@ -52,7 +54,7 @@ export default async function DashboardPage(props: {
       infoWidget={
         <MarkdownWidget
           filePath='src/content/dashboard-widget.md'
-          title={t('Dashboard.dashboardInfo.title')}
+          title={tDashboard('dashboardInfo.title')}
         />
       }
     />
