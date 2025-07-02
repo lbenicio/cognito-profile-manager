@@ -3,12 +3,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
 import type { AuthTokenPayload } from '@/interfaces/auth/auth.interfaces';
-import { createSession } from '@/lib/session';
+import { createSessionCookieValue } from '@/lib/session';
 import { Logger } from '@/lib/logger';
 import { getWellKnownConfig } from '@/lib/well-known';
 import { getCognitoCallbackUrl } from '@/lib/url';
 
 const logger = new Logger('OIDC-CALLBACK');
+const SESSION_DURATION_SECONDS = 30 * 24 * 60 * 60;
 
 function createErrorResponse(
   origin: string,
@@ -130,16 +131,23 @@ export async function GET(request: NextRequest) {
       sub: sessionData.claims && (sessionData.claims as any).sub,
     });
 
-    // The new createSession uses a long-lived duration internally.
-    await createSession(sessionData);
+    // Create the session cookie value
+    const encryptedSessionId = await createSessionCookieValue(sessionData);
 
     logger.info(
       'OIDC callback: Session created successfully, redirecting to dashboard.'
     );
 
-    // Clear the state cookie on the SAME response object before returning.
+    // Set the session cookie and clear the state cookie on the SAME response object before returning.
     const dashboardUrl = new URL('/', origin);
     const response = NextResponse.redirect(dashboardUrl);
+    response.cookies.set('session', encryptedSessionId, {
+      expires: new Date(Date.now() + SESSION_DURATION_SECONDS * 1000),
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      sameSite: 'lax',
+    });
     response.cookies.set('oauth_state', '', {
       expires: new Date(0),
       path: '/',

@@ -54,9 +54,9 @@ async function decrypt(
   }
 }
 
-export async function createSession(
+export async function createSessionCookieValue(
   sessionData: OIDC_SessionData
-): Promise<void> {
+): Promise<string> {
   const sessionId = crypto.randomUUID();
   const key = `${sessionPrefix}${sessionId}`;
 
@@ -64,15 +64,7 @@ export async function createSession(
 
   const encryptedSessionId = await encrypt({ sessionId });
 
-  const expires = new Date(Date.now() + SESSION_DURATION_SECONDS * 1000);
-
-  (await cookies()).set(cookieName, encryptedSessionId, {
-    expires,
-    httpOnly: true,
-    secure: true,
-    path: '/',
-    sameSite: 'lax',
-  });
+  return encryptedSessionId;
 }
 
 export async function createMockSession(
