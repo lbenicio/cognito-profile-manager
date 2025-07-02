@@ -133,13 +133,9 @@ export async function GET(request: NextRequest) {
       accessToken: tokens.access_token,
       refreshToken: tokens.refresh_token,
     };
-    const expiresIn =
-      tokens.expires_in && typeof tokens.expires_in === 'number'
-        ? tokens.expires_in
-        : 3600;
 
-    // This now stores data in Redis and sets a small cookie with the session ID
-    await createSession(sessionData, expiresIn);
+    // The new createSession uses a long-lived duration internally.
+    await createSession(sessionData);
 
     // Clear the state cookie on the SAME response object before returning.
     const dashboardUrl = new URL('/', origin);

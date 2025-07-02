@@ -20,6 +20,9 @@ const encodedKey = Buffer.from(secretKey, 'base64');
 const cookieName = 'session';
 const sessionPrefix = 'session:';
 
+// Define a long-lived session duration (30 days in seconds)
+const SESSION_DURATION_SECONDS = 30 * 24 * 60 * 60;
+
 // Interfaces for session data shapes
 interface OIDC_SessionData {
   claims: JWTPayload;
@@ -53,17 +56,18 @@ async function decrypt(
 }
 
 export async function createSession(
-  sessionData: OIDC_SessionData,
-  expiresInSeconds: number
+  sessionData: OIDC_SessionData
 ): Promise<void> {
   const sessionId = crypto.randomUUID();
   const key = `${sessionPrefix}${sessionId}`;
 
-  await setCache<OIDC_SessionData>(key, sessionData, expiresInSeconds);
+  // Store session in Redis with a 30-day TTL
+  await setCache<OIDC_SessionData>(key, sessionData, SESSION_DURATION_SECONDS);
 
   const encryptedSessionId = await encrypt({ sessionId });
 
-  const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7-day cookie
+  // Set the browser cookie to also expire in 30 days
+  const expires = new Date(Date.now() + SESSION_DURATION_SECONDS * 1000);
 
   (await cookies()).set(cookieName, encryptedSessionId, {
     expires,
@@ -97,11 +101,11 @@ export async function createMockSession(
 
 export async function updateSession(
   sessionId: string,
-  sessionData: OIDC_SessionData,
-  expiresInSeconds: number
+  sessionData: OIDC_SessionData
 ): Promise<void> {
   const key = `${sessionPrefix}${sessionId}`;
-  await setCache(key, sessionData, expiresInSeconds);
+  // When updating, reset the TTL to the full 30-day duration
+  await setCache(key, sessionData, SESSION_DURATION_SECONDS);
 }
 
 export async function deleteSession(): Promise<void> {
@@ -157,14 +161,20 @@ export const getSession = cache(async (): Promise<Session | null> => {
       return null;
     }
 
-    // Check if the token is expired and refresh if necessary
-    if (sessionData.claims.exp && sessionData.claims.exp * 1000 < Date.now()) {
-      logger.info('Session token expired, attempting refresh...');
+    // Check if the access token is expired or close to expiring.
+    // Refresh 5 minutes before actual expiry to be safe.
+    const isTokenExpired = sessionData.claims.exp
+      ? sessionData.claims.exp * 1000 < Date.now() + 5 * 60 * 1000
+      : true;
+
+    if (isTokenExpired) {
+      logger.info(
+        'Access token expired or nearing expiry, attempting refresh...'
+      );
       const refreshResult = await refreshAuthTokens(sessionData.refreshToken);
 
       if (refreshResult) {
-        const { newClaims, newAccessToken, newRefreshToken, newExpiresIn } =
-          refreshResult;
+        const { newClaims, newAccessToken, newRefreshToken } = refreshResult;
 
         const newSessionData: OIDC_SessionData = {
           claims: newClaims,
@@ -172,11 +182,19 @@ export const getSession = cache(async (): Promise<Session | null> => {
           refreshToken: newRefreshToken,
         };
 
-        await updateSession(payload.sessionId, newSessionData, newExpiresIn);
+        // The updateSession function will reset the Redis TTL to the full duration
+        await updateSession(payload.sessionId, newSessionData);
         sessionData = newSessionData; // Update the session for the current request
       } else {
-        logger.warn('Token refresh failed, deleting session from Redis.');
+        logger.warn(
+          'Token refresh failed. Deleting session from Redis and browser.'
+        );
         await deleteCache(key);
+        // Important: clear the invalid cookie to prevent redirect loops
+        (await cookies()).set(cookieName, '', {
+          expires: new Date(0),
+          path: '/',
+        });
         return null;
       }
     }
