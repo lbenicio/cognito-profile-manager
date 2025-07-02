@@ -227,10 +227,9 @@ function getCacheClient(): CacheClient {
       if (process.env.KV_URL && process.env.KV_REST_API_TOKEN) {
         cacheInstance = new VercelKVCache();
       } else {
-        logger.warn(
-          'Vercel KV env vars not found. Falling back to no-op cache.'
+        throw new Error(
+          'CACHE_PROVIDER is "vercel_kv" but KV_URL or KV_REST_API_TOKEN is missing.'
         );
-        cacheInstance = new NoOpCache();
       }
       break;
 
@@ -242,10 +241,9 @@ function getCacheClient(): CacheClient {
       ) {
         cacheInstance = new CloudflareKVCache();
       } else {
-        logger.warn(
-          'Cloudflare KV env vars not found. Falling back to no-op cache.'
+        throw new Error(
+          'CACHE_PROVIDER is "cloudflare_kv" but one or more required Cloudflare environment variables are missing.'
         );
-        cacheInstance = new NoOpCache();
       }
       break;
 
@@ -253,14 +251,15 @@ function getCacheClient(): CacheClient {
       if (process.env.REDIS_URL) {
         cacheInstance = new RedisCache(process.env.REDIS_URL);
       } else {
-        logger.warn('REDIS_URL not found. Falling back to no-op cache.');
-        cacheInstance = new NoOpCache();
+        throw new Error(
+          'CACHE_PROVIDER is set to "redis" but REDIS_URL is missing from environment variables.'
+        );
       }
       break;
 
     default:
       logger.warn(
-        `Unknown CACHE_PROVIDER "${provider}". Falling back to no-op cache.`
+        `Unknown or disabled CACHE_PROVIDER "${provider}". Caching will be non-functional.`
       );
       cacheInstance = new NoOpCache();
       break;

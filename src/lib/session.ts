@@ -4,7 +4,7 @@ import { cache } from 'react';
 import { EncryptJWT, jwtDecrypt, type JWTPayload } from 'jose';
 import { cookies } from 'next/headers';
 import { getCache, setCache, delCache } from './cache';
-import { refreshAuthTokens } from './actions/session.action';
+import { refreshAuthTokens } from '@/actions/session.action';
 import { Logger } from '@/lib/logger';
 import type { AppSession } from '@/types/user/user.types';
 import type { AuthTokenPayload } from '@/interfaces/auth/auth.interfaces';
@@ -114,9 +114,7 @@ export async function deleteSession(): Promise<void> {
 export const getSession = cache(async (): Promise<AppSession | null> => {
   const cookie = (await cookies()).get(cookieName)?.value;
   if (!cookie) {
-    logger.warn('No session cookie found when calling getSession.');
-  } else {
-    logger.info('Session cookie found in getSession.');
+    return null;
   }
   const payload = await decrypt(cookie);
 
@@ -152,6 +150,9 @@ export const getSession = cache(async (): Promise<AppSession | null> => {
     let sessionData = await getCache<OIDC_SessionData>(key);
 
     if (!sessionData) {
+      logger.error(
+        `Session data not found in cache for session ID: ${payload.sessionId}. The session may have expired from the cache or the cache is unreachable/misconfigured.`
+      );
       return null;
     }
 

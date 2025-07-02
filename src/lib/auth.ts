@@ -1,3 +1,4 @@
+'use server';
 import 'server-only';
 import { cache } from 'react';
 import {
@@ -68,9 +69,8 @@ export const getUser = cache(async (): Promise<User | null> => {
   }
 
   if (!session?.accessToken || !session.claims) {
-    logger.error(
-      'getUser: No valid session or access token found. Session:',
-      JSON.stringify(session)
+    logger.warn(
+      'getUser: No valid session or access token found. This is expected if the user is not logged in.'
     );
     return null;
   }
@@ -246,12 +246,17 @@ export const getUser = cache(async (): Promise<User | null> => {
       messages: messages,
     };
   } catch (error: any) {
+    logger.error(`Error in getUser for sub: ${session.claims.sub}.`);
+    logger.error(`Error Name: ${error.name}`);
+    logger.error(`Error Message: ${error.message}`);
+    if (error.stack) {
+      logger.error(`Stack Trace: ${error.stack}`);
+    }
     logger.error(
-      'General error in getUser, likely during device list or user attribute fetch:',
-      error
+      'This could be due to IAM permissions (missing cognito-idp:GetUser), an invalid/expired access token, or a network issue connecting to Cognito.'
     );
     logger.error(
-      'getUser: Returning null due to error above. Session:',
+      'Session details at time of error:',
       JSON.stringify(session)
     );
     return null;
