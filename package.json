@@ -48,7 +48,7 @@
     "@tailwindcss/postcss": "^4.1.11",
     "@tailwindcss/typography": "^0.5.13",
     "@vercel/analytics": "^1.5.0",
-    "@vercel/kv": "^2.0.0",
+    "@vercel/kv": "^3.0.0",
     "chalk": "^5.4.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
