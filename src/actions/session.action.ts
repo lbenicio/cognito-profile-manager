@@ -2,7 +2,7 @@
 
 import { jwtVerify, createRemoteJWKSet } from 'jose';
 import { Logger } from '@/lib/logger';
-import { getWellKnownConfig } from './well-known';
+import { getWellKnownConfig } from '../lib/well-known';
 import type { AuthTokenPayload } from '@/interfaces/auth/auth.interfaces';
 
 const logger = new Logger('SESSION-ACTIONS');

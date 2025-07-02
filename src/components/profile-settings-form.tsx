@@ -17,7 +17,7 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Save, Loader2 } from 'lucide-react';
 import type { PublicProfilePreferences } from '@/types/user/user.types';
-import { updatePublicProfilePreferences } from '@/lib/actions/profile-settings.action';
+import { updatePublicProfilePreferences } from '@/actions/profile-settings.action';
 
 export interface ProfileSettingsFormProps {
   initialPreferences: PublicProfilePreferences;

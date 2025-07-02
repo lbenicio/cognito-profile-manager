@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { devAdminLogin, devUserLogin, ssoLogin } from '@/lib/actions/auth.action';
+import { devAdminLogin, devUserLogin, ssoLogin } from '@/actions/auth.action';
 import { Button } from '@/components/ui/button';
 import {
   Card,

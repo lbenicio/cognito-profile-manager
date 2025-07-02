@@ -1,8 +1,8 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { cognitoClient, UpdateUserAttributesCommand } from './cognito';
-import { getSession } from './session';
+import { cognitoClient, UpdateUserAttributesCommand } from '../lib/cognito';
+import { getSession } from '../lib/session';
 import type { PublicProfilePreferences } from '@/types/user/user.types';
 import { Logger } from '@/lib/logger';
 

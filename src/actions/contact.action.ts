@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import nodemailer from 'nodemailer';
 import { Logger } from '@/lib/logger';
-import { getUser } from './auth';
+import { getUser } from '../lib/auth';
 
 const logger = new Logger('CONTACT');
 

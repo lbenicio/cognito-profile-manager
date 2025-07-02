@@ -9,9 +9,9 @@ import {
   VerifySoftwareTokenCommand,
   SetUserMFAPreferenceCommand,
   UpdateUserAttributesCommand,
-} from './cognito';
-import { getUser } from './auth';
-import { getSession } from './session';
+} from '../lib/cognito';
+import { getUser } from '../lib/auth';
+import { getSession } from '../lib/session';
 import { Logger } from '@/lib/logger';
 
 const logger = new Logger('MFA');

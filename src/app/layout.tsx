@@ -1,17 +1,17 @@
 import type { Metadata } from 'next';
-import './globals.css';
-import './fonts.css';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getLocale } from 'next-intl/server';
+import { inter } from './fonts';
+import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { getUser } from '@/lib/auth';
+import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: 'Outpost',
   description: 'Manage your Outpost user profile',
 };
 
-// This is the root layout. It now includes the i18n and theme providers.
 export default async function RootLayout({
   children,
 }: {
@@ -27,7 +27,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className='h-full'
+      className={cn('h-full', inter.variable)}
       style={{ fontSize: `${fontSize}pt` }}
       suppressHydrationWarning
     >

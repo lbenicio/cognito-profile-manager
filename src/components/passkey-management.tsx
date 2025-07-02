@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { KeyRound, Loader2, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslations } from 'next-intl';
-import { deletePasskey } from '@/lib/actions/passkey.action';
+import { deletePasskey } from '@/actions/passkey.action';
 import {
   Table,
   TableBody,

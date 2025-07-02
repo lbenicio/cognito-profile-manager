@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { createMockSession, getSession, deleteSession } from '@/lib/session';
 import { mockAdminUser, mockUser } from '@/lib/mock-data';
 import type { AuthTokenPayload } from '@/interfaces/auth/auth.interfaces';
+import { getBaseUrl } from '@/lib/url';
 
 export async function ssoLogin() {
   redirect('/api/v1/auth/sso/start');
@@ -92,4 +93,47 @@ export async function localLogout() {
     // For real sessions, redirect to the API route that handles Cognito logout.
     redirect('/api/v1/auth/logout');
   }
+}
+
+export async function mockLogin(type: 'admin' | 'user') {
+  const claims: AuthTokenPayload =
+    type === 'admin'
+      ? {
+          sub: 'mock-admin-sub',
+          email: 'admin@example.com',
+          name: 'Mock Admin',
+          'cognito:groups': ['admins'],
+          email_verified: true,
+          token_use: 'id',
+          client_id: 'mock-client',
+          aud: 'mock-client',
+          iss: 'mock-issuer',
+          exp: Math.floor(Date.now() / 1000) + 3600,
+          iat: Math.floor(Date.now() / 1000),
+          username: 'mockadmin',
+        }
+      : {
+          sub: 'mock-user-sub',
+          email: 'user@example.com',
+          name: 'Mock User',
+          'cognito:groups': ['users'],
+          email_verified: true,
+          token_use: 'id',
+          client_id: 'mock-client',
+          aud: 'mock-client',
+          iss: 'mock-issuer',
+          exp: Math.floor(Date.now() / 1000) + 3600,
+          iat: Math.floor(Date.now() / 1000),
+          username: 'mockuser',
+        };
+
+  await createMockSession({
+    username: claims.username!,
+    claims,
+    accessToken: 'mock-access-token',
+    refreshToken: 'mock-refresh-token',
+  });
+
+  const baseUrl = await getBaseUrl();
+  redirect(baseUrl);
 }

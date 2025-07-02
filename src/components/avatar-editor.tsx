@@ -7,7 +7,7 @@ import { UploadCloud, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import type { User as UserType } from '@/types/user/user.types';
-import { getPresignedUploadUrl, updateUserAvatar } from '@/lib/actions/avatar.action';
+import { getPresignedUploadUrl, updateUserAvatar } from '@/actions/avatar.action';
 import type { AvatarEditorProps } from '../interfaces/components/avatar-editor.interfaces';
 
 export function AvatarEditor({

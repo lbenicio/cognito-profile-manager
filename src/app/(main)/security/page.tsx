@@ -1,10 +1,10 @@
 import { getUser } from '@/lib/auth';
 import { SecurityView } from '@/components/security-view';
 import { getTranslations } from 'next-intl/server';
-import { syncPasskeysEnabledFlag } from '@/lib/actions/passkey.action';
+import { syncPasskeysEnabledFlag } from '@/actions/passkey.action';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
-import { localLogout } from '@/lib/actions/auth.action';
+import { localLogout } from '@/actions/auth.action';
 
 export default async function SecurityPage() {
   let user = await getUser();

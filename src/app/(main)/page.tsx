@@ -1,10 +1,10 @@
 import { getUser } from '@/lib/auth';
 import { DashboardView } from '@/components/dashboard-view';
 import { getTranslations } from 'next-intl/server';
-import { syncPasskeysEnabledFlag } from '@/lib/actions/passkey.action';
+import { syncPasskeysEnabledFlag } from '@/actions/passkey.action';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
-import { localLogout } from '@/lib/actions/auth.action';
+import { localLogout } from '@/actions/auth.action';
 import { MarkdownWidget } from '@/components/markdown-widget';
 import type { User } from '@/types/user/user.types';
 
