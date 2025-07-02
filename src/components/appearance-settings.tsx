@@ -19,7 +19,7 @@ import { Slider } from '@/components/ui/slider';
 import { LanguageSelect } from './language-select';
 import { updateUserPreferences } from '@/lib/preference-actions';
 import { useToast } from '@/hooks/use-toast';
-import type { User as UserType, UserPreferences } from '@/lib/auth';
+import type { User as UserType, UserPreferences } from '@/types/user/user.types';
 
 interface AppearanceSettingsProps {
   user: UserType;

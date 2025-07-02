@@ -3,6 +3,7 @@
  */
 
 import type { JWTPayload } from 'jose';
+import type { AuthTokenPayload } from '@/interfaces/auth/auth.interfaces';
 
 /**
  * User Preferences
@@ -102,13 +103,13 @@ export type User = {
 };
 
 /**
- * Session type for authentication/session management
+ * The shape of the session object returned by getSession()
  */
-export type Session = {
+export type AppSession = {
   accessToken: string;
   refreshToken: string;
-  claims: JWTPayload;
+  claims: AuthTokenPayload;
   isMock?: boolean;
   username?: string;
   sessionId: string;
-} | null;
+};

@@ -15,21 +15,10 @@ import type {
   PublicProfilePreferences,
   Device,
   Fingerprint,
+  AppSession,
 } from '@/types/user/user.types';
-import type { Session } from '@/interfaces/session/session.interfaces';
 
 const logger = new Logger('AUTH');
-
-// Re-export types for backward compatibility
-export type {
-  User,
-  UserPreferences,
-  NotificationPreferences,
-  PublicProfilePreferences,
-  Device,
-  Fingerprint,
-  Session,
-};
 
 const defaultPreferences: UserPreferences = {
   theme: 'system',
@@ -65,14 +54,14 @@ const defaultPublicProfilePreferences: PublicProfilePreferences = {
 };
 
 export const getUser = cache(async (): Promise<User | null> => {
-  const session = await getSession();
+  const session: AppSession | null = await getSession();
 
-  if (session?.isMock) {
+  if (session?.isMock && session.username) {
     logger.info('Using mock user data for development.');
     const mockUser = getMockUser(session.username);
     return {
       ...mockUser,
-      username: session.username || 'mockuser_dev',
+      username: session.username,
       sessionStartedAt: (session.claims.auth_time as number) || 0,
       sessionExpiresAt: (session.claims.exp as number) || 0,
     };
@@ -257,8 +246,6 @@ export const getUser = cache(async (): Promise<User | null> => {
       'General error in getUser, likely during device list or user attribute fetch:',
       error
     );
-    // Do not delete session here. A temporary Cognito error shouldn't log out the user.
-    // The session will be invalid for this request, and they can retry.
     return null;
   }
 });

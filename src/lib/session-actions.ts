@@ -1,9 +1,9 @@
 'use server';
 
 import { jwtVerify, createRemoteJWKSet } from 'jose';
-import type { JWTPayload } from 'jose';
 import { Logger } from '@/lib/logger';
 import { getWellKnownConfig } from './well-known';
+import type { AuthTokenPayload } from '@/interfaces/auth/auth.interfaces';
 
 const logger = new Logger('SESSION-ACTIONS');
 
@@ -14,7 +14,7 @@ type NewTokenResponse = {
 };
 
 export async function refreshAuthTokens(refreshToken: string): Promise<{
-  newClaims: JWTPayload;
+  newClaims: AuthTokenPayload;
   newAccessToken: string;
   newRefreshToken: string;
   newExpiresIn: number;
@@ -62,10 +62,14 @@ export async function refreshAuthTokens(refreshToken: string): Promise<{
     }
 
     const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
-    const { payload } = await jwtVerify(tokens.id_token, JWKS, {
-      issuer: wellknown.issuer,
-      audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
-    });
+    const { payload }: { payload: AuthTokenPayload } = await jwtVerify(
+      tokens.id_token,
+      JWKS,
+      {
+        issuer: wellknown.issuer,
+        audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
+      }
+    );
 
     // Cognito refresh tokens can be long-lived. The response might not include a new refresh token.
     // If it doesn't, we must reuse the old one.
