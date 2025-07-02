@@ -61,7 +61,8 @@ export async function GET(request: NextRequest) {
         cognitoLogoutUrl.searchParams.set('client_id', clientId);
 
         // AWS Cognito uses logout_uri parameter (even with custom domains)
-        const logoutRedirectUri = `${getBaseUrl()}/login`;
+        const baseUrl = await getBaseUrl();
+        const logoutRedirectUri = `${baseUrl}/login`;
         cognitoLogoutUrl.searchParams.set('logout_uri', logoutRedirectUri);
 
         logger.info('Using logout_uri parameter for AWS Cognito');
