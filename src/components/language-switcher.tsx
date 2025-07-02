@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { updateUserPreferences } from '@/lib/preference-actions';
+import { setLocaleCookie, getLocaleCookie } from '@/navigation';
 import type { UserPreferences } from '@/types/user/user.types';
 
 interface LanguageSwitcherProps {
@@ -27,7 +28,9 @@ export function LanguageSwitcher({
 
   function onSelectLocale(nextLocale: UserPreferences['language']) {
     startTransition(async () => {
+      // Update both user preferences and locale cookie
       await updateUserPreferences({ language: nextLocale });
+      setLocaleCookie(nextLocale);
       router.refresh();
     });
   }

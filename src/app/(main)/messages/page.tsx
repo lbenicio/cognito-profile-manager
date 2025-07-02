@@ -1,5 +1,5 @@
 import { getUser } from '@/lib/auth';
-import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 import {
   Card,
   CardContent,
@@ -13,11 +13,7 @@ import { clearMessages } from '@/lib/messages-actions';
 import { AlertCircle, Trash2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
-export default async function MessagesPage(props: {
-  params: Promise<{ locale: string }>;
-}) {
-  const params = await props.params;
-  setRequestLocale(params.locale);
+export default async function MessagesPage() {
   const user = await getUser();
   const t = await getTranslations('Messages');
 

@@ -7,12 +7,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { getLocale, getTranslations, setRequestLocale } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
+import { getLocale } from '@/i18n/i18n';
 import { AlertCircle } from 'lucide-react';
 
 export default async function NotFoundPage() {
-  const locale = await getLocale();
-  setRequestLocale(locale);
+  await getLocale(); // Ensure locale is set
   const t = await getTranslations('Errors.notFound');
 
   return (

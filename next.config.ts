@@ -1,7 +1,4 @@
 import type { NextConfig } from 'next';
-import withNextIntl from 'next-intl/plugin';
-
-const nextIntlConfig = withNextIntl('./src/i18n/i18n.ts');
 
 const r2Hostname = (() => {
   const r2Url = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
@@ -47,4 +44,4 @@ if (r2Hostname && nextConfig.images?.remotePatterns) {
   });
 }
 
-export default nextIntlConfig(nextConfig);
+export default nextConfig;

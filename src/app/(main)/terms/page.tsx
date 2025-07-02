@@ -1,11 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 
-export default async function TermsOfServicePage(props: {
-  params: Promise<{ locale: string }>;
-}) {
-  const params = await props.params;
-  setRequestLocale(params.locale);
+export default async function TermsOfServicePage() {
   const t = await getTranslations('Terms');
 
   return (

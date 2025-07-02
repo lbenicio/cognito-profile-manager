@@ -1,15 +1,11 @@
 import { getUser } from '@/lib/auth';
 import { ContactForm } from '@/components/contact-form';
-import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { localLogout } from '@/lib/auth-actions';
 
-export default async function ContactPage(props: {
-  params: Promise<{ locale: string }>;
-}) {
-  const params = await props.params;
-  setRequestLocale(params.locale);
+export default async function ContactPage() {
   const user = await getUser();
   const t = await getTranslations();
 

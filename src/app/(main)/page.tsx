@@ -1,6 +1,6 @@
 import { getUser } from '@/lib/auth';
 import { DashboardView } from '@/components/dashboard-view';
-import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 import { syncPasskeysEnabledFlag } from '@/lib/passkey-actions';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
@@ -8,10 +8,7 @@ import { localLogout } from '@/lib/auth-actions';
 import { MarkdownWidget } from '@/components/markdown-widget';
 
 // This is now a Server Component
-export default async function DashboardPage(props: {
-  params: Promise<{ locale: string }>;
-}) {
-  setRequestLocale((await props.params).locale);
+export default async function DashboardPage() {
   let user = await getUser();
 
   // Specifically load the namespaces we need for this page

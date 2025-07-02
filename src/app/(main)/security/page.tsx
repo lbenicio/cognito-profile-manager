@@ -1,16 +1,12 @@
 import { getUser } from '@/lib/auth';
 import { SecurityView } from '@/components/security-view';
-import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 import { syncPasskeysEnabledFlag } from '@/lib/passkey-actions';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
 import { localLogout } from '@/lib/auth-actions';
 
-export default async function SecurityPage(props: {
-  params: Promise<{ locale: string }>;
-}) {
-  const params = await props.params;
-  setRequestLocale(params.locale);
+export default async function SecurityPage() {
   let user = await getUser();
   const t = await getTranslations();
 
