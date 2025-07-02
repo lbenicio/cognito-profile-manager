@@ -16,6 +16,7 @@ import type {
   Device,
   Fingerprint,
 } from '@/types/user/user.types';
+import type { Session } from '@/interfaces/session/session.interfaces';
 
 const logger = new Logger('AUTH');
 
@@ -27,16 +28,8 @@ export type {
   PublicProfilePreferences,
   Device,
   Fingerprint,
-} from '@/types/user/user.types';
-
-export type Session = {
-  accessToken: string;
-  refreshToken: string;
-  claims: import('jose').JWTPayload;
-  isMock?: boolean;
-  username?: string;
-  sessionId: string;
-} | null;
+  Session,
+};
 
 const defaultPreferences: UserPreferences = {
   theme: 'system',
