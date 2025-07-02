@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { cognitoClient, UpdateUserAttributesCommand } from './cognito';
 import { getSession } from './session';
-import type { PublicProfilePreferences } from './auth';
+import type { PublicProfilePreferences } from '@/types/user/user.types';
 import { Logger } from '@/lib/logger';
 
 const logger = new Logger('PROFILE-SETTINGS');
