@@ -116,13 +116,22 @@ export class Logger {
 
       // The first argument to console.log can be a format string, but passing
       // multiple colored arguments allows for better inspection of objects in some terminals.
+      // Safely stringify any non-string arguments to avoid logging errors
+      const safeArgs = args.map((arg) => {
+        if (typeof arg === 'string') return arg;
+        try {
+          return JSON.stringify(arg, null, 2);
+        } catch {
+          return String(arg);
+        }
+      });
       logMethod(
         timestamp,
         env,
         name,
         levelStr,
         messageColorizer(message),
-        ...args
+        ...safeArgs
       );
     } else {
       // Frontend logging without colors

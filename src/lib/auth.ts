@@ -68,6 +68,10 @@ export const getUser = cache(async (): Promise<User | null> => {
   }
 
   if (!session?.accessToken || !session.claims) {
+    logger.error(
+      'getUser: No valid session or access token found. Session:',
+      JSON.stringify(session)
+    );
     return null;
   }
 
@@ -245,6 +249,10 @@ export const getUser = cache(async (): Promise<User | null> => {
     logger.error(
       'General error in getUser, likely during device list or user attribute fetch:',
       error
+    );
+    logger.error(
+      'getUser: Returning null due to error above. Session:',
+      JSON.stringify(session)
     );
     return null;
   }

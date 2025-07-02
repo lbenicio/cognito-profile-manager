@@ -65,7 +65,9 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const callbackUrl = await getCognitoCallbackUrl('/api/v1/auth/callback/oidc');
+    const callbackUrl = await getCognitoCallbackUrl(
+      '/api/v1/auth/callback/oidc'
+    );
 
     const wellknown = await getWellKnownConfig();
     const tokenEndpoint = wellknown.token_endpoint;
@@ -120,8 +122,20 @@ export async function GET(request: NextRequest) {
       refreshToken: tokens.refresh_token,
     };
 
+    logger.info('OIDC callback: Token exchange successful. Session data:', {
+      claims: sessionData.claims,
+      accessTokenExists: !!sessionData.accessToken,
+      refreshTokenExists: !!sessionData.refreshToken,
+      exp: sessionData.claims && (sessionData.claims as any).exp,
+      sub: sessionData.claims && (sessionData.claims as any).sub,
+    });
+
     // The new createSession uses a long-lived duration internally.
     await createSession(sessionData);
+
+    logger.info(
+      'OIDC callback: Session created successfully, redirecting to dashboard.'
+    );
 
     // Clear the state cookie on the SAME response object before returning.
     const dashboardUrl = new URL('/', origin);

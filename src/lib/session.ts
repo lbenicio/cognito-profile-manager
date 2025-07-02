@@ -121,9 +121,17 @@ export async function deleteSession(): Promise<void> {
 
 export const getSession = cache(async (): Promise<AppSession | null> => {
   const cookie = (await cookies()).get(cookieName)?.value;
+  if (!cookie) {
+    logger.warn('No session cookie found when calling getSession.');
+  } else {
+    logger.info('Session cookie found in getSession.');
+  }
   const payload = await decrypt(cookie);
 
   if (!payload) {
+    logger.warn(
+      'Session cookie could not be decrypted or was empty in getSession.'
+    );
     return null;
   }
 
