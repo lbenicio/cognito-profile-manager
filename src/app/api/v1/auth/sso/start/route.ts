@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const callbackUrl = getCognitoCallbackUrl('/api/v1/auth/callback/oidc');
+    const callbackUrl = await getCognitoCallbackUrl('/api/v1/auth/callback/oidc');
 
     const wellknown = await getWellKnownConfig();
     const authorizationEndpoint = wellknown.authorization_endpoint;

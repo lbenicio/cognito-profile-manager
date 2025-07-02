@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
       throw new Error('SSO client configuration is missing.');
     }
 
-    const callbackUrl = getCognitoCallbackUrl('/api/v1/auth/callback/passkey');
+    const callbackUrl = await getCognitoCallbackUrl('/api/v1/auth/callback/passkey');
 
     const wellknown = await getWellKnownConfig();
     const authorizationEndpoint = wellknown.authorization_endpoint;
