@@ -25,7 +25,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Save } from 'lucide-react';
 import React from 'react';
-import { updateUserProfile } from '@/lib/profile-actions';
+import { updateUserProfile } from '@/lib/actions/profile.action';
 import { TimezoneSelect } from './timezone-select';
 import { PhoneInput } from './phone-input';
 import { Textarea } from './ui/textarea';

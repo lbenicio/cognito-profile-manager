@@ -20,7 +20,7 @@ import type {
   User as UserType,
   NotificationPreferences,
 } from '@/types/user/user.types';
-import { updateNotificationPreferences } from '@/lib/notification-actions';
+import { updateNotificationPreferences } from '@/lib/actions/notification.action';
 
 interface NotificationSettingsProps {
   user: UserType;

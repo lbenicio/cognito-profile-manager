@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { clearMessages } from '@/lib/messages-actions';
+import { clearMessages } from '@/lib/actions/messages.action';
 import { AlertCircle, Trash2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 

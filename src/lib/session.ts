@@ -4,7 +4,7 @@ import { cache } from 'react';
 import { EncryptJWT, jwtDecrypt, type JWTPayload } from 'jose';
 import { cookies } from 'next/headers';
 import { getCache, setCache, delCache } from './cache';
-import { refreshAuthTokens } from './session-actions';
+import { refreshAuthTokens } from './actions/session.action';
 import { Logger } from '@/lib/logger';
 import type { AppSession } from '@/types/user/user.types';
 import type { AuthTokenPayload } from '@/interfaces/auth/auth.interfaces';

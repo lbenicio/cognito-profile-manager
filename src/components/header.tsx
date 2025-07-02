@@ -37,7 +37,7 @@ import type { User as UserType } from '@/types/user/user.types';
 import { Separator } from '@/components/ui/separator';
 import { useTransition } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { localLogout } from '@/lib/auth-actions';
+import { localLogout } from '@/lib/actions/auth.action';
 import { Badge } from '@/components/ui/badge';
 
 type HeaderTranslations = {

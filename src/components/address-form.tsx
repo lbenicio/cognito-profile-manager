@@ -24,7 +24,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Save } from 'lucide-react';
 import React from 'react';
-import { updateUserAddress } from '@/lib/profile-actions';
+import { updateUserAddress } from '@/lib/actions/profile.action';
 import { addressFormSchema } from '@/types/forms/address-form.types';
 import {
   AddressFormProps,

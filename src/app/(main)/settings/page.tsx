@@ -4,7 +4,7 @@ import { getTranslations } from 'next-intl/server';
 import { getUser } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
-import { localLogout } from '@/lib/auth-actions';
+import { localLogout } from '@/lib/actions/auth.action';
 
 export default async function SettingsPage() {
   const user = await getUser();

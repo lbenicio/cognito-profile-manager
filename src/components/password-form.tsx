@@ -25,7 +25,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { KeyRound, Loader2 } from 'lucide-react';
 import React from 'react';
-import { changePassword } from '@/lib/password-actions';
+import { changePassword } from '@/lib/actions/password.action';
 import { passwordFormSchema } from '@/types/forms/password-form.types';
 import { PasswordFormValues } from '@/interfaces/forms/password-form.interfaces';
 
