@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
-import type { JWTPayload } from 'jose';
+import type { AuthTokenPayload } from '@/interfaces/auth/auth.interfaces';
 import { createSession } from '@/lib/session';
 import { Logger } from '@/lib/logger';
 import { getWellKnownConfig } from '@/lib/well-known';
@@ -108,18 +108,14 @@ export async function GET(request: NextRequest) {
     }
 
     const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
-    const { payload }: { payload: JWTPayload } = await jwtVerify(
-      tokens.id_token,
-      JWKS,
-      {
-        issuer: wellknown.issuer,
-        audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
-      }
-    );
+    const { payload } = await jwtVerify(tokens.id_token, JWKS, {
+      issuer: wellknown.issuer,
+      audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
+    });
 
     // Store the full token set in Redis, identified by a new session ID
     const sessionData = {
-      claims: payload,
+      claims: payload as AuthTokenPayload,
       accessToken: tokens.access_token,
       refreshToken: tokens.refresh_token,
     };

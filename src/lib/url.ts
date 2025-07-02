@@ -9,8 +9,8 @@ import { headers } from 'next/headers';
  *
  * @returns The full base URL (e.g., "https://example.com").
  */
-export function getBaseUrl() {
-  const headersList = headers();
+export async function getBaseUrl() {
+  const headersList = await headers();
   const forwardedHost = headersList.get('x-forwarded-host');
   const host = forwardedHost || headersList.get('host');
 
@@ -33,8 +33,8 @@ export function getBaseUrl() {
  * @param path - The API path for the callback (e.g., /api/v1/auth/callback/oidc).
  * @returns The full, correctly formatted callback URL for Cognito.
  */
-export function getCognitoCallbackUrl(path: string): string {
-  const headersList = headers();
+export async function getCognitoCallbackUrl(path: string): Promise<string> {
+  const headersList = await headers();
   const forwardedHost = headersList.get('x-forwarded-host');
   const host = forwardedHost || headersList.get('host');
 
