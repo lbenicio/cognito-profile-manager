@@ -12,14 +12,13 @@ export default async function DashboardPage(props: {
   params: Promise<{ locale: string }>;
 }) {
   setRequestLocale((await props.params).locale);
-  const tDashboard = await getTranslations('Dashboard');
+  const t = await getTranslations(); // Get all translations
   let user = await getUser();
 
   // The middleware should protect this page. If user is null here, it indicates
   // a session issue that the middleware couldn't catch, or a failed API call in getUser.
   // We render an error instead of redirecting to prevent an infinite loop.
   if (!user) {
-    const t = await getTranslations('Header');
     return (
       <div className='flex h-screen items-center justify-center'>
         <div className='space-y-4 text-center'>
@@ -31,7 +30,7 @@ export default async function DashboardPage(props: {
           <form action={localLogout}>
             <Button type='submit'>
               <LogOut className='mr-2 h-4 w-4' />
-              {t('userMenu.logout')}
+              {t('Header.userMenu.logout')}
             </Button>
           </form>
         </div>
@@ -53,7 +52,7 @@ export default async function DashboardPage(props: {
       infoWidget={
         <MarkdownWidget
           filePath='src/content/dashboard-widget.md'
-          title={tDashboard('dashboardInfo.title')}
+          title={t('Dashboard.dashboardInfo.title')}
         />
       }
     />
