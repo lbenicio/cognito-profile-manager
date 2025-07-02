@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { deleteSession, getSession } from '@/lib/session';
 import { Logger } from '@/lib/logger';
 import { getWellKnownConfig } from '@/lib/well-known';
+import { getBaseUrl } from '@/lib/url';
 
 const logger = new Logger('LOGOUT');
 
@@ -32,12 +33,11 @@ export async function GET(request: NextRequest) {
     }
 
     // 3. For real OAuth2 sessions, redirect to Cognito logout
-    const appUrl = process.env.APP_URL?.replace(/\/$/, '');
     const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
     const loginUrl = new URL('/login', request.url);
 
     // If we don't have the required config, just do local logout
-    if (!appUrl || !clientId) {
+    if (!clientId) {
       logger.warn(
         'Missing Cognito configuration - performing local logout only'
       );
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
         cognitoLogoutUrl.searchParams.set('client_id', clientId);
 
         // AWS Cognito uses logout_uri parameter (even with custom domains)
-        const logoutRedirectUri = `${appUrl}/login`;
+        const logoutRedirectUri = `${getBaseUrl()}/login`;
         cognitoLogoutUrl.searchParams.set('logout_uri', logoutRedirectUri);
 
         logger.info('Using logout_uri parameter for AWS Cognito');
