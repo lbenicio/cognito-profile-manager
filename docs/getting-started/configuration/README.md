@@ -30,6 +30,16 @@ These variables connect the application to your AWS Cognito User Pool.
 - `COGNITO_ADMIN_GROUP_NAME`: The name of the user group in Cognito that grants admin privileges.
 - `COGNITO_GROUPS_CLAIM_KEY`: The key used in the ID token to identify a user's groups (e.g., `cognito:groups`).
 
+## Caching
+
+- `CACHE_PROVIDER`: Specifies the caching backend to use. Options are `redis`, `vercel_kv`, `cloudflare_kv`. Defaults to `redis` if not set.
+- `REDIS_URL`: The full connection URL for your Redis instance (e.g., `redis://:password@hostname:port`).
+- `KV_URL`: (Vercel KV) The URL of your Vercel KV store.
+- `KV_REST_API_TOKEN`: (Vercel KV) The API token for your Vercel KV store.
+- `CLOUDFLARE_ACCOUNT_ID`: (Cloudflare KV) Your Cloudflare account ID.
+- `CLOUDFLARE_KV_NAMESPACE_ID`: (Cloudflare KV) The ID of the KV namespace to use for caching.
+- `CLOUDFLARE_API_TOKEN`: (Cloudflare KV) A Cloudflare API token with permission to write to the specified KV namespace.
+
 ## Cloudflare R2 / S3-Compatible Storage
 
 These variables are for storing user assets like profile pictures.

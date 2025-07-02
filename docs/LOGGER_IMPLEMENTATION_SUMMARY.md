@@ -51,7 +51,7 @@ enum LogLevel {
 - `src/lib/auth.ts` - Authentication logging
 - `src/lib/session.ts` - Session management logging
 - `src/lib/session-actions.ts` - Session action logging
-- `src/lib/redis.ts` - Cache operation logging
+- `src/lib/cache.ts` - Cache operation logging
 
 ### Action Files
 - `src/lib/contact-actions.ts` - Contact form logging
@@ -119,7 +119,7 @@ import {
 - `AUTH` - Authentication operations
 - `SESSION` - Session management
 - `SESSION-ACTIONS` - Session action operations
-- `CACHE` - Redis caching operations
+- `CACHE` - Caching operations
 - `CONTACT` - Contact form operations
 - `MFA` - Multi-factor authentication
 - `NOTIFICATION` - Notification preferences

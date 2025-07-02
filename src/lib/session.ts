@@ -3,7 +3,7 @@ import 'server-only';
 import { cache } from 'react';
 import { EncryptJWT, jwtDecrypt, type JWTPayload } from 'jose';
 import { cookies } from 'next/headers';
-import { getCache, setCache, deleteCache } from './redis';
+import { getCache, setCache, delCache } from './cache';
 import { refreshAuthTokens } from './session-actions';
 import type { Session } from '@/types/user/user.types';
 import { Logger } from '@/lib/logger';
@@ -114,10 +114,10 @@ export async function deleteSession(): Promise<void> {
     try {
       const payload = await decrypt(cookie);
       if (payload?.sessionId && typeof payload.sessionId === 'string') {
-        await deleteCache(`${sessionPrefix}${payload.sessionId}`);
+        await delCache(`${sessionPrefix}${payload.sessionId}`);
       }
     } catch (e) {
-      logger.error('Error deleting session from Redis:', e);
+      logger.error('Error deleting session from cache:', e);
     }
   }
   (await cookies()).set(cookieName, '', { expires: new Date(0), path: '/' });
@@ -187,9 +187,9 @@ export const getSession = cache(async (): Promise<Session | null> => {
         sessionData = newSessionData; // Update the session for the current request
       } else {
         logger.warn(
-          'Token refresh failed. Deleting session from Redis and browser.'
+          'Token refresh failed. Deleting session from cache and browser.'
         );
-        await deleteCache(key);
+        await delCache(key);
         // Important: clear the invalid cookie to prevent redirect loops
         (await cookies()).set(cookieName, '', {
           expires: new Date(0),

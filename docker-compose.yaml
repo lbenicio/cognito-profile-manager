@@ -45,8 +45,16 @@ services:
       SMTP_FROM_EMAIL: ${SMTP_FROM_EMAIL}
       CONTACT_FORM_TO_EMAIL: ${CONTACT_FORM_TO_EMAIL}
 
-      # Optional services
+      # Caching Provider
+      CACHE_PROVIDER: ${CACHE_PROVIDER:-redis}
       REDIS_URL: ${REDIS_URL}
+      KV_URL: ${KV_URL}
+      KV_REST_API_TOKEN: ${KV_REST_API_TOKEN}
+      CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID}
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
+      CLOUDFLARE_KV_NAMESPACE_ID: ${CLOUDFLARE_KV_NAMESPACE_ID}
+
+      # Log Level
       LOG_LEVEL: ${LOG_LEVEL:-DEBUG}
     restart: unless-stopped
     profiles: ['dev']
@@ -90,8 +98,16 @@ services:
       SMTP_FROM_EMAIL: ${SMTP_FROM_EMAIL}
       CONTACT_FORM_TO_EMAIL: ${CONTACT_FORM_TO_EMAIL}
 
-      # Optional services
+      # Caching Provider
+      CACHE_PROVIDER: ${CACHE_PROVIDER:-redis}
       REDIS_URL: ${REDIS_URL}
+      KV_URL: ${KV_URL}
+      KV_REST_API_TOKEN: ${KV_REST_API_TOKEN}
+      CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID}
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
+      CLOUDFLARE_KV_NAMESPACE_ID: ${CLOUDFLARE_KV_NAMESPACE_ID}
+      
+      # Log Level
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       NEXT_TELEMETRY_DISABLED: 1
     restart: unless-stopped
