@@ -7,7 +7,7 @@ import { getUser } from '@/lib/auth';
 import { getSession } from '@/lib/session';
 import { r2 } from '@/lib/r2';
 import { revalidatePath } from 'next/cache';
-import { cognitoClient, UpdateUserAttributesCommand } from './cognito';
+import { cognitoClient, UpdateUserAttributesCommand } from '../lib/cognito';
 
 const BUCKET_NAME = process.env.R2_BUCKET_NAME;
 const PUBLIC_URL = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;

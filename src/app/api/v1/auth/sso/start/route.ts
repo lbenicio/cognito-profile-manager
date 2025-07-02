@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Logger } from '@/lib/logger';
 import { getWellKnownConfig } from '@/lib/well-known';
+import { getCognitoCallbackUrl } from '@/lib/url';
 
 const logger = new Logger('SSO-START');
 
 export async function GET(request: NextRequest) {
   try {
     const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
-    const appUrl = process.env.APP_URL?.replace(/\/$/, '');
     const scope =
       process.env.NEXT_PUBLIC_OAUTH2_SCOPE ||
       'openid email profile aws.cognito.signin.user.admin';
@@ -18,10 +18,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    if (!appUrl) {
-      throw new Error('APP_URL environment variable is required.');
-    }
-    const callbackUrl = `${appUrl}/api/v1/auth/callback/oidc`;
+    const callbackUrl = await getCognitoCallbackUrl('/api/v1/auth/callback/oidc');
 
     const wellknown = await getWellKnownConfig();
     const authorizationEndpoint = wellknown.authorization_endpoint;

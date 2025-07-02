@@ -17,9 +17,9 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
 import { LanguageSelect } from './language-select';
-import { updateUserPreferences } from '@/lib/preference-actions';
+import { updateUserPreferences } from '@/actions/preference.action';
 import { useToast } from '@/hooks/use-toast';
-import type { User as UserType, UserPreferences } from '@/lib/auth';
+import type { User as UserType, UserPreferences } from '@/types/user/user.types';
 
 interface AppearanceSettingsProps {
   user: UserType;

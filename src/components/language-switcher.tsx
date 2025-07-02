@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { updateUserPreferences } from '@/lib/preference-actions';
+import { updateUserPreferences } from '@/actions/preference.action';
 import { setLocaleCookie, getLocaleCookie } from '@/navigation';
 import type { UserPreferences } from '@/types/user/user.types';
 

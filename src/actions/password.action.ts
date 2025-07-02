@@ -6,8 +6,8 @@ import {
   ChangePasswordCommand,
   NotAuthorizedException,
   InvalidPasswordException,
-} from './cognito';
-import { getSession } from './session';
+} from '../lib/cognito';
+import { getSession } from '../lib/session';
 import { Logger } from '@/lib/logger';
 
 const logger = new Logger('PASSWORD');

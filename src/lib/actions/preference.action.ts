@@ -2,11 +2,12 @@
 
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
-import { cognitoClient, UpdateUserAttributesCommand } from './cognito';
-import { getUser, type UserPreferences } from './auth';
-import { getSession } from './session';
+import { cognitoClient, UpdateUserAttributesCommand } from '../cognito';
+import { getUser } from '../auth';
+import { getSession } from '../session';
 import { locales } from '@/navigation';
 import { Logger } from '@/lib/logger';
+import type { UserPreferences } from '@/types/user/user.types';
 
 const logger = new Logger('PREFERENCE');
 

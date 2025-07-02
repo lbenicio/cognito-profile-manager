@@ -13,6 +13,7 @@ interface CacheClient {
   get<T>(key: string): Promise<T | null>;
   set<T>(key: string, value: T, ttlSeconds?: number): Promise<void>;
   del(keys: string | string[]): Promise<number>;
+  ping(): Promise<{ status: 'ok' | 'error'; message: string }>;
 }
 
 /**
@@ -28,6 +29,9 @@ class NoOpCache implements CacheClient {
   async set<T>(): Promise<void> {}
   async del(): Promise<number> {
     return 0;
+  }
+  async ping(): Promise<{ status: 'ok' | 'error'; message: string }> {
+    return { status: 'ok', message: 'No-op cache is active.' };
   }
 }
 
@@ -61,6 +65,23 @@ class RedisCache implements CacheClient {
     if (keysToDelete.length === 0) return 0;
     return this.client.del(...keysToDelete);
   }
+
+  async ping(): Promise<{ status: 'ok' | 'error'; message: string }> {
+    try {
+      const result = await this.client.ping();
+      if (result === 'PONG') {
+        return { status: 'ok', message: 'Redis connection successful.' };
+      }
+      return {
+        status: 'error',
+        message: `Unexpected ping response: ${result}`,
+      };
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Unknown Redis error';
+      return { status: 'error', message };
+    }
+  }
 }
 
 /**
@@ -85,6 +106,22 @@ class VercelKVCache implements CacheClient {
     const keysToDelete = Array.isArray(keys) ? keys : [keys];
     if (keysToDelete.length === 0) return 0;
     return this.client.del(...keysToDelete);
+  }
+
+  async ping(): Promise<{ status: 'ok' | 'error'; message: string }> {
+    try {
+      const testKey = 'healthcheck_ping';
+      await this.client.set(testKey, 'ok', { ex: 5 });
+      const result = await this.client.get(testKey);
+      if (result === 'ok') {
+        return { status: 'ok', message: 'Vercel KV connection successful.' };
+      }
+      return { status: 'error', message: 'Vercel KV ping failed.' };
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Unknown Vercel KV error';
+      return { status: 'error', message };
+    }
   }
 }
 
@@ -150,6 +187,25 @@ class CloudflareKVCache implements CacheClient {
       throw new Error(`Cloudflare KV DEL failed: ${response.statusText}`);
     }
     return keysToDelete.length; // Note: This is an assumption; API returns success boolean.
+  }
+
+  async ping(): Promise<{ status: 'ok' | 'error'; message: string }> {
+    try {
+      const response = await this.request(`/keys/healthcheck_ping`);
+      if (response.ok || response.status === 404) {
+        return { status: 'ok', message: 'Cloudflare KV API is reachable.' };
+      }
+      return {
+        status: 'error',
+        message: `Cloudflare KV API returned status ${response.status}.`,
+      };
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Unknown Cloudflare KV error';
+      return { status: 'error', message };
+    }
   }
 }
 
@@ -231,4 +287,12 @@ export async function setCache<T>(
 export async function delCache(keys: string | string[]): Promise<number> {
   const client = getCacheClient();
   return client.del(keys);
+}
+
+export async function pingCache(): Promise<{
+  status: 'ok' | 'error';
+  message: string;
+}> {
+  const client = getCacheClient();
+  return client.ping();
 }

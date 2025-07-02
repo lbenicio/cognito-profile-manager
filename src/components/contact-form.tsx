@@ -33,7 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { sendContactEmail } from '@/lib/contact-actions';
+import { sendContactEmail } from '@/actions/contact.action';
 import { Label } from './ui/label';
 import {
   ContactFormProps,

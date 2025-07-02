@@ -20,7 +20,7 @@ import {
   generateMfaSetup,
   verifyAndEnableMfa,
   disableMfa,
-} from '@/lib/mfa-actions';
+} from '@/actions/mfa.action';
 
 interface TwoFactorAuthProps {
   user: User;

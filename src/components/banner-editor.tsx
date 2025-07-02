@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import {
   getBannerPresignedUploadUrl,
   updateUserBanner,
-} from '@/lib/banner-actions';
+} from '@/actions/banner.action';
 import type { BannerEditorProps } from '../interfaces/components/banner-editor.interfaces';
 
 export function BannerEditor({

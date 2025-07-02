@@ -1,12 +1,12 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { cognitoClient, UpdateUserAttributesCommand } from './cognito';
-import { getSession } from './session';
+import { cognitoClient, UpdateUserAttributesCommand } from '../cognito';
+import { getSession } from '../session';
 import { Logger } from '@/lib/logger';
+import type { NotificationPreferences } from '@/types/user/user.types';
 
 const logger = new Logger('NOTIFICATION');
-import type { NotificationPreferences } from './auth';
 
 export async function updateNotificationPreferences(
   newPreferences: NotificationPreferences

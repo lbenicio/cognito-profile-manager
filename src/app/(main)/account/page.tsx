@@ -3,7 +3,7 @@ import { AccountView } from '@/components/account-view';
 import { getTranslations } from 'next-intl/server';
 import { Button } from '@/components/ui/button';
 import { LogOut } from 'lucide-react';
-import { localLogout } from '@/lib/auth-actions';
+import { localLogout } from '@/actions/auth.action';
 
 export default async function AccountPage() {
   const user = await getUser();

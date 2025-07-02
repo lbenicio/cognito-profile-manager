@@ -1,8 +1,8 @@
 'use server';
 
-import { cognitoClient, ListWebAuthnCredentialsCommand } from './cognito';
-import { getUser } from './auth';
-import { getSession } from './session';
+import { cognitoClient, ListWebAuthnCredentialsCommand } from '../lib/cognito';
+import { getUser } from '../lib/auth';
+import { getSession } from '../lib/session';
 import { Logger } from '@/lib/logger';
 
 const logger = new Logger('PASSKEY-ADMIN');

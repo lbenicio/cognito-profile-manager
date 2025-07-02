@@ -56,32 +56,11 @@ export class Logger {
     return new Date().toISOString();
   }
 
+  // This is now only used for client-side logging
   private formatMessage(level: string, message: string): string {
     const timestamp = this.formatTimestamp();
-    const env = this.isServer ? 'SERVER' : 'CLIENT';
+    const env = 'CLIENT';
     return `[${timestamp}] [${env}] [${this.name}] [${level}] ${message}`;
-  }
-
-  private colorizeLevel(level: string, message: string): string {
-    if (!this.isServer) {
-      // No coloring in browser
-      return this.formatMessage(level, message);
-    }
-
-    const formattedMessage = this.formatMessage(level, message);
-
-    switch (level) {
-      case 'DEBUG':
-        return chalk.gray(formattedMessage);
-      case 'INFO':
-        return chalk.blue(formattedMessage);
-      case 'WARN':
-        return chalk.yellow(formattedMessage);
-      case 'ERROR':
-        return chalk.red(formattedMessage);
-      default:
-        return formattedMessage;
-    }
   }
 
   private shouldLog(level: LogLevel): boolean {
@@ -96,19 +75,59 @@ export class Logger {
   ): void {
     if (!this.shouldLog(logLevel)) return;
 
-    const formattedMessage = this.colorizeLevel(level, message);
+    // Determine the correct console method
+    const logMethod =
+      {
+        DEBUG: console.log,
+        INFO: console.log,
+        WARN: console.warn,
+        ERROR: console.error,
+      }[level] || console.log;
 
-    switch (level) {
-      case 'DEBUG':
-      case 'INFO':
-        console.log(formattedMessage, ...args);
-        break;
-      case 'WARN':
-        console.warn(formattedMessage, ...args);
-        break;
-      case 'ERROR':
-        console.error(formattedMessage, ...args);
-        break;
+    if (this.isServer) {
+      // Backend logging with individual colors for better readability
+      const timestamp = chalk.dim(`[${this.formatTimestamp()}]`);
+      const env = chalk.magenta('[SERVER]');
+      const name = chalk.cyan(`[${this.name}]`);
+
+      let levelStr: string;
+      let messageColorizer: (s: string) => string = (s) => s;
+
+      switch (logLevel) {
+        case LogLevel.DEBUG:
+          levelStr = chalk.gray('[DEBUG]');
+          messageColorizer = chalk.gray;
+          break;
+        case LogLevel.INFO:
+          levelStr = chalk.blueBright('[INFO]');
+          break;
+        case LogLevel.WARN:
+          levelStr = chalk.yellowBright('[WARN]');
+          messageColorizer = chalk.yellow;
+          break;
+        case LogLevel.ERROR:
+          levelStr = chalk.redBright('[ERROR]');
+          messageColorizer = chalk.red;
+          break;
+        default:
+          levelStr = `[${level}]`;
+          break;
+      }
+
+      // The first argument to console.log can be a format string, but passing
+      // multiple colored arguments allows for better inspection of objects in some terminals.
+      logMethod(
+        timestamp,
+        env,
+        name,
+        levelStr,
+        messageColorizer(message),
+        ...args
+      );
+    } else {
+      // Frontend logging without colors
+      const formattedMessage = this.formatMessage(level, message);
+      logMethod(formattedMessage, ...args);
     }
   }
 

@@ -2,10 +2,11 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
-import type { JWTPayload } from 'jose';
+import type { AuthTokenPayload } from '@/interfaces/auth/auth.interfaces';
 import { createSession } from '@/lib/session';
 import { Logger } from '@/lib/logger';
 import { getWellKnownConfig } from '@/lib/well-known';
+import { getCognitoCallbackUrl } from '@/lib/url';
 
 const logger = new Logger('OIDC-CALLBACK');
 
@@ -64,11 +65,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const appUrl = process.env.APP_URL?.replace(/\/$/, '');
-    if (!appUrl) {
-      throw new Error('Missing APP_URL env var');
-    }
-    const callbackUrl = `${appUrl}/api/v1/auth/callback/oidc`;
+    const callbackUrl = await getCognitoCallbackUrl('/api/v1/auth/callback/oidc');
 
     const wellknown = await getWellKnownConfig();
     const tokenEndpoint = wellknown.token_endpoint;
@@ -111,18 +108,14 @@ export async function GET(request: NextRequest) {
     }
 
     const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
-    const { payload }: { payload: JWTPayload } = await jwtVerify(
-      tokens.id_token,
-      JWKS,
-      {
-        issuer: wellknown.issuer,
-        audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
-      }
-    );
+    const { payload } = await jwtVerify(tokens.id_token, JWKS, {
+      issuer: wellknown.issuer,
+      audience: process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!,
+    });
 
     // Store the full token set in Redis, identified by a new session ID
     const sessionData = {
-      claims: payload,
+      claims: payload as AuthTokenPayload,
       accessToken: tokens.access_token,
       refreshToken: tokens.refresh_token,
     };
