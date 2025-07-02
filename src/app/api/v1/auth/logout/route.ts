@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
       return response;
     }
 
-    // 3. For real OAuth2 sessions, try to logout from Cognito
+    // 3. For real OAuth2 sessions, redirect to Cognito logout
     const appUrl = process.env.APP_URL?.replace(/\/$/, '');
     const clientId = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
     const loginUrl = new URL('/login', request.url);
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
       return response;
     }
 
-    // 4. Try to get Cognito logout endpoint
+    // 4. Try to get Cognito logout endpoint and redirect user
     try {
       const wellknown = await getWellKnownConfig();
       const logoutEndpoint =
@@ -60,18 +60,19 @@ export async function GET(request: NextRequest) {
         const cognitoLogoutUrl = new URL(logoutEndpoint);
         cognitoLogoutUrl.searchParams.set('client_id', clientId);
 
-        // AWS Cognito uses post_logout_redirect_uri parameter
-        const redirectUri = `${appUrl}/login`;
-        cognitoLogoutUrl.searchParams.set(
-          'post_logout_redirect_uri',
-          redirectUri
-        );
+        // AWS Cognito uses logout_uri parameter (even with custom domains)
+        const logoutRedirectUri = `${appUrl}/login`;
+        cognitoLogoutUrl.searchParams.set('logout_uri', logoutRedirectUri);
+
+        logger.info('Using logout_uri parameter for AWS Cognito');
 
         logger.info(
-          `Redirecting to Cognito logout: ${cognitoLogoutUrl.toString()}`
+          `Redirecting user to Cognito logout: ${cognitoLogoutUrl.toString()}`
         );
 
         const response = NextResponse.redirect(cognitoLogoutUrl.toString());
+
+        // Clear auth cookies before redirect
         response.cookies.set('oauth_state', '', {
           expires: new Date(0),
           path: '/',
@@ -79,15 +80,10 @@ export async function GET(request: NextRequest) {
 
         return response;
       } else {
-        logger.warn(
-          'No logout endpoint found in OIDC well-known configuration'
-        );
+        logger.warn('No logout endpoint found in OIDC configuration');
       }
     } catch (error) {
       logger.error('Failed to get Cognito logout endpoint:', error);
-      if (error instanceof Error) {
-        logger.error('Error details:', error.message);
-      }
     }
 
     // 5. Fallback to local logout if Cognito logout fails

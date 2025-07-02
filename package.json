@@ -1,6 +1,6 @@
 {
   "name": "outpost",
-  "version": "0.3.18",
+  "version": "0.3.19",
   "private": true,
   "license": "GPL-3.0-only",
   "description": "Outpost is a platform for managing user profiles and authentication.",
@@ -16,7 +16,8 @@
     "generate:key": "node scripts/generate-encryption-key.js",
     "setup:dev": "node scripts/setup-dev.js",
     "test:auth": "node scripts/test-auth-flow.js",
-    "test:cognito": "node scripts/test-cognito-config.js"
+    "test:cognito": "node scripts/test-cognito-config.js",
+    "test:logout": "node scripts/test-logout.js"
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.588.0",
