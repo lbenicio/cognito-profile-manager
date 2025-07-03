@@ -19,6 +19,7 @@ The Docker setup includes:
 - Docker and Docker Compose installed
 - AWS Cognito User Pool configured
 - Cloudflare R2 bucket (or S3-compatible storage)
+- Upstash Redis instance for caching
 
 ### 2. Environment Setup
 
@@ -41,6 +42,10 @@ NEXT_PUBLIC_COGNITO_WELLKNOWN=https://cognito-idp.us-east-1.amazonaws.com/us-eas
 
 # Required: Encryption key (generate with: openssl rand -base64 32)
 TOTP_SECRET_ENCRYPTION_KEY=your-32-byte-base64-key
+
+# Required: Caching provider
+CACHE_PROVIDER=upstash
+UPSTASH_REDIS_URL=your-upstash-redis-url
 
 # Required: AWS and R2 settings
 AWS_REGION=us-east-1
@@ -101,9 +106,6 @@ docker-compose --profile dev up --build
 
 # Start production environment
 docker-compose --profile prod up --build
-
-# With Redis caching
-docker-compose --profile prod --profile redis up --build
 ```
 
 ## Environment Variable Handling
@@ -136,6 +138,7 @@ These are handled normally by Node.js at runtime:
 - `AWS_REGION`
 - `R2_*` secrets
 - `SMTP_*` settings
+- `UPSTASH_REDIS_URL`
 
 ### Security Considerations
 
@@ -165,6 +168,7 @@ services:
       - cognito_client_secret
       - totp_encryption_key
       - r2_secret_key
+      - upstash_redis_url
     deploy:
       replicas: 2
       restart_policy:
@@ -181,6 +185,8 @@ secrets:
   totp_encryption_key:
     external: true
   r2_secret_key:
+    external: true
+  upstash_redis_url:
     external: true
 ```
 
@@ -217,6 +223,11 @@ spec:
             secretKeyRef:
               name: app-secrets
               key: cognito-client-secret
+        - name: UPSTASH_REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: upstash-redis-url
         # ... other environment variables
         resources:
           limits:
@@ -371,7 +382,6 @@ docker exec cognito-profile-manager env | grep -E "(NEXT_PUBLIC_|APP_URL)"
 **Solutions**:
 - Monitor resource usage: `docker stats cognito-profile-manager`
 - Increase container memory limits
-- Enable Redis caching
 - Check for memory leaks in logs
 
 ### Debug Mode
@@ -411,8 +421,7 @@ docker exec cognito-profile-manager npm list
 1. **Multi-stage builds**: Already implemented to reduce image size
 2. **Layer caching**: Order Dockerfile commands for optimal caching
 3. **Resource limits**: Set appropriate CPU and memory limits
-4. **Redis caching**: Enable Redis for session and data caching
-5. **CDN**: Use a CDN for static assets (images, CSS, JS)
+4. **CDN**: Use a CDN for static assets (images, CSS, JS)
 
 ## Backup and Recovery
 
@@ -420,8 +429,7 @@ docker exec cognito-profile-manager npm list
 
 - Environment configuration files
 - User-uploaded assets (R2/S3 bucket)
-- Session data (if using Redis)
-- Application logs
+- Session data from Upstash Redis
 
 ### Backup Strategy
 
@@ -429,8 +437,7 @@ docker exec cognito-profile-manager npm list
 # Backup environment files
 tar -czf config-backup-$(date +%Y%m%d).tar.gz .env.* *.yml
 
-# Backup Redis data (if using)
-docker exec redis-container redis-cli BGSAVE
+# Backup Redis data (if using Upstash, use their backup tools)
 ```
 
 ## Support
@@ -458,7 +465,7 @@ TOTP_SECRET_ENCRYPTION_KEY=abc123def456ghi789jkl012mno345pqr678stu901vwx234yz=
 # Cognito
 NEXT_PUBLIC_COGNITO_CLIENT_ID=1a2b3c4d5e6f7g8h9i0j
 COGNITO_CLIENT_SECRET=your-cognito-client-secret
-NEXT_PUBLIC_COGNITO_WELLKNOWN=https://cognito-idp.us-east-1.amazonaws.com/us-east-1_XXXXXXXXX/.well-known/openid-configuration
+NEXT_PUBLIC_COGNITO_WELLKNOWN=https://cognito-idp.us-east-1.amazonaws.com/us-east-1_XXXXXXXXX/.well-known/openid_configuration
 
 # AWS
 AWS_REGION=us-east-1
@@ -479,7 +486,8 @@ SMTP_FROM_EMAIL=noreply@example.com
 CONTACT_FORM_TO_EMAIL=contact@example.com
 
 # Optional
-REDIS_URL=redis://redis:6379
+CACHE_PROVIDER=upstash
+UPSTASH_REDIS_URL=rediss://default:your-token@your-host.upstash.io:port
 LOG_LEVEL=INFO
 ```
 
@@ -495,24 +503,12 @@ services:
       - "3000:3000"
     env_file: .env.local
     restart: unless-stopped
-    depends_on:
-      - redis
     healthcheck:
       test: ["CMD", "node", "-e", "const http = require('http'); const options = { host: 'localhost', port: 3000, path: '/', timeout: 2000 }; const req = http.request(options, (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.end();"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-
-  redis:
-    image: redis:7-alpine
-    volumes:
-      - redis_data:/data
-    command: redis-server --appendonly yes
-    restart: unless-stopped
-
-volumes:
-  redis_data:
 ```
 
 This completes the Docker deployment guide for the Cognito Profile Manager.

@@ -46,13 +46,8 @@ services:
       CONTACT_FORM_TO_EMAIL: ${CONTACT_FORM_TO_EMAIL}
 
       # Caching Provider
-      CACHE_PROVIDER: ${CACHE_PROVIDER:-redis}
-      REDIS_URL: ${REDIS_URL}
-      KV_URL: ${KV_URL}
-      KV_REST_API_TOKEN: ${KV_REST_API_TOKEN}
-      CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID}
-      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
-      CLOUDFLARE_KV_NAMESPACE_ID: ${CLOUDFLARE_KV_NAMESPACE_ID}
+      CACHE_PROVIDER: ${CACHE_PROVIDER:-upstash}
+      UPSTASH_REDIS_URL: ${UPSTASH_REDIS_URL}
 
       # Log Level
       LOG_LEVEL: ${LOG_LEVEL:-DEBUG}
@@ -99,13 +94,8 @@ services:
       CONTACT_FORM_TO_EMAIL: ${CONTACT_FORM_TO_EMAIL}
 
       # Caching Provider
-      CACHE_PROVIDER: ${CACHE_PROVIDER:-redis}
-      REDIS_URL: ${REDIS_URL}
-      KV_URL: ${KV_URL}
-      KV_REST_API_TOKEN: ${KV_REST_API_TOKEN}
-      CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID}
-      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
-      CLOUDFLARE_KV_NAMESPACE_ID: ${CLOUDFLARE_KV_NAMESPACE_ID}
+      CACHE_PROVIDER: ${CACHE_PROVIDER:-upstash}
+      UPSTASH_REDIS_URL: ${UPSTASH_REDIS_URL}
       
       # Log Level
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
@@ -124,17 +114,6 @@ services:
       retries: 3
       start_period: 40s
     profiles: ['prod']
-
-  # Optional Redis service for caching
-  redis:
-    image: redis:7-alpine
-    ports:
-      - '6379:6379'
-    volumes:
-      - redis_data:/data
-    command: redis-server --appendonly yes
-    restart: unless-stopped
-    profiles: ['redis', 'dev', 'prod']
 
 volumes:
   redis_data:
