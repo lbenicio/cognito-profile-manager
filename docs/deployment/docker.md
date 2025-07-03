@@ -42,6 +42,11 @@ NEXT_PUBLIC_COGNITO_WELLKNOWN=https://cognito-idp.us-east-1.amazonaws.com/us-eas
 # Required: Encryption key (generate with: openssl rand -base64 32)
 TOTP_SECRET_ENCRYPTION_KEY=your-32-byte-base64-key
 
+# Required: Caching provider
+CACHE_PROVIDER=upstash
+UPSTASH_KV_REST_API_URL=your-upstash-rest-api-url
+UPSTASH_KV_REST_API_TOKEN=your-upstash-rest-api-token
+
 # Required: AWS and R2 settings
 AWS_REGION=us-east-1
 R2_ACCOUNT_ID=your-account-id
@@ -136,6 +141,8 @@ These are handled normally by Node.js at runtime:
 - `AWS_REGION`
 - `R2_*` secrets
 - `SMTP_*` settings
+- `UPSTASH_KV_REST_API_URL`
+- `UPSTASH_KV_REST_API_TOKEN`
 
 ### Security Considerations
 
@@ -165,6 +172,7 @@ services:
       - cognito_client_secret
       - totp_encryption_key
       - r2_secret_key
+      - upstash_kv_rest_api_token
     deploy:
       replicas: 2
       restart_policy:
@@ -181,6 +189,8 @@ secrets:
   totp_encryption_key:
     external: true
   r2_secret_key:
+    external: true
+  upstash_kv_rest_api_token:
     external: true
 ```
 
@@ -217,6 +227,11 @@ spec:
             secretKeyRef:
               name: app-secrets
               key: cognito-client-secret
+        - name: UPSTASH_KV_REST_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: upstash-kv-rest-api-token
         # ... other environment variables
         resources:
           limits:
@@ -479,7 +494,9 @@ SMTP_FROM_EMAIL=noreply@example.com
 CONTACT_FORM_TO_EMAIL=contact@example.com
 
 # Optional
-REDIS_URL=redis://redis:6379
+CACHE_PROVIDER=upstash
+UPSTASH_KV_REST_API_URL=https://your-upstash-instance.upstash.io
+UPSTASH_KV_REST_API_TOKEN=your-upstash-token
 LOG_LEVEL=INFO
 ```
 
@@ -495,24 +512,12 @@ services:
       - "3000:3000"
     env_file: .env.local
     restart: unless-stopped
-    depends_on:
-      - redis
     healthcheck:
       test: ["CMD", "node", "-e", "const http = require('http'); const options = { host: 'localhost', port: 3000, path: '/', timeout: 2000 }; const req = http.request(options, (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.end();"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-
-  redis:
-    image: redis:7-alpine
-    volumes:
-      - redis_data:/data
-    command: redis-server --appendonly yes
-    restart: unless-stopped
-
-volumes:
-  redis_data:
 ```
 
 This completes the Docker deployment guide for the Cognito Profile Manager.

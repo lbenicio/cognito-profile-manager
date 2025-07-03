@@ -21,7 +21,7 @@ These variables connect the application to your AWS Cognito User Pool.
 
 - `NEXT_PUBLIC_COGNITO_CLIENT_ID`: The App Client ID from your Cognito User Pool.
 - `COGNITO_CLIENT_SECRET`: The App Client Secret. This is required for the authorization code grant flow.
-- `NEXT_PUBLIC_COGNITO_WELLKNOWN`: The OpenID Connect discovery endpoint for your User Pool. It looks like: `https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/openid-configuration`.
+- `NEXT_PUBLIC_COGNITO_WELLKNOWN`: The OpenID Connect discovery endpoint for your User Pool. It looks like: `https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/openid_configuration`.
 - `NEXT_PUBLIC_OAUTH2_SCOPE`: The OAuth2 scopes to request during authentication. `openid profile email aws.cognito.signin.user.admin` are common defaults.
 
 ## Admin Settings
@@ -33,7 +33,9 @@ These variables connect the application to your AWS Cognito User Pool.
 ## Caching
 
 - `CACHE_PROVIDER`: Specifies the caching backend to use. Set to `upstash` to use Upstash Redis. Defaults to `upstash` if not set.
-- `UPSTASH_REDIS_URL`: The full connection URL for your Upstash Redis instance (e.g., `rediss://default:password@hostname:port`).
+- `UPSTASH_KV_REST_API_URL`: The REST API URL for your Upstash instance.
+- `UPSTASH_KV_REST_API_TOKEN`: The REST API token for your Upstash instance.
+
 
 ## Cloudflare R2 / S3-Compatible Storage
 

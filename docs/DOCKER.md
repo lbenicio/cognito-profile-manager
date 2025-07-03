@@ -45,7 +45,9 @@ TOTP_SECRET_ENCRYPTION_KEY=your-32-byte-base64-key
 
 # Required: Caching provider
 CACHE_PROVIDER=upstash
-UPSTASH_REDIS_URL=your-upstash-redis-url
+UPSTASH_KV_REST_API_URL=your-upstash-rest-api-url
+UPSTASH_KV_REST_API_TOKEN=your-upstash-rest-api-token
+
 
 # Required: AWS and R2 settings
 AWS_REGION=us-east-1
@@ -138,7 +140,8 @@ These are handled normally by Node.js at runtime:
 - `AWS_REGION`
 - `R2_*` secrets
 - `SMTP_*` settings
-- `UPSTASH_REDIS_URL`
+- `UPSTASH_KV_REST_API_URL`
+- `UPSTASH_KV_REST_API_TOKEN`
 
 ### Security Considerations
 
@@ -168,7 +171,7 @@ services:
       - cognito_client_secret
       - totp_encryption_key
       - r2_secret_key
-      - upstash_redis_url
+      - upstash_kv_rest_api_token
     deploy:
       replicas: 2
       restart_policy:
@@ -186,7 +189,7 @@ secrets:
     external: true
   r2_secret_key:
     external: true
-  upstash_redis_url:
+  upstash_kv_rest_api_token:
     external: true
 ```
 
@@ -223,11 +226,11 @@ spec:
             secretKeyRef:
               name: app-secrets
               key: cognito-client-secret
-        - name: UPSTASH_REDIS_URL
+        - name: UPSTASH_KV_REST_API_TOKEN
           valueFrom:
             secretKeyRef:
               name: app-secrets
-              key: upstash-redis-url
+              key: upstash-kv-rest-api-token
         # ... other environment variables
         resources:
           limits:
@@ -487,7 +490,8 @@ CONTACT_FORM_TO_EMAIL=contact@example.com
 
 # Optional
 CACHE_PROVIDER=upstash
-UPSTASH_REDIS_URL=rediss://default:your-token@your-host.upstash.io:port
+UPSTASH_KV_REST_API_URL=https://your-upstash-instance.upstash.io
+UPSTASH_KV_REST_API_TOKEN=your-upstash-token
 LOG_LEVEL=INFO
 ```
 
