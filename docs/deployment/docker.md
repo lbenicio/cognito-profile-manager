@@ -19,6 +19,7 @@ The Docker setup includes:
 - Docker and Docker Compose installed
 - AWS Cognito User Pool configured
 - Cloudflare R2 bucket (or S3-compatible storage)
+- Upstash Redis instance for caching
 
 ### 2. Environment Setup
 
@@ -37,15 +38,16 @@ APP_URL=https://yourapp.com
 # Required: Cognito settings
 NEXT_PUBLIC_COGNITO_CLIENT_ID=your-client-id
 COGNITO_CLIENT_SECRET=your-client-secret
-NEXT_PUBLIC_COGNITO_WELLKNOWN=https://cognito-idp.us-east-1.amazonaws.com/us-east-1_XXXXXXXXX/.well-known/openid-configuration
+NEXT_PUBLIC_COGNITO_WELLKNOWN=https://cognito-idp.us-east-1.amazonaws.com/us-east-1_XXXXXXXXX/.well-known/openid_configuration
 
 # Required: Encryption key (generate with: openssl rand -base64 32)
 TOTP_SECRET_ENCRYPTION_KEY=your-32-byte-base64-key
 
 # Required: Caching provider
 CACHE_PROVIDER=upstash
-UPSTASH_KV_REST_API_URL=your-upstash-rest-api-url
-UPSTASH_KV_REST_API_TOKEN=your-upstash-rest-api-token
+upstash_KV_REST_API_URL=your-upstash-rest-api-url
+upstash_KV_REST_API_TOKEN=your-upstash-rest-api-token
+
 
 # Required: AWS and R2 settings
 AWS_REGION=us-east-1
@@ -106,9 +108,6 @@ docker-compose --profile dev up --build
 
 # Start production environment
 docker-compose --profile prod up --build
-
-# With Redis caching
-docker-compose --profile prod --profile redis up --build
 ```
 
 ## Environment Variable Handling
@@ -141,8 +140,8 @@ These are handled normally by Node.js at runtime:
 - `AWS_REGION`
 - `R2_*` secrets
 - `SMTP_*` settings
-- `UPSTASH_KV_REST_API_URL`
-- `UPSTASH_KV_REST_API_TOKEN`
+- `upstash_KV_REST_API_URL`
+- `upstash_KV_REST_API_TOKEN`
 
 ### Security Considerations
 
@@ -227,7 +226,7 @@ spec:
             secretKeyRef:
               name: app-secrets
               key: cognito-client-secret
-        - name: UPSTASH_KV_REST_API_TOKEN
+        - name: upstash_KV_REST_API_TOKEN
           valueFrom:
             secretKeyRef:
               name: app-secrets
@@ -386,7 +385,6 @@ docker exec cognito-profile-manager env | grep -E "(NEXT_PUBLIC_|APP_URL)"
 **Solutions**:
 - Monitor resource usage: `docker stats cognito-profile-manager`
 - Increase container memory limits
-- Enable Redis caching
 - Check for memory leaks in logs
 
 ### Debug Mode
@@ -426,8 +424,7 @@ docker exec cognito-profile-manager npm list
 1. **Multi-stage builds**: Already implemented to reduce image size
 2. **Layer caching**: Order Dockerfile commands for optimal caching
 3. **Resource limits**: Set appropriate CPU and memory limits
-4. **Redis caching**: Enable Redis for session and data caching
-5. **CDN**: Use a CDN for static assets (images, CSS, JS)
+4. **CDN**: Use a CDN for static assets (images, CSS, JS)
 
 ## Backup and Recovery
 
@@ -435,8 +432,7 @@ docker exec cognito-profile-manager npm list
 
 - Environment configuration files
 - User-uploaded assets (R2/S3 bucket)
-- Session data (if using Redis)
-- Application logs
+- Session data from Upstash Redis
 
 ### Backup Strategy
 
@@ -444,8 +440,7 @@ docker exec cognito-profile-manager npm list
 # Backup environment files
 tar -czf config-backup-$(date +%Y%m%d).tar.gz .env.* *.yml
 
-# Backup Redis data (if using)
-docker exec redis-container redis-cli BGSAVE
+# Backup Redis data (if using Upstash, use their backup tools)
 ```
 
 ## Support
@@ -495,8 +490,8 @@ CONTACT_FORM_TO_EMAIL=contact@example.com
 
 # Optional
 CACHE_PROVIDER=upstash
-UPSTASH_KV_REST_API_URL=https://your-upstash-instance.upstash.io
-UPSTASH_KV_REST_API_TOKEN=your-upstash-token
+upstash_KV_REST_API_URL=https://your-upstash-instance.upstash.io
+upstash_KV_REST_API_TOKEN=your-upstash-token
 LOG_LEVEL=INFO
 ```
 

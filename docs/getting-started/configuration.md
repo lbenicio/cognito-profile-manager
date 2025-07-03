@@ -33,8 +33,8 @@ These variables connect the application to your AWS Cognito User Pool.
 ## Caching
 
 - `CACHE_PROVIDER`: Specifies the caching backend to use. Set to `upstash` to use Upstash Redis. Defaults to `upstash` if not set.
-- `UPSTASH_KV_REST_API_URL`: The REST API URL for your Upstash instance.
-- `UPSTASH_KV_REST_API_TOKEN`: The REST API token for your Upstash instance.
+- `upstash_KV_REST_API_URL`: The REST API URL for your Upstash instance.
+- `upstash_KV_REST_API_TOKEN`: The REST API token for your Upstash instance.
 
 
 ## Cloudflare R2 / S3-Compatible Storage
