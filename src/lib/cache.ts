@@ -40,8 +40,8 @@ class NoOpCache implements CacheClient {
 class UpstashRedisCache implements CacheClient {
   private client: Redis;
 
-  constructor(url: string) {
-    this.client = new Redis({ url });
+  constructor(url: string, token: string) {
+    this.client = new Redis({ url, token });
     logger.info('Upstash Redis cache client initialized.');
   }
 
@@ -85,11 +85,14 @@ function initializeCacheClient(): CacheClient {
   const provider = process.env.CACHE_PROVIDER || 'upstash';
 
   if (provider === 'upstash') {
-    if (process.env.UPSTASH_REDIS_URL) {
-      return new UpstashRedisCache(process.env.UPSTASH_REDIS_URL);
+    const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
+    const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+    if (redisUrl && redisToken) {
+      return new UpstashRedisCache(redisUrl, redisToken);
     }
     logger.warn(
-      'CACHE_PROVIDER is "upstash" but UPSTASH_REDIS_URL is missing. Caching is disabled.'
+      'CACHE_PROVIDER is "upstash" but UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN are missing. Caching is disabled.'
     );
     return new NoOpCache();
   }
