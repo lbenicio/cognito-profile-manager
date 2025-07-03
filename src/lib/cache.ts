@@ -77,41 +77,34 @@ class UpstashRedisCache implements CacheClient {
   }
 }
 
-// Singleton instance of the cache client
-let cacheInstance: CacheClient;
-
 /**
- * Factory function to get the appropriate cache client based on environment variables.
+ * Initializes the cache client based on environment variables.
+ * This function is called once when the module is loaded, ensuring a single client instance.
  */
-function getCacheClient(): CacheClient {
-  if (cacheInstance) {
-    return cacheInstance;
-  }
-
+function initializeCacheClient(): CacheClient {
   const provider = process.env.CACHE_PROVIDER || 'upstash';
 
   if (provider === 'upstash') {
     if (process.env.UPSTASH_REDIS_URL) {
-      cacheInstance = new UpstashRedisCache(process.env.UPSTASH_REDIS_URL);
-    } else {
-      logger.warn(
-        'CACHE_PROVIDER is "upstash" but UPSTASH_REDIS_URL is missing. Caching is disabled.'
-      );
-      cacheInstance = new NoOpCache();
+      return new UpstashRedisCache(process.env.UPSTASH_REDIS_URL);
     }
-  } else {
     logger.warn(
-      `Unsupported CACHE_PROVIDER "${provider}". Caching will be disabled.`
+      'CACHE_PROVIDER is "upstash" but UPSTASH_REDIS_URL is missing. Caching is disabled.'
     );
-    cacheInstance = new NoOpCache();
+    return new NoOpCache();
   }
 
-  return cacheInstance;
+  logger.warn(
+    `Unsupported CACHE_PROVIDER "${provider}". Caching will be disabled.`
+  );
+  return new NoOpCache();
 }
+
+// Singleton instance of the cache client, initialized once.
+const client: CacheClient = initializeCacheClient();
 
 // --- Public API ---
 export async function getCache<T>(key: string): Promise<T | null> {
-  const client = getCacheClient();
   return client.get<T>(key);
 }
 
@@ -120,12 +113,10 @@ export async function setCache<T>(
   value: T,
   ttlSeconds?: number
 ): Promise<void> {
-  const client = getCacheClient();
   await client.set(key, value, ttlSeconds);
 }
 
 export async function delCache(keys: string | string[]): Promise<number> {
-  const client = getCacheClient();
   return client.del(keys);
 }
 
@@ -133,6 +124,5 @@ export async function pingCache(): Promise<{
   status: 'ok' | 'error';
   message: string;
 }> {
-  const client = getCacheClient();
   return client.ping();
 }

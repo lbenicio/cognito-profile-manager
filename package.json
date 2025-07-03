@@ -1,6 +1,6 @@
 {
   "name": "cognito-profile-manager",
-  "version": "0.3.100",
+  "version": "0.3.101",
   "private": true,
   "license": "GPL-3.0-only",
   "description": "Outpost is a platform for managing user profiles and authentication.",
