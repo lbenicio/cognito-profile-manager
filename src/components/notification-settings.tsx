@@ -111,7 +111,7 @@ export function NotificationSettings({ user }: NotificationSettingsProps) {
               <Label htmlFor='user-notifications'>
                 {t('types.user.label')}
               </Label>
-              <p className='text-sm text-muted-foreground'>
+              <p className='text-muted-foreground text-sm'>
                 {t('types.user.description')}
               </p>
             </div>
@@ -127,7 +127,7 @@ export function NotificationSettings({ user }: NotificationSettingsProps) {
               <Label htmlFor='system-notifications'>
                 {t('types.system.label')}
               </Label>
-              <p className='text-sm text-muted-foreground'>
+              <p className='text-muted-foreground text-sm'>
                 {t('types.system.description')}
               </p>
             </div>
@@ -143,7 +143,7 @@ export function NotificationSettings({ user }: NotificationSettingsProps) {
               <Label htmlFor='marketing-notifications'>
                 {t('types.marketing.label')}
               </Label>
-              <p className='text-sm text-muted-foreground'>
+              <p className='text-muted-foreground text-sm'>
                 {t('types.marketing.description')}
               </p>
             </div>

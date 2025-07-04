@@ -115,7 +115,7 @@ export function LoginView({}: LoginViewProps) {
   };
 
   return (
-    <div className='flex min-h-screen items-center justify-center bg-background'>
+    <div className='bg-background flex min-h-screen items-center justify-center'>
       <Card className='mx-4 w-full max-w-md'>
         <CardHeader className='text-center'>
           <CardTitle className='text-2xl'>{t('title')}</CardTitle>
@@ -143,7 +143,7 @@ export function LoginView({}: LoginViewProps) {
                     <span className='w-full border-t' />
                   </div>
                   <div className='relative flex justify-center text-xs uppercase'>
-                    <span className='bg-background px-2 text-muted-foreground'>
+                    <span className='bg-background text-muted-foreground px-2'>
                       Development Only
                     </span>
                   </div>
@@ -187,7 +187,7 @@ export function LoginView({}: LoginViewProps) {
                   </form>
                 </div>
 
-                <p className='text-center text-xs text-muted-foreground'>
+                <p className='text-muted-foreground text-center text-xs'>
                   Mock logins use test data and skip authentication
                 </p>
               </>

@@ -36,7 +36,6 @@ These variables connect the application to your AWS Cognito User Pool.
 - `upstash_KV_REST_API_URL`: The REST API URL for your Upstash instance.
 - `upstash_KV_REST_API_TOKEN`: The REST API token for your Upstash instance.
 
-
 ## Cloudflare R2 / S3-Compatible Storage
 
 These variables are for storing user assets like profile pictures.

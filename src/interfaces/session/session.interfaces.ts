@@ -240,7 +240,9 @@ export interface SessionContext {
     isAdmin: boolean;
     groups: string[];
   } | null;
-  login: (credentials: import('@/interfaces/auth/auth.interfaces').LoginCredentials) => Promise<void>;
+  login: (
+    credentials: import('@/interfaces/auth/auth.interfaces').LoginCredentials
+  ) => Promise<void>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
 }

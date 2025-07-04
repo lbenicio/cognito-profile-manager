@@ -4,7 +4,9 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-console.log('🚀 Setting up development environment for Cognito Profile Manager\n');
+console.log(
+  '🚀 Setting up development environment for Cognito Profile Manager\n'
+);
 
 const projectRoot = path.join(__dirname, '..');
 const envDevFile = path.join(projectRoot, '.env.development.local');
@@ -63,7 +65,9 @@ DEV_MODE=true
 `;
 
   fs.writeFileSync(envDevFile, envContent);
-  console.log('✅ Created .env.development.local with generated encryption key');
+  console.log(
+    '✅ Created .env.development.local with generated encryption key'
+  );
 }
 
 function checkExistingEnvFile() {

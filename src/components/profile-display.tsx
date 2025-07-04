@@ -132,7 +132,7 @@ export function ProfileDisplay({ user, onUpdateAction }: ProfileDisplayProps) {
         <CardContent className='space-y-4 text-sm'>
           <div className='flex items-center justify-between gap-4'>
             <div className='flex min-w-0 items-center gap-3'>
-              <Mail className='h-5 w-5 shrink-0 text-muted-foreground' />
+              <Mail className='text-muted-foreground h-5 w-5 shrink-0' />
               <span className='truncate'>{user.email}</span>
             </div>
             {user.email_verified ? (
@@ -152,7 +152,7 @@ export function ProfileDisplay({ user, onUpdateAction }: ProfileDisplayProps) {
                 className='shrink-0'
               >
                 {emailLoading ? (
-                  <div className='h-4 w-4 animate-spin rounded-full border-b-2 border-primary'></div>
+                  <div className='border-primary h-4 w-4 animate-spin rounded-full border-b-2'></div>
                 ) : (
                   tProfile('verification.resend')
                 )}
@@ -161,7 +161,7 @@ export function ProfileDisplay({ user, onUpdateAction }: ProfileDisplayProps) {
           </div>
           <div className='flex items-center justify-between gap-4'>
             <div className='flex min-w-0 items-center gap-3'>
-              <Phone className='h-5 w-5 shrink-0 text-muted-foreground' />
+              <Phone className='text-muted-foreground h-5 w-5 shrink-0' />
               <span className='text-sm'>
                 {user.phone_number || tProfile('display.notSet')}
               </span>
@@ -184,7 +184,7 @@ export function ProfileDisplay({ user, onUpdateAction }: ProfileDisplayProps) {
                   className='shrink-0'
                 >
                   {phoneLoading ? (
-                    <div className='h-4 w-4 animate-spin rounded-full border-b-2 border-primary'></div>
+                    <div className='border-primary h-4 w-4 animate-spin rounded-full border-b-2'></div>
                   ) : (
                     tProfile('verification.resend')
                   )}
@@ -192,20 +192,20 @@ export function ProfileDisplay({ user, onUpdateAction }: ProfileDisplayProps) {
               ))}
           </div>
           <div className='flex items-start gap-3'>
-            <Home className='mt-1 h-5 w-5 shrink-0 text-muted-foreground' />
+            <Home className='text-muted-foreground mt-1 h-5 w-5 shrink-0' />
             <span className='flex-1'>
               {user.address || tProfile('display.notSet')}
             </span>
           </div>
           <div className='flex items-start gap-3'>
-            <PersonStanding className='mt-1 h-5 w-5 shrink-0 text-muted-foreground' />
+            <PersonStanding className='text-muted-foreground mt-1 h-5 w-5 shrink-0' />
             <span className='flex-1'>
               {user.gender || tProfile('display.notSet')}
             </span>
           </div>
           {user.website && (
             <div className='flex items-center gap-3'>
-              <Globe className='h-5 w-5 text-muted-foreground' />
+              <Globe className='text-muted-foreground h-5 w-5' />
               <a
                 href={user.website}
                 target='_blank'
@@ -218,13 +218,13 @@ export function ProfileDisplay({ user, onUpdateAction }: ProfileDisplayProps) {
           )}
           {user.zoneinfo && (
             <div className='flex items-center gap-3'>
-              <Clock className='h-5 w-5 text-muted-foreground' />
+              <Clock className='text-muted-foreground h-5 w-5' />
               <span>{user.zoneinfo}</span>
             </div>
           )}
           {user.locale && (
             <div className='flex items-center gap-3'>
-              <Languages className='h-5 w-5 text-muted-foreground' />
+              <Languages className='text-muted-foreground h-5 w-5' />
               <span>{user.locale}</span>
             </div>
           )}
@@ -233,13 +233,13 @@ export function ProfileDisplay({ user, onUpdateAction }: ProfileDisplayProps) {
             <h4 className='font-semibold'>
               {tProfile('display.aboutMeTitle')}
             </h4>
-            <p className='whitespace-pre-wrap text-sm text-muted-foreground'>
+            <p className='text-muted-foreground text-sm whitespace-pre-wrap'>
               {user.aboutMe || tProfile('display.notSet')}
             </p>
           </div>
           <Separator className='my-4' />
           <div className='flex items-start gap-3'>
-            <Users className='mt-1 h-5 w-5 shrink-0 text-muted-foreground' />
+            <Users className='text-muted-foreground mt-1 h-5 w-5 shrink-0' />
             <div className='flex-1'>
               <span className='font-semibold'>{tDashboard('groups')}</span>
               <div className='mt-2 flex flex-wrap gap-2'>
@@ -258,7 +258,7 @@ export function ProfileDisplay({ user, onUpdateAction }: ProfileDisplayProps) {
             </div>
           </div>
         </CardContent>
-        <CardFooter className='flex-col items-start gap-2 border-t pt-4 text-xs text-muted-foreground'>
+        <CardFooter className='text-muted-foreground flex-col items-start gap-2 border-t pt-4 text-xs'>
           <div className='flex items-center gap-2'>
             <BadgeCheck className='h-4 w-4' />
             <span>

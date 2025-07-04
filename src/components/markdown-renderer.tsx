@@ -23,7 +23,7 @@ export async function MarkdownRenderer({ filePath }: { filePath: string }) {
 
   return (
     <div
-      className='prose prose-lg max-w-none dark:prose-invert'
+      className='prose prose-lg dark:prose-invert max-w-none'
       dangerouslySetInnerHTML={{ __html: content }}
     />
   );

@@ -7,7 +7,10 @@ import { UploadCloud, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import type { User as UserType } from '@/types/user/user.types';
-import { getPresignedUploadUrl, updateUserAvatar } from '@/actions/avatar.action';
+import {
+  getPresignedUploadUrl,
+  updateUserAvatar,
+} from '@/actions/avatar.action';
 import type { AvatarEditorProps } from '../interfaces/components/avatar-editor.interfaces';
 
 export function AvatarEditor({
@@ -113,7 +116,7 @@ export function AvatarEditor({
         className='hidden'
       />
 
-      {error && <p className='text-sm text-destructive'>{error}</p>}
+      {error && <p className='text-destructive text-sm'>{error}</p>}
 
       <div className='flex gap-4'>
         <Button variant='outline' onClick={onCloseAction} disabled={isLoading}>

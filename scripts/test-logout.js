@@ -21,9 +21,10 @@ function makeRequest(url, options = {}) {
       method: options.method || 'GET',
       headers: {
         'User-Agent': 'logout-test/1.0',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        ...options.headers
-      }
+        Accept:
+          'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        ...options.headers,
+      },
     };
 
     const req = http.request(requestOptions, (res) => {
@@ -37,7 +38,7 @@ function makeRequest(url, options = {}) {
           statusMessage: res.statusMessage,
           headers: res.headers,
           data: data,
-          cookies: res.headers['set-cookie'] || []
+          cookies: res.headers['set-cookie'] || [],
         });
       });
     });
@@ -59,7 +60,9 @@ async function testLogoutEndpoint() {
   try {
     const response = await makeRequest(`${BASE_URL}/api/v1/auth/logout`);
 
-    console.log(`   📊 Status: ${response.statusCode} ${response.statusMessage}`);
+    console.log(
+      `   📊 Status: ${response.statusCode} ${response.statusMessage}`
+    );
 
     if (response.statusCode === 307 || response.statusCode === 302) {
       const location = response.headers.location;
@@ -68,7 +71,9 @@ async function testLogoutEndpoint() {
       if (location && location.includes('/login')) {
         console.log('   ✅ Redirects to our login page (CORRECT)');
       } else if (location && location.includes('cognito')) {
-        console.log('   ❌ Redirects to Cognito (INCORRECT - should be background call)');
+        console.log(
+          '   ❌ Redirects to Cognito (INCORRECT - should be background call)'
+        );
       } else {
         console.log('   ⚠️  Redirects to unexpected location');
       }
@@ -77,11 +82,15 @@ async function testLogoutEndpoint() {
     }
 
     // Check cookie clearing
-    const sessionCookie = response.cookies.find(cookie =>
-      cookie.includes('session=') && cookie.includes('Expires=Thu, 01 Jan 1970')
+    const sessionCookie = response.cookies.find(
+      (cookie) =>
+        cookie.includes('session=') &&
+        cookie.includes('Expires=Thu, 01 Jan 1970')
     );
-    const stateCookie = response.cookies.find(cookie =>
-      cookie.includes('oauth_state=') && cookie.includes('Expires=Thu, 01 Jan 1970')
+    const stateCookie = response.cookies.find(
+      (cookie) =>
+        cookie.includes('oauth_state=') &&
+        cookie.includes('Expires=Thu, 01 Jan 1970')
     );
 
     if (sessionCookie) {
@@ -122,7 +131,9 @@ async function testLogoutResponseTime() {
     } else if (responseTime < 3000) {
       console.log('   ⚠️  Moderate response time');
     } else {
-      console.log('   ❌ Slow response (may be redirecting to external service)');
+      console.log(
+        '   ❌ Slow response (may be redirecting to external service)'
+      );
     }
 
     return responseTime;
@@ -212,7 +223,7 @@ async function runLogoutTests() {
 
 // Run if called directly
 if (require.main === module) {
-  runLogoutTests().catch(error => {
+  runLogoutTests().catch((error) => {
     console.error('\n❌ Test runner failed:', error.message);
     process.exit(1);
   });

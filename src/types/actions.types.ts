@@ -365,17 +365,23 @@ export type AnyActionResult =
 /**
  * Type guards for action results
  */
-export const isActionSuccess = <T>(result: ActionResult<T>): result is ActionSuccessResult<T> =>
-  result.success === true;
+export const isActionSuccess = <T>(
+  result: ActionResult<T>
+): result is ActionSuccessResult<T> => result.success === true;
 
-export const isActionError = <T>(result: ActionResult<T>): result is ActionErrorResult =>
-  result.success === false;
+export const isActionError = <T>(
+  result: ActionResult<T>
+): result is ActionErrorResult => result.success === false;
 
-export const hasData = <T>(result: ActionResult<T>): result is ActionResult<T> & { data: T } =>
-  result.data !== undefined;
+export const hasData = <T>(
+  result: ActionResult<T>
+): result is ActionResult<T> & { data: T } => result.data !== undefined;
 
-export const hasFieldErrors = <T>(result: FormActionResult<T>): result is FormActionResult<T> & { fieldErrors: Record<string, string[]> } =>
-  result.fieldErrors !== undefined && Object.keys(result.fieldErrors).length > 0;
+export const hasFieldErrors = <T>(
+  result: FormActionResult<T>
+): result is FormActionResult<T> & { fieldErrors: Record<string, string[]> } =>
+  result.fieldErrors !== undefined &&
+  Object.keys(result.fieldErrors).length > 0;
 
 /**
  * Helper functions for creating action results
@@ -434,7 +440,8 @@ export const createValidationResult = (
  * Default action result values
  */
 export const DEFAULT_SUCCESS_MESSAGE = 'Operation completed successfully';
-export const DEFAULT_ERROR_MESSAGE = 'An error occurred while processing your request';
+export const DEFAULT_ERROR_MESSAGE =
+  'An error occurred while processing your request';
 export const DEFAULT_VALIDATION_ERROR_MESSAGE = 'Validation failed';
 export const DEFAULT_AUTHENTICATION_ERROR_MESSAGE = 'Authentication required';
 export const DEFAULT_AUTHORIZATION_ERROR_MESSAGE = 'Insufficient permissions';

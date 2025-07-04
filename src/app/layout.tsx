@@ -45,7 +45,7 @@ export default async function RootLayout({
           crossOrigin='anonymous'
         />
       </head>
-      <body className='flex min-h-screen flex-col font-body antialiased'>
+      <body className='font-body flex min-h-screen flex-col antialiased'>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider
             attribute='class'

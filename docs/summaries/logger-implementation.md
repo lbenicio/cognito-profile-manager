@@ -18,17 +18,19 @@ Successfully implemented a comprehensive logging system for the Cognito Profile 
 ### 2. Logger Features
 
 #### Log Levels
+
 ```typescript
 enum LogLevel {
-  DEBUG = 0,    // Detailed debugging information
-  INFO = 1,     // General informational messages
-  WARN = 2,     // Warning messages
-  ERROR = 3,    // Error messages only
-  SILENT = 4    // No logging output
+  DEBUG = 0, // Detailed debugging information
+  INFO = 1, // General informational messages
+  WARN = 2, // Warning messages
+  ERROR = 3, // Error messages only
+  SILENT = 4, // No logging output
 }
 ```
 
 #### Environment Configuration
+
 - Uses `LOG_LEVEL` environment variable
 - Default behavior:
   - Server: INFO level
@@ -36,6 +38,7 @@ enum LogLevel {
   - Client (production): SILENT level
 
 #### Output Format
+
 ```
 [2024-01-15T10:30:45.123Z] [SERVER] [COMPONENT-NAME] [INFO] Message text
 ```
@@ -48,12 +51,14 @@ enum LogLevel {
 ## Files Modified
 
 ### Core Library Files
+
 - `src/lib/auth.ts` - Authentication logging
 - `src/lib/session.ts` - Session management logging
 - `src/lib/session-actions.ts` - Session action logging
 - `src/lib/cache.ts` - Cache operation logging
 
 ### Action Files
+
 - `src/lib/contact-actions.ts` - Contact form logging
 - `src/lib/mfa-actions.ts` - MFA operation logging
 - `src/lib/notification-actions.ts` - Notification logging
@@ -65,6 +70,7 @@ enum LogLevel {
 - `src/lib/profile-settings-actions.ts` - Profile settings logging
 
 ### API Routes
+
 - `src/app/api/v1/auth/callback/oidc/route.ts` - OIDC callback logging
 - `src/app/api/v1/auth/callback/passkey/route.ts` - Passkey callback logging
 - `src/app/api/v1/auth/logout/route.ts` - Logout logging
@@ -72,9 +78,11 @@ enum LogLevel {
 - `src/app/api/v1/auth/sso/start/route.ts` - SSO start logging
 
 ### Middleware
+
 - `src/middlewares/auth.ts` - Authentication middleware logging
 
 ### Components
+
 - `src/components/dashboard-view.tsx` - Dashboard component logging
 - `src/components/session-info-card.tsx` - Session info logging
 - `src/app/[locale]/error.tsx` - Error page logging
@@ -101,16 +109,16 @@ Available for import when needed:
 
 ```typescript
 import {
-  authLogger,        // AUTH
-  apiLogger,         // API
-  dbLogger,          // DB
-  cacheLogger,       // CACHE
-  sessionLogger,     // SESSION
-  mfaLogger,         // MFA
-  passkeyLogger,     // PASSKEY
-  profileLogger,     // PROFILE
-  notificationLogger,// NOTIFICATION
-  middlewareLogger   // MIDDLEWARE
+  authLogger, // AUTH
+  apiLogger, // API
+  dbLogger, // DB
+  cacheLogger, // CACHE
+  sessionLogger, // SESSION
+  mfaLogger, // MFA
+  passkeyLogger, // PASSKEY
+  profileLogger, // PROFILE
+  notificationLogger, // NOTIFICATION
+  middlewareLogger, // MIDDLEWARE
 } from '@/lib/logger';
 ```
 

@@ -19,8 +19,8 @@ function fetchJson(url) {
       method: 'GET',
       headers: {
         'User-Agent': 'cognito-config-test/1.0',
-        'Accept': 'application/json'
-      }
+        Accept: 'application/json',
+      },
     };
 
     const req = https.request(options, (res) => {
@@ -33,7 +33,7 @@ function fetchJson(url) {
           const jsonData = JSON.parse(data);
           resolve({
             statusCode: res.statusCode,
-            data: jsonData
+            data: jsonData,
           });
         } catch (error) {
           reject(new Error(`Failed to parse JSON: ${error.message}`));
@@ -69,12 +69,18 @@ function checkEnvironment() {
     const envContent = fs.readFileSync(envFile, 'utf8');
 
     // Extract well-known URL
-    const wellKnownMatch = envContent.match(/NEXT_PUBLIC_COGNITO_WELLKNOWN=(.+)/);
-    const clientIdMatch = envContent.match(/NEXT_PUBLIC_COGNITO_CLIENT_ID=(.+)/);
+    const wellKnownMatch = envContent.match(
+      /NEXT_PUBLIC_COGNITO_WELLKNOWN=(.+)/
+    );
+    const clientIdMatch = envContent.match(
+      /NEXT_PUBLIC_COGNITO_CLIENT_ID=(.+)/
+    );
     const appUrlMatch = envContent.match(/APP_URL=(.+)/);
 
     if (!wellKnownMatch || wellKnownMatch[1].startsWith('#')) {
-      console.log('   ⚠️  NEXT_PUBLIC_COGNITO_WELLKNOWN not configured or commented out');
+      console.log(
+        '   ⚠️  NEXT_PUBLIC_COGNITO_WELLKNOWN not configured or commented out'
+      );
       return null;
     }
 
@@ -84,13 +90,15 @@ function checkEnvironment() {
 
     console.log('   ✅ Environment file found');
     console.log(`   📍 Well-known URL: ${wellKnownUrl}`);
-    console.log(`   🔑 Client ID: ${clientId ? clientId.substring(0, 10) + '...' : 'Not set'}`);
+    console.log(
+      `   🔑 Client ID: ${clientId ? clientId.substring(0, 10) + '...' : 'Not set'}`
+    );
     console.log(`   🌐 App URL: ${appUrl || 'Not set'}`);
 
     return {
       wellKnownUrl,
       clientId,
-      appUrl
+      appUrl,
     };
   } catch (error) {
     console.log(`   ❌ Error reading environment: ${error.message}`);
@@ -119,11 +127,11 @@ async function testWellKnownConfig(wellKnownUrl) {
         'issuer',
         'authorization_endpoint',
         'token_endpoint',
-        'jwks_uri'
+        'jwks_uri',
       ];
 
       console.log('\n   📋 Configuration details:');
-      requiredFields.forEach(field => {
+      requiredFields.forEach((field) => {
         if (config[field]) {
           console.log(`   ✅ ${field}: ${config[field]}`);
         } else {
@@ -134,7 +142,9 @@ async function testWellKnownConfig(wellKnownUrl) {
       // Check logout endpoints
       console.log('\n   🚪 Logout endpoints:');
       if (config.end_session_endpoint) {
-        console.log(`   ✅ end_session_endpoint: ${config.end_session_endpoint}`);
+        console.log(
+          `   ✅ end_session_endpoint: ${config.end_session_endpoint}`
+        );
       } else {
         console.log('   ❌ end_session_endpoint: Not found');
       }
@@ -142,7 +152,9 @@ async function testWellKnownConfig(wellKnownUrl) {
       if (config.logout_endpoint) {
         console.log(`   ✅ logout_endpoint: ${config.logout_endpoint}`);
       } else {
-        console.log('   ⚠️  logout_endpoint: Not found (this is normal for AWS Cognito)');
+        console.log(
+          '   ⚠️  logout_endpoint: Not found (this is normal for AWS Cognito)'
+        );
       }
 
       return config;
@@ -196,14 +208,14 @@ function testLogoutUrlConstruction(config, clientId, appUrl) {
       console.log('   ❌ Client ID parameter issue');
     }
 
-    const redirectParam = logoutUrl.searchParams.get('logout_uri') ||
-                         logoutUrl.searchParams.get('post_logout_redirect_uri');
+    const redirectParam =
+      logoutUrl.searchParams.get('logout_uri') ||
+      logoutUrl.searchParams.get('post_logout_redirect_uri');
     if (redirectParam === redirectUri) {
       console.log('   ✅ Redirect URI parameter set correctly');
     } else {
       console.log('   ❌ Redirect URI parameter issue');
     }
-
   } catch (error) {
     console.log(`   ❌ Failed to construct logout URL: ${error.message}`);
   }
@@ -236,17 +248,18 @@ async function testLogoutEndpoint(config, clientId, appUrl) {
     // Make a simple request to see if endpoint exists
     const response = await fetchJson(testUrl.toString()).catch(() => ({
       statusCode: 400,
-      error: 'Expected - this endpoint requires parameters'
+      error: 'Expected - this endpoint requires parameters',
     }));
 
     if (response.statusCode === 400) {
-      console.log('   ✅ Endpoint exists (400 expected without proper parameters)');
+      console.log(
+        '   ✅ Endpoint exists (400 expected without proper parameters)'
+      );
     } else if (response.statusCode < 500) {
       console.log(`   ✅ Endpoint accessible (HTTP ${response.statusCode})`);
     } else {
       console.log(`   ⚠️  Endpoint returned HTTP ${response.statusCode}`);
     }
-
   } catch (error) {
     console.log(`   ⚠️  Could not test endpoint: ${error.message}`);
   }
@@ -269,7 +282,9 @@ function provideRecommendations(env, config) {
     console.log('   📝 Fix Cognito configuration:');
     console.log('      - Verify NEXT_PUBLIC_COGNITO_WELLKNOWN URL is correct');
     console.log('      - Check if User Pool exists and is accessible');
-    console.log('      - Ensure URL format: https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/openid_configuration');
+    console.log(
+      '      - Ensure URL format: https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/openid_configuration'
+    );
     return;
   }
 
@@ -277,7 +292,9 @@ function provideRecommendations(env, config) {
   console.log('   📝 Next steps:');
   console.log('      - Test logout flow in browser');
   console.log('      - Check browser network tab for any 400 errors');
-  console.log('      - Verify logout_uri is configured in Cognito App Client settings');
+  console.log(
+    '      - Verify logout_uri is configured in Cognito App Client settings'
+  );
 }
 
 /**
@@ -310,7 +327,7 @@ async function runTests() {
 
 // Run if called directly
 if (require.main === module) {
-  runTests().catch(error => {
+  runTests().catch((error) => {
     console.error('\n❌ Test failed:', error.message);
     process.exit(1);
   });

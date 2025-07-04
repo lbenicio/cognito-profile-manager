@@ -49,7 +49,7 @@ export function PublicProfileDisplay({ user }: PublicProfileDisplayProps) {
       <CardContent className='p-0'>
         <div className='bg-muted/40 p-6'>
           {!isPublic ? (
-            <div className='flex min-h-[200px] flex-col items-center justify-center gap-4 text-center text-muted-foreground'>
+            <div className='text-muted-foreground flex min-h-[200px] flex-col items-center justify-center gap-4 text-center'>
               <EyeOff className='h-12 w-12' />
               <p className='font-medium'>{t('isPrivate')}</p>
             </div>
@@ -71,7 +71,7 @@ export function PublicProfileDisplay({ user }: PublicProfileDisplayProps) {
                 <div className='flex flex-col items-center space-y-4 text-center'>
                   {publicFields.picture && (
                     <Avatar
-                      className={`h-24 w-24 border-4 border-background ${publicFields.banner && user.banner ? '-mt-16' : ''}`}
+                      className={`border-background h-24 w-24 border-4 ${publicFields.banner && user.banner ? '-mt-16' : ''}`}
                     >
                       <AvatarImage
                         src={user.picture || ''}
@@ -107,7 +107,7 @@ export function PublicProfileDisplay({ user }: PublicProfileDisplayProps) {
                     {publicFields.aboutMe && user.aboutMe && (
                       <>
                         <Separator />
-                        <p className='whitespace-pre-wrap pt-4 text-center text-sm text-muted-foreground'>
+                        <p className='text-muted-foreground pt-4 text-center text-sm whitespace-pre-wrap'>
                           {user.aboutMe}
                         </p>
                       </>
@@ -118,7 +118,7 @@ export function PublicProfileDisplay({ user }: PublicProfileDisplayProps) {
                     <div className='flex w-full flex-col items-start gap-3 text-left'>
                       {publicFields.email && (
                         <div className='flex items-center gap-2 text-sm'>
-                          <Mail className='h-4 w-4 text-muted-foreground' />
+                          <Mail className='text-muted-foreground h-4 w-4' />
                           <a
                             href={`mailto:${user.email}`}
                             className='text-primary hover:underline'
@@ -129,7 +129,7 @@ export function PublicProfileDisplay({ user }: PublicProfileDisplayProps) {
                       )}
                       {publicFields.website && user.website && (
                         <div className='flex items-center gap-2 text-sm'>
-                          <Globe className='h-4 w-4 text-muted-foreground' />
+                          <Globe className='text-muted-foreground h-4 w-4' />
                           <a
                             href={user.website}
                             target='_blank'
@@ -142,31 +142,31 @@ export function PublicProfileDisplay({ user }: PublicProfileDisplayProps) {
                       )}
                       {publicFields.phone_number && user.phone_number && (
                         <div className='flex items-center gap-2 text-sm'>
-                          <Phone className='h-4 w-4 text-muted-foreground' />
+                          <Phone className='text-muted-foreground h-4 w-4' />
                           <span>{user.phone_number}</span>
                         </div>
                       )}
                       {publicFields.gender && user.gender && (
                         <div className='flex items-center gap-2 text-sm'>
-                          <PersonStanding className='h-4 w-4 text-muted-foreground' />
+                          <PersonStanding className='text-muted-foreground h-4 w-4' />
                           <span>{user.gender}</span>
                         </div>
                       )}
                       {publicFields.birthdate && user.birthdate && (
                         <div className='flex items-center gap-2 text-sm'>
-                          <Cake className='h-4 w-4 text-muted-foreground' />
+                          <Cake className='text-muted-foreground h-4 w-4' />
                           <span>{format(parseISO(user.birthdate), 'PPP')}</span>
                         </div>
                       )}
                       {publicFields.zoneinfo && user.zoneinfo && (
                         <div className='flex items-center gap-2 text-sm'>
-                          <Clock className='h-4 w-4 text-muted-foreground' />
+                          <Clock className='text-muted-foreground h-4 w-4' />
                           <span>{user.zoneinfo}</span>
                         </div>
                       )}
                       {publicFields.locale && user.locale && (
                         <div className='flex items-center gap-2 text-sm'>
-                          <Languages className='h-4 w-4 text-muted-foreground' />
+                          <Languages className='text-muted-foreground h-4 w-4' />
                           <span>{user.locale}</span>
                         </div>
                       )}

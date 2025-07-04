@@ -54,22 +54,24 @@ LOG_LEVEL=ERROR
 
 ### Log Levels
 
-| Level | Value | Description |
-|-------|-------|-------------|
-| DEBUG | 0 | Detailed debugging information |
-| INFO  | 1 | General informational messages |
-| WARN  | 2 | Warning messages |
-| ERROR | 3 | Error messages only |
-| SILENT| 4 | No logging output |
+| Level  | Value | Description                    |
+| ------ | ----- | ------------------------------ |
+| DEBUG  | 0     | Detailed debugging information |
+| INFO   | 1     | General informational messages |
+| WARN   | 2     | Warning messages               |
+| ERROR  | 3     | Error messages only            |
+| SILENT | 4     | No logging output              |
 
 ## Environment Behavior
 
 ### Server-Side (Node.js)
+
 - Full colored output with timestamps
 - All log levels available
 - Default level: `INFO` (configurable via `LOG_LEVEL`)
 
 ### Client-Side (Browser)
+
 - Plain text output (no colors)
 - Production builds automatically set to `SILENT` unless overridden
 - Development builds follow `LOG_LEVEL` setting
@@ -92,6 +94,7 @@ export function myFunction() {
 ### Naming Conventions
 
 Use descriptive, uppercase names with hyphens:
+
 - `AUTH` - Authentication related
 - `API` - API routes and calls
 - `DB` - Database operations
@@ -105,16 +108,16 @@ The following loggers are available for import:
 
 ```typescript
 import {
-  authLogger,        // Authentication
-  apiLogger,         // API operations
-  dbLogger,          // Database operations
-  cacheLogger,       // Cache operations
-  sessionLogger,     // Session management
-  mfaLogger,         // Multi-factor authentication
-  passkeyLogger,     // Passkey/WebAuthn
-  profileLogger,     // User profile operations
-  notificationLogger,// Notifications
-  middlewareLogger   // Middleware operations
+  authLogger, // Authentication
+  apiLogger, // API operations
+  dbLogger, // Database operations
+  cacheLogger, // Cache operations
+  sessionLogger, // Session management
+  mfaLogger, // Multi-factor authentication
+  passkeyLogger, // Passkey/WebAuthn
+  profileLogger, // User profile operations
+  notificationLogger, // Notifications
+  middlewareLogger, // Middleware operations
 } from '@/lib/logger';
 ```
 
@@ -129,7 +132,7 @@ const logger = new Logger('PAYMENT');
 const stripeLogger = logger.child('STRIPE');
 const paypalLogger = logger.child('PAYPAL');
 
-stripeLogger.info('Processing Stripe payment'); 
+stripeLogger.info('Processing Stripe payment');
 // Output: [timestamp] [SERVER] [PAYMENT:STRIPE] [INFO] Processing Stripe payment
 ```
 
@@ -165,12 +168,14 @@ if (logger.isLevelEnabled(LogLevel.DEBUG)) {
 ## Output Format
 
 ### Server-Side Output
+
 ```
 [2024-01-15T10:30:45.123Z] [SERVER] [AUTH] [INFO] User login successful
 [2024-01-15T10:30:46.456Z] [SERVER] [API] [ERROR] Database connection failed
 ```
 
 ### Client-Side Output
+
 ```
 [2024-01-15T10:30:45.123Z] [CLIENT] [USER-PROFILE] [WARN] Profile data incomplete
 ```
@@ -178,17 +183,19 @@ if (logger.isLevelEnabled(LogLevel.DEBUG)) {
 ## Best Practices
 
 ### 1. Use Appropriate Log Levels
+
 - **DEBUG**: Detailed flow information, variable values
 - **INFO**: General application flow, successful operations
 - **WARN**: Recoverable errors, deprecated usage
 - **ERROR**: Serious problems, exceptions
 
 ### 2. Include Context
+
 ```typescript
 // Good
-logger.error('Failed to save user profile', { 
-  userId: user.id, 
-  error: error.message 
+logger.error('Failed to save user profile', {
+  userId: user.id,
+  error: error.message,
 });
 
 // Avoid
@@ -196,6 +203,7 @@ logger.error('Save failed');
 ```
 
 ### 3. Don't Log Sensitive Information
+
 ```typescript
 // Never do this
 logger.info('User password', { password: user.password });
@@ -205,13 +213,14 @@ logger.info('Password validation completed', { userId: user.id });
 ```
 
 ### 4. Use Structured Logging
+
 ```typescript
 logger.info('API request completed', {
   endpoint: '/api/users',
   method: 'POST',
   status: 201,
   duration: 125,
-  userId: user.id
+  userId: user.id,
 });
 ```
 
@@ -234,15 +243,18 @@ logger.warn('Deprecated API usage');
 ## Troubleshooting
 
 ### No Log Output
+
 1. Check `LOG_LEVEL` environment variable
 2. Verify logger level allows the message type
 3. In production frontend, logs are silent by default
 
 ### Missing Colors
+
 - Colors only work server-side
 - Client-side logging is always plain text
 
 ### Performance Concerns
+
 - Logging is designed to be lightweight
 - Use conditional logging for expensive debug operations
 - Consider log level in production environments
@@ -250,6 +262,7 @@ logger.warn('Deprecated API usage');
 ## Examples
 
 ### API Route Logging
+
 ```typescript
 // src/app/api/users/route.ts
 import { Logger } from '@/lib/logger';
@@ -270,6 +283,7 @@ export async function POST(request: Request) {
 ```
 
 ### Component Logging
+
 ```typescript
 // src/components/user-profile.tsx
 'use client';
@@ -281,7 +295,7 @@ const logger = new Logger('USER-PROFILE-COMPONENT');
 export function UserProfile() {
   useEffect(() => {
     logger.debug('UserProfile component mounted');
-    
+
     return () => {
       logger.debug('UserProfile component unmounted');
     };

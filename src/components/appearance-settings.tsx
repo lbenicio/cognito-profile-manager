@@ -19,7 +19,10 @@ import { Slider } from '@/components/ui/slider';
 import { LanguageSelect } from './language-select';
 import { updateUserPreferences } from '@/actions/preference.action';
 import { useToast } from '@/hooks/use-toast';
-import type { User as UserType, UserPreferences } from '@/types/user/user.types';
+import type {
+  User as UserType,
+  UserPreferences,
+} from '@/types/user/user.types';
 
 interface AppearanceSettingsProps {
   user: UserType;
@@ -85,7 +88,7 @@ export function AppearanceSettings({ user }: AppearanceSettingsProps) {
               />
               <Label
                 htmlFor='light'
-                className='flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary'
+                className='border-muted bg-popover hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary flex cursor-pointer flex-col items-center justify-between rounded-md border-2 p-4'
               >
                 <Sun className='mb-3 h-6 w-6' />
                 {t('light')}
@@ -95,7 +98,7 @@ export function AppearanceSettings({ user }: AppearanceSettingsProps) {
               <RadioGroupItem value='dark' id='dark' className='peer sr-only' />
               <Label
                 htmlFor='dark'
-                className='flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary'
+                className='border-muted bg-popover hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary flex cursor-pointer flex-col items-center justify-between rounded-md border-2 p-4'
               >
                 <Moon className='mb-3 h-6 w-6' />
                 {t('dark')}
@@ -109,7 +112,7 @@ export function AppearanceSettings({ user }: AppearanceSettingsProps) {
               />
               <Label
                 htmlFor='system'
-                className='flex cursor-pointer flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary'
+                className='border-muted bg-popover hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary flex cursor-pointer flex-col items-center justify-between rounded-md border-2 p-4'
               >
                 <Palette className='mb-3 h-6 w-6' />
                 {t('system')}
@@ -134,7 +137,7 @@ export function AppearanceSettings({ user }: AppearanceSettingsProps) {
               onValueCommit={handleFontSizeChange}
               disabled={isPending}
             />
-            <span className='w-12 text-right text-sm text-muted-foreground'>
+            <span className='text-muted-foreground w-12 text-right text-sm'>
               {user.preferences.fontSize}pt
             </span>
           </div>

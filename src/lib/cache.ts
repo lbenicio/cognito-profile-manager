@@ -63,7 +63,10 @@ class UpstashRedisCache implements CacheClient {
     try {
       const result = await this.client.ping();
       if (result === 'PONG') {
-        return { status: 'ok', message: 'Upstash Redis connection successful.' };
+        return {
+          status: 'ok',
+          message: 'Upstash Redis connection successful.',
+        };
       }
       return {
         status: 'error',

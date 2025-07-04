@@ -18,12 +18,14 @@ The original Docker setup had several critical issues:
 **File**: `Dockerfile`
 
 **Changes**:
+
 - Added placeholder environment variables for both client-side (`NEXT_PUBLIC_*`) and server-side variables during build
 - Improved multi-stage build process with better caching
 - Added health checks and proper user management
 - Fixed dependencies installation with production-only packages
 
 **Key placeholder variables added**:
+
 ```dockerfile
 # Client-side placeholders
 ENV NEXT_PUBLIC_COGNITO_CLIENT_ID=__NEXT_PUBLIC_COGNITO_CLIENT_ID__
@@ -40,8 +42,8 @@ ENV COGNITO_CLIENT_SECRET=__COGNITO_CLIENT_SECRET__
 
 **File**: `scripts/entrypoint.sh`
 
-
 **Improvements**:
+
 - **Safer Replacement**: Uses proper escaping for special characters in environment values
 - **Validation**: Checks for critical environment variables before starting
 - **Logging**: Provides detailed output about the injection process
@@ -49,6 +51,7 @@ ENV COGNITO_CLIENT_SECRET=__COGNITO_CLIENT_SECRET__
 - **Configuration Summary**: Shows sanitized configuration overview
 
 **Key features**:
+
 ```bash
 # Escape special characters for sed
 escaped_value=$(echo "$value" | sed 's/[[\.*^$()+?{|]/\\&/g')
@@ -63,11 +66,13 @@ find "$dir" -type f \( -name "*.js" -o -name "*.css" \) -exec \
 **File**: `next.config.ts`
 
 **Changes**:
+
 - Added robust URL parsing that handles placeholder values
 - Temporarily disabled TypeScript checks during build (for Docker builds only)
 - Added proper error handling for invalid URLs
 
 **Before**:
+
 ```typescript
 const r2Hostname = process.env.NEXT_PUBLIC_R2_PUBLIC_URL
   ? new URL(process.env.NEXT_PUBLIC_R2_PUBLIC_URL).hostname
@@ -75,15 +80,16 @@ const r2Hostname = process.env.NEXT_PUBLIC_R2_PUBLIC_URL
 ```
 
 **After**:
+
 ```typescript
 const r2Hostname = (() => {
   const r2Url = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
-  
+
   // Skip URL parsing if it's a placeholder value
   if (!r2Url || r2Url.startsWith('__')) {
     return undefined;
   }
-  
+
   try {
     return new URL(r2Url).hostname;
   } catch (error) {
@@ -95,11 +101,13 @@ const r2Hostname = (() => {
 
 ### 4. Fixed TypeScript Interface Issues
 
-**Files**: 
+**Files**:
+
 - `src/interfaces/auth/auth.interfaces.ts`
 - `src/interfaces/index.ts`
 
 **Changes**:
+
 - Fixed interface extension syntax for `AuthTokenPayload`
 - Corrected export/import mismatches in interface files
 - Properly organized interface exports from their respective files
@@ -109,6 +117,7 @@ const r2Hostname = (() => {
 **File**: `docker-compose.yaml`
 
 **Improvements**:
+
 - Separate profiles for development (`dev`) and production (`prod`)
 - Optional Redis service for caching
 - Proper health checks and restart policies
@@ -117,6 +126,7 @@ const r2Hostname = (() => {
 ### 6. Docker Deployment Tools
 
 **Files Created**:
+
 - `.dockerignore` - Optimized build context
 - `.env.example` - Complete environment variable template
 - `scripts/docker-run.sh` - Helper script for Docker operations
@@ -125,11 +135,13 @@ const r2Hostname = (() => {
 ## How It Works
 
 ### Build Process
+
 1. **Placeholder Injection**: During `docker build`, placeholder values are set for all environment variables
 2. **Next.js Build**: Application builds successfully with placeholders, embedding them in the client bundle
 3. **Multi-stage Build**: Production dependencies and built application are copied to final image
 
 ### Runtime Process
+
 1. **Container Startup**: `scripts/entrypoint.sh` script executes before the main application
 2. **Variable Injection**: Script finds all JavaScript/CSS files and replaces placeholders with real values
 3. **Validation**: Critical environment variables are validated
@@ -146,6 +158,7 @@ Server Variables →   __PLACEHOLDER__   →   Real Value (Node.js process.env)
 ## Usage Examples
 
 ### Basic Docker Run
+
 ```bash
 # Build the image
 docker build -t cognito-profile-manager .
@@ -159,6 +172,7 @@ docker run -d \
 ```
 
 ### Using Helper Script
+
 ```bash
 # Copy environment template
 cp .env.example .env.local
@@ -175,6 +189,7 @@ nano .env.local
 ```
 
 ### Docker Compose
+
 ```bash
 # Development with hot-reload
 docker-compose --profile dev up

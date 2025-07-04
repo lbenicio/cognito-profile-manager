@@ -148,7 +148,8 @@ export class ErrorFactory {
       code,
       message,
       details,
-      statusCode: code === 'UNAUTHORIZED' ? 401 : code === 'FORBIDDEN' ? 403 : 400,
+      statusCode:
+        code === 'UNAUTHORIZED' ? 401 : code === 'FORBIDDEN' ? 403 : 400,
     };
   }
 
@@ -233,19 +234,29 @@ export class ErrorFactory {
  * Type guards for error types
  */
 export const isAuthError = (error: unknown): error is AuthError =>
-  typeof error === 'object' && error !== null && (error as AppError).name === 'AuthError';
+  typeof error === 'object' &&
+  error !== null &&
+  (error as AppError).name === 'AuthError';
 
 export const isValidationError = (error: unknown): error is ValidationError =>
-  typeof error === 'object' && error !== null && (error as AppError).name === 'ValidationError';
+  typeof error === 'object' &&
+  error !== null &&
+  (error as AppError).name === 'ValidationError';
 
 export const isApiError = (error: unknown): error is ApiError =>
-  typeof error === 'object' && error !== null && (error as AppError).name === 'ApiError';
+  typeof error === 'object' &&
+  error !== null &&
+  (error as AppError).name === 'ApiError';
 
 export const isCognitoError = (error: unknown): error is CognitoError =>
-  typeof error === 'object' && error !== null && (error as AppError).name === 'CognitoError';
+  typeof error === 'object' &&
+  error !== null &&
+  (error as AppError).name === 'CognitoError';
 
 export const isUploadError = (error: unknown): error is UploadError =>
-  typeof error === 'object' && error !== null && (error as AppError).name === 'UploadError';
+  typeof error === 'object' &&
+  error !== null &&
+  (error as AppError).name === 'UploadError';
 
 export const isAppError = (error: unknown): error is ApplicationError =>
   isAuthError(error) ||

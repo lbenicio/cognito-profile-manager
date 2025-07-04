@@ -62,7 +62,7 @@ export default async function ContactPage() {
         <h1 className='text-3xl font-bold tracking-tight'>
           {translations.title}
         </h1>
-        <p className='mt-2 text-muted-foreground'>{translations.description}</p>
+        <p className='text-muted-foreground mt-2'>{translations.description}</p>
       </header>
       <ContactForm user={user} translations={translations.form} />
     </div>

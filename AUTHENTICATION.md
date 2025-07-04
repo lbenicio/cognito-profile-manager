@@ -49,9 +49,9 @@ For production, the application uses AWS Cognito with OAuth2/OIDC flow.
    - **Generate client secret**: ✅ Yes
    - **Authentication flows**: Allow all flows
    - **OAuth 2.0 grant types**: Authorization code grant
-   - **OAuth 2.0 scopes**: 
+   - **OAuth 2.0 scopes**:
      - `openid`
-     - `email` 
+     - `email`
      - `profile`
      - `aws.cognito.signin.user.admin`
    - **Callback URLs**: `{YOUR_APP_URL}/api/v1/auth/callback/oidc`
@@ -158,11 +158,13 @@ Production sessions automatically refresh access tokens when they expire (5 minu
 The application performs **proper OAuth2 logout** for both mock and real sessions:
 
 **Mock Sessions (Development)**:
+
 - Clears local session cookies only
 - Redirects directly to login page
 - No external API calls
 
 **Real OAuth2 Sessions (Production)**:
+
 - Clears local session cookies first
 - Redirects user to AWS Cognito logout endpoint
 - Uses `logout_uri` parameter for proper session termination
@@ -171,17 +173,20 @@ The application performs **proper OAuth2 logout** for both mock and real session
 - Ensures complete session termination on both client and server
 
 **Logout Flow**:
+
 ```
 User clicks logout → Clear local session → Redirect to Cognito logout → Cognito clears session → Redirect to login page
 ```
 
 **Benefits**:
+
 - Complete session termination on both client and server
 - Proper OAuth2 logout flow compliance
 - Handles Cognito session cookies and server state
 - Clean logout with full security guarantees
 
-**Required Configuration**: 
+**Required Configuration**:
+
 - Add `http://localhost:9002/login` (and your production URL) as allowed **Sign out URLs** in your Cognito App Client settings
 - Ensure the logout endpoint URL is properly configured in your User Pool domain
 
@@ -231,6 +236,7 @@ All session data encrypted using AES-256-GCM with server-side secret key.
 ### Debug Mode
 
 Set `NODE_ENV=development` to enable:
+
 - Mock login options
 - Detailed error messages
 - Debug logging
@@ -238,11 +244,13 @@ Set `NODE_ENV=development` to enable:
 ### Verifying Configuration
 
 Test your well-known URL in browser:
+
 ```
 https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/openid_configuration
 ```
 
 Should return JSON with endpoints like:
+
 - `authorization_endpoint`
 - `token_endpoint`
 - `userinfo_endpoint`
@@ -268,7 +276,7 @@ Mock sessions now include comprehensive user claims matching production JWT stru
 ### Auth Actions
 
 - `ssoLogin()`: Initiates OAuth2 flow
-- `devAdminLogin()`: Creates admin mock session (dev only)  
+- `devAdminLogin()`: Creates admin mock session (dev only)
 - `devUserLogin()`: Creates user mock session (dev only)
 - `localLogout()`: Clears session and redirects to login
 

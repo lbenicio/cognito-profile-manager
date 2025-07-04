@@ -23,7 +23,9 @@ function generateEncryptionKey() {
   console.log(`TOTP_SECRET_ENCRYPTION_KEY=${base64Key}`);
   console.log('');
   console.log('⚠️  Keep this key secure and never share it publicly!');
-  console.log('💡 Use different keys for development and production environments.');
+  console.log(
+    '💡 Use different keys for development and production environments.'
+  );
 
   return base64Key;
 }

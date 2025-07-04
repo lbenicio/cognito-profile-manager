@@ -124,6 +124,7 @@ These variables are embedded in the client-side JavaScript bundle and need speci
 - **Runtime**: The `scripts/entrypoint.sh` script replaces placeholders with actual values
 
 **Supported variables:**
+
 - `NEXT_PUBLIC_COGNITO_CLIENT_ID`
 - `NEXT_PUBLIC_COGNITO_WELLKNOWN`
 - `NEXT_PUBLIC_R2_PUBLIC_URL`
@@ -162,7 +163,7 @@ services:
   app:
     image: cognito-profile-manager:latest
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       NODE_ENV: production
       APP_URL: https://yourapp.com
@@ -212,45 +213,45 @@ spec:
         app: cognito-profile-manager
     spec:
       containers:
-      - name: app
-        image: cognito-profile-manager:latest
-        ports:
-        - containerPort: 3000
-        env:
-        - name: NODE_ENV
-          value: "production"
-        - name: APP_URL
-          value: "https://yourapp.com"
-        - name: COGNITO_CLIENT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: app-secrets
-              key: cognito-client-secret
-        - name: upstash_KV_REST_API_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: app-secrets
-              key: upstash-kv-rest-api-token
-        # ... other environment variables
-        resources:
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-          requests:
-            memory: "256Mi"
-            cpu: "100m"
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 3000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 3000
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        - name: app
+          image: cognito-profile-manager:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: 'production'
+            - name: APP_URL
+              value: 'https://yourapp.com'
+            - name: COGNITO_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: cognito-client-secret
+            - name: upstash_KV_REST_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: upstash-kv-rest-api-token
+          # ... other environment variables
+          resources:
+            limits:
+              memory: '512Mi'
+              cpu: '500m'
+            requests:
+              memory: '256Mi'
+              cpu: '100m'
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
 ```
 
 ### 2. Reverse Proxy Setup
@@ -299,10 +300,10 @@ services:
   app:
     image: cognito-profile-manager:latest
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.app.rule=Host(`yourapp.com`)"
-      - "traefik.http.routers.app.tls.certresolver=letsencrypt"
-      - "traefik.http.services.app.loadbalancer.server.port=3000"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.app.rule=Host(`yourapp.com`)'
+      - 'traefik.http.routers.app.tls.certresolver=letsencrypt'
+      - 'traefik.http.services.app.loadbalancer.server.port=3000'
     environment:
       # ... your environment variables
 ```
@@ -351,6 +352,7 @@ For production monitoring, consider:
 **Symptoms**: App shows placeholder values or errors about missing config
 
 **Solutions**:
+
 - Check that `.env.local` exists and has correct values
 - Verify file permissions on environment file
 - Check container logs for environment injection messages
@@ -365,6 +367,7 @@ docker exec cognito-profile-manager env | grep -E "(NEXT_PUBLIC_|APP_URL)"
 **Symptoms**: Docker build fails during npm install or build
 
 **Solutions**:
+
 - Clear Docker build cache: `docker build --no-cache`
 - Check Node.js version compatibility
 - Verify package.json and dependencies
@@ -374,6 +377,7 @@ docker exec cognito-profile-manager env | grep -E "(NEXT_PUBLIC_|APP_URL)"
 **Symptoms**: Container exits immediately or fails health checks
 
 **Solutions**:
+
 - Check logs: `docker logs cognito-profile-manager`
 - Verify critical environment variables are set
 - Test with minimal configuration first
@@ -383,6 +387,7 @@ docker exec cognito-profile-manager env | grep -E "(NEXT_PUBLIC_|APP_URL)"
 **Symptoms**: Slow response times or high memory usage
 
 **Solutions**:
+
 - Monitor resource usage: `docker stats cognito-profile-manager`
 - Increase container memory limits
 - Check for memory leaks in logs
@@ -504,11 +509,17 @@ services:
   app:
     build: .
     ports:
-      - "3000:3000"
+      - '3000:3000'
     env_file: .env.local
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "node", "-e", "const http = require('http'); const options = { host: 'localhost', port: 3000, path: '/', timeout: 2000 }; const req = http.request(options, (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.end();"]
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "const http = require('http'); const options = { host: 'localhost', port: 3000, path: '/', timeout: 2000 }; const req = http.request(options, (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.end();",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3

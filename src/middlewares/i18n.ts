@@ -24,12 +24,12 @@ export function handleI18n(request: NextRequest) {
     // Parse Accept-Language header
     const preferredLocales = acceptLanguage
       .split(',')
-      .map(lang => {
+      .map((lang) => {
         const [locale, qValue] = lang.trim().split(';q=');
         const normalizedLocale = locale.split('-')[0]; // Convert 'en-US' to 'en'
         return {
           locale: normalizedLocale,
-          quality: qValue ? parseFloat(qValue) : 1.0
+          quality: qValue ? parseFloat(qValue) : 1.0,
         };
       })
       .sort((a, b) => b.quality - a.quality);
@@ -49,7 +49,7 @@ export function handleI18n(request: NextRequest) {
     path: '/',
     maxAge: 31536000, // 1 year
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production'
+    secure: process.env.NODE_ENV === 'production',
   });
 
   return response;

@@ -255,10 +255,7 @@ export const getUser = cache(async (): Promise<User | null> => {
     logger.error(
       'This could be due to IAM permissions (missing cognito-idp:GetUser), an invalid/expired access token, or a network issue connecting to Cognito.'
     );
-    logger.error(
-      'Session details at time of error:',
-      JSON.stringify(session)
-    );
+    logger.error('Session details at time of error:', JSON.stringify(session));
     return null;
   }
 });

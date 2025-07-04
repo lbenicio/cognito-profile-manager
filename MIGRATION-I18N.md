@@ -11,6 +11,7 @@ The application has been refactored to remove dependency on the `[locale]` direc
 ### 1. Directory Structure Changes
 
 **Before:**
+
 ```
 src/app/[locale]/
 ├── (main)/
@@ -26,6 +27,7 @@ src/app/[locale]/
 ```
 
 **After:**
+
 ```
 src/app/
 ├── (main)/
@@ -51,40 +53,49 @@ The new system uses the following priority order for locale detection:
 ### 3. Configuration Changes
 
 #### `src/i18n/i18n.ts`
+
 - Removed dependency on `requestConfig.locale`
 - Added custom `getLocale()` function for cookie/header-based detection
 - Maintains same translation loading mechanism
 
 #### `src/navigation.ts`
+
 - Switched from `createLocalizedPathnamesNavigation` to `createSharedPathnamesNavigation`
 - Added cookie helper functions: `setLocaleCookie()` and `getLocaleCookie()`
 - Removed `localePrefix` configuration
 
 #### `src/middlewares/i18n.ts`
+
 - Completely rewritten to handle cookie-based locale detection
 - Sets locale cookie based on Accept-Language header for new users
 - No longer performs URL rewriting
 
 #### `next.config.ts`
+
 - Removed `withNextIntl` wrapper
 - Simplified configuration (no URL-based routing needed)
 
 ### 4. Component Updates
 
 #### Page Components
+
 All page components have been updated to:
+
 - Remove `params: Promise<{ locale: string }>` prop
 - Remove `setRequestLocale()` calls
 - Work directly with server-side locale detection
 
 #### Language Switcher
+
 - Enhanced to work with both user preferences and locale cookies
 - Maintains backward compatibility with existing user preference system
 
 ### 5. New Components
 
 #### `LocaleSwitcher`
+
 A new component (`src/components/locale-switcher/`) that provides:
+
 - Cookie-based locale switching
 - Visual feedback during transitions
 - Integration with the routing system
@@ -113,6 +124,7 @@ A new component (`src/components/locale-switcher/`) that provides:
 ## Implementation Details
 
 ### Locale Cookie
+
 - **Name**: `locale`
 - **Path**: `/`
 - **Max Age**: 1 year (31536000 seconds)
@@ -120,6 +132,7 @@ A new component (`src/components/locale-switcher/`) that provides:
 - **Secure**: Only in production
 
 ### Fallback Logic
+
 ```typescript
 async function getLocale(): Promise<string> {
   // 1. Check cookie
@@ -138,7 +151,9 @@ async function getLocale(): Promise<string> {
 ```
 
 ### User Preference Integration
+
 The system maintains integration with user preferences:
+
 - Language changes update both cookie and user preferences
 - User preferences take precedence for authenticated users
 - Cookie serves as fallback for unauthenticated users
@@ -146,14 +161,16 @@ The system maintains integration with user preferences:
 ## Testing
 
 The refactoring has been validated through:
+
 - ✅ TypeScript compilation
-- ✅ Next.js build process  
+- ✅ Next.js build process
 - ✅ All routes accessible without locale prefixes
 - ✅ Locale detection working via cookies and headers
 
 ## Support
 
 For questions or issues related to this refactoring:
+
 1. Check that cookies are enabled in your browser
 2. Verify Accept-Language headers are being sent correctly
 3. Clear browser cache if experiencing locale detection issues
@@ -162,6 +179,7 @@ For questions or issues related to this refactoring:
 ## Future Enhancements
 
 Potential improvements for the new system:
+
 1. **Subdomain Support**: Easy to add `en.example.com` support
 2. **Geolocation**: Integrate IP-based locale detection
 3. **A/B Testing**: Test different locale detection strategies

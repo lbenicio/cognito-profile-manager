@@ -121,7 +121,7 @@ export function PhoneInput({
                       )}
                     />
                     <span className='text-lg'>{c.flag}</span>
-                    <span className='text-sm text-muted-foreground'>
+                    <span className='text-muted-foreground text-sm'>
                       {c.dialCode}
                     </span>
                     <span className='truncate text-sm'>{c.name}</span>

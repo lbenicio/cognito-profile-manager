@@ -6,30 +6,35 @@ This guide helps you get started with developing the Cognito Profile Manager app
 
 ### Prerequisites
 
-- Node.js 22+ 
+- Node.js 22+
 - npm or yarn
 - Git
 
 ### Setup
 
 1. **Clone the repository**:
+
    ```bash
    git clone https://github.com/lbenicio/cognito-profile-manager.git
    cd cognito-profile-manager
    ```
 
 2. **Install dependencies**:
+
    ```bash
    npm install
    ```
 
 3. **Set up development environment**:
+
    ```bash
    npm run setup:dev
    ```
+
    This will create `.env.development.local` with a secure encryption key.
 
 4. **Start the development server**:
+
    ```bash
    npm run dev
    ```
@@ -78,6 +83,7 @@ Mock users are defined in `src/lib/mock-data.ts`:
 - **Regular User**: Standard user access with basic profile
 
 Both users include:
+
 - Complete profile information
 - Session management
 - Group memberships
@@ -132,11 +138,13 @@ COGNITO_ADMIN_GROUP_NAME=admins
 ### 1. Authentication Flow Testing
 
 **Mock Authentication**:
+
 - Always works without external dependencies
 - Instant login with predefined users
 - Full profile data available immediately
 
 **Real Authentication**:
+
 - Requires AWS Cognito setup
 - Tests complete OAuth2 flow
 - Real JWT token validation
@@ -144,12 +152,14 @@ COGNITO_ADMIN_GROUP_NAME=admins
 ### 2. Session Management
 
 Sessions are stored differently based on environment:
+
 - **Development**: Encrypted cookies (mock) or Redis + cookies (real)
 - **Production**: Redis/KV storage with session cookies
 
 ### 3. Internationalization
 
 The app supports multiple languages:
+
 - English (default)
 - Spanish, French, German, Portuguese
 - Locale detected from cookies or Accept-Language header
@@ -174,12 +184,14 @@ The app supports multiple languages:
 ### Debugging
 
 Enable debug mode:
+
 ```bash
 NODE_ENV=development
 DEV_MODE=true
 ```
 
 This provides:
+
 - Detailed error messages
 - Development login options
 - Console logging
@@ -192,6 +204,7 @@ npm run build:pkg
 ```
 
 This will:
+
 - Compile TypeScript
 - Bundle assets
 - Optimize for production

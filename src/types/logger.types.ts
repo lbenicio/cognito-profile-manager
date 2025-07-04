@@ -148,7 +148,12 @@ export interface AuditLogMetadata {
  * Security logging metadata
  */
 export interface SecurityLogMetadata {
-  event: 'login' | 'logout' | 'failed_login' | 'permission_denied' | 'suspicious_activity';
+  event:
+    | 'login'
+    | 'logout'
+    | 'failed_login'
+    | 'permission_denied'
+    | 'suspicious_activity';
   userId?: string;
   ipAddress?: string;
   userAgent?: string;
@@ -294,7 +299,7 @@ export const LOGGER_NAMES = {
 /**
  * Logger name type
  */
-export type LoggerName = typeof LOGGER_NAMES[keyof typeof LOGGER_NAMES];
+export type LoggerName = (typeof LOGGER_NAMES)[keyof typeof LOGGER_NAMES];
 
 /**
  * Log level mapping for configuration

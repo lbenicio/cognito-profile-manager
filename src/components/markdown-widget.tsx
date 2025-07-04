@@ -38,7 +38,7 @@ export async function MarkdownWidget({
         </CardTitle>
       </CardHeader>
       <CardContent
-        className='prose prose-sm max-w-none dark:prose-invert'
+        className='prose prose-sm dark:prose-invert max-w-none'
         dangerouslySetInnerHTML={{ __html: content }}
       />
     </Card>

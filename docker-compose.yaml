@@ -98,7 +98,7 @@ services:
       CACHE_PROVIDER: ${CACHE_PROVIDER:-upstash}
       upstash_KV_REST_API_URL: ${upstash_KV_REST_API_URL}
       upstash_KV_REST_API_TOKEN: ${upstash_KV_REST_API_TOKEN}
-      
+
       # Log Level
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       NEXT_TELEMETRY_DISABLED: 1

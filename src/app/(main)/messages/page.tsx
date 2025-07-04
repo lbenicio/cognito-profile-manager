@@ -48,7 +48,7 @@ export default async function MessagesPage() {
           ) : (
             <div className='flex flex-col items-center justify-center rounded-md border-2 border-dashed p-12 text-center'>
               <h3 className='text-lg font-semibold'>{t('noMessages.title')}</h3>
-              <p className='mt-1 text-sm text-muted-foreground'>
+              <p className='text-muted-foreground mt-1 text-sm'>
                 {t('noMessages.description')}
               </p>
             </div>

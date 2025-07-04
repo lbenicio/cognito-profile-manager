@@ -101,7 +101,7 @@ export function BannerEditor({
           alt='Banner preview'
           width={800}
           height={200}
-          className='h-40 w-full rounded-md bg-muted object-cover'
+          className='bg-muted h-40 w-full rounded-md object-cover'
           data-ai-hint='abstract banner'
         />
         <div className='absolute inset-0 flex flex-col items-center justify-center rounded-md bg-black/50 opacity-0 transition-opacity group-hover:opacity-100'>
@@ -117,7 +117,7 @@ export function BannerEditor({
         className='hidden'
       />
 
-      {error && <p className='text-sm text-destructive'>{error}</p>}
+      {error && <p className='text-destructive text-sm'>{error}</p>}
 
       <div className='flex gap-4'>
         <Button variant='outline' onClick={onCloseAction} disabled={isLoading}>

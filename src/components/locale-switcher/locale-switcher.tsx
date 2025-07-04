@@ -41,18 +41,20 @@ export function LocaleSwitcher() {
   };
 
   const getCurrentLocaleName = () => {
-    return locales.find(locale => locale.code === currentLocale)?.name || 'English';
+    return (
+      locales.find((locale) => locale.code === currentLocale)?.name || 'English'
+    );
   };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" disabled={isPending}>
-          <Languages className="h-4 w-4 mr-2" />
+        <Button variant='outline' disabled={isPending}>
+          <Languages className='mr-2 h-4 w-4' />
           {getCurrentLocaleName()}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align='end'>
         {locales.map((locale) => (
           <DropdownMenuItem
             key={locale.code}

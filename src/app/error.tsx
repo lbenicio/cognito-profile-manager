@@ -30,11 +30,11 @@ export default function ErrorPage({
   }, [error]);
 
   return (
-    <div className='flex min-h-screen items-center justify-center bg-background'>
+    <div className='bg-background flex min-h-screen items-center justify-center'>
       <Card className='mx-4 w-full max-w-md text-center'>
         <CardHeader>
-          <div className='mx-auto w-fit rounded-full bg-destructive/10 p-3'>
-            <AlertTriangle className='h-10 w-10 text-destructive' />
+          <div className='bg-destructive/10 mx-auto w-fit rounded-full p-3'>
+            <AlertTriangle className='text-destructive h-10 w-10' />
           </div>
           <CardTitle className='mt-4 text-3xl font-bold'>
             {t('title')}

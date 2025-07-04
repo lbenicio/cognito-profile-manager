@@ -143,7 +143,7 @@ export function TwoFactorAuth({ user, onUpdateAction }: TwoFactorAuthProps) {
       <CardContent className='space-y-6'>
         <div className='space-y-2'>
           <div className='flex items-start gap-3'>
-            <Smartphone className='mt-1 h-5 w-5 shrink-0 text-muted-foreground' />
+            <Smartphone className='text-muted-foreground mt-1 h-5 w-5 shrink-0' />
             <div className='w-full'>
               <h4 className='text-sm font-medium'>{t('authenticatorApp')}</h4>
               {user.twoFactorEnabled ? (
@@ -167,7 +167,7 @@ export function TwoFactorAuth({ user, onUpdateAction }: TwoFactorAuthProps) {
                 <div className='space-y-4 pt-2'>
                   {!showSetup ? (
                     <>
-                      <p className='text-sm text-muted-foreground'>
+                      <p className='text-muted-foreground text-sm'>
                         {t('statusDisabled')}
                       </p>
                       <Button
@@ -184,7 +184,7 @@ export function TwoFactorAuth({ user, onUpdateAction }: TwoFactorAuthProps) {
                     </>
                   ) : (
                     <div className='space-y-4'>
-                      <p className='text-sm text-muted-foreground'>
+                      <p className='text-muted-foreground text-sm'>
                         {t('qrInstructions')}
                       </p>
                       <div className='flex w-fit justify-start rounded-md bg-white p-4'>
@@ -204,7 +204,7 @@ export function TwoFactorAuth({ user, onUpdateAction }: TwoFactorAuthProps) {
                       </div>
 
                       <div className='space-y-2'>
-                        <p className='text-sm text-muted-foreground'>
+                        <p className='text-muted-foreground text-sm'>
                           {t('manualEntryInstructions')}
                         </p>
                         <div className='flex max-w-xs items-center gap-2'>
@@ -268,10 +268,10 @@ export function TwoFactorAuth({ user, onUpdateAction }: TwoFactorAuthProps) {
         <Separator />
         <div className='space-y-4'>
           <div className='flex items-start gap-3'>
-            <Smartphone className='mt-1 h-5 w-5 shrink-0 text-muted-foreground' />
+            <Smartphone className='text-muted-foreground mt-1 h-5 w-5 shrink-0' />
             <div className='w-full space-y-4'>
               <h4 className='text-sm font-medium'>{t('smsMessagingTitle')}</h4>
-              <p className='text-sm text-muted-foreground'>
+              <p className='text-muted-foreground text-sm'>
                 {t('smsMessagingDescription')}
               </p>
               <Button variant='outline' size='sm' disabled>

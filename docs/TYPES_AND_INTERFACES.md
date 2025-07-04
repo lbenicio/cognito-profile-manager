@@ -38,11 +38,14 @@ src/
 ## Architecture Principles
 
 ### 1. **Clear Separation**
+
 - **`/types/`**: Contains only type aliases, union types, enums, and simple type definitions
 - **`/interfaces/`**: Contains only interface definitions, object shapes, and contracts
 
 ### 2. **Domain Organization**
+
 Both directories are organized by domain/module:
+
 - `auth/` - Authentication and authorization
 - `session/` - Session management
 - `api/` - API contracts and responses
@@ -52,12 +55,16 @@ Both directories are organized by domain/module:
 - `forms/` - Form validation and props
 
 ### 3. **Import Strategy**
+
 ```typescript
 // Import types (unions, aliases, enums)
 import type { AuthState, AuthMethod } from '@/types/auth.types';
 
 // Import interfaces (object shapes)
-import type { AuthUser, LoginCredentials } from '@/interfaces/auth/auth.interfaces';
+import type {
+  AuthUser,
+  LoginCredentials,
+} from '@/interfaces/auth/auth.interfaces';
 
 // Convenience imports from main index files
 import type { AuthUser, AuthState } from '@/types'; // Re-exports from both
@@ -69,14 +76,24 @@ import type { BaseActionResult } from '@/interfaces';
 ### 1. Authentication System
 
 #### Types (`/types/auth.types.ts`)
+
 ```typescript
-export type AuthState = 'authenticated' | 'unauthenticated' | 'loading' | 'error';
+export type AuthState =
+  | 'authenticated'
+  | 'unauthenticated'
+  | 'loading'
+  | 'error';
 export type AuthMethod = 'sso' | 'passkey' | 'mfa' | 'password' | 'mock';
 export type UserRole = 'user' | 'admin' | 'moderator' | 'viewer';
-export type AccountStatus = 'active' | 'inactive' | 'suspended' | 'pending_verification';
+export type AccountStatus =
+  | 'active'
+  | 'inactive'
+  | 'suspended'
+  | 'pending_verification';
 ```
 
 #### Interfaces (`/interfaces/auth/auth.interfaces.ts`)
+
 ```typescript
 export interface AuthUser {
   id: string;
@@ -111,14 +128,19 @@ export interface AuthContext {
 ### 2. Session Management
 
 #### Types (`/types/session.types.ts`)
+
 ```typescript
 export type SessionInvalidReason = 'NOT_FOUND' | 'EXPIRED' | 'INVALID_TOKEN';
-export type SessionAction = 'SESSION_CREATED' | 'SESSION_REFRESHED' | 'LOGIN_SUCCESS';
+export type SessionAction =
+  | 'SESSION_CREATED'
+  | 'SESSION_REFRESHED'
+  | 'LOGIN_SUCCESS';
 export type SessionStatus = 'active' | 'expired' | 'revoked' | 'suspended';
 export type LogoutType = 'local' | 'global' | 'forced' | 'expired';
 ```
 
 #### Interfaces (`/interfaces/session/session.interfaces.ts`)
+
 ```typescript
 export interface AuthSession extends BaseSession {
   accessToken: string;
@@ -138,6 +160,7 @@ export interface SessionManager {
 ### 3. API Response System
 
 #### Types (`/types/api/response.types.ts`)
+
 ```typescript
 export type HttpStatusCode = 200 | 201 | 400 | 401 | 403 | 404 | 500;
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -146,6 +169,7 @@ export type ExportFormat = 'csv' | 'json' | 'pdf' | 'xlsx';
 ```
 
 #### Interfaces (`/interfaces/api/response.interfaces.ts`)
+
 ```typescript
 export interface BaseApiResponse {
   success: boolean;
@@ -156,7 +180,8 @@ export interface ApiResponse<T = unknown> extends BaseApiResponse {
   data?: T;
 }
 
-export interface PaginatedApiResponse<T = unknown> extends ApiSuccessResponse<T[]> {
+export interface PaginatedApiResponse<T = unknown>
+  extends ApiSuccessResponse<T[]> {
   pagination: PaginationMeta;
 }
 ```
@@ -164,6 +189,7 @@ export interface PaginatedApiResponse<T = unknown> extends ApiSuccessResponse<T[
 ### 4. Server Actions
 
 #### Interfaces (`/interfaces/actions/action.interfaces.ts`)
+
 ```typescript
 export interface BaseActionResult {
   success: boolean;
@@ -184,11 +210,17 @@ export interface ProfileUpdateResult extends BaseActionResult {
 ### 5. Error Handling
 
 #### Types (`/types/error.types.ts`)
+
 ```typescript
-export type ApplicationError = AuthError | ValidationError | ApiError | CognitoError;
+export type ApplicationError =
+  | AuthError
+  | ValidationError
+  | ApiError
+  | CognitoError;
 ```
 
 #### Interfaces (`/interfaces/error/error.interfaces.ts`)
+
 ```typescript
 export interface AppError {
   name: string;
@@ -316,15 +348,17 @@ function handleError(error: ApplicationError): void {
 ## Migration Guide
 
 ### Before (Old Structure)
+
 ```typescript
 // Everything mixed in types/
 import type { AuthUser, AuthState } from '@/types/auth.types';
 ```
 
 ### After (New Structure)
+
 ```typescript
 // Clear separation
-import type { AuthState } from '@/types/auth.types';           // Type alias
+import type { AuthState } from '@/types/auth.types'; // Type alias
 import type { AuthUser } from '@/interfaces/auth/auth.interfaces'; // Interface
 
 // Or use convenience re-exports
@@ -336,12 +370,14 @@ import type { AuthUser, AuthState } from '@/types'; // Both available
 ### 1. **When to Use Types vs Interfaces**
 
 **Use Types (`/types/`) for:**
+
 - Union types: `type Status = 'loading' | 'success' | 'error'`
 - Type aliases: `type UserId = string`
 - Enums: `enum LogLevel { DEBUG, INFO, WARN, ERROR }`
 - Mapped types: `type Partial<T> = { [P in keyof T]?: T[P] }`
 
 **Use Interfaces (`/interfaces/`) for:**
+
 - Object shapes: `interface User { id: string; name: string }`
 - Component props: `interface ButtonProps { onClick: () => void }`
 - API contracts: `interface ApiResponse<T> { data: T }`
@@ -358,7 +394,10 @@ import type { AuthUser } from '@/interfaces/auth/auth.interfaces';
 import type { AuthUser, AuthState } from '@/types';
 
 // Domain-specific imports
-import type { LoginCredentials, AuthResult } from '@/interfaces/auth/auth.interfaces';
+import type {
+  LoginCredentials,
+  AuthResult,
+} from '@/interfaces/auth/auth.interfaces';
 ```
 
 ### 3. **Naming Conventions**
@@ -388,26 +427,31 @@ import type { LoginCredentials, AuthResult } from '@/interfaces/auth/auth.interf
 ## Benefits of This Architecture
 
 ### 1. **Clarity and Intent**
+
 - Clear distinction between data shapes (interfaces) and type unions/aliases (types)
 - Easier to understand what each import provides
 - Better IDE support and autocomplete
 
 ### 2. **Maintainability**
+
 - Related types and interfaces are co-located by domain
 - Easier to find and update related definitions
 - Consistent naming and organization patterns
 
 ### 3. **Reusability**
+
 - Common interfaces can be easily shared across components
 - Type aliases provide flexibility for union types
 - Clear contracts for API responses and server actions
 
 ### 4. **Type Safety**
+
 - Comprehensive coverage of all application domains
 - Consistent error handling patterns
 - Strong typing for server actions and API responses
 
 ### 5. **Developer Experience**
+
 - Excellent IntelliSense and autocomplete
 - Clear error messages with proper type information
 - Easy refactoring with TypeScript language server
@@ -421,10 +465,10 @@ The type system includes several utility functions and type guards:
 import { isAuthError, isValidationError } from '@/types/error.types';
 
 // Action result helpers
-import { 
-  createSuccessResult, 
+import {
+  createSuccessResult,
   createErrorResult,
-  isActionSuccess 
+  isActionSuccess,
 } from '@/types/actions.types';
 
 // Error factory functions

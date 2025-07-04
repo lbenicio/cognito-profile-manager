@@ -24,16 +24,19 @@ In the **App client settings** section:
 3. Add your logout redirect URLs:
 
 **For Development:**
+
 ```
 http://localhost:9002/login
 ```
 
 **For Production:**
+
 ```
 https://your-domain.com/login
 ```
 
 **For Multiple Environments:**
+
 ```
 http://localhost:9002/login,https://staging.your-domain.com/login,https://your-domain.com/login
 ```
@@ -52,7 +55,7 @@ Ensure your Cognito User Pool has a domain configured:
 Verify these OAuth 2.0 settings in your App Client:
 
 1. **OAuth 2.0 grant types**: ✅ Authorization code grant
-2. **OAuth 2.0 scopes**: 
+2. **OAuth 2.0 scopes**:
    - ✅ `openid`
    - ✅ `email`
    - ✅ `profile`
@@ -63,11 +66,13 @@ Verify these OAuth 2.0 settings in your App Client:
 Also ensure your callback URLs are configured:
 
 **For Development:**
+
 ```
 http://localhost:9002/api/v1/auth/callback/oidc
 ```
 
 **For Production:**
+
 ```
 https://your-domain.com/api/v1/auth/callback/oidc
 ```
@@ -104,23 +109,27 @@ npm run test:logout
 ### Issue: 400 Bad Request from Cognito
 
 **Symptoms:**
+
 - User clicks logout
 - Gets redirected to Cognito
 - Sees 400 error page
 - URL shows invalid_request error
 
 **Solution:**
+
 - Add `http://localhost:9002/login` to Sign out URLs in Cognito App Client
 - Ensure URL exactly matches (no trailing slashes, correct protocol)
 
 ### Issue: Logout doesn't work at all
 
 **Symptoms:**
+
 - Logout button doesn't work
 - No redirect happens
 - User stays logged in
 
 **Solution:**
+
 - Check environment variables are set correctly
 - Verify `NEXT_PUBLIC_COGNITO_CLIENT_ID` is configured
 - Ensure `APP_URL` matches your development URL
@@ -128,10 +137,12 @@ npm run test:logout
 ### Issue: Works in development but not production
 
 **Symptoms:**
+
 - Logout works on localhost
 - Fails in production environment
 
 **Solution:**
+
 - Add production domain to Sign out URLs
 - Update `APP_URL` environment variable for production
 - Ensure HTTPS URLs for production

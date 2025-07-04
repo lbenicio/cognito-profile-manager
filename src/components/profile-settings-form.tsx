@@ -79,7 +79,7 @@ export function ProfileSettingsForm({
         <div className='flex items-start justify-between'>
           <div className='pr-4'>
             <Label htmlFor='profile-visibility'>{t('isPublicLabel')}</Label>
-            <p className='text-sm text-muted-foreground'>
+            <p className='text-muted-foreground text-sm'>
               {t('isPublicDescription')}
             </p>
           </div>
