@@ -85,14 +85,14 @@ function initializeCacheClient(): CacheClient {
   const provider = process.env.CACHE_PROVIDER || 'upstash';
 
   if (provider === 'upstash') {
-    const redisUrl = process.env.UPSTASH_KV_REST_API_URL;
-    const redisToken = process.env.UPSTASH_KV_REST_API_TOKEN;
+    const redisUrl = process.env.upstash_KV_REST_API_URL;
+    const redisToken = process.env.upstash_KV_REST_API_TOKEN;
 
     if (redisUrl && redisToken) {
       return new UpstashRedisCache(redisUrl, redisToken);
     }
     logger.warn(
-      'CACHE_PROVIDER is "upstash" but UPSTASH_KV_REST_API_URL or UPSTASH_KV_REST_API_TOKEN are missing. Caching is disabled.'
+      'CACHE_PROVIDER is "upstash" but upstash_KV_REST_API_URL or upstash_KV_REST_API_TOKEN are missing. Caching is disabled.'
     );
     return new NoOpCache();
   }
