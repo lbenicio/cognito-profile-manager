@@ -41,7 +41,7 @@ import {
 } from '@/components/ui/table';
 import type { User as UserType } from '@/types/user/user.types';
 import { format } from 'date-fns';
-import UAParser from 'ua-parser-js';
+import { UAParser } from 'ua-parser-js';
 import { Progress } from '@/components/ui/progress';
 import { SessionInfoCard } from './session-info-card';
 import { LoginActivityChart } from './login-activity-chart';
@@ -133,7 +133,8 @@ const formatUserAgent = (uaString: string): string => {
   }
 
   try {
-    const parser = new UAParser(uaString);
+    const parser = new UAParser();
+    parser.setUA(uaString);
     const browser = parser.getBrowser();
     const os = parser.getOS();
     const device = parser.getDevice();
@@ -144,7 +145,7 @@ const formatUserAgent = (uaString: string): string => {
       parts.push(browser.name);
     }
 
-    if (device.model && device.type !== 'desktop') {
+    if (device.model && device.type && device.type !== undefined) {
       parts.push(`on ${device.model}`);
     } else if (os.name) {
       parts.push(`on ${os.name}`);
@@ -203,7 +204,7 @@ export function DashboardView({
         <h1 className='text-3xl font-bold tracking-tight md:text-4xl'>
           {translations.welcome}
         </h1>
-        <p className='text-lg text-muted-foreground'>
+        <p className='text-muted-foreground text-lg'>
           {translations.description}
         </p>
       </header>
@@ -229,7 +230,7 @@ export function DashboardView({
               <div>
                 <CardTitle>{user.name}</CardTitle>
                 <CardDescription>@{user.username}</CardDescription>
-                <div className='flex items-center pt-1 text-xs text-muted-foreground'>
+                <div className='text-muted-foreground flex items-center pt-1 text-xs'>
                   <UserIcon className='mr-1.5 h-3 w-3' />
                   <span>
                     {translations.id}: {user.sub}
@@ -239,18 +240,18 @@ export function DashboardView({
             </CardHeader>
             <CardContent className='grid grid-cols-1 gap-6 pt-6 md:grid-cols-2'>
               <div className='flex items-start gap-4'>
-                <Mail className='h-5 w-5 shrink-0 text-muted-foreground' />
+                <Mail className='text-muted-foreground h-5 w-5 shrink-0' />
                 <div>
                   <h4 className='text-sm font-semibold'>
                     {translations.profileCard.email}
                   </h4>
-                  <p className='truncate text-sm text-muted-foreground'>
+                  <p className='text-muted-foreground truncate text-sm'>
                     {user.email}
                   </p>
                 </div>
               </div>
               <div className='flex items-start gap-4'>
-                <Users className='h-5 w-5 shrink-0 text-muted-foreground' />
+                <Users className='text-muted-foreground h-5 w-5 shrink-0' />
                 <div>
                   <h4 className='text-sm font-semibold'>
                     {translations.profileCard.groups}
@@ -263,7 +264,7 @@ export function DashboardView({
                         </Badge>
                       ))
                     ) : (
-                      <p className='text-sm text-muted-foreground'>
+                      <p className='text-muted-foreground text-sm'>
                         {translations.profileCard.noGroups}
                       </p>
                     )}
@@ -328,7 +329,7 @@ export function DashboardView({
                     <TableRow>
                       <TableCell
                         colSpan={3}
-                        className='text-center text-muted-foreground'
+                        className='text-muted-foreground text-center'
                       >
                         {translations.loginHistory.noHistory}
                       </TableCell>
@@ -368,7 +369,7 @@ export function DashboardView({
                   ))}
                 </div>
               ) : (
-                <p className='text-sm text-muted-foreground'>
+                <p className='text-muted-foreground text-sm'>
                   {translations.messagesPreview.noMessages}
                 </p>
               )}
@@ -404,7 +405,7 @@ export function DashboardView({
                   {isComplete ? (
                     <CheckCircle2 className='mr-2 h-4 w-4 text-green-500' />
                   ) : (
-                    <XCircle className='mr-2 h-4 w-4 text-muted-foreground' />
+                    <XCircle className='text-muted-foreground mr-2 h-4 w-4' />
                   )}
                   <span
                     className={
@@ -458,7 +459,7 @@ export function DashboardView({
                     {isComplete ? (
                       <CheckCircle2 className='mr-2 h-4 w-4 text-green-500' />
                     ) : (
-                      <XCircle className='mr-2 h-4 w-4 text-muted-foreground' />
+                      <XCircle className='text-muted-foreground mr-2 h-4 w-4' />
                     )}
                     <span
                       className={

@@ -12,7 +12,7 @@ import {
 import { Clock, Computer, Globe, Timer } from 'lucide-react';
 import { format, formatDistanceToNowStrict } from 'date-fns';
 import type { User } from '@/types/user/user.types';
-import UAParser from 'ua-parser-js';
+import { UAParser } from 'ua-parser-js';
 import { Logger } from '@/lib/logger';
 
 const logger = new Logger('SESSION-INFO-CARD');
@@ -38,7 +38,19 @@ const formatUserAgent = (uaString: string): string => {
       parts.push(browser.name);
     }
 
-    if (device.model && device.type !== 'desktop') {
+    if (
+      device.model &&
+      device.type &&
+      [
+        'mobile',
+        'tablet',
+        'console',
+        'smarttv',
+        'wearable',
+        'xr',
+        'embedded',
+      ].includes(device.type)
+    ) {
       parts.push(`on ${device.model}`);
     } else if (os.name) {
       parts.push(`on ${os.name}`);
@@ -90,7 +102,7 @@ export function SessionInfoCard({ user }: SessionInfoCardProps) {
       </CardHeader>
       <CardContent className='space-y-4 text-sm'>
         <div className='flex items-center justify-between'>
-          <div className='flex items-center gap-2 text-muted-foreground'>
+          <div className='text-muted-foreground flex items-center gap-2'>
             <Clock className='h-4 w-4' />
             <span>{t('startedAt')}</span>
           </div>
@@ -99,14 +111,14 @@ export function SessionInfoCard({ user }: SessionInfoCardProps) {
           </span>
         </div>
         <div className='flex items-center justify-between'>
-          <div className='flex items-center gap-2 text-muted-foreground'>
+          <div className='text-muted-foreground flex items-center gap-2'>
             <Timer className='h-4 w-4' />
             <span>{t('expiresIn')}</span>
           </div>
           <span className='font-medium'>{isMounted ? timeLeft : '...'}</span>
         </div>
         <div className='flex items-center justify-between'>
-          <div className='flex items-center gap-2 text-muted-foreground'>
+          <div className='text-muted-foreground flex items-center gap-2'>
             <Computer className='h-4 w-4' />
             <span>{t('currentDevice')}</span>
           </div>
@@ -117,7 +129,7 @@ export function SessionInfoCard({ user }: SessionInfoCardProps) {
           </span>
         </div>
         <div className='flex items-center justify-between'>
-          <div className='flex items-center gap-2 text-muted-foreground'>
+          <div className='text-muted-foreground flex items-center gap-2'>
             <Globe className='h-4 w-4' />
             <span>{t('ipAddress')}</span>
           </div>

@@ -254,7 +254,7 @@ export function ProfileForm({ user, onUpdateAction }: ProfileFormProps) {
                   <FormControl>
                     <DatePicker
                       value={field.value}
-                      onChange={field.onChange}
+                      onChangeAction={field.onChange}
                       placeholder={t('birthdatePlaceholder')}
                     />
                   </FormControl>
@@ -296,7 +296,7 @@ export function ProfileForm({ user, onUpdateAction }: ProfileFormProps) {
           <CardFooter>
             <Button type='submit' disabled={isSubmitting}>
               {isSubmitting ? (
-                <div className='h-4 w-4 animate-spin rounded-full border-b-2 border-primary-foreground'></div>
+                <div className='border-primary-foreground h-4 w-4 animate-spin rounded-full border-b-2'></div>
               ) : (
                 <Save />
               )}

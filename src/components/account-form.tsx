@@ -235,7 +235,7 @@ export function AccountForm({ user, onUpdateAction }: AccountFormProps) {
                   <FormControl>
                     <DatePicker
                       value={field.value}
-                      onChange={field.onChange}
+                      onChangeAction={field.onChange}
                       placeholder={t('birthdatePlaceholder')}
                     />
                   </FormControl>

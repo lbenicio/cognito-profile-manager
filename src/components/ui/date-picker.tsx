@@ -15,11 +15,15 @@ import {
 
 interface DatePickerProps {
   value?: Date;
-  onChange: (date: Date | undefined) => void;
+  onChangeAction: (date: Date | undefined) => void;
   placeholder: string;
 }
 
-export function DatePicker({ value, onChange, placeholder }: DatePickerProps) {
+export function DatePicker({
+  value,
+  onChangeAction,
+  placeholder,
+}: DatePickerProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -38,7 +42,7 @@ export function DatePicker({ value, onChange, placeholder }: DatePickerProps) {
         <Calendar
           mode='single'
           selected={value}
-          onSelect={onChange}
+          onSelect={onChangeAction}
           initialFocus
         />
       </PopoverContent>
