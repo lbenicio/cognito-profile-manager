@@ -1,6 +1,7 @@
 'use client';
 
-import { Link, useRouter } from '@/navigation';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   LogOut,
   Settings,
@@ -77,11 +78,11 @@ export function Header({
   };
 
   return (
-    <header className='sticky top-0 z-50 w-full border-b bg-card shadow-xs'>
+    <header className='bg-card sticky top-0 z-50 w-full border-b shadow-xs'>
       <div className='container mx-auto flex h-16 items-center justify-between px-4 md:px-8'>
         {/* Left side: App Logo and Title */}
         <Link href='/' className='flex items-center gap-2 text-xl font-bold'>
-          <LayoutDashboard className='h-6 w-6 text-primary' />
+          <LayoutDashboard className='text-primary h-6 w-6' />
           <span className='hidden sm:inline-block'>{t.title}</span>
         </Link>
 
@@ -102,7 +103,7 @@ export function Header({
                     {user.messages.length > 0 && (
                       <Badge
                         variant='destructive'
-                        className='absolute -right-1 -top-1 h-5 w-5 justify-center rounded-full p-0 text-xs'
+                        className='absolute -top-1 -right-1 h-5 w-5 justify-center rounded-full p-0 text-xs'
                       >
                         {user.messages.length}
                       </Badge>
@@ -137,10 +138,10 @@ export function Header({
                   <DropdownMenuContent className='w-56' align='end' forceMount>
                     <DropdownMenuLabel className='font-normal'>
                       <div className='flex flex-col space-y-1'>
-                        <p className='text-sm font-medium leading-none'>
+                        <p className='text-sm leading-none font-medium'>
                           {user.name}
                         </p>
-                        <p className='text-xs leading-none text-muted-foreground'>
+                        <p className='text-muted-foreground text-xs leading-none'>
                           {user.email}
                         </p>
                       </div>
@@ -216,7 +217,7 @@ export function Header({
                             href='/'
                             className='flex items-center gap-2 text-lg font-semibold'
                           >
-                            <LayoutDashboard className='h-6 w-6 text-primary' />
+                            <LayoutDashboard className='text-primary h-6 w-6' />
                             <span>{t.title}</span>
                           </Link>
                         </SheetClose>
@@ -240,10 +241,10 @@ export function Header({
                           </AvatarFallback>
                         </Avatar>
                         <div className='flex flex-col space-y-1'>
-                          <p className='text-sm font-medium leading-none'>
+                          <p className='text-sm leading-none font-medium'>
                             {user.name}
                           </p>
-                          <p className='text-xs leading-none text-muted-foreground'>
+                          <p className='text-muted-foreground text-xs leading-none'>
                             {user.email}
                           </p>
                         </div>
@@ -257,7 +258,7 @@ export function Header({
                             href={adminDashboardUrl}
                             target='_blank'
                             rel='noopener noreferrer'
-                            className='flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary'
+                            className='text-muted-foreground hover:text-primary flex items-center gap-3 rounded-lg px-3 py-2 transition-all'
                           >
                             <Shield className='h-5 w-5' />{' '}
                             {t.userMenu.adminDashboard}
@@ -267,7 +268,7 @@ export function Header({
                       <SheetClose asChild>
                         <Link
                           href='/messages'
-                          className='relative flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary'
+                          className='text-muted-foreground hover:text-primary relative flex items-center gap-3 rounded-lg px-3 py-2 transition-all'
                         >
                           <Bell className='h-5 w-5' />
                           {t.userMenu.messages}
@@ -281,7 +282,7 @@ export function Header({
                       <SheetClose asChild>
                         <Link
                           href='/profile'
-                          className='flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary'
+                          className='text-muted-foreground hover:text-primary flex items-center gap-3 rounded-lg px-3 py-2 transition-all'
                         >
                           <Contact className='h-5 w-5' />
                           {t.userMenu.profile}
@@ -290,7 +291,7 @@ export function Header({
                       <SheetClose asChild>
                         <Link
                           href='/account'
-                          className='flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary'
+                          className='text-muted-foreground hover:text-primary flex items-center gap-3 rounded-lg px-3 py-2 transition-all'
                         >
                           <CircleUserRound className='h-5 w-5' />
                           {t.userMenu.account}
@@ -299,7 +300,7 @@ export function Header({
                       <SheetClose asChild>
                         <Link
                           href='/security'
-                          className='flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary'
+                          className='text-muted-foreground hover:text-primary flex items-center gap-3 rounded-lg px-3 py-2 transition-all'
                         >
                           <ShieldCheck className='h-5 w-5' />
                           {t.userMenu.security}
@@ -308,7 +309,7 @@ export function Header({
                       <SheetClose asChild>
                         <Link
                           href='/settings'
-                          className='flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary'
+                          className='text-muted-foreground hover:text-primary flex items-center gap-3 rounded-lg px-3 py-2 transition-all'
                         >
                           <Settings className='h-5 w-5' />
                           {t.userMenu.settings}

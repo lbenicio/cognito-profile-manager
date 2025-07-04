@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from '@/navigation';
+import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { Languages } from 'lucide-react';
 import {

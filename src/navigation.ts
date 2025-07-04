@@ -1,9 +1,11 @@
-import { createSharedPathnamesNavigation } from 'next-intl/navigation';
+/*
+  [MIGRATION NOTE]
+  In next-intl v3+, navigation helpers like Link, usePathname, useRouter, and redirect
+  are no longer exported from 'next-intl/navigation'. Use Next.js built-in navigation
+  utilities (e.g., 'next/link', 'next/navigation') and handle locale in your routes as needed.
+*/
 
 export const locales = ['en', 'es', 'fr', 'de', 'pt'];
-
-export const { Link, redirect, usePathname, useRouter } =
-  createSharedPathnamesNavigation({ locales });
 
 // Helper function to set locale in cookie
 export function setLocaleCookie(locale: string) {

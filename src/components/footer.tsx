@@ -1,7 +1,7 @@
 'use client';
 import { useTranslations } from 'next-intl';
 import { useState, useEffect } from 'react';
-import { Link } from '@/navigation';
+import Link from 'next/link';
 import { LayoutDashboard, Calendar, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -27,7 +27,7 @@ export function Footer() {
   }, []);
 
   return (
-    <footer className='border-t bg-card'>
+    <footer className='bg-card border-t'>
       <div className='container mx-auto px-4 py-8 md:px-8'>
         <div className='grid grid-cols-1 gap-8 md:grid-cols-4'>
           {/* Left side: Logo, Copyright, and Clock */}
@@ -36,18 +36,18 @@ export function Footer() {
               href='/'
               className='flex items-center gap-2 text-xl font-bold'
             >
-              <LayoutDashboard className='h-6 w-6 text-primary' />
+              <LayoutDashboard className='text-primary h-6 w-6' />
               <span>Outpost</span>
             </Link>
             <div
-              className='text-sm text-muted-foreground'
+              className='text-muted-foreground text-sm'
               style={{ minHeight: '20px' }}
             >
               {isClient && (
                 <p>{t('copyright', { year: currentDate.getFullYear() })}</p>
               )}
             </div>
-            <div className='space-y-1 pt-2 text-sm text-muted-foreground'>
+            <div className='text-muted-foreground space-y-1 pt-2 text-sm'>
               <div
                 className='flex items-center gap-2'
                 style={{ minHeight: '20px' }}
@@ -74,19 +74,19 @@ export function Footer() {
               <nav className='flex flex-col gap-2'>
                 <Link
                   href='/'
-                  className='text-sm text-muted-foreground transition-colors hover:text-primary'
+                  className='text-muted-foreground hover:text-primary text-sm transition-colors'
                 >
                   {tSitemap('dashboard')}
                 </Link>
                 <Link
                   href='/account'
-                  className='text-sm text-muted-foreground transition-colors hover:text-primary'
+                  className='text-muted-foreground hover:text-primary text-sm transition-colors'
                 >
                   {tSitemap('account')}
                 </Link>
                 <Link
                   href='/profile'
-                  className='text-sm text-muted-foreground transition-colors hover:text-primary'
+                  className='text-muted-foreground hover:text-primary text-sm transition-colors'
                 >
                   {tSitemap('profile')}
                 </Link>
@@ -99,19 +99,19 @@ export function Footer() {
               <nav className='flex flex-col gap-2'>
                 <Link
                   href='/settings'
-                  className='text-sm text-muted-foreground transition-colors hover:text-primary'
+                  className='text-muted-foreground hover:text-primary text-sm transition-colors'
                 >
                   {tSitemap('settings')}
                 </Link>
                 <Link
                   href='/security'
-                  className='text-sm text-muted-foreground transition-colors hover:text-primary'
+                  className='text-muted-foreground hover:text-primary text-sm transition-colors'
                 >
                   {tSitemap('security')}
                 </Link>
                 <Link
                   href='/contact'
-                  className='text-sm text-muted-foreground transition-colors hover:text-primary'
+                  className='text-muted-foreground hover:text-primary text-sm transition-colors'
                 >
                   {tSitemap('contact')}
                 </Link>
@@ -122,13 +122,13 @@ export function Footer() {
               <nav className='flex flex-col gap-2'>
                 <Link
                   href='/terms'
-                  className='text-sm text-muted-foreground transition-colors hover:text-primary'
+                  className='text-muted-foreground hover:text-primary text-sm transition-colors'
                 >
                   {tLegal('terms')}
                 </Link>
                 <Link
                   href='/privacy'
-                  className='text-sm text-muted-foreground transition-colors hover:text-primary'
+                  className='text-muted-foreground hover:text-primary text-sm transition-colors'
                 >
                   {tLegal('privacy')}
                 </Link>

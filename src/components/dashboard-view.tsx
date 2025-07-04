@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, type ReactNode } from 'react';
-import { Link } from '@/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Logger } from '@/lib/logger';
 import {

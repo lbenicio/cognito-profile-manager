@@ -1,4 +1,4 @@
-import { Link } from '@/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -15,11 +15,11 @@ export default async function NotFoundPage() {
   const t = await getTranslations('Errors.notFound');
 
   return (
-    <div className='flex min-h-screen items-center justify-center bg-background'>
+    <div className='bg-background flex min-h-screen items-center justify-center'>
       <Card className='mx-4 w-full max-w-md text-center'>
         <CardHeader>
-          <div className='mx-auto w-fit rounded-full bg-secondary p-3'>
-            <AlertCircle className='h-10 w-10 text-muted-foreground' />
+          <div className='bg-secondary mx-auto w-fit rounded-full p-3'>
+            <AlertCircle className='text-muted-foreground h-10 w-10' />
           </div>
           <CardTitle className='mt-4 text-3xl font-bold'>
             {t('title')}
