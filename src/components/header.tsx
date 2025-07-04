@@ -77,7 +77,7 @@ export function Header({
   };
 
   return (
-    <header className='sticky top-0 z-50 w-full border-b bg-card shadow-sm'>
+    <header className='sticky top-0 z-50 w-full border-b bg-card shadow-xs'>
       <div className='container mx-auto flex h-16 items-center justify-between px-4 md:px-8'>
         {/* Left side: App Logo and Title */}
         <Link href='/' className='flex items-center gap-2 text-xl font-bold'>

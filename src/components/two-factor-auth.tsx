@@ -143,7 +143,7 @@ export function TwoFactorAuth({ user, onUpdateAction }: TwoFactorAuthProps) {
       <CardContent className='space-y-6'>
         <div className='space-y-2'>
           <div className='flex items-start gap-3'>
-            <Smartphone className='mt-1 h-5 w-5 flex-shrink-0 text-muted-foreground' />
+            <Smartphone className='mt-1 h-5 w-5 shrink-0 text-muted-foreground' />
             <div className='w-full'>
               <h4 className='text-sm font-medium'>{t('authenticatorApp')}</h4>
               {user.twoFactorEnabled ? (
@@ -268,7 +268,7 @@ export function TwoFactorAuth({ user, onUpdateAction }: TwoFactorAuthProps) {
         <Separator />
         <div className='space-y-4'>
           <div className='flex items-start gap-3'>
-            <Smartphone className='mt-1 h-5 w-5 flex-shrink-0 text-muted-foreground' />
+            <Smartphone className='mt-1 h-5 w-5 shrink-0 text-muted-foreground' />
             <div className='w-full space-y-4'>
               <h4 className='text-sm font-medium'>{t('smsMessagingTitle')}</h4>
               <p className='text-sm text-muted-foreground'>

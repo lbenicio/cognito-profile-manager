@@ -115,7 +115,7 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
       </CardHeader>
       <CardContent className='space-y-6'>
         <div className='flex items-start gap-3'>
-          <KeyRound className='mt-1 h-5 w-5 flex-shrink-0 text-muted-foreground' />
+          <KeyRound className='mt-1 h-5 w-5 shrink-0 text-muted-foreground' />
           <div className='w-full space-y-4'>
             {user.devices && user.devices.length > 0 ? (
               <div className='space-y-4'>
@@ -124,7 +124,7 @@ export function PasskeyManagement({ user }: PasskeyManagementProps) {
                 </p>
                 <div className='relative'>
                   {isPending && (
-                    <div className='absolute inset-0 z-10 flex items-center justify-center rounded-md bg-card/80 backdrop-blur-sm'>
+                    <div className='absolute inset-0 z-10 flex items-center justify-center rounded-md bg-card/80 backdrop-blur-xs'>
                       <div className='flex items-center gap-2 text-muted-foreground'>
                         <Loader2 className='h-5 w-5 animate-spin' />
                         <span>{t('updatingList')}</span>

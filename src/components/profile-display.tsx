@@ -132,13 +132,13 @@ export function ProfileDisplay({ user, onUpdateAction }: ProfileDisplayProps) {
         <CardContent className='space-y-4 text-sm'>
           <div className='flex items-center justify-between gap-4'>
             <div className='flex min-w-0 items-center gap-3'>
-              <Mail className='h-5 w-5 flex-shrink-0 text-muted-foreground' />
+              <Mail className='h-5 w-5 shrink-0 text-muted-foreground' />
               <span className='truncate'>{user.email}</span>
             </div>
             {user.email_verified ? (
               <Badge
                 variant='secondary'
-                className='flex flex-shrink-0 items-center gap-1 bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300'
+                className='flex shrink-0 items-center gap-1 bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300'
               >
                 <BadgeCheck className='h-3.5 w-3.5' />
                 {t('verified')}
@@ -149,7 +149,7 @@ export function ProfileDisplay({ user, onUpdateAction }: ProfileDisplayProps) {
                 size='sm'
                 onClick={handleSendVerificationEmail}
                 disabled={emailLoading}
-                className='flex-shrink-0'
+                className='shrink-0'
               >
                 {emailLoading ? (
                   <div className='h-4 w-4 animate-spin rounded-full border-b-2 border-primary'></div>
@@ -161,7 +161,7 @@ export function ProfileDisplay({ user, onUpdateAction }: ProfileDisplayProps) {
           </div>
           <div className='flex items-center justify-between gap-4'>
             <div className='flex min-w-0 items-center gap-3'>
-              <Phone className='h-5 w-5 flex-shrink-0 text-muted-foreground' />
+              <Phone className='h-5 w-5 shrink-0 text-muted-foreground' />
               <span className='text-sm'>
                 {user.phone_number || tProfile('display.notSet')}
               </span>
@@ -170,7 +170,7 @@ export function ProfileDisplay({ user, onUpdateAction }: ProfileDisplayProps) {
               (user.phone_number_verified ? (
                 <Badge
                   variant='secondary'
-                  className='flex flex-shrink-0 items-center gap-1 bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300'
+                  className='flex shrink-0 items-center gap-1 bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300'
                 >
                   <BadgeCheck className='h-3.5 w-3.5' />
                   {t('verified')}
@@ -181,7 +181,7 @@ export function ProfileDisplay({ user, onUpdateAction }: ProfileDisplayProps) {
                   size='sm'
                   onClick={handleSendVerificationSms}
                   disabled={phoneLoading}
-                  className='flex-shrink-0'
+                  className='shrink-0'
                 >
                   {phoneLoading ? (
                     <div className='h-4 w-4 animate-spin rounded-full border-b-2 border-primary'></div>
@@ -192,13 +192,13 @@ export function ProfileDisplay({ user, onUpdateAction }: ProfileDisplayProps) {
               ))}
           </div>
           <div className='flex items-start gap-3'>
-            <Home className='mt-1 h-5 w-5 flex-shrink-0 text-muted-foreground' />
+            <Home className='mt-1 h-5 w-5 shrink-0 text-muted-foreground' />
             <span className='flex-1'>
               {user.address || tProfile('display.notSet')}
             </span>
           </div>
           <div className='flex items-start gap-3'>
-            <PersonStanding className='mt-1 h-5 w-5 flex-shrink-0 text-muted-foreground' />
+            <PersonStanding className='mt-1 h-5 w-5 shrink-0 text-muted-foreground' />
             <span className='flex-1'>
               {user.gender || tProfile('display.notSet')}
             </span>
@@ -239,7 +239,7 @@ export function ProfileDisplay({ user, onUpdateAction }: ProfileDisplayProps) {
           </div>
           <Separator className='my-4' />
           <div className='flex items-start gap-3'>
-            <Users className='mt-1 h-5 w-5 flex-shrink-0 text-muted-foreground' />
+            <Users className='mt-1 h-5 w-5 shrink-0 text-muted-foreground' />
             <div className='flex-1'>
               <span className='font-semibold'>{tDashboard('groups')}</span>
               <div className='mt-2 flex flex-wrap gap-2'>

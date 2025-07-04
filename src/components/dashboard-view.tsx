@@ -239,7 +239,7 @@ export function DashboardView({
             </CardHeader>
             <CardContent className='grid grid-cols-1 gap-6 pt-6 md:grid-cols-2'>
               <div className='flex items-start gap-4'>
-                <Mail className='h-5 w-5 flex-shrink-0 text-muted-foreground' />
+                <Mail className='h-5 w-5 shrink-0 text-muted-foreground' />
                 <div>
                   <h4 className='text-sm font-semibold'>
                     {translations.profileCard.email}
@@ -250,7 +250,7 @@ export function DashboardView({
                 </div>
               </div>
               <div className='flex items-start gap-4'>
-                <Users className='h-5 w-5 flex-shrink-0 text-muted-foreground' />
+                <Users className='h-5 w-5 shrink-0 text-muted-foreground' />
                 <div>
                   <h4 className='text-sm font-semibold'>
                     {translations.profileCard.groups}
@@ -398,7 +398,7 @@ export function DashboardView({
                 {translations.securityHealth.description}
               </CardDescription>
             </CardHeader>
-            <CardContent className='flex-grow space-y-3'>
+            <CardContent className='grow space-y-3'>
               {Object.entries(securityChecklist).map(([key, isComplete]) => (
                 <div key={key} className='flex items-center text-sm'>
                   {isComplete ? (
@@ -445,7 +445,7 @@ export function DashboardView({
                 {translations.profileCompletion.description}
               </CardDescription>
             </CardHeader>
-            <CardContent className='flex-grow space-y-4'>
+            <CardContent className='grow space-y-4'>
               <div className='flex items-center gap-4'>
                 <Progress value={profileCompletion} className='w-full' />
                 <span className='font-bold'>
