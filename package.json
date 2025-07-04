@@ -1,6 +1,6 @@
 {
   "name": "cognito-profile-manager",
-  "version": "0.3.107",
+  "version": "0.3.108",
   "private": true,
   "license": "GPL-3.0-only",
   "description": "Outpost is a platform for managing user profiles and authentication.",
@@ -94,6 +94,91 @@
     "prettier-plugin-tailwindcss": "^0.6.13",
     "tailwindcss": "^4.1.11",
     "typescript": "^5"
+  },
+  "overrides": {
+    "@radix-ui/react-accordion": {
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0"
+    },
+    "@radix-ui/react-alert-dialog": {
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0"
+    },
+    "@radix-ui/react-avatar": {
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0"
+    },
+    "@radix-ui/react-checkbox": {
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0"
+    },
+    "@radix-ui/react-dialog": {
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0"
+    },
+    "@radix-ui/react-dropdown-menu": {
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0"
+    },
+    "@radix-ui/react-label": {
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0"
+    },
+    "@radix-ui/react-menubar": {
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0"
+    },
+    "@radix-ui/react-popover": {
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0"
+    },
+    "@radix-ui/react-progress": {
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0"
+    },
+    "@radix-ui/react-radio-group": {
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0"
+    },
+    "@radix-ui/react-scroll-area": {
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0"
+    },
+    "@radix-ui/react-select": {
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0"
+    },
+    "@radix-ui/react-separator": {
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0"
+    },
+    "@radix-ui/react-slider": {
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0"
+    },
+    "@radix-ui/react-slot": {
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0"
+    },
+    "@radix-ui/react-switch": {
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0"
+    },
+    "@radix-ui/react-tabs": {
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0"
+    },
+    "@radix-ui/react-toast": {
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0"
+    },
+    "@radix-ui/react-tooltip": {
+      "react": "^19.1.0",
+      "react-dom": "^19.1.0"
+    },
+    "@motherduck/wasm-client": {
+      "apache-arrow": "^21.0.0"
+    }
   },
   "engines": {
     "node": ">=22.0.0"
