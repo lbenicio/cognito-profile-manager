@@ -13,6 +13,7 @@ import {
   ForgetDeviceCommand,
   ListWebAuthnCredentialsCommand,
   DeleteWebAuthnCredentialCommand,
+  InitiateAuthCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
 
 const region = process.env.AWS_REGION;
@@ -39,4 +40,5 @@ export {
   ListWebAuthnCredentialsCommand,
   DeleteWebAuthnCredentialCommand,
   CognitoIdentityProviderClient,
+  InitiateAuthCommand,
 };
