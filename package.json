@@ -87,7 +87,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/ua-parser-js": "^0.7.39",
-    "eslint-config-next": "^15.3.5",
+    "eslint-config-next": "^15.4.2",
     "eslint-config-prettier": "^10.1.5",
     "npm-check-updates": "^18.0.1",
     "postcss": "^8",
