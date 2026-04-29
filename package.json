@@ -81,7 +81,7 @@
     "@tailwindcss/postcss": "^4.2.4",
     "@types/chalk": "^2.2.4",
     "@types/marked": "^6.0.0",
-    "@types/node": "^24",
+    "@types/node": "^25",
     "@types/nodemailer": "^8.0.0",
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19",
