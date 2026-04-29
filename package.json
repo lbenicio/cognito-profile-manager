@@ -93,7 +93,7 @@
     "postcss": "^8",
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.6.14",
-    "typescript": "^5"
+    "typescript": "^6"
   },
   "overrides": {
     "@radix-ui/react-accordion": {
