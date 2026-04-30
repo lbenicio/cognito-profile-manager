@@ -75,7 +75,7 @@
     "tailwindcss-animate": "^1.0.7",
     "ua-parser-js": "^2.0.9",
     "tailwindcss": "^4.2.4",
-    "zod": "^4.3.6"
+    "zod": "^4.4.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.4",
