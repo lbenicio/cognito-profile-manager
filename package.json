@@ -20,7 +20,7 @@
     "test:logout": "node scripts/test-logout.js"
   },
   "dependencies": {
-    "@aws-sdk/client-cognito-identity-provider": "^3.1062.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.1067.0",
     "@aws-sdk/client-s3": "^3.1062.0",
     "@aws-sdk/s3-request-presigner": "^3.1062.0",
     "@hookform/resolvers": "^5.4.0",
