@@ -12,7 +12,7 @@ const contactSchema = z.object({
   message: z.string().trim().min(10).max(5000),
 });
 
-type ContactData = z.infer<typeof contactSchema>;
+type ContactData = { category: string; message: string };
 
 export async function sendContactEmail(
   data: ContactData
