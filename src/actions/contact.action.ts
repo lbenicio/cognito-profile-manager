@@ -8,8 +8,8 @@ import { getUser } from '../lib/auth';
 const logger = new Logger('CONTACT');
 
 const contactSchema = z.object({
-  category: z.string(),
-  message: z.string(),
+  category: z.enum(['general', 'billing', 'technical', 'feedback']),
+  message: z.string().trim().min(10).max(5000),
 });
 
 type ContactData = z.infer<typeof contactSchema>;
@@ -17,6 +17,11 @@ type ContactData = z.infer<typeof contactSchema>;
 export async function sendContactEmail(
   data: ContactData
 ): Promise<{ success: boolean; message: string }> {
+  const parsedData = contactSchema.safeParse(data);
+  if (!parsedData.success) {
+    return { success: false, message: 'Invalid contact form data.' };
+  }
+
   const user = await getUser();
   if (!user) {
     return { success: false, message: 'Not authenticated' };
@@ -53,22 +58,23 @@ export async function sendContactEmail(
     },
   });
 
+  const { category, message } = parsedData.data;
   const mailOptions = {
-    from: `"${user.name}" <${SMTP_FROM_EMAIL}>`,
+    from: { name: user.name, address: SMTP_FROM_EMAIL },
     to: CONTACT_FORM_TO_EMAIL,
-    subject: `New Contact Form Submission - Category: ${data.category}`,
-    replyTo: user.email,
-    html: `
-        <h1>New Contact Form Submission</h1>
-        <p><strong>Name:</strong> ${user.name}</p>
-        <p><strong>Email:</strong> ${user.email}</p>
-        <p><strong>Username:</strong> ${user.username}</p>
-        <hr>
-        <h2>Message Details</h2>
-        <p><strong>Category:</strong> ${data.category}</p>
-        <p><strong>Message:</strong></p>
-        <p style="white-space: pre-wrap;">${data.message}</p>
-    `,
+    subject: `New Contact Form Submission - Category: ${category}`,
+    replyTo: { name: user.name, address: user.email },
+    text: [
+      'New Contact Form Submission',
+      `Name: ${user.name}`,
+      `Email: ${user.email}`,
+      `Username: ${user.username}`,
+      '',
+      `Category: ${category}`,
+      '',
+      'Message:',
+      message,
+    ].join('\n'),
   };
 
   try {

@@ -96,6 +96,10 @@ export async function localLogout() {
 }
 
 export async function mockLogin(type: 'admin' | 'user') {
+  if (process.env.NODE_ENV !== 'development') {
+    throw new Error('This action is only available in development.');
+  }
+
   const claims: AuthTokenPayload =
     type === 'admin'
       ? {

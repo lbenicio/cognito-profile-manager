@@ -6,6 +6,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
+    env_file:
+      - path: .env.development.local
+        required: false
     ports:
       - '3000:3000'
     volumes:
@@ -16,7 +19,6 @@ services:
     environment:
       NODE_ENV: development
       APP_URL: ${APP_URL:-http://localhost:3000}
-      TOTP_SECRET_ENCRYPTION_KEY: ${TOTP_SECRET_ENCRYPTION_KEY:-t0tvpe3jCyxyGODCIn6WmxQNYFStu+clqOWu0OkKQLo=}
 
       # Cognito & OAuth2
       NEXT_PUBLIC_COGNITO_CLIENT_ID: ${NEXT_PUBLIC_COGNITO_CLIENT_ID}

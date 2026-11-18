@@ -104,6 +104,7 @@ docker run -d \
 
 ```bash
 # Start development environment
+npm run setup:dev
 docker-compose --profile dev up --build
 
 # Start production environment
@@ -468,7 +469,8 @@ For issues related to Docker deployment:
 # Application
 NODE_ENV=production
 APP_URL=https://myapp.example.com
-TOTP_SECRET_ENCRYPTION_KEY=abc123def456ghi789jkl012mno345pqr678stu901vwx234yz=
+# Generate a unique key with: openssl rand -base64 32
+TOTP_SECRET_ENCRYPTION_KEY=replace-with-your-generated-key
 
 # Cognito
 NEXT_PUBLIC_COGNITO_CLIENT_ID=1a2b3c4d5e6f7g8h9i0j
