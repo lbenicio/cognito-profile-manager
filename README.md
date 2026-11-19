@@ -1,8 +1,6 @@
 # Cognito Profile Manager
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Issues](https://img.shields.io/github/issues/lbenicio/cognito-profile-manager)](https://github.com/lbenicio/cognito-profile-manager/issues)
-[![Pull Requests](https://img.shields.io/github/issues-pr/lbenicio/cognito-profile-manager)](https://github.com/lbenicio/cognito-profile-manager/pulls)
 
 A modern, secure, and feature-rich profile management application for AWS Cognito, built with Next.js. This project provides a user-facing interface for managing profile details, security settings, and more.
 
@@ -71,12 +69,12 @@ All necessary environment variables are documented in the `.env.example` file. T
 
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
-Please read our [contribution guidelines](./.github/pull_request_template.md) and [issue template](./.github/issue_template.md) before getting started.
+Please read our [contribution guidelines](.github/pull_request_template.md) and [issue template](.github/issue_template.md) before getting started.
 
 ## 🛡️ Security Policy
 
-We take security seriously. If you discover a security vulnerability, please follow our [Security Policy](./SECURITY.md) to report it.
+We take security seriously. If you discover a security vulnerability, please follow our [Security Policy](SECURITY.md) to report it.
 
 ## 📄 License
 
-This project is licensed under the GNU General Public License v3.0. See the [LICENSE.md](./LICENSE.md) file for details.
+This project is licensed under the GNU General Public License v3.0. See the [LICENSE.txt](LICENSE.txt) file for details.
