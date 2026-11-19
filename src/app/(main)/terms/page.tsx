@@ -12,7 +12,7 @@ export default async function TermsOfServicePage() {
           <CardTitle className='text-3xl'>{t('title')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <MarkdownRenderer filePath='src/content/terms.md' />
+          <MarkdownRenderer filePath='terms.md' />
         </CardContent>
       </Card>
     </div>

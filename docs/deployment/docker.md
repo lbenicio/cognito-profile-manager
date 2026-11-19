@@ -1,6 +1,6 @@
 # Docker and Docker Compose
 
-The repository includes a multi-stage production `Dockerfile`, a development `Dockerfile.dev`, and Compose profiles for each.
+The production `Dockerfile` uses a dependency stage, a build stage, and a runtime stage. The build stage installs devDependencies because Next.js needs them to compile the app. Next.js standalone output traces the server's runtime files and dependencies, so the runner only receives that output plus static and public assets. Both Dockerfiles use standard `npm ci` commands and do not require BuildKit.
 
 ## Requirements
 

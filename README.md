@@ -44,7 +44,7 @@ To use a real Cognito user pool or enable optional services, follow [Getting sta
 | `npm run generate:key`     | Print a new 32-byte session-encryption key         |
 | `npm run setup:dev`        | Create local development environment settings      |
 
-See [Development](docs/DEVELOPMENT.md) for the workflow and [Contributing](docs/contributing/README.md) before opening a change.
+See [Development](docs/DEVELOPMENT.md) for the workflow, read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a change, and follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Documentation
 

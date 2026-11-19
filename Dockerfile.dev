@@ -1,4 +1,3 @@
-# Use a specific Node.js version for consistency
 FROM node:26-alpine
 
 # Set the working directory inside the container
@@ -9,7 +8,7 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 
 # Install all dependencies, including devDependencies needed for development
-RUN npm install
+RUN npm ci --include=dev --no-audit --no-fund
 
 # Copy the rest of the application source code into the container.
 # In a typical development setup, this will be overwritten by a volume mount

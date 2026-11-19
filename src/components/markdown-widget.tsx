@@ -1,32 +1,10 @@
 import 'server-only';
-import { promises as fs } from 'fs';
-import path from 'path';
-import { marked } from 'marked';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText } from 'lucide-react';
-import { Logger } from '@/lib/logger';
+import { getMarkdownContent } from '@/lib/markdown';
+import type { MarkdownWidgetProps } from '@/types/content.types';
 
-const logger = new Logger('MARKDOWN-WIDGET');
-
-async function getMarkdownContent(filePath: string): Promise<string> {
-  try {
-    const fullPath = path.join(process.cwd(), filePath);
-    const fileContents = await fs.readFile(fullPath, 'utf8');
-    const htmlContent = await marked.parse(fileContents);
-    return htmlContent;
-  } catch (error) {
-    logger.error('Error reading markdown file:', error);
-    return '<p>Could not load content.</p>';
-  }
-}
-
-export async function MarkdownWidget({
-  filePath,
-  title,
-}: {
-  filePath: string;
-  title: string;
-}) {
+export async function MarkdownWidget({ filePath, title }: MarkdownWidgetProps) {
   const content = await getMarkdownContent(filePath);
 
   return (

@@ -159,7 +159,7 @@ export default async function DashboardPage() {
       user={user}
       infoWidget={
         <MarkdownWidget
-          filePath='src/content/dashboard-widget.md'
+          filePath='dashboard-widget.md'
           title={tDashboard('dashboardInfo.title')}
         />
       }

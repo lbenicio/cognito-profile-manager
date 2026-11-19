@@ -19,7 +19,8 @@ Start with the guide that matches what you need to do:
 ## Deploy and contribute
 
 - [Deployment](./deployment/README.md): Docker and Vercel notes.
-- [Contributing](./contributing/README.md): coding conventions and checks to run before a pull request.
+- [Contributing](../CONTRIBUTING.md): setup and pull request guidance; the [detailed contribution guide](./contributing/README.md) covers coding conventions and checks.
+- [Code of Conduct](../CODE_OF_CONDUCT.md): expectations and how to report a concern.
 - [Security policy](../SECURITY.md): report a security issue privately.
 
 ## Historical notes

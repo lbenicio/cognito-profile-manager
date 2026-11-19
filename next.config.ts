@@ -19,6 +19,7 @@ const r2Hostname = (() => {
 
 const nextConfig: NextConfig = {
   turbopack: {},
+  output: 'standalone',
   distDir: 'dist',
   images: {
     remotePatterns: [

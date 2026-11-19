@@ -12,7 +12,7 @@ export default async function PrivacyPolicyPage() {
           <CardTitle className='text-3xl'>{t('title')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <MarkdownRenderer filePath='src/content/privacy.md' />
+          <MarkdownRenderer filePath='privacy.md' />
         </CardContent>
       </Card>
     </div>
