@@ -7,7 +7,7 @@ import { profileFormSchema } from '@/types/forms/profile-form.types';
 import type {
   ProfileFormProps,
   ProfileFormValues,
-} from '@/interfaces/forms/profile-form.interfaces';
+} from '@/types/forms/profile-form.types';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import {

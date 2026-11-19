@@ -11,7 +11,7 @@ import {
   getPresignedUploadUrl,
   updateUserAvatar,
 } from '@/actions/avatar.action';
-import type { AvatarEditorProps } from '../interfaces/components/avatar-editor.interfaces';
+import type { AvatarEditorProps } from '@/types/components.types';
 
 export function AvatarEditor({
   user,

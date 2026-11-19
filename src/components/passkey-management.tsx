@@ -1,5 +1,6 @@
 'use client';
 
+import type { PasskeyManagementProps } from '@/types/components.types';
 import { useState, useEffect, useTransition } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
@@ -36,10 +37,6 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
-
-export interface PasskeyManagementProps {
-  user: import('@/types/user/user.types').User;
-}
 
 export function PasskeyManagement({ user }: PasskeyManagementProps) {
   const { toast } = useToast();

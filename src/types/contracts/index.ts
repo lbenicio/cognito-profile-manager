@@ -7,50 +7,31 @@
 // AUTHENTICATION INTERFACES
 // ============================================================================
 
-export * from './auth/auth.interfaces';
+export * from './auth/auth.types';
 
 // ============================================================================
 // SESSION INTERFACES
 // ============================================================================
 
-export * from './session/session.interfaces';
+export * from './session/session.types';
 
 // ============================================================================
 // API INTERFACES
 // ============================================================================
 
-export * from './api/response.interfaces';
+export * from './api/response.types';
 
 // ============================================================================
 // ERROR INTERFACES
 // ============================================================================
 
-export * from './error/error.interfaces';
+export * from './error/error.types';
 
 // ============================================================================
 // ACTION INTERFACES
 // ============================================================================
 
-export * from './actions/action.interfaces';
-
-// ============================================================================
-// COMPONENT INTERFACES
-// ============================================================================
-
-export * from './components/account-display.interfaces';
-export * from './components/avatar-editor.interfaces';
-export * from './components/banner-editor.interfaces';
-export * from './components/contact-form.interfaces';
-export * from './components/profile-display.interfaces';
-
-// ============================================================================
-// FORM INTERFACES
-// ============================================================================
-
-export * from './forms/account-form.interfaces';
-export * from './forms/address-form.interfaces';
-export * from './forms/password-form.interfaces';
-export * from './forms/profile-form.interfaces';
+export * from './actions/action.types';
 
 // ============================================================================
 // COMMONLY USED INTERFACES (for convenience)
@@ -66,7 +47,7 @@ export type {
   Role,
   PasswordPolicy,
   SecuritySettings,
-} from './auth/auth.interfaces';
+} from './auth/auth.types';
 
 // Session interfaces
 export type {
@@ -76,7 +57,7 @@ export type {
   SessionManager,
   SessionValidation,
   SessionConfig,
-} from './session/session.interfaces';
+} from './session/session.types';
 
 // API interfaces
 export type {
@@ -86,7 +67,7 @@ export type {
   ApiSuccessResponse,
   PaginationMeta,
   PaginatedApiResponse,
-} from './api/response.interfaces';
+} from './api/response.types';
 
 // Error interfaces
 export type {
@@ -96,7 +77,7 @@ export type {
   ApiError,
   CognitoError,
   UploadError,
-} from './error/error.interfaces';
+} from './error/error.types';
 
 // Action interfaces
 export type {
@@ -110,26 +91,4 @@ export type {
   PasswordChangeResult,
   UploadActionResult,
   ValidationResult,
-} from './actions/action.interfaces';
-
-// Component interfaces
-export type { AccountDisplayProps } from './components/account-display.interfaces';
-export type { AvatarEditorProps } from './components/avatar-editor.interfaces';
-export type { BannerEditorProps } from './components/banner-editor.interfaces';
-export type { ContactFormProps } from './components/contact-form.interfaces';
-export type { ProfileDisplayProps } from './components/profile-display.interfaces';
-
-// Form interfaces
-export type {
-  AccountFormProps,
-  AccountFormValues,
-} from './forms/account-form.interfaces';
-export type {
-  AddressFormProps,
-  AddressFormValues,
-} from './forms/address-form.interfaces';
-export type { PasswordFormValues } from './forms/password-form.interfaces';
-export type {
-  ProfileFormProps,
-  ProfileFormValues,
-} from './forms/profile-form.interfaces';
+} from './actions/action.types';

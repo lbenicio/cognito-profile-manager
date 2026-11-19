@@ -3,15 +3,13 @@
 import { jwtVerify, createRemoteJWKSet } from 'jose';
 import { Logger } from '@/lib/logger';
 import { getWellKnownConfig } from '../well-known';
-import type { AuthTokenPayload } from '@/interfaces/auth/auth.interfaces';
+import type { AuthTokenPayload } from '@/types/contracts/auth/auth.types';
+import {
+  oauthTokenErrorSchema,
+  oauthTokenSuccessSchema,
+} from '@/types/auth/token-response.types';
 
 const logger = new Logger('SESSION-ACTIONS');
-
-type NewTokenResponse = {
-  id_token: string;
-  access_token: string;
-  expires_in?: number;
-};
 
 export async function refreshAuthTokens(refreshToken: string): Promise<{
   newClaims: AuthTokenPayload;
@@ -48,18 +46,25 @@ export async function refreshAuthTokens(refreshToken: string): Promise<{
       cache: 'no-store',
     });
 
-    const tokens: NewTokenResponse & { refresh_token?: string } =
-      await tokenResponse.json();
+    const responseBody: unknown = await tokenResponse.json();
 
     if (!tokenResponse.ok) {
+      const errorResponse = oauthTokenErrorSchema.safeParse(responseBody);
       logger.error(
         'Failed to refresh tokens:',
-        (tokens as any).error_description ||
-          (tokens as any).error ||
-          'Unknown error'
+        errorResponse.success
+          ? errorResponse.data.error_description || errorResponse.data.error
+          : 'The token endpoint returned an invalid error response.'
       );
       return null;
     }
+
+    const tokenResult = oauthTokenSuccessSchema.safeParse(responseBody);
+    if (!tokenResult.success) {
+      logger.error('The token endpoint returned an invalid success response.');
+      return null;
+    }
+    const tokens = tokenResult.data;
 
     const JWKS = createRemoteJWKSet(new URL(wellknown.jwks_uri));
     const { payload }: { payload: AuthTokenPayload } = await jwtVerify(

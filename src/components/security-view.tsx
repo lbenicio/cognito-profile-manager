@@ -1,17 +1,10 @@
 'use client';
+import type { SecurityViewProps } from '@/types/components.types';
 import { useState, useEffect } from 'react';
 import type { User as UserType } from '@/types/user/user.types';
 import { PasswordForm } from '@/components/password-form';
 import { TwoFactorAuth } from '@/components/two-factor-auth';
 import { PasskeyManagement } from './passkey-management';
-
-interface SecurityViewProps {
-  initialUser: UserType;
-  translations: {
-    title: string;
-    description: string;
-  };
-}
 
 export function SecurityView({ initialUser, translations }: SecurityViewProps) {
   const [user, setUser] = useState(initialUser);

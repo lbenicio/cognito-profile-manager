@@ -3,7 +3,7 @@
  */
 
 import type { JWTPayload } from 'jose';
-import type { AuthTokenPayload } from '@/interfaces/auth/auth.interfaces';
+import type { AuthTokenPayload } from '@/types/contracts/auth/auth.types';
 
 /**
  * User Preferences

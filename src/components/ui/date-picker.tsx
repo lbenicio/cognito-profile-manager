@@ -1,5 +1,6 @@
 'use client';
 
+import type { DatePickerProps } from '@/types/ui.types';
 import * as React from 'react';
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon } from 'lucide-react';
@@ -12,12 +13,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-
-interface DatePickerProps {
-  value?: Date;
-  onChangeAction: (date: Date | undefined) => void;
-  placeholder: string;
-}
 
 export function DatePicker({
   value,
@@ -43,7 +38,7 @@ export function DatePicker({
           mode='single'
           selected={value}
           onSelect={onChangeAction}
-          initialFocus
+          autoFocus
         />
       </PopoverContent>
     </Popover>

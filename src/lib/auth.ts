@@ -184,7 +184,7 @@ export const getUser = cache(async (): Promise<User | null> => {
           } as Device;
         })
         .filter((d): d is Device => d !== null);
-    } catch (e: any) {
+    } catch (e) {
       logger.error('Could not fetch WebAuthn credentials for user:', e);
     }
 
@@ -245,12 +245,16 @@ export const getUser = cache(async (): Promise<User | null> => {
       sessionExpiresAt: (claims.exp as number) || 0,
       messages: messages,
     };
-  } catch (error: any) {
+  } catch (error) {
     logger.error(`Error in getUser for sub: ${session.claims.sub}.`);
-    logger.error(`Error Name: ${error.name}`);
-    logger.error(`Error Message: ${error.message}`);
-    if (error.stack) {
-      logger.error(`Stack Trace: ${error.stack}`);
+    if (error instanceof Error) {
+      logger.error(`Error Name: ${error.name}`);
+      logger.error(`Error Message: ${error.message}`);
+      if (error.stack) {
+        logger.error(`Stack Trace: ${error.stack}`);
+      }
+    } else {
+      logger.error('Unexpected non-Error value:', error);
     }
     logger.error(
       'This could be due to IAM permissions (missing cognito-idp:GetUser), an invalid/expired access token, or a network issue connecting to Cognito.'

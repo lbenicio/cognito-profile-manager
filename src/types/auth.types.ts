@@ -1,16 +1,13 @@
 /**
  * Authentication types for the application.
- * Contains only type aliases, unions, and enums. All interfaces are in @/interfaces/auth/
+ * Contains only type aliases, unions, and enums. All interfaces are in @/types/contracts/auth/
  */
 
 /**
  * Authentication state
  */
 export type AuthState =
-  | 'authenticated'
-  | 'unauthenticated'
-  | 'loading'
-  | 'error';
+  'authenticated' | 'unauthenticated' | 'loading' | 'error';
 
 /**
  * Authentication method
@@ -50,11 +47,7 @@ export type AuthFlow =
  * OAuth provider types
  */
 export type OAuthProvider =
-  | 'cognito'
-  | 'google'
-  | 'facebook'
-  | 'apple'
-  | 'github';
+  'cognito' | 'google' | 'facebook' | 'apple' | 'github';
 
 /**
  * Token types
@@ -65,25 +58,13 @@ export type TokenType = 'access' | 'refresh' | 'id' | 'session';
  * Permission action types
  */
 export type PermissionAction =
-  | 'create'
-  | 'read'
-  | 'update'
-  | 'delete'
-  | 'list'
-  | 'manage'
-  | 'admin';
+  'create' | 'read' | 'update' | 'delete' | 'list' | 'manage' | 'admin';
 
 /**
  * Permission resource types
  */
 export type PermissionResource =
-  | 'user'
-  | 'profile'
-  | 'settings'
-  | 'admin'
-  | 'system'
-  | 'audit'
-  | 'logs';
+  'user' | 'profile' | 'settings' | 'admin' | 'system' | 'audit' | 'logs';
 
 /**
  * User role types
@@ -110,19 +91,13 @@ export type MfaMethod = 'sms' | 'email' | 'totp' | 'webauthn' | 'backup_codes';
  * Login result types
  */
 export type LoginResult =
-  | 'success'
-  | 'failure'
-  | 'mfa_required'
-  | 'password_reset_required';
+  'success' | 'failure' | 'mfa_required' | 'password_reset_required';
 
 /**
  * Logout reason types
  */
 export type LogoutReason =
-  | 'user_action'
-  | 'session_expired'
-  | 'admin_action'
-  | 'security_violation';
+  'user_action' | 'session_expired' | 'admin_action' | 'security_violation';
 
 /**
  * Device type for authentication
@@ -133,23 +108,13 @@ export type DeviceType = 'desktop' | 'mobile' | 'tablet' | 'unknown';
  * Browser type
  */
 export type BrowserType =
-  | 'chrome'
-  | 'firefox'
-  | 'safari'
-  | 'edge'
-  | 'opera'
-  | 'unknown';
+  'chrome' | 'firefox' | 'safari' | 'edge' | 'opera' | 'unknown';
 
 /**
  * Operating system type
  */
 export type OperatingSystem =
-  | 'windows'
-  | 'macos'
-  | 'linux'
-  | 'ios'
-  | 'android'
-  | 'unknown';
+  'windows' | 'macos' | 'linux' | 'ios' | 'android' | 'unknown';
 
 /**
  * Risk level types
@@ -218,4 +183,4 @@ export type {
   SsoLoginParams,
   PasskeyAuthParams,
   MfaVerificationParams,
-} from '@/interfaces/auth/auth.interfaces';
+} from '@/types/contracts/auth/auth.types';

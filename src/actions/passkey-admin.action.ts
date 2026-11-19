@@ -4,12 +4,13 @@ import { cognitoClient, ListWebAuthnCredentialsCommand } from '../lib/cognito';
 import { getUser } from '../lib/auth';
 import { getSession } from '../lib/session';
 import { Logger } from '@/lib/logger';
+import type { ListCognitoPasskeysResult } from '@/types/actions/passkey.types';
 
 const logger = new Logger('PASSKEY-ADMIN');
 
 export async function listCognitoPasskeys(
   username: string
-): Promise<{ success: boolean; message: string; data?: any }> {
+): Promise<ListCognitoPasskeysResult> {
   if (process.env.NODE_ENV !== 'development') {
     return {
       success: false,
@@ -50,13 +51,17 @@ export async function listCognitoPasskeys(
     return {
       success: true,
       message: `Found ${response.Credentials?.length || 0} passkeys for ${username}. Check the server console for details.`,
-      data: response.Credentials,
+      data: response.Credentials ?? [],
     };
-  } catch (error: any) {
+  } catch (error) {
     logger.error('List WebAuthn Credentials Error:', error);
+    const errorMessage =
+      error instanceof Error
+        ? `${error.name} - ${error.message}`
+        : 'Unknown error';
     return {
       success: false,
-      message: `Failed to list passkeys: ${error.name} - ${error.message}. Ensure your server's IAM role has 'cognito-idp:ListWebAuthnCredentials' permission.`,
+      message: `Failed to list passkeys: ${errorMessage}. Ensure your server's IAM role has 'cognito-idp:ListWebAuthnCredentials' permission.`,
     };
   }
 }

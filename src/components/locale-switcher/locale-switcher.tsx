@@ -12,8 +12,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Languages } from 'lucide-react';
 import { setLocaleCookie, getLocaleCookie } from '@/navigation';
+import type { Locale } from '@/types/i18n.types';
 
-const locales = [
+const locales: { code: Locale; name: string }[] = [
   { code: 'en', name: 'English' },
   { code: 'es', name: 'Español' },
   { code: 'fr', name: 'Français' },
@@ -29,7 +30,7 @@ export function LocaleSwitcher() {
     () => getLocaleCookie() || 'en'
   );
 
-  const handleLocaleChange = (newLocale: string) => {
+  const handleLocaleChange = (newLocale: Locale) => {
     if (newLocale === currentLocale) return;
 
     startTransition(() => {

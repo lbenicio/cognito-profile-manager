@@ -44,7 +44,7 @@ import { BannerEditor } from './banner-editor';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
-import type { AccountDisplayProps } from '../interfaces/components/account-display.interfaces';
+import type { AccountDisplayProps } from '@/types/components.types';
 
 export function AccountDisplay({ user, onUpdateAction }: AccountDisplayProps) {
   const t = useTranslations('Dashboard');

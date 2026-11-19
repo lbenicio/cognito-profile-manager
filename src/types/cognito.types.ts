@@ -4,6 +4,14 @@
 
 import type {
   CognitoIdentityProviderClient,
+  AdminCreateUserCommandOutput,
+  AdminDeleteUserCommandOutput,
+  AdminDisableUserCommandOutput,
+  AdminEnableUserCommandOutput,
+  AdminResetUserPasswordCommandOutput,
+  AdminSetUserPasswordCommandOutput,
+  AdminAddUserToGroupCommandOutput,
+  AdminRemoveUserFromGroupCommandOutput,
   GetUserCommandOutput,
   UpdateUserAttributesCommandOutput,
   ListWebAuthnCredentialsCommandOutput,
@@ -258,11 +266,11 @@ export interface CognitoGroup {
 export interface CognitoUserSession {
   AccessToken: {
     jwtToken: string;
-    payload: Record<string, any>;
+    payload: Record<string, unknown>;
   };
   IdToken: {
     jwtToken: string;
-    payload: Record<string, any>;
+    payload: Record<string, unknown>;
   };
   RefreshToken: {
     token: string;
@@ -327,31 +335,33 @@ export interface CognitoAdminOperations {
     UserAttributes: CognitoUserAttribute[];
     TemporaryPassword?: string;
     MessageAction?: 'RESEND' | 'SUPPRESS';
-  }) => Promise<any>;
+  }) => Promise<AdminCreateUserCommandOutput>;
 
-  deleteUser: (username: string) => Promise<any>;
+  deleteUser: (username: string) => Promise<AdminDeleteUserCommandOutput>;
 
-  disableUser: (username: string) => Promise<any>;
+  disableUser: (username: string) => Promise<AdminDisableUserCommandOutput>;
 
-  enableUser: (username: string) => Promise<any>;
+  enableUser: (username: string) => Promise<AdminEnableUserCommandOutput>;
 
-  resetUserPassword: (username: string) => Promise<any>;
+  resetUserPassword: (
+    username: string
+  ) => Promise<AdminResetUserPasswordCommandOutput>;
 
   setUserPassword: (params: {
     Username: string;
     Password: string;
     Permanent?: boolean;
-  }) => Promise<any>;
+  }) => Promise<AdminSetUserPasswordCommandOutput>;
 
   addUserToGroup: (params: {
     Username: string;
     GroupName: string;
-  }) => Promise<any>;
+  }) => Promise<AdminAddUserToGroupCommandOutput>;
 
   removeUserFromGroup: (params: {
     Username: string;
     GroupName: string;
-  }) => Promise<any>;
+  }) => Promise<AdminRemoveUserFromGroupCommandOutput>;
 }
 
 /**

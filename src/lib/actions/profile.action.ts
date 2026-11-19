@@ -4,20 +4,10 @@ import { revalidatePath } from 'next/cache';
 import { cognitoClient, UpdateUserAttributesCommand } from '../cognito';
 import { getSession } from '../session';
 import { Logger } from '@/lib/logger';
-import type { ProfileUpdateResult } from '@/interfaces/actions/action.interfaces';
+import type { ProfileUpdateResult } from '@/types/actions.types';
+import type { UserProfileAttributes } from '@/types/actions/profile.types';
 
 const logger = new Logger('PROFILE');
-
-type UserProfileAttributes = {
-  given_name: string;
-  family_name: string;
-  phone_number: string;
-  birthdate?: string;
-  website: string;
-  zoneinfo: string;
-  gender: string;
-  aboutMe: string;
-};
 
 export async function updateUserProfile(
   data: Partial<UserProfileAttributes>
@@ -73,7 +63,7 @@ export async function updateUserProfile(
         (key) => data[key as keyof typeof data] !== undefined
       ),
     };
-  } catch (error: any) {
+  } catch (error) {
     logger.error('Update Profile Error:', error);
     return {
       success: false,
@@ -109,7 +99,7 @@ export async function updateUserAddress(
       message: 'Address updated successfully.',
       updatedFields: ['address'],
     };
-  } catch (error: any) {
+  } catch (error) {
     logger.error('Update Profile Error:', error);
     return {
       success: false,

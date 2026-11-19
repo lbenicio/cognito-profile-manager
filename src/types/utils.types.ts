@@ -85,26 +85,26 @@ export type PromiseResolveType<T> = T extends Promise<infer U> ? U : T;
 /**
  * Function parameter types
  */
-export type Parameters<T extends (...args: any) => any> = T extends (
+export type Parameters<T extends (...args: never[]) => unknown> = T extends (
   ...args: infer P
-) => any
+) => unknown
   ? P
   : never;
 
 /**
  * Function return type
  */
-export type ReturnType<T extends (...args: any) => any> = T extends (
-  ...args: any
+export type ReturnType<T extends (...args: never[]) => unknown> = T extends (
+  ...args: never[]
 ) => infer R
   ? R
-  : any;
+  : never;
 
 /**
  * Async function return type
  */
-export type AsyncReturnType<T extends (...args: any) => Promise<any>> =
-  T extends (...args: any) => Promise<infer R> ? R : any;
+export type AsyncReturnType<T extends (...args: never[]) => Promise<unknown>> =
+  T extends (...args: never[]) => Promise<infer R> ? R : never;
 
 /**
  * Object values type
@@ -133,13 +133,13 @@ export type StringLiteral<T> = T extends string
 /**
  * Tuple to union
  */
-export type TupleToUnion<T extends readonly any[]> = T[number];
+export type TupleToUnion<T extends readonly unknown[]> = T[number];
 
 /**
  * Union to intersection
  */
 export type UnionToIntersection<U> = (
-  U extends any ? (k: U) => void : never
+  U extends unknown ? (k: U) => void : never
 ) extends (k: infer I) => void
   ? I
   : never;
@@ -198,12 +198,14 @@ export type JsonSerializable<T> = T extends JsonValue ? T : never;
 /**
  * Constructor type
  */
-export type Constructor<T = {}> = new (...args: any[]) => T;
+export type Constructor<T = object> = new (...args: never[]) => T;
 
 /**
  * Abstract constructor type
  */
-export type AbstractConstructor<T = {}> = abstract new (...args: any[]) => T;
+export type AbstractConstructor<T = object> = abstract new (
+  ...args: never[]
+) => T;
 
 /**
  * Class type
@@ -295,12 +297,12 @@ export type AsyncTransform<T, U> = (input: T) => Promise<U>;
 /**
  * Factory function type
  */
-export type Factory<T> = (...args: any[]) => T;
+export type Factory<T> = (...args: never[]) => T;
 
 /**
  * Async factory function type
  */
-export type AsyncFactory<T> = (...args: any[]) => Promise<T>;
+export type AsyncFactory<T> = (...args: never[]) => Promise<T>;
 
 /**
  * Disposable interface
@@ -369,8 +371,7 @@ export interface Subject<T> {
  * Result type for error handling
  */
 export type Result<T, E = Error> =
-  | { success: true; data: T }
-  | { success: false; error: E };
+  { success: true; data: T } | { success: false; error: E };
 
 /**
  * Option type for nullable values
@@ -386,8 +387,7 @@ export type Either<L, R> = { left: true; value: L } | { right: true; value: R };
  * Try type for exception handling
  */
 export type Try<T> =
-  | { success: true; value: T }
-  | { success: false; error: Error };
+  { success: true; value: T } | { success: false; error: Error };
 
 /**
  * Lazy type for deferred evaluation
@@ -412,7 +412,7 @@ export interface Lens<S, A> {
  * Path type for nested object access
  */
 export type Path<T, K extends keyof T = keyof T> = K extends string
-  ? T[K] extends Record<string, any>
+  ? T[K] extends object
     ? K | `${K}.${Path<T[K], keyof T[K]>}`
     : K
   : never;
@@ -448,13 +448,7 @@ export type Environment = 'development' | 'production' | 'test';
  * HTTP methods
  */
 export type HttpMethod =
-  | 'GET'
-  | 'POST'
-  | 'PUT'
-  | 'PATCH'
-  | 'DELETE'
-  | 'HEAD'
-  | 'OPTIONS';
+  'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS';
 
 /**
  * HTTP status codes
@@ -513,12 +507,7 @@ export type RgbaColor = `rgba(${number}, ${number}, ${number}, ${number})`;
 export type HslColor = `hsl(${number}, ${number}%, ${number}%)`;
 export type HslaColor = `hsla(${number}, ${number}%, ${number}%, ${number})`;
 export type Color =
-  | HexColor
-  | RgbColor
-  | RgbaColor
-  | HslColor
-  | HslaColor
-  | string;
+  HexColor | RgbColor | RgbaColor | HslColor | HslaColor | string;
 
 /**
  * Date string formats
@@ -569,13 +558,13 @@ export interface PaginationResult<T> {
  */
 export interface SearchParams {
   query: string;
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
   pagination?: PaginationParams;
 }
 
 export interface SearchResult<T> extends PaginationResult<T> {
   query: string;
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
   totalResults: number;
   searchTime: number;
 }

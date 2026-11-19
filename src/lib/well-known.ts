@@ -4,21 +4,11 @@ import 'server-only';
 import { cache } from 'react';
 import { getCache, setCache } from './cache';
 import { Logger } from './logger';
+import type { WellKnownConfig } from '@/types/cognito/well-known.types';
 
 const logger = new Logger('WELL-KNOWN');
 const CACHE_KEY = 'oidc-well-known-config';
 const CACHE_TTL_SECONDS = 24 * 60 * 60; // 24 hours
-
-interface WellKnownConfig {
-  issuer: string;
-  authorization_endpoint: string;
-  token_endpoint: string;
-  userinfo_endpoint: string;
-  jwks_uri: string;
-  end_session_endpoint?: string;
-  logout_endpoint?: string;
-  [key: string]: any;
-}
 
 export const getWellKnownConfig = cache(async (): Promise<WellKnownConfig> => {
   const cachedConfig = await getCache<WellKnownConfig>(CACHE_KEY);

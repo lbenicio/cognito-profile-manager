@@ -1,5 +1,9 @@
 'use client';
 
+import type {
+  DashboardTranslations,
+  DashboardViewProps,
+} from '@/types/components.types';
 import { useState, useEffect, type ReactNode } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -48,84 +52,6 @@ import { LoginActivityChart } from './login-activity-chart';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 
 const logger = new Logger('DASHBOARD-VIEW');
-
-interface DashboardTranslations {
-  welcome: string;
-  description: string;
-  id: string;
-  lastLogin: string;
-  verified: string;
-  profileCard: {
-    email: string;
-    groups: string;
-    noGroups: string;
-  };
-  editProfileButton: string;
-  securityHealth: {
-    title: string;
-    description: string;
-    score: string;
-    manageButton: string;
-    checks: {
-      email: string;
-      phone: string;
-      twoFactor: string;
-      passkeys: string;
-    };
-  };
-  profileCompletion: {
-    title: string;
-    description: string;
-    percentage: string;
-    completeProfileButton: string;
-    tasks: {
-      picture: string;
-      banner: string;
-      aboutMe: string;
-      address: string;
-      phone: string;
-      website: string;
-    };
-  };
-  quickActions: {
-    title: string;
-    description: string;
-    changePassword: string;
-    manageSecurity: string;
-    appearanceSettings: string;
-  };
-  loginHistory: {
-    title: string;
-    description: string;
-    date: string;
-    device: string;
-    ipAddress: string;
-    noHistory: string;
-  };
-  sessionInfo: {
-    title: string;
-    description: string;
-    startedAt: string;
-    expiresIn: string;
-    currentDevice: string;
-    ipAddress: string;
-    expired: string;
-  };
-  messagesPreview: {
-    title: string;
-    description: string;
-    noMessages: string;
-    viewAllButton: string;
-  };
-  messages: {
-    alertTitle: string;
-  };
-}
-interface DashboardViewProps {
-  user: UserType;
-  infoWidget: ReactNode;
-  translations: DashboardTranslations;
-}
 
 const formatUserAgent = (uaString: string): string => {
   if (!uaString || uaString === 'Unknown') {

@@ -35,17 +35,22 @@ import {
 } from '@/components/ui/select';
 import { sendContactEmail } from '@/actions/contact.action';
 import { Label } from './ui/label';
-import {
+import type {
   ContactFormProps,
   ContactFormValues,
-} from '../interfaces/components/contact-form.interfaces';
+} from '@/types/components.types';
 
 const contactFormSchema = (t: {
   categoryRequired: string;
   messageTooShort: string;
 }) =>
   z.object({
-    category: z.string().min(1, { message: t.categoryRequired }),
+    category: z
+      .enum(['general', 'billing', 'technical', 'feedback'])
+      .or(z.literal(''))
+      .refine((category) => category !== '', {
+        message: t.categoryRequired,
+      }),
     message: z.string().min(10, { message: t.messageTooShort }),
   });
 

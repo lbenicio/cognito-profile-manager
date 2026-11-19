@@ -1,8 +1,8 @@
 import { getRequestConfig } from 'next-intl/server';
 import { cookies, headers } from 'next/headers';
+import { defaultLocale, isLocale, locales } from '@/types/i18n.types';
 
-export const locales = ['en', 'es', 'fr', 'de', 'pt'] as const;
-export const defaultLocale = 'en';
+export { defaultLocale, locales };
 
 export default getRequestConfig(async () => {
   // Determine locale from cookie or Accept-Language header
@@ -13,7 +13,7 @@ export default getRequestConfig(async () => {
     const cookieStore = await cookies();
     const localeCookie = cookieStore.get('locale')?.value;
 
-    if (localeCookie && locales.includes(localeCookie as any)) {
+    if (localeCookie && isLocale(localeCookie)) {
       locale = localeCookie;
     } else {
       // Fallback to Accept-Language header
@@ -35,7 +35,7 @@ export default getRequestConfig(async () => {
           .sort((a, b) => b.quality - a.quality);
 
         for (const { locale: preferredLocale } of preferredLocales) {
-          if (locales.includes(preferredLocale as any)) {
+          if (isLocale(preferredLocale)) {
             locale = preferredLocale;
             break;
           }
@@ -52,7 +52,7 @@ export default getRequestConfig(async () => {
   }
 
   // Validate locale
-  if (!locales.includes(locale as any)) {
+  if (!isLocale(locale)) {
     locale = defaultLocale;
   }
 

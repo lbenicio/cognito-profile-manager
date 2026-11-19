@@ -1,5 +1,6 @@
 'use client';
 
+import type { LoginActivityChartProps } from '@/types/components.types';
 import { useMemo } from 'react';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import {
@@ -17,10 +18,6 @@ import {
 import type { Fingerprint } from '@/types/user/user.types';
 import { useTranslations } from 'next-intl';
 import { format, subDays, startOfDay } from 'date-fns';
-
-interface LoginActivityChartProps {
-  fingerprint: Fingerprint[];
-}
 
 export function LoginActivityChart({ fingerprint }: LoginActivityChartProps) {
   const t = useTranslations('Dashboard.loginActivity');

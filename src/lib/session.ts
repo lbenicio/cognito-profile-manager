@@ -7,7 +7,11 @@ import { getCache, setCache, delCache } from './cache';
 import { refreshAuthTokens } from '@/actions/session.action';
 import { Logger } from '@/lib/logger';
 import type { AppSession } from '@/types/user/user.types';
-import type { AuthTokenPayload } from '@/interfaces/auth/auth.interfaces';
+import type { AuthTokenPayload } from '@/types/contracts/auth/auth.types';
+import type {
+  MockSessionData,
+  OidcSessionData,
+} from '@/types/session/oidc-session.types';
 
 const logger = new Logger('SESSION');
 
@@ -22,16 +26,6 @@ const cookieName = 'session';
 const sessionPrefix = 'session:';
 
 const SESSION_DURATION_SECONDS = 30 * 24 * 60 * 60;
-
-interface OIDC_SessionData {
-  claims: AuthTokenPayload;
-  accessToken: string;
-  refreshToken: string;
-}
-
-interface Mock_SessionData extends OIDC_SessionData {
-  username: string;
-}
 
 async function encrypt(payload: JWTPayload): Promise<string> {
   return new EncryptJWT(payload)
@@ -55,12 +49,12 @@ async function decrypt(
 }
 
 export async function createSessionCookieValue(
-  sessionData: OIDC_SessionData
+  sessionData: OidcSessionData
 ): Promise<string> {
   const sessionId = crypto.randomUUID();
   const key = `${sessionPrefix}${sessionId}`;
 
-  await setCache<OIDC_SessionData>(key, sessionData, SESSION_DURATION_SECONDS);
+  await setCache<OidcSessionData>(key, sessionData, SESSION_DURATION_SECONDS);
 
   const encryptedSessionId = await encrypt({ sessionId });
 
@@ -68,7 +62,7 @@ export async function createSessionCookieValue(
 }
 
 export async function createMockSession(
-  sessionData: Mock_SessionData
+  sessionData: MockSessionData
 ): Promise<void> {
   const payload: JWTPayload = {
     ...sessionData,
@@ -90,7 +84,7 @@ export async function createMockSession(
 
 export async function updateSession(
   sessionId: string,
-  sessionData: OIDC_SessionData
+  sessionData: OidcSessionData
 ): Promise<void> {
   const key = `${sessionPrefix}${sessionId}`;
   await setCache(key, sessionData, SESSION_DURATION_SECONDS);
@@ -147,7 +141,7 @@ export const getSession = cache(async (): Promise<AppSession | null> => {
 
   if (payload.sessionId && typeof payload.sessionId === 'string') {
     const key = `${sessionPrefix}${payload.sessionId}`;
-    let sessionData = await getCache<OIDC_SessionData>(key);
+    let sessionData = await getCache<OidcSessionData>(key);
 
     if (!sessionData) {
       logger.error(
@@ -169,7 +163,7 @@ export const getSession = cache(async (): Promise<AppSession | null> => {
       if (refreshResult) {
         const { newClaims, newAccessToken, newRefreshToken } = refreshResult;
 
-        const newSessionData: OIDC_SessionData = {
+        const newSessionData: OidcSessionData = {
           claims: newClaims,
           accessToken: newAccessToken,
           refreshToken: newRefreshToken,

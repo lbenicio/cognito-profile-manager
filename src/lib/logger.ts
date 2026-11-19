@@ -1,16 +1,5 @@
 import chalk from 'chalk';
-
-export enum LogLevel {
-  DEBUG = 0,
-  INFO = 1,
-  WARN = 2,
-  ERROR = 3,
-  SILENT = 4,
-}
-
-interface LoggerOptions {
-  level?: LogLevel;
-}
+import { LogLevel, type LoggerOptions } from '@/types/logger.types';
 
 export class Logger {
   private name: string;
@@ -71,7 +60,7 @@ export class Logger {
     level: string,
     logLevel: LogLevel,
     message: string,
-    ...args: any[]
+    ...args: unknown[]
   ): void {
     if (!this.shouldLog(logLevel)) return;
 
@@ -140,24 +129,24 @@ export class Logger {
     }
   }
 
-  debug(message: string, ...args: any[]): void {
+  debug(message: string, ...args: unknown[]): void {
     this.logToConsole('DEBUG', LogLevel.DEBUG, message, ...args);
   }
 
-  info(message: string, ...args: any[]): void {
+  info(message: string, ...args: unknown[]): void {
     this.logToConsole('INFO', LogLevel.INFO, message, ...args);
   }
 
-  warn(message: string, ...args: any[]): void {
+  warn(message: string, ...args: unknown[]): void {
     this.logToConsole('WARN', LogLevel.WARN, message, ...args);
   }
 
-  error(message: string, ...args: any[]): void {
+  error(message: string, ...args: unknown[]): void {
     this.logToConsole('ERROR', LogLevel.ERROR, message, ...args);
   }
 
   // Convenience method for general logging (maps to info)
-  log(message: string, ...args: any[]): void {
+  log(message: string, ...args: unknown[]): void {
     this.info(message, ...args);
   }
 

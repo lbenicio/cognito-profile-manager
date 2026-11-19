@@ -58,7 +58,7 @@ export async function deletePasskey(
     revalidatePath('/');
 
     return { success: true, message: 'Passkey deleted successfully.' };
-  } catch (error: any) {
+  } catch (error) {
     logger.error('Delete Passkey Error:', error);
     return {
       success: false,
@@ -92,7 +92,7 @@ export async function syncPasskeysEnabledFlag(): Promise<{
     revalidatePath('/');
 
     return { success: true, message: 'Passkey flag synced successfully.' };
-  } catch (error: any) {
+  } catch (error) {
     logger.error('Error syncing passkey flag:', error);
     return {
       success: false,

@@ -4,6 +4,8 @@ import { z } from 'zod';
 import nodemailer from 'nodemailer';
 import { Logger } from '@/lib/logger';
 import { getUser } from '../auth';
+import type { ContactSubmissionInput } from '@/types/actions/contact.types';
+import type { ContactActionResponse } from '@/types/api/response.types';
 
 const logger = new Logger('CONTACT');
 
@@ -12,11 +14,9 @@ const contactSchema = z.object({
   message: z.string().trim().min(10).max(5000),
 });
 
-type ContactData = { category: string; message: string };
-
 export async function sendContactEmail(
-  data: ContactData
-): Promise<{ success: boolean; message: string }> {
+  data: ContactSubmissionInput
+): Promise<ContactActionResponse> {
   const parsedData = contactSchema.safeParse(data);
   if (!parsedData.success) {
     return { success: false, message: 'Invalid contact form data.' };

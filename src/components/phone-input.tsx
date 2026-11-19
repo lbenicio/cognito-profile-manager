@@ -1,5 +1,6 @@
 'use client';
 
+import type { PhoneInputProps } from '@/types/components.types';
 import * as React from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -43,15 +44,6 @@ const parsePhoneNumber = (
     : '';
   return { country, nationalNumber };
 };
-
-interface PhoneInputProps
-  extends Omit<
-    React.InputHTMLAttributes<HTMLInputElement>,
-    'onChange' | 'value'
-  > {
-  value: string;
-  onChangeAction: (value: string) => void;
-}
 
 export function PhoneInput({
   value,

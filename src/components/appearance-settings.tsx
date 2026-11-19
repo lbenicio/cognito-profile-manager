@@ -1,5 +1,6 @@
 'use client';
 
+import type { AppearanceSettingsProps } from '@/types/components.types';
 import { useTransition } from 'react';
 import { useTheme } from 'next-themes';
 import { Moon, Palette, Sun } from 'lucide-react';
@@ -23,10 +24,6 @@ import type {
   User as UserType,
   UserPreferences,
 } from '@/types/user/user.types';
-
-interface AppearanceSettingsProps {
-  user: UserType;
-}
 
 export function AppearanceSettings({ user }: AppearanceSettingsProps) {
   const t = useTranslations('Settings.appearance');

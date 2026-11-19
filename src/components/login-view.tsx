@@ -1,5 +1,6 @@
 'use client';
 
+import type { LoginViewProps } from '@/types/components.types';
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -14,8 +15,6 @@ import {
 } from '@/components/ui/card';
 import { Loader2, LogIn, Shield, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
-export interface LoginViewProps {}
 
 export function LoginView({}: LoginViewProps) {
   const t = useTranslations('Login');

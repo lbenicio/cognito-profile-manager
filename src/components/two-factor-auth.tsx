@@ -1,5 +1,6 @@
 'use client';
 
+import type { TwoFactorAuthProps } from '@/types/components.types';
 import { useState } from 'react';
 import {
   Card,
@@ -21,11 +22,6 @@ import {
   verifyAndEnableMfa,
   disableMfa,
 } from '@/actions/mfa.action';
-
-interface TwoFactorAuthProps {
-  user: User;
-  onUpdateAction: (data: Partial<User>) => void;
-}
 
 export function TwoFactorAuth({ user, onUpdateAction }: TwoFactorAuthProps) {
   const { toast } = useToast();

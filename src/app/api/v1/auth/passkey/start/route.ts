@@ -46,13 +46,15 @@ export async function GET(request: NextRequest) {
     response.headers.set('Authorization', `Bearer ${session.accessToken}`);
 
     return response;
-  } catch (error: any) {
+  } catch (error) {
     logger.error('Passkey start error:', error);
     const securityUrl = new URL(pathnames['/security'], request.url);
     securityUrl.searchParams.set('error', 'passkey_start_failed');
     securityUrl.searchParams.set(
       'error_description',
-      error.message || 'Could not start the passkey setup process.'
+      error instanceof Error
+        ? error.message
+        : 'Could not start the passkey setup process.'
     );
     return NextResponse.redirect(securityUrl);
   }

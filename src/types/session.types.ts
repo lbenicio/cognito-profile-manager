@@ -1,6 +1,6 @@
 /**
  * Session types for authentication and session management.
- * Contains only type aliases, unions, and enums. All interfaces are in @/interfaces/session/
+ * Contains only type aliases, unions, and enums. All interfaces are in @/types/contracts/session/
  */
 
 /**
@@ -125,4 +125,4 @@ export type {
   SessionConfig,
   SessionContext,
   SessionMetrics,
-} from '@/interfaces/session/session.interfaces';
+} from '@/types/contracts/session/session.types';

@@ -32,7 +32,7 @@ export async function updatePublicProfilePreferences(
     revalidatePath('/profile');
 
     return { success: true, message: 'Profile settings updated successfully.' };
-  } catch (error: any) {
+  } catch (error) {
     logger.error('Update Public Profile Preferences Error:', error);
     return {
       success: false,

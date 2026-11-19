@@ -1,6 +1,6 @@
 'use server';
 
-import { authenticator } from 'otplib';
+import { generateURI } from 'otplib';
 import QRCode from 'qrcode';
 import { revalidatePath } from 'next/cache';
 import {
@@ -35,7 +35,11 @@ export async function generateMfaSetup() {
   }
 
   const serviceName = 'Outpost';
-  const otpauth = authenticator.keyuri(user.email, serviceName, secretCode);
+  const otpauth = generateURI({
+    issuer: serviceName,
+    label: user.email,
+    secret: secretCode,
+  });
   const qrCodeDataUrl = await QRCode.toDataURL(otpauth);
 
   return { qrCodeDataUrl, secretCode };
@@ -78,11 +82,17 @@ export async function verifyAndEnableMfa(
       success: true,
       message: 'Authenticator app enabled successfully.',
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('MFA Verification Error:', error);
+    const errorName =
+      error instanceof Error
+        ? error.name
+        : typeof error === 'object' && error !== null && 'name' in error
+          ? String(error.name)
+          : undefined;
     if (
-      error.name === 'EnableSoftwareTokenMFAException' ||
-      error.name === 'NotAuthorizedException'
+      errorName === 'EnableSoftwareTokenMFAException' ||
+      errorName === 'NotAuthorizedException'
     ) {
       return {
         success: false,

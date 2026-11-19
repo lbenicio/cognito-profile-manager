@@ -1,4 +1,5 @@
 'use client';
+import type { PublicProfileDisplayProps } from '@/types/components.types';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import {
@@ -23,10 +24,6 @@ import {
 } from 'lucide-react';
 import type { User } from '@/types/user/user.types';
 import { format, parseISO } from 'date-fns';
-
-export interface PublicProfileDisplayProps {
-  user: User;
-}
 
 export function PublicProfileDisplay({ user }: PublicProfileDisplayProps) {
   const t = useTranslations('Profile.preview');

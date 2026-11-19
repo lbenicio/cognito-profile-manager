@@ -1,26 +1,19 @@
 'use client';
 
+import type {
+  ChartConfig,
+  ChartContextProps,
+  ChartTooltipContentProps,
+} from '@/types/ui.types';
 import * as React from 'react';
 import * as RechartsPrimitive from 'recharts';
 
 import { cn } from '@/lib/utils';
 
+export type { ChartConfig } from '@/types/ui.types';
+
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: '', dark: '.dark' } as const;
-
-export type ChartConfig = {
-  [k in string]: {
-    label?: React.ReactNode;
-    icon?: React.ComponentType;
-  } & (
-    | { color?: string; theme?: never }
-    | { color?: never; theme: Record<keyof typeof THEMES, string> }
-  );
-};
-
-type ChartContextProps = {
-  config: ChartConfig;
-};
 
 const ChartContext = React.createContext<ChartContextProps | null>(null);
 
@@ -102,35 +95,6 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip;
 
-type ChartTooltipContentProps = {
-  active?: boolean;
-  payload?: Array<{
-    name?: string;
-    value?: number | string;
-    color?: string;
-    dataKey?: string;
-    [key: string]: any;
-  }>;
-  className?: string;
-  indicator?: 'line' | 'dot' | 'dashed';
-  hideLabel?: boolean;
-  hideIndicator?: boolean;
-  label?: string | number;
-  labelFormatter?: (label: any, payload?: any[]) => React.ReactNode;
-  labelClassName?: string;
-  formatter?: (
-    value: any,
-    name: any,
-    item: any,
-    index: number,
-    payload: any
-  ) => React.ReactNode;
-  color?: string;
-  nameKey?: string;
-  labelKey?: string;
-  config?: ChartConfig;
-};
-
 const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
   ChartTooltipContentProps
@@ -138,12 +102,7 @@ const ChartTooltipContent = React.forwardRef<
   (
     {
       active,
-      payload = [] as Array<{
-        name: string;
-        value: number;
-        color?: string;
-        dataKey?: string;
-      }>,
+      payload = [],
       className,
       indicator = 'dot',
       hideLabel = false,
@@ -229,24 +188,14 @@ const ChartTooltipContent = React.forwardRef<
 
             return (
               <div
-                key={item.dataKey}
+                key={key}
                 className={cn(
                   '[&>svg]:text-muted-foreground flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5',
                   indicator === 'dot' && 'items-center'
                 )}
               >
                 {formatter && item?.value !== undefined && item.name ? (
-                  formatter(
-                    item.value,
-                    item.name,
-                    item,
-                    index,
-                    typeof item === 'object' &&
-                      item !== null &&
-                      'payload' in item
-                      ? (item as any).payload
-                      : undefined
-                  )
+                  formatter(item.value, item.name, item, index, payload)
                 ) : (
                   <>
                     {itemConfig?.icon ? (

@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify, createRemoteJWKSet } from 'jose';
-import type { AuthTokenPayload } from '@/interfaces/auth/auth.interfaces';
+import type { AuthTokenPayload } from '@/types/contracts/auth/auth.types';
 import { createSessionCookieValue } from '@/lib/session';
 import { Logger } from '@/lib/logger';
 import { getWellKnownConfig } from '@/lib/well-known';
@@ -127,8 +127,8 @@ export async function GET(request: NextRequest) {
       claims: sessionData.claims,
       accessTokenExists: !!sessionData.accessToken,
       refreshTokenExists: !!sessionData.refreshToken,
-      exp: sessionData.claims && (sessionData.claims as any).exp,
-      sub: sessionData.claims && (sessionData.claims as any).sub,
+      exp: sessionData.claims.exp,
+      sub: sessionData.claims.sub,
     });
 
     // Create the session cookie value

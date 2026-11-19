@@ -41,7 +41,7 @@ export async function updateUserPreferences(
     revalidatePath('/', 'layout');
 
     return { success: true, message: 'Preferences updated successfully.' };
-  } catch (error: any) {
+  } catch (error) {
     logger.error('Update Preferences Error:', error);
     return {
       success: false,

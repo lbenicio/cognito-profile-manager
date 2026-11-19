@@ -67,8 +67,9 @@ export interface PaginationMeta {
 /**
  * Paginated API response
  */
-export interface PaginatedApiResponse<T = unknown>
-  extends ApiSuccessResponse<T[]> {
+export interface PaginatedApiResponse<T = unknown> extends ApiSuccessResponse<
+  T[]
+> {
   pagination: PaginationMeta;
 }
 

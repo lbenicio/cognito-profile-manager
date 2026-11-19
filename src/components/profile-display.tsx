@@ -40,7 +40,7 @@ import { AvatarEditor } from './avatar-editor';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
-import type { ProfileDisplayProps } from '../interfaces/components/profile-display.interfaces';
+import type { ProfileDisplayProps } from '@/types/components.types';
 
 export function ProfileDisplay({ user, onUpdateAction }: ProfileDisplayProps) {
   const t = useTranslations('Dashboard');

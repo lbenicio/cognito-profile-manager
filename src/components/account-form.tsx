@@ -39,10 +39,10 @@ import {
 import { DatePicker } from './ui/date-picker';
 import { format } from 'date-fns';
 import { accountFormSchema } from '@/types/forms/account-form.types';
-import {
+import type {
   AccountFormProps,
   AccountFormValues,
-} from '@/interfaces/forms/account-form.interfaces';
+} from '@/types/forms/account-form.types';
 
 export function AccountForm({ user, onUpdateAction }: AccountFormProps) {
   const { toast } = useToast();

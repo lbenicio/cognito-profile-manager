@@ -53,7 +53,7 @@ export async function updateNotificationPreferences(
       success: true,
       message: 'Notification preferences updated successfully.',
     };
-  } catch (error: any) {
+  } catch (error) {
     logger.error('Update Notification Preferences Error:', error);
     return {
       success: false,

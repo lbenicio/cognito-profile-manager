@@ -33,7 +33,7 @@ export async function changePassword(
     });
     await cognitoClient.send(command);
     return { success: true, message: 'Password changed successfully.' };
-  } catch (error: any) {
+  } catch (error) {
     logger.error('Change Password Error:', error);
     if (error instanceof NotAuthorizedException) {
       return {

@@ -1,14 +1,11 @@
 'use client';
+import type { AccountViewProps } from '@/types/components.types';
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { AccountDisplay } from '@/components/account-display';
 import { AccountForm } from '@/components/account-form';
 import type { User as UserType } from '@/types/user/user.types';
 import { AddressForm } from './address-form';
-
-interface AccountViewProps {
-  initialUser: UserType;
-}
 
 export function AccountView({ initialUser }: AccountViewProps) {
   const [user, setUser] = useState(initialUser);

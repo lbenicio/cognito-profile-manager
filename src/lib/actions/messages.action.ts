@@ -24,7 +24,7 @@ export async function clearMessages(): Promise<void> {
 
     // Revalidate all relevant paths to reflect the change immediately
     revalidatePath('/', 'layout');
-  } catch (error: any) {
+  } catch (error) {
     logger.error('Clear Messages Error:', error);
     // The action will fail, but the user will see the old state.
     // In a real app, you might want to throw an error to be caught by an error boundary.

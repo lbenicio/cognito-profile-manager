@@ -1,5 +1,6 @@
 'use client';
 
+import type { LanguageSwitcherProps } from '@/types/components.types';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { Languages } from 'lucide-react';
@@ -13,11 +14,6 @@ import { Button } from '@/components/ui/button';
 import { updateUserPreferences } from '@/actions/preference.action';
 import { setLocaleCookie, getLocaleCookie } from '@/navigation';
 import type { UserPreferences } from '@/types/user/user.types';
-
-interface LanguageSwitcherProps {
-  languageLabel: string;
-  currentLanguage: UserPreferences['language'];
-}
 
 export function LanguageSwitcher({
   languageLabel,

@@ -1,5 +1,6 @@
 'use client';
 
+import type { LanguageSelectProps } from '@/types/components.types';
 import { useTranslations } from 'next-intl';
 
 import {
@@ -10,12 +11,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import type { UserPreferences } from '@/types/user/user.types';
-
-interface LanguageSelectProps {
-  currentLanguage: UserPreferences['language'];
-  onLanguageChangeAction: (language: UserPreferences['language']) => void;
-  disabled?: boolean;
-}
 
 export function LanguageSelect({
   currentLanguage,

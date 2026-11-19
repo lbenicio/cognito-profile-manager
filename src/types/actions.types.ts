@@ -279,6 +279,45 @@ export interface HealthCheckResult extends BaseActionResult {
   version?: string;
 }
 
+export interface FileOperationResult extends BaseActionResult {
+  fileId?: string;
+  fileName?: string;
+  fileSize?: number;
+  filePath?: string;
+  mimeType?: string;
+  operation: 'upload' | 'download' | 'delete' | 'move' | 'copy';
+}
+
+export interface DatabaseOperationResult extends BaseActionResult {
+  recordId?: string;
+  affectedRows?: number;
+  operation: 'create' | 'read' | 'update' | 'delete' | 'query';
+  executionTime?: number;
+}
+
+export interface EmailOperationResult extends BaseActionResult {
+  messageId?: string;
+  recipients?: string[];
+  deliveryStatus?: 'sent' | 'delivered' | 'bounced' | 'failed';
+  templateUsed?: string;
+}
+
+export interface NotificationOperationResult extends BaseActionResult {
+  notificationId?: string;
+  channels?: string[];
+  deliveryStatus?: Record<string, 'sent' | 'delivered' | 'failed'>;
+  recipientCount?: number;
+}
+
+export interface SyncOperationResult extends BaseActionResult {
+  syncId?: string;
+  itemsSynced?: number;
+  itemsSkipped?: number;
+  itemsFailed?: number;
+  lastSyncTime?: number;
+  nextSyncTime?: number;
+}
+
 /**
  * Backup and restore action results
  */

@@ -1,4 +1,12 @@
 import * as z from 'zod';
+import type { User } from '@/types/user/user.types';
+
+export interface AccountFormProps {
+  user: User;
+  onUpdateAction: (data: Partial<User>) => void;
+}
+
+export type AccountFormValues = z.infer<ReturnType<typeof accountFormSchema>>;
 
 /**
  * Schema for the Account Form using zod.

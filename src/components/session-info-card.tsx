@@ -1,5 +1,6 @@
 'use client';
 
+import type { SessionInfoCardProps } from '@/types/components.types';
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import {
@@ -16,10 +17,6 @@ import { UAParser } from 'ua-parser-js';
 import { Logger } from '@/lib/logger';
 
 const logger = new Logger('SESSION-INFO-CARD');
-
-interface SessionInfoCardProps {
-  user: User;
-}
 
 const formatUserAgent = (uaString: string): string => {
   if (!uaString || uaString === 'Unknown') {

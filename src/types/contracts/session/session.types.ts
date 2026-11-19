@@ -241,7 +241,7 @@ export interface SessionContext {
     groups: string[];
   } | null;
   login: (
-    credentials: import('@/interfaces/auth/auth.interfaces').LoginCredentials
+    credentials: import('@/types/contracts/auth/auth.types').LoginCredentials
   ) => Promise<void>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;

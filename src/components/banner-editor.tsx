@@ -11,7 +11,7 @@ import {
   getBannerPresignedUploadUrl,
   updateUserBanner,
 } from '@/actions/banner.action';
-import type { BannerEditorProps } from '../interfaces/components/banner-editor.interfaces';
+import type { BannerEditorProps } from '@/types/components.types';
 
 export function BannerEditor({
   user,

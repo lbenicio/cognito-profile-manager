@@ -1,7 +1,7 @@
 /**
  * Main types index file - exports all type definitions for the application.
  * This file only exports type aliases, unions, and enums from the types/ directory.
- * All interfaces are exported from the interfaces/ directory.
+ * Shared interfaces and domain contracts are organized under src/types.
  */
 
 // ============================================================================
@@ -206,6 +206,9 @@ export * from './forms/address-form.types';
 export * from './forms/password-form.types';
 export * from './forms/profile-form.types';
 
+// Component Props
+export * from './components.types';
+
 // R2/Storage Types
 export * from './r2.types';
 
@@ -243,7 +246,7 @@ export type {
   AuthAuditLog,
   AuthDevice,
   AuthConfig,
-} from '@/interfaces/auth/auth.interfaces';
+} from '@/types/contracts/auth/auth.types';
 
 // Session Interfaces
 export type {
@@ -264,7 +267,7 @@ export type {
   SessionConfig,
   SessionContext,
   SessionMetrics,
-} from '@/interfaces/session/session.interfaces';
+} from '@/types/contracts/session/session.types';
 
 // API Interfaces
 export type {
@@ -295,7 +298,7 @@ export type {
   AuditLogResponse,
   FeatureFlagResponse,
   MetricsResponse,
-} from '@/interfaces/api/response.interfaces';
+} from '@/types/contracts/api/response.types';
 
 // Error Interfaces
 export type {
@@ -321,7 +324,7 @@ export type {
   ErrorAggregation,
   ErrorNotification,
   ErrorConfig,
-} from '@/interfaces/error/error.interfaces';
+} from '@/types/contracts/error/error.types';
 
 // Action Interfaces
 export type {
@@ -367,7 +370,7 @@ export type {
   EmailOperationResult,
   NotificationOperationResult,
   SyncOperationResult,
-} from '@/interfaces/actions/action.interfaces';
+} from './actions.types';
 
 // Helper functions and constants from actions.types
 export {

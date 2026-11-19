@@ -1,4 +1,5 @@
 'use client';
+import type { ProfileViewProps } from '@/types/components.types';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import type {
@@ -7,10 +8,6 @@ import type {
 } from '@/types/user/user.types';
 import { PublicProfileDisplay } from './public-profile-display';
 import { ProfileSettingsForm } from './profile-settings-form';
-
-interface ProfileViewProps {
-  user: UserType;
-}
 
 export function ProfileView({ user: initialUser }: ProfileViewProps) {
   const [user, setUser] = useState(initialUser);

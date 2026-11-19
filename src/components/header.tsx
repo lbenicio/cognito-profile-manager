@@ -1,5 +1,6 @@
 'use client';
 
+import type { HeaderProps } from '@/types/components.types';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -34,36 +35,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from './theme-toggle';
 import { LanguageSwitcher } from './language-switcher';
-import type { User as UserType } from '@/types/user/user.types';
 import { Separator } from '@/components/ui/separator';
 import { useTransition } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { localLogout } from '@/actions/auth.action';
 import { Badge } from '@/components/ui/badge';
 
-type HeaderTranslations = {
-  title: string;
-  userMenu: {
-    profile: string;
-    settings: string;
-    logout: string;
-    adminDashboard: string;
-    account: string;
-    security: string;
-    messages: string;
-  };
-  mobileMenuTitle: string;
-  mobileMenuTrigger: string;
-  language: string;
-};
-
-export function Header({
-  user,
-  translations: t,
-}: {
-  user: UserType | null;
-  translations: HeaderTranslations;
-}) {
+export function Header({ user, translations: t }: HeaderProps) {
   const adminDashboardUrl = process.env.NEXT_PUBLIC_ADMIN_DASHBOARD_URL || '#';
   const currentLanguage = user?.preferences?.language || 'en';
   const [isLoggingOut, startTransition] = useTransition();

@@ -54,14 +54,15 @@ export async function GET(request: NextRequest) {
     });
 
     return response;
-  } catch (error: any) {
+  } catch (error) {
     logger.error('SSO start error:', error);
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('error', 'sso_start_failed');
     loginUrl.searchParams.set(
       'error_description',
-      error.message ||
-        'Could not start the SSO process. Please check your OAuth2 configuration.'
+      error instanceof Error
+        ? error.message
+        : 'Could not start the SSO process. Please check your OAuth2 configuration.'
     );
     return NextResponse.redirect(loginUrl);
   }

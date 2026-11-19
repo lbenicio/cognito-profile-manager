@@ -1,6 +1,6 @@
 /**
  * API response types for standardized API responses.
- * Contains only type aliases, unions, and enums. All interfaces are in @/interfaces/api/
+ * Contains only type aliases, unions, and enums. All interfaces are in @/types/contracts/api/
  */
 
 /**
@@ -91,13 +91,7 @@ export type HttpStatusCode =
  * HTTP methods
  */
 export type HttpMethod =
-  | 'GET'
-  | 'POST'
-  | 'PUT'
-  | 'PATCH'
-  | 'DELETE'
-  | 'HEAD'
-  | 'OPTIONS';
+  'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS';
 
 /**
  * API response status
@@ -145,20 +139,13 @@ export type ExportFormat = 'csv' | 'json' | 'pdf' | 'xlsx' | 'xml';
  * Import status types
  */
 export type ImportStatus =
-  | 'pending'
-  | 'processing'
-  | 'completed'
-  | 'failed'
-  | 'cancelled';
+  'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
 
 /**
  * Webhook delivery status types
  */
 export type WebhookDeliveryStatus =
-  | 'pending'
-  | 'delivered'
-  | 'failed'
-  | 'retrying';
+  'pending' | 'delivered' | 'failed' | 'retrying';
 
 /**
  * Health check status types
@@ -201,4 +188,4 @@ export type {
   AuditLogResponse,
   FeatureFlagResponse,
   MetricsResponse,
-} from '@/interfaces/api/response.interfaces';
+} from '@/types/contracts/api/response.types';

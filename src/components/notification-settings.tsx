@@ -1,5 +1,6 @@
 'use client';
 
+import type { NotificationSettingsProps } from '@/types/components.types';
 import { useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import {
@@ -21,10 +22,6 @@ import type {
   NotificationPreferences,
 } from '@/types/user/user.types';
 import { updateNotificationPreferences } from '@/actions/notification.action';
-
-interface NotificationSettingsProps {
-  user: UserType;
-}
 
 export function NotificationSettings({ user }: NotificationSettingsProps) {
   const t = useTranslations('Settings.notifications');

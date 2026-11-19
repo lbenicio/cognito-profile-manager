@@ -1,5 +1,6 @@
 'use client';
 
+import type { ProfileSettingsFormProps } from '@/types/components.types';
 import { useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
 import {
@@ -18,11 +19,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Save, Loader2 } from 'lucide-react';
 import type { PublicProfilePreferences } from '@/types/user/user.types';
 import { updatePublicProfilePreferences } from '@/actions/profile-settings.action';
-
-export interface ProfileSettingsFormProps {
-  initialPreferences: PublicProfilePreferences;
-  onUpdateAction: (newPrefs: PublicProfilePreferences) => void;
-}
 
 export function ProfileSettingsForm({
   initialPreferences,

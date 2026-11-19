@@ -27,7 +27,7 @@ import { KeyRound, Loader2 } from 'lucide-react';
 import React from 'react';
 import { changePassword } from '@/actions/password.action';
 import { passwordFormSchema } from '@/types/forms/password-form.types';
-import { PasswordFormValues } from '@/interfaces/forms/password-form.interfaces';
+import type { PasswordFormValues } from '@/types/forms/password-form.types';
 
 export function PasswordForm() {
   const { toast } = useToast();

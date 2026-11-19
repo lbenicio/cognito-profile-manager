@@ -4,7 +4,7 @@ import { jwtVerify, createRemoteJWKSet } from 'jose';
 import { Logger } from '@/lib/logger';
 import { getWellKnownConfig } from '@/lib/well-known';
 import { cognitoClient, InitiateAuthCommand } from '@/lib/cognito';
-import type { AuthTokenPayload } from '@/interfaces/auth/auth.interfaces';
+import type { AuthTokenPayload } from '@/types/contracts/auth/auth.types';
 
 const logger = new Logger('SESSION-ACTIONS');
 

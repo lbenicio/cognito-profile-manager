@@ -1,8 +1,12 @@
 import * as z from 'zod';
-import type {
-  ProfileFormProps,
-  ProfileFormValues,
-} from '@/interfaces/forms/profile-form.interfaces';
+import type { User } from '@/types/user/user.types';
+
+export interface ProfileFormProps {
+  user: User;
+  onUpdateAction: (data: Partial<User>) => void;
+}
+
+export type ProfileFormValues = z.infer<ReturnType<typeof profileFormSchema>>;
 
 /**
  * Schema for the Profile Form using zod.

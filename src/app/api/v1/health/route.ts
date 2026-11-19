@@ -1,18 +1,14 @@
 import { NextResponse } from 'next/server';
 import { pingCache } from '@/lib/cache';
 import { getWellKnownConfig } from '@/lib/well-known';
-
-type CheckStatus = 'ok' | 'error';
-interface HealthCheckResult {
-  name: string;
-  status: CheckStatus;
-  details?: string;
-  duration?: number;
-}
+import type {
+  HealthProbeResult,
+  HealthProbeStatus,
+} from '@/types/api/health.types';
 
 export async function GET() {
-  const checks: HealthCheckResult[] = [];
-  let overallStatus: CheckStatus = 'ok';
+  const checks: HealthProbeResult[] = [];
+  let overallStatus: HealthProbeStatus = 'ok';
 
   // --- Check App Status (always ok if we reach here) ---
   checks.push({ name: 'application', status: 'ok' });

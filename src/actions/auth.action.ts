@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation';
 import { createMockSession, getSession, deleteSession } from '@/lib/session';
 import { mockAdminUser, mockUser } from '@/lib/mock-data';
-import type { AuthTokenPayload } from '@/interfaces/auth/auth.interfaces';
+import type { AuthTokenPayload } from '@/types/contracts/auth/auth.types';
 import { getBaseUrl } from '@/lib/url';
 
 export async function ssoLogin() {

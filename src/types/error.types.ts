@@ -121,6 +121,125 @@ export interface SessionError extends AppError {
     | 'SESSION_INVALID';
 }
 
+export interface NetworkError extends AppError {
+  name: 'NetworkError';
+  code:
+    'CONNECTION_FAILED' | 'TIMEOUT' | 'DNS_ERROR' | 'SSL_ERROR' | 'PROXY_ERROR';
+  url?: string;
+  timeout?: number;
+}
+
+export interface PermissionError extends AppError {
+  name: 'PermissionError';
+  code:
+    | 'ACCESS_DENIED'
+    | 'INSUFFICIENT_PERMISSIONS'
+    | 'ROLE_REQUIRED'
+    | 'RESOURCE_FORBIDDEN';
+  resource?: string;
+  action?: string;
+  requiredRole?: string;
+}
+
+export interface RateLimitError extends AppError {
+  name: 'RateLimitError';
+  code: 'RATE_LIMIT_EXCEEDED' | 'QUOTA_EXCEEDED' | 'THROTTLED';
+  limit?: number;
+  remaining?: number;
+  resetTime?: number;
+  retryAfter?: number;
+}
+
+export interface BusinessLogicError extends AppError {
+  name: 'BusinessLogicError';
+  code:
+    | 'BUSINESS_RULE_VIOLATION'
+    | 'OPERATION_NOT_ALLOWED'
+    | 'CONSTRAINT_VIOLATION'
+    | 'INVALID_STATE';
+  rule?: string;
+  constraint?: string;
+}
+
+export interface ExternalServiceError extends AppError {
+  name: 'ExternalServiceError';
+  code:
+    | 'SERVICE_UNAVAILABLE'
+    | 'SERVICE_TIMEOUT'
+    | 'SERVICE_ERROR'
+    | 'API_ERROR'
+    | 'INTEGRATION_ERROR';
+  service?: string;
+  serviceResponse?: unknown;
+}
+
+export interface ErrorContext {
+  userId?: string;
+  sessionId?: string;
+  requestId?: string;
+  traceId?: string;
+  timestamp: number;
+  userAgent?: string;
+  ipAddress?: string;
+  path?: string;
+  method?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface ErrorReport {
+  error: AppError;
+  context: ErrorContext;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  handled: boolean;
+  reportedAt: number;
+  fingerprint?: string;
+}
+
+export interface ErrorHandler {
+  canHandle(error: unknown): boolean;
+  handle(error: AppError, context: ErrorContext): Promise<void> | void;
+  priority: number;
+}
+
+export interface ErrorRecovery {
+  canRecover(error: AppError): boolean;
+  recover(error: AppError, context: ErrorContext): Promise<unknown>;
+  maxAttempts: number;
+}
+
+export interface ErrorLogger {
+  log(error: AppError, context: ErrorContext): Promise<void> | void;
+  logReport(report: ErrorReport): Promise<void> | void;
+}
+
+export interface ErrorAggregation {
+  count: number;
+  firstOccurrence: number;
+  lastOccurrence: number;
+  fingerprint: string;
+  error: AppError;
+  contexts: ErrorContext[];
+}
+
+export interface ErrorNotification {
+  recipients: string[];
+  threshold: number;
+  cooldown: number;
+  channels: ('email' | 'slack' | 'webhook')[];
+  template?: string;
+}
+
+export interface ErrorConfig {
+  enableLogging: boolean;
+  enableReporting: boolean;
+  enableNotifications: boolean;
+  enableRecovery: boolean;
+  logLevel: 'error' | 'warn' | 'info' | 'debug';
+  handlers: ErrorHandler[];
+  recoveryStrategies: ErrorRecovery[];
+  notifications: Record<string, ErrorNotification>;
+}
+
 /**
  * Union type of all application errors
  */
@@ -132,7 +251,12 @@ export type ApplicationError =
   | UploadError
   | FormError
   | ConfigError
-  | SessionError;
+  | SessionError
+  | NetworkError
+  | PermissionError
+  | RateLimitError
+  | BusinessLogicError
+  | ExternalServiceError;
 
 /**
  * Error factory functions

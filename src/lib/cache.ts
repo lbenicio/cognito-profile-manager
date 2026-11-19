@@ -2,18 +2,9 @@
 import 'server-only';
 import { Redis } from '@upstash/redis';
 import { Logger } from '@/lib/logger';
+import type { CacheClient } from '@/types/cache.types';
 
 const logger = new Logger('CACHE');
-
-/**
- * The standard interface that all cache clients must implement.
- */
-interface CacheClient {
-  get<T>(key: string): Promise<T | null>;
-  set<T>(key: string, value: T, ttlSeconds?: number): Promise<void>;
-  del(keys: string | string[]): Promise<number>;
-  ping(): Promise<{ status: 'ok' | 'error'; message: string }>;
-}
 
 /**
  * A no-op cache client that does nothing. Used when caching is disabled.

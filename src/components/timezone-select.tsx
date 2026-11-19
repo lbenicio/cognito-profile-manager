@@ -1,5 +1,6 @@
 'use client';
 
+import type { TimezoneSelectProps } from '@/types/components.types';
 import * as React from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 
@@ -19,11 +20,6 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { timezones } from '@/lib/timezones';
-
-interface TimezoneSelectProps {
-  value: string;
-  onChangeAction: (value: string) => void;
-}
 
 export function TimezoneSelect({ value, onChangeAction }: TimezoneSelectProps) {
   const [open, setOpen] = React.useState(false);

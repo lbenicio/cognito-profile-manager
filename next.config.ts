@@ -18,10 +18,6 @@ const r2Hostname = (() => {
 })();
 
 const nextConfig: NextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-
   turbopack: {},
   distDir: 'dist',
   images: {

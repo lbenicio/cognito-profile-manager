@@ -26,10 +26,10 @@ import { Loader2, Save } from 'lucide-react';
 import React from 'react';
 import { updateUserAddress } from '@/actions/profile.action';
 import { addressFormSchema } from '@/types/forms/address-form.types';
-import {
+import type {
   AddressFormProps,
   AddressFormValues,
-} from '@/interfaces/forms/address-form.interfaces';
+} from '@/types/forms/address-form.types';
 
 export function AddressForm({ user, onUpdateAction }: AddressFormProps) {
   const { toast } = useToast();
