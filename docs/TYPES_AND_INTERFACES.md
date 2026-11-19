@@ -79,17 +79,11 @@ import type { BaseActionResult } from '@/interfaces';
 
 ```typescript
 export type AuthState =
-  | 'authenticated'
-  | 'unauthenticated'
-  | 'loading'
-  | 'error';
+  'authenticated' | 'unauthenticated' | 'loading' | 'error';
 export type AuthMethod = 'sso' | 'passkey' | 'mfa' | 'password' | 'mock';
 export type UserRole = 'user' | 'admin' | 'moderator' | 'viewer';
 export type AccountStatus =
-  | 'active'
-  | 'inactive'
-  | 'suspended'
-  | 'pending_verification';
+  'active' | 'inactive' | 'suspended' | 'pending_verification';
 ```
 
 #### Interfaces (`/interfaces/auth/auth.interfaces.ts`)
@@ -132,9 +126,7 @@ export interface AuthContext {
 ```typescript
 export type SessionInvalidReason = 'NOT_FOUND' | 'EXPIRED' | 'INVALID_TOKEN';
 export type SessionAction =
-  | 'SESSION_CREATED'
-  | 'SESSION_REFRESHED'
-  | 'LOGIN_SUCCESS';
+  'SESSION_CREATED' | 'SESSION_REFRESHED' | 'LOGIN_SUCCESS';
 export type SessionStatus = 'active' | 'expired' | 'revoked' | 'suspended';
 export type LogoutType = 'local' | 'global' | 'forced' | 'expired';
 ```
@@ -180,8 +172,9 @@ export interface ApiResponse<T = unknown> extends BaseApiResponse {
   data?: T;
 }
 
-export interface PaginatedApiResponse<T = unknown>
-  extends ApiSuccessResponse<T[]> {
+export interface PaginatedApiResponse<T = unknown> extends ApiSuccessResponse<
+  T[]
+> {
   pagination: PaginationMeta;
 }
 ```
@@ -213,10 +206,7 @@ export interface ProfileUpdateResult extends BaseActionResult {
 
 ```typescript
 export type ApplicationError =
-  | AuthError
-  | ValidationError
-  | ApiError
-  | CognitoError;
+  AuthError | ValidationError | ApiError | CognitoError;
 ```
 
 #### Interfaces (`/interfaces/error/error.interfaces.ts`)

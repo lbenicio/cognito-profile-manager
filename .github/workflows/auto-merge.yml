@@ -31,8 +31,8 @@ jobs:
     steps:
       - id: automerge
         name: automerge
-        uses: "pascalgn/automerge-action@v0.16.4"
+        uses: 'pascalgn/automerge-action@v0.16.4'
         env:
-          MERGE_LABELS: "dependencies"
-          MERGE_FILTER_AUTHOR: "dependabot[bot]"
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          MERGE_LABELS: 'dependencies'
+          MERGE_FILTER_AUTHOR: 'dependabot[bot]'
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
