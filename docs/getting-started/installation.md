@@ -1,56 +1,37 @@
-# Installation Guide
+# Install for local development
 
-This guide provides detailed steps to set up the Cognito Profile Manager for local development.
+## Requirements
 
-## Prerequisites
+- Node.js 22 or later
+- npm (the repository includes `package-lock.json`)
+- Git
 
-Before you begin, ensure you have the following installed:
+AWS Cognito, Cloudflare R2, and Upstash Redis are optional when you use the development mock accounts.
 
-- **Node.js**: Version 18.x or later. You can download it from [nodejs.org](https://nodejs.org/).
-- **Package Manager**: `npm`, `yarn`, or `pnpm`. This guide will use `npm` in its examples.
-- **Git**: Required to clone the repository.
-- **AWS Account**: With access to Cognito to create a User Pool.
-- **S3-Compatible Storage**: An AWS S3 bucket or a Cloudflare R2 bucket.
+## Install and run
 
-## Installation Steps
+```sh
+git clone https://github.com/lbenicio/cognito-profile-manager.git
+cd cognito-profile-manager
+npm ci
+npm run setup:dev
+npm run dev
+```
 
-1. **Clone the Repository**
+Visit [http://localhost:3000](http://localhost:3000). On the login page, select a mock user or mock admin account. These options are only available when `NODE_ENV` is `development`.
 
-   Open your terminal and clone the project from GitHub:
+The setup command creates `.env.development.local` and generates a session-encryption key. It does not overwrite that file if it already exists. Check the required local values in the [configuration reference](./configuration.md). Never commit the file.
 
-   ```sh
-   git clone https://github.com/lbenicio/cognito-profile-manager.git
-   cd cognito-profile-manager
-   ```
+## Connect Cognito
 
-2. **Install Dependencies**
+To test real sign-in, configure a Cognito user pool and app client, then set the Cognito variables in `.env.development.local`. The [Cognito guide](../guides/aws-cognito-setup.md) lists callback URLs and required scopes. Restart the dev server after changing environment variables.
 
-   Install the required Node.js packages using your preferred package manager:
+## Verify a change
 
-   ```sh
-   npm install
-   ```
+```sh
+npm run type:check
+npx prettier --check src
+npm run build:pkg
+```
 
-3. **Set Up Environment Variables**
-
-   The project requires a set of environment variables to connect to external services like AWS Cognito and your S3-compatible storage.
-
-   Copy the example environment file to create your local configuration:
-
-   ```sh
-   cp .env.example .env.local
-   ```
-
-   Next, you will need to edit the `.env.local` file with your specific credentials and endpoints. See the [Configuration Guide](./configuration.md) for detailed instructions on each variable.
-
-4. **Run the Development Server**
-
-   Once your configuration is complete, you can start the Next.js development server:
-
-   ```sh
-   npm run dev
-   ```
-
-   The application will be available at `http://localhost:3000`.
-
-You are now ready to start developing! Any changes you make to the source code will be automatically reloaded in your browser.
+The production build needs `AWS_REGION` and `TOTP_SECRET_ENCRYPTION_KEY`. Some integrations also require their service credentials at runtime.

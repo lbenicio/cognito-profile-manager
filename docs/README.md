@@ -1,39 +1,27 @@
-# Cognito Profile Manager Documentation
+# Documentation
 
-Welcome to the official documentation for the Cognito Profile Manager. This section provides in-depth information about the project's architecture, API, configuration, and advanced features.
+Start with the guide that matches what you need to do:
 
-Whether you are a developer looking to contribute, or an administrator setting up the application, these documents are here to guide you.
+## Set up the app
 
-## Table of Contents
+- [Getting started](./getting-started/README.md): install dependencies, configure a local environment, and run the app.
+- [Configuration reference](./getting-started/configuration.md): environment variables and service requirements.
+- [Development workflow](./DEVELOPMENT.md): scripts, project layout, and local development.
 
-1.  **[Getting Started](./getting-started/README.md)**
-    - [Installation](./getting-started/installation.md)
-    - [Configuration](./getting-started/configuration.md)
+## Understand and configure features
 
-2.  **[Architecture](./architecture/README.md)**
-    - [Overview](./architecture/overview.md)
-    - [Authentication Flow](./architecture/authentication-flow.md)
-    - [Type System](./architecture/type-system.md)
-    - [Logging System](./architecture/logging.md)
+- [Architecture](./architecture/README.md): application layers, authentication, and type organization.
+- [AWS Cognito setup](./guides/aws-cognito-setup.md): configure OIDC sign-in and callback URLs.
+- [Passkeys](./guides/passkey-setup.md), [TOTP MFA](./guides/totp-setup.md), and [R2 storage](./guides/storage-setup.md).
+- [API reference](./api/README.md): implemented HTTP route handlers and their behavior.
+- [Logging](./LOGGING.md): logger configuration and usage.
 
-3.  **[Guides](./guides/README.md)**
-    - [Setting up AWS Cognito](./guides/aws-cognito-setup.md)
+## Deploy and contribute
 
-4.  **[API Reference](./api/README.md)**
-    - [Authentication Endpoints](./api/auth-endpoints.md)
-    - [User Profile Endpoints](./api/user-endpoints.md)
+- [Deployment](./deployment/README.md): Docker and Vercel notes.
+- [Contributing](./contributing/README.md): coding conventions and checks to run before a pull request.
+- [Security policy](../SECURITY.md): report a security issue privately.
 
-5.  **[Deployment](./deployment/README.md)**
-    - [Deploying with Docker](./deployment/docker.md)
+## Historical notes
 
-6.  **[Contributing](./contributing/README.md)**
-    - [Development Workflow](../.github/pull_request_template.md)
-
-7.  **[Implementation Summaries](./summaries/README.md)**
-    - For historical context on major refactors.
-
-## How to Use This Documentation
-
-- If you are new to the project, start with the **[Getting Started](./getting-started/installation.md)** section.
-- For a deeper understanding of how the application works, explore the **[Architecture](./architecture/overview.md)** documents.
-- For specific setup instructions, refer to the **[Guides](./guides/aws-cognito-setup.md)**.
+Documents in [Implementation summaries](./summaries/README.md) describe past changes. They may mention old paths, dependencies, or behavior; use the guides above for current instructions.

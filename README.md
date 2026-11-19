@@ -1,80 +1,55 @@
 # Cognito Profile Manager
 
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE.txt)
 
-A modern, secure, and feature-rich profile management application for AWS Cognito, built with Next.js. This project provides a user-facing interface for managing profile details, security settings, and more.
+Cognito Profile Manager (also called **Outpost**) is a Next.js application for managing an AWS Cognito user profile and account security. It includes a development-only mock login, so you can explore the app without connecting an AWS account.
 
-## ✨ Features
+## Features
 
-- **AWS Cognito Integration**: Full integration with AWS Cognito for user authentication and management.
-- **OAuth2/OIDC Support**: Secure authentication using the OAuth2 and OpenID Connect protocols.
-- **Passkey Authentication**: Support for modern, passwordless authentication using Passkeys (WebAuthn).
-- **TOTP Multi-Factor Authentication**: Users can enable and manage Time-based One-Time Passwords for added security.
-- **Admin Integration**: Connects to an external admin dashboard.
-- **S3-Compatible Storage**: Uses Cloudflare R2 for storing user assets like profile pictures.
-- **Secure by Design**: Follows security best practices, with a clear policy for reporting vulnerabilities.
+- Cognito sign-in through OAuth 2.0 and OpenID Connect
+- Profile, account, notification, and privacy settings
+- TOTP multi-factor authentication and Cognito WebAuthn passkey management
+- Profile image and banner uploads to Cloudflare R2
+- English, Spanish, French, German, and Portuguese interface translations
+- Optional Upstash Redis caching
+- Development-only mock user and admin accounts
 
-## 🚀 Getting Started
+## Run locally
 
-Follow these instructions to get a local copy up and running for development and testing purposes.
+**Requirements:** Node.js 22 or later, npm, and Git. AWS Cognito and R2 are optional for local mock development.
 
-### Prerequisites
+```sh
+git clone https://github.com/lbenicio/cognito-profile-manager.git
+cd cognito-profile-manager
+npm ci
+npm run setup:dev
+npm run dev
+```
 
-- [Node.js](https://nodejs.org/) (v18 or later recommended)
-- [npm](https://www.npmjs.com/), [yarn](https://yarnpkg.com/), or [pnpm](https://pnpm.io/)
-- An AWS account with a configured Cognito User Pool.
-- An S3-compatible object storage bucket (e.g., AWS S3 or Cloudflare R2).
+Open [http://localhost:3000](http://localhost:3000), then choose a mock account on the login page. The mock login buttons are available only in development mode.
 
-### Installation
+`setup:dev` creates `.env.development.local` with a new session-encryption key and local defaults. It leaves an existing file in place; if you already have one, make sure `TOTP_SECRET_ENCRYPTION_KEY`, `AWS_REGION`, `APP_URL`, and `NO_HTTPS` are set as described in the [configuration guide](docs/getting-started/configuration.md). This file is ignored by Git.
 
-1. **Clone the repository:**
+To use a real Cognito user pool or enable optional services, follow [Getting started](docs/getting-started/README.md) and the [service setup guides](docs/guides/README.md).
 
-   ```sh
-   git clone https://github.com/lbenicio/cognito-profile-manager.git
-   cd cognito-profile-manager
-   ```
+## Common commands
 
-2. **Install dependencies:**
+| Command                    | Purpose                                            |
+| -------------------------- | -------------------------------------------------- |
+| `npm run dev`              | Start the development server on port 3000          |
+| `npm run type:check`       | Run the TypeScript compiler without emitting files |
+| `npx prettier --check src` | Check source formatting                            |
+| `npm run build:pkg`        | Create a production build                          |
+| `npm run start:prod`       | Serve the production build                         |
+| `npm run generate:key`     | Print a new 32-byte session-encryption key         |
+| `npm run setup:dev`        | Create local development environment settings      |
 
-   ```sh
-   npm install
-   # or
-   yarn install
-   # or
-   pnpm install
-   ```
+See [Development](docs/DEVELOPMENT.md) for the workflow and [Contributing](docs/contributing/README.md) before opening a change.
 
-3. **Set up environment variables:**
-   Create a `.env.local` file in the root of the project by copying the example file:
+## Documentation
 
-   ```sh
-   cp .env.example .env.local
-   ```
+The [documentation index](docs/README.md) links to setup, architecture, API, deployment, and contribution guides.
 
-   Now, fill in the values in `.env.local` with your specific configuration from AWS Cognito, R2, etc.
+## Security and license
 
-4. **Run the development server:**
-
-   ```sh
-   npm run dev
-   ```
-
-   Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-## ⚙️ Configuration
-
-All necessary environment variables are documented in the `.env.example` file. These include settings for your Cognito User Pool, client credentials, and S3-compatible storage.
-
-## 🤝 Contributing
-
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-Please read our [contribution guidelines](.github/pull_request_template.md) and [issue template](.github/issue_template.md) before getting started.
-
-## 🛡️ Security Policy
-
-We take security seriously. If you discover a security vulnerability, please follow our [Security Policy](SECURITY.md) to report it.
-
-## 📄 License
-
-This project is licensed under the GNU General Public License v3.0. See the [LICENSE.txt](LICENSE.txt) file for details.
+Do not commit environment files or put secrets in variables prefixed with `NEXT_PUBLIC_`; those values can be included in browser code. To report a vulnerability, follow [SECURITY.md](SECURITY.md). This project is licensed under [GPL-3.0](LICENSE.txt).

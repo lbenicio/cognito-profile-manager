@@ -1,30 +1,43 @@
-# Guide: Setting up AWS Cognito
+# Configure AWS Cognito
 
-To use this application, you need a properly configured AWS Cognito User Pool.
+Real sign-in uses Cognito's OIDC authorization-code flow. Development mock accounts work without a user pool.
 
-## Steps
+## Configure the user pool and app client
 
-1. **Create a User Pool**:
-   - Navigate to the Cognito service in the AWS Console.
-   - Click "Create user pool".
-   - Choose your desired sign-in options (e.g., email, username).
-   - Configure your password policy and MFA settings.
-   - Complete the pool creation process. Note the **User Pool ID**.
+1. Create or select a Cognito user pool and configure its sign-in options.
+2. Configure a user-pool domain so Cognito can serve its hosted authorization flow.
+3. Create an app client that allows the authorization code grant. A client secret is optional; if you configure one, set `COGNITO_CLIENT_SECRET` on the server.
+4. Add the required callback URLs to the app client's allowed callback URLs:
 
-2. **Configure an App Client**:
-   - In your new User Pool, go to the "App integration" tab.
-   - Under "App clients", click "Create an app client".
-   - Choose "Public client" or "Confidential client". For this project, a **Confidential client** is recommended as it allows for a client secret.
-   - Give it a name (e.g., `cognito-profile-manager-app`).
-   - **Generate a client secret**.
-   - Under "Allowed callback URLs", add your callback URL (e.g., `http://localhost:3000/api/v1/auth/callback/oidc`).
-   - Under "Allowed sign-out URLs", add your sign-out URL (e.g., `http://localhost:3000`).
-   - In "Allowed OAuth Flows", check **Authorization code grant**.
-   - In "Allowed OAuth Scopes", check `email`, `openid`, and `profile`. If you need to manage users, also add `aws.cognito.signin.user.admin`.
-   - Create the app client. Note the **Client ID** and **Client secret**.
+   ```text
+   http://localhost:3000/api/v1/auth/callback/oidc
+   http://localhost:3000/api/v1/auth/callback/passkey
+   https://your-domain.example/api/v1/auth/callback/oidc
+   https://your-domain.example/api/v1/auth/callback/passkey
+   ```
 
-3. **Configure a Domain**:
-   - In the "App integration" tab, configure a domain name for the Hosted UI. You can use a Cognito domain or a custom domain.
+   Add only URLs for environments you operate. Cognito requires an exact match.
 
-4. **Update `.env.local`**:
-   - Use the User Pool ID, Client ID, Client Secret, and Domain to fill the Cognito-related variables in your `.env.local` file.
+5. Add the local and production `/login` URLs to allowed sign-out URLs.
+6. Enable the scopes the app requests. The default is `openid email profile aws.cognito.signin.user.admin`.
+
+## Configure the app
+
+Set these variables in the app environment:
+
+```dotenv
+AWS_REGION=us-east-1
+NEXT_PUBLIC_COGNITO_CLIENT_ID=your-app-client-id
+NEXT_PUBLIC_COGNITO_WELLKNOWN=https://cognito-idp.us-east-1.amazonaws.com/us-east-1_example/.well-known/openid_configuration
+NEXT_PUBLIC_OAUTH2_SCOPE=openid email profile aws.cognito.signin.user.admin
+```
+
+For a confidential app client, also set `COGNITO_CLIENT_SECRET`. The discovery URL has the form:
+
+```text
+https://cognito-idp.<region>.amazonaws.com/<user-pool-id>/.well-known/openid_configuration
+```
+
+For local HTTP, set `APP_URL=http://localhost:3000` and `NO_HTTPS=true`. In production, use the public HTTPS origin for `APP_URL` and leave `NO_HTTPS` unset. Restart the app after changing environment values.
+
+See the [configuration reference](../getting-started/configuration.md) and [authentication flow](../architecture/authentication-flow/README.md) for session and logout behavior.

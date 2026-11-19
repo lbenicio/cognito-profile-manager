@@ -1,8 +1,6 @@
-# Implementation Summaries
+# Historical summaries
 
-This section contains historical summaries of major refactoring efforts and implementations. These documents provide context on the evolution of the codebase but may not reflect the current state of the application.
+These pages preserve context about earlier implementation work. They are not maintained as current setup instructions; use the documentation index for current guidance.
 
-## In this section
-
-- **[Docker Fixes](./docker-fixes.md)**: Summary of fixes for Docker container environment variable handling.
-- **[Logger Implementation](./logger-implementation.md)**: Summary of the initial structured logger implementation.
+- [Docker troubleshooting notes](./docker-fixes.md)
+- [Logger implementation notes](./logger-implementation.md)

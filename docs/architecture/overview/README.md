@@ -1,35 +1,35 @@
-# Architecture Overview
+# System overview
 
-This project is a modern web application built with Next.js, designed to provide a user profile management interface for an AWS Cognito backend.
-
-## Core Technologies
-
-- **Framework**: [Next.js](https://nextjs.org/) (React)
-- **Authentication**: [AWS Cognito](https://aws.amazon.com/cognito/) using OAuth2/OIDC
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **File Storage**: S3-compatible object storage (e.g., Cloudflare R2, AWS S3)
-- **Deployment**: Vercel, Docker, or any Node.js hosting.
-
-## System Diagram
-
-The system consists of three main parts:
-
-1. **Frontend (Next.js)**: A server-side rendered React application that the user interacts with. It handles displaying the profile, security settings, and user actions.
-2. **Backend API (Next.js API Routes)**: A set of serverless functions responsible for communicating securely with AWS Cognito and the S3-compatible storage. These routes handle sensitive operations like token exchange and file uploads.
-3. **External Services**:
-   - **AWS Cognito**: The source of truth for user identity, authentication, and user data.
-   - **Cloudflare R2 / S3**: Stores user-generated assets like profile pictures.
+Cognito Profile Manager is a server-rendered Next.js application. The browser renders the account interface; server actions and route handlers read the encrypted session and communicate with AWS Cognito and optional services.
 
 ```text
-+----------------+      +------------------------+      +-----------------+
-| User's Browser | <--> |  Next.js Application   | <--> |   AWS Cognito   |
-+----------------+      | (Frontend + API Routes)|      +-----------------+
-                        +------------------------+
-                                   ^
-                                   |
-                                   v
-                        +------------------------+
-                        | S3-Compatible Storage  |
-                        | (e.g., Cloudflare R2)  |
-                        +------------------------+
+Browser
+  │ pages, forms, locale preferences
+  ▼
+Next.js App Router
+  ├── Server Actions ── Cognito user and security operations
+  ├── Route Handlers ── OIDC redirects, callbacks, logout, health, ping
+  ├── Session Layer ─── encrypted session cookie + optional Upstash cache
+  └── Upload Actions ── presigned Cloudflare R2 uploads
 ```
+
+## External services
+
+- **AWS Cognito** is the identity provider and source of user attributes. OAuth 2.0 authorization-code sign-in uses its OIDC discovery configuration.
+- **Cloudflare R2** stores profile images and banners. Uploads use short-lived presigned URLs.
+- **Upstash Redis** is optional. If its REST URL or token is missing, the cache client falls back to a no-op implementation.
+- **SMTP** is optional and used by the authenticated contact form.
+
+## Source layout
+
+| Path              | Responsibility                                             |
+| ----------------- | ---------------------------------------------------------- |
+| `src/app/`        | App Router pages, layouts, and HTTP route handlers         |
+| `src/actions/`    | Server actions called by the UI                            |
+| `src/components/` | Feature and shared UI components                           |
+| `src/lib/`        | Cognito, session, cache, storage, logging, and helper code |
+| `src/i18n/`       | Locale configuration and translation messages              |
+| `src/types/`      | Shared TypeScript declarations                             |
+| `src/content/`    | Markdown displayed by app pages                            |
+
+See the [backend guide](../backend-api.md) for the distinction between server actions and route handlers.

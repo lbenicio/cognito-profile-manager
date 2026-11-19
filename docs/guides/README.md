@@ -1,10 +1,8 @@
-# Guides
+# Setup guides
 
-This section provides step-by-step guides for setting up external services and configuring specific features of the application.
+- [AWS Cognito](./aws-cognito-setup.md): configure OIDC sign-in, callback URLs, and logout URLs.
+- [Passkeys](./passkey-setup.md): use Cognito WebAuthn credential management from the security page.
+- [TOTP MFA](./totp-setup.md): enable an authenticator app for a Cognito user.
+- [Cloudflare R2 uploads](./storage-setup.md): configure avatar and banner storage.
 
-## In this section
-
-- **[Setting up AWS Cognito](./aws-cognito-setup.md)**: How to create and configure an AWS Cognito User Pool.
-- **[Configuring Passkey (WebAuthn) Authentication](./passkey-setup.md)**: (Coming soon)
-- **[Enabling TOTP MFA](./totp-setup.md)**: (Coming soon)
-- **[Connecting to S3-Compatible Storage](./storage-setup.md)**: (Coming soon)
+All local settings belong in the ignored `.env.development.local` file. See the [environment reference](../getting-started/configuration.md) for variable names and defaults.

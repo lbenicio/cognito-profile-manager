@@ -1,51 +1,97 @@
-# Configuration
+# Environment configuration
 
-The Cognito Profile Manager is configured using environment variables. These are stored in a `.env.local` file in the project's root directory.
+The app reads environment variables from Next.js environment files or the process environment. For local development, use the ignored `.env.development.local` file created by `npm run setup:dev`. There is no tracked `.env.example` file.
 
-Create this file by copying the template: `cp .env.example .env.local`.
+Restart the server after changing values. Treat credentials as secrets, and never commit local environment files. Any `NEXT_PUBLIC_` value may be included in browser code and must not contain a secret.
 
-## Application Settings
+## Core application
 
-- `NODE_ENV`: The runtime environment. Set to `"development"` for local development.
-- `APP_URL`: The full base URL of your application (e.g., `http://localhost:3000` for local development, or `https://yourapp.com` for production). This is used to construct callback URLs for authentication.
-- `TOTP_SECRET_ENCRYPTION_KEY`: A 32-byte, base64-encoded key used to encrypt TOTP secrets before storing them. Generate one with: `openssl rand -base64 32`.
+| Variable                     | Required for               | Description                                                                                                                                 |
+| ---------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TOTP_SECRET_ENCRYPTION_KEY` | Sessions                   | Base64-encoded 32-byte key used to encrypt the session cookie. Generate with `npm run generate:key`; `setup:dev` creates one automatically. |
+| `AWS_REGION`                 | Cognito SDK initialization | AWS region, such as `us-east-1`. The SDK client requires this even when you are developing without real Cognito sign-in.                    |
+| `APP_URL`                    | URL fallback               | Public base URL. Defaults to `http://localhost:3000` when request headers are unavailable.                                                  |
+| `NO_HTTPS`                   | Local HTTP callbacks       | Set to `true` for local HTTP development. Leave unset or set to `false` behind production HTTPS.                                            |
 
-## Security (AWS Cognito & OAuth2)
+For a local setup, the defaults should be:
 
-These variables connect the application to your AWS Cognito User Pool.
+```dotenv
+APP_URL=http://localhost:3000
+NO_HTTPS=true
+AWS_REGION=us-east-1
+```
 
-**Important**: You must add the following URLs to the "Allowed callback URLs" list in your Cognito App Client settings, replacing `{APP_URL}` with the value you set above:
+Generate a new key when needed:
 
-- `{APP_URL}/api/v1/auth/callback/oidc`
-- `{APP_URL}/api/v1/auth/callback/passkey`
+```sh
+npm run generate:key
+```
 
-- `NEXT_PUBLIC_COGNITO_CLIENT_ID`: The App Client ID from your Cognito User Pool.
-- `COGNITO_CLIENT_SECRET`: The App Client Secret. This is required for the authorization code grant flow.
-- `NEXT_PUBLIC_COGNITO_WELLKNOWN`: The OpenID Connect discovery endpoint for your User Pool. It looks like: `https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/openid_configuration`.
-- `NEXT_PUBLIC_OAUTH2_SCOPE`: The OAuth2 scopes to request during authentication. `openid profile email aws.cognito.signin.user.admin` are common defaults.
+The command prints the key to the terminal. Store it in your secret manager or ignored environment file; anyone with the key can decrypt sessions created with it.
 
-## Admin Settings
+## AWS Cognito and OIDC
 
-- `NEXT_PUBLIC_ADMIN_DASHBOARD_URL`: The URL to an external admin dashboard, if you have one.
-- `COGNITO_ADMIN_GROUP_NAME`: The name of the user group in Cognito that grants admin privileges.
-- `COGNITO_GROUPS_CLAIM_KEY`: The key used in the ID token to identify a user's groups (e.g., `cognito:groups`).
+These values are needed for real Cognito sign-in. Mock login in development does not require the Cognito client values.
 
-## Caching
+| Variable                        | Description                                                                                        |
+| ------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_COGNITO_CLIENT_ID` | Cognito app client ID. This is public configuration, not a secret.                                 |
+| `COGNITO_CLIENT_SECRET`         | Optional app client secret. Set it when using a confidential app client.                           |
+| `NEXT_PUBLIC_COGNITO_WELLKNOWN` | Full OIDC discovery URL for the user pool, ending in `/.well-known/openid_configuration`.          |
+| `NEXT_PUBLIC_OAUTH2_SCOPE`      | Optional space-separated scopes. Defaults to `openid email profile aws.cognito.signin.user.admin`. |
+| `COGNITO_ADMIN_GROUP_NAME`      | Cognito group treated as the admin group. Defaults to `admins`.                                    |
+| `COGNITO_GROUPS_CLAIM_KEY`      | JWT claim containing group membership. Defaults to `cognito:groups`.                               |
 
-- `CACHE_PROVIDER`: Specifies the caching backend to use. Set to `upstash` to use Upstash Redis. Defaults to `upstash` if not set.
-- `upstash_KV_REST_API_URL`: The REST API URL for your Upstash instance.
-- `upstash_KV_REST_API_TOKEN`: The REST API token for your Upstash instance.
+Register these callback URLs in the Cognito app client:
 
-## Cloudflare R2 / S3-Compatible Storage
+- `http://localhost:3000/api/v1/auth/callback/oidc` for local sign-in
+- `http://localhost:3000/api/v1/auth/callback/passkey` for the passkey callback
+- `https://your-domain.example/api/v1/auth/callback/oidc` and `/api/v1/auth/callback/passkey` in production
 
-These variables are for storing user assets like profile pictures.
+Also register the local and production `/login` URLs as allowed sign-out URLs. See the [Cognito setup guide](../guides/aws-cognito-setup.md) for the app client setup.
 
-- `R2_ACCOUNT_ID`: Your Cloudflare Account ID.
-- `R2_ACCESS_KEY_ID`: The Access Key ID for your R2 bucket.
-- `R2_SECRET_ACCESS_KEY`: The Secret Access Key for your R2 bucket.
-- `R2_BUCKET_NAME`: The name of the R2 bucket.
-- `NEXT_PUBLIC_R2_PUBLIC_URL`: The public URL for accessing assets in your R2 bucket.
+## Optional integrations
 
-## AWS General
+### Cloudflare R2 uploads
 
-- `AWS_REGION`: The AWS region where your Cognito User Pool is located (e.g., `sa-east-1`).
+Set these values to enable profile image and banner uploads. The app currently builds its S3 endpoint from the Cloudflare account ID.
+
+| Variable                    | Description                                      |
+| --------------------------- | ------------------------------------------------ |
+| `R2_ACCOUNT_ID`             | Cloudflare account ID.                           |
+| `R2_ACCESS_KEY_ID`          | R2 access key ID.                                |
+| `R2_SECRET_ACCESS_KEY`      | R2 secret access key.                            |
+| `R2_BUCKET_NAME`            | Bucket used for uploaded assets.                 |
+| `NEXT_PUBLIC_R2_PUBLIC_URL` | Public base URL used to display uploaded assets. |
+
+See the [storage guide](../guides/storage-setup.md) for bucket and upload details.
+
+### Upstash Redis cache
+
+The cache provider defaults to `upstash`. Without both credentials, the app logs a warning and uses a no-op cache. The health endpoint reports on the configured cache and OIDC discovery endpoint.
+
+| Variable                    | Description                                                           |
+| --------------------------- | --------------------------------------------------------------------- |
+| `CACHE_PROVIDER`            | Currently, `upstash` is supported; an unknown value disables caching. |
+| `upstash_KV_REST_API_URL`   | Upstash Redis REST URL. Preserve this exact casing.                   |
+| `upstash_KV_REST_API_TOKEN` | Upstash Redis REST token. Preserve this exact casing.                 |
+
+### Contact form email
+
+All six values are required for the authenticated contact form to send mail:
+
+`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM_EMAIL`, and `CONTACT_FORM_TO_EMAIL`.
+
+### Admin dashboard and logs
+
+| Variable                          | Description                                                               |
+| --------------------------------- | ------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_ADMIN_DASHBOARD_URL` | Optional link to an external admin dashboard.                             |
+| `LOG_LEVEL`                       | Optional logger threshold: `DEBUG`, `INFO`, `WARN`, `ERROR`, or `SILENT`. |
+
+## Production notes
+
+- Use a unique encryption key per environment and keep it stable across app instances that share sessions.
+- Use HTTPS and register the exact HTTPS callback and sign-out URLs with Cognito.
+- Keep `COGNITO_CLIENT_SECRET`, R2 credentials, SMTP credentials, Upstash tokens, and the encryption key server-side.
+- Set `APP_URL` to the public origin when request headers are not available to construct URLs.

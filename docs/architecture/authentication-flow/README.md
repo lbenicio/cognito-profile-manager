@@ -1,18 +1,26 @@
-# Authentication Flow
+# Authentication flow
 
-The application uses the **OAuth 2.0 Authorization Code Grant** flow with **OpenID Connect (OIDC)** to authenticate users with AWS Cognito.
+## Cognito OIDC sign-in
 
-## Standard Login Flow
+1. The browser requests `GET /api/v1/auth/sso/start`.
+2. The server reads Cognito's OIDC discovery document, creates a random `state` value, stores it in an HTTP-only cookie, and redirects to the authorization endpoint.
+3. Cognito returns the browser to `/api/v1/auth/callback/oidc` with an authorization code and state.
+4. The callback validates the state, exchanges the code on the server, and verifies the ID token against Cognito's JWKS.
+5. The app stores session data in an encrypted, HTTP-only cookie and redirects to the app.
 
-1. **Initiation**: The user clicks the "Login" button on the frontend.
-2. **Redirect to Cognito**: The application redirects the user to the Cognito Hosted UI.
-3. **Authentication**: The user enters their credentials (or uses a social provider) on the Cognito page.
-4. **Authorization Code**: After successful authentication, Cognito redirects the user back to the `NEXT_PUBLIC_OAUTH2_CALLBACK_URL` specified in the configuration, providing an `authorization code` in the URL parameters.
-5. **Token Exchange**: The Next.js API route at the callback URL receives the authorization code. It then makes a secure, server-to-server request to Cognito's token endpoint, exchanging the code for an `ID Token`, `Access Token`, and `Refresh Token`.
-6. **Session Creation**: The tokens are stored securely in an encrypted, HTTP-only cookie, establishing a session for the user.
-7. **User Redirect**: The user is redirected to their profile page.
+Configure the client ID, optional client secret, discovery URL, callback URLs, and scopes using the [Cognito guide](../../guides/aws-cognito-setup.md).
 
-## Passkey & TOTP
+## Sessions and logout
 
-- **Passkey (WebAuthn)**: This flow is initiated from the user's security settings page. The backend API generates a challenge, which the frontend uses to prompt the user's device to create and register a new passkey.
-- **TOTP MFA**: When a user enables TOTP, the backend generates a secret, which is displayed as a QR code. On subsequent logins, Cognito will prompt the user for a TOTP code after they enter their password.
+The app encrypts session data using `TOTP_SECRET_ENCRYPTION_KEY`. Use the same key across instances that need to read the same sessions, and keep the key secret. The logout handler clears the local session first; for Cognito sessions, it then attempts to redirect through the provider's logout endpoint and falls back to the local login page if that fails.
+
+## Passkeys and TOTP
+
+- **Passkeys:** The security page sends a signed-in user through the Cognito-hosted passkey setup route. On return, the callback updates the `custom:pless` profile flag. The app lists and deletes Cognito WebAuthn credentials through server actions.
+- **TOTP:** The security page asks Cognito to associate a software token, displays its QR code, then verifies the user's code and enables the Cognito MFA preference.
+
+See the [passkey guide](../../guides/passkey-setup.md) and [TOTP guide](../../guides/totp-setup.md) for feature setup.
+
+## Local development
+
+Mock user and mock admin sign-in are available only in development mode. They do not exercise Cognito or validate production authentication configuration.

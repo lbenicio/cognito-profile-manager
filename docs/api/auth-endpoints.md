@@ -1,38 +1,32 @@
-# Authentication Endpoints
+# Authentication routes
 
-These API routes manage the user authentication lifecycle using the OAuth2/OIDC flow with AWS Cognito.
+These route handlers support the browser-based Cognito flow. They use redirects and cookies; they are not a token API for third-party clients.
 
----
+## `GET /api/v1/auth/sso/start`
 
-## `GET /api/v1/auth/login`
+Starts OIDC authorization. The handler reads `NEXT_PUBLIC_COGNITO_CLIENT_ID`, `NEXT_PUBLIC_OAUTH2_SCOPE`, and `NEXT_PUBLIC_COGNITO_WELLKNOWN`, creates a short-lived HTTP-only `oauth_state` cookie, then redirects to the provider authorization endpoint.
 
-Initiates the login process. This endpoint constructs the appropriate URL and redirects the user to the AWS Cognito Hosted UI for authentication.
-
-- **Request**: No request body or parameters.
-- **Response**:
-  - `302 Found`: A redirect to the Cognito authentication page.
-
----
+If configuration is missing or the discovery request fails, the handler redirects to `/login` with an error query parameter.
 
 ## `GET /api/v1/auth/callback/oidc`
 
-The callback URL that Cognito redirects to after a user successfully authenticates. This endpoint performs the critical server-side step of exchanging the received authorization `code` for JWTs (ID, Access, and Refresh tokens). It then establishes a session by storing the tokens in a secure, encrypted, HTTP-only cookie.
+Cognito returns the browser here after authorization. The query string includes `code` and `state` on success, or provider error fields on failure. The route compares the returned state with the `oauth_state` cookie, exchanges the code server-side, validates the ID token, writes an encrypted HTTP-only `session` cookie, clears the state cookie, and redirects to `/`.
 
-This endpoint is not intended to be called directly by a client application.
+The callback URL must exactly match one of the allowed callback URLs in the Cognito app client. See [Cognito setup](../guides/aws-cognito-setup.md).
 
-- **Query Parameters**:
-  - `code` (string, required): The authorization code provided by Cognito.
-- **Response**:
-  - `302 Found`: A redirect to the user's profile page (e.g., `/profile`) upon successful token exchange and session creation.
-  - `400 Bad Request`: If the `code` is missing or invalid.
-  - `500 Internal Server Error`: If the token exchange with Cognito fails.
+## `GET /api/v1/auth/passkey/start`
 
----
+Requires an active user session. Redirects the user to the Cognito-hosted passkey setup flow. If there is no session, redirects to the login page.
 
-## `GET /api/v1/auth/logout`
+## `GET /api/v1/auth/callback/passkey`
 
-Logs the user out of the application. This involves clearing the session cookie and redirecting the user to the Cognito logout endpoint to invalidate the session on the provider's side.
+Handles the provider return. A `result=success` query value updates the user's `custom:pless` attribute and redirects to `/security`; provider error values are forwarded to the security page.
 
-- **Request**: No request body or parameters.
-- **Response**:
-  - `302 Found`: A redirect to the Cognito logout page, which will then redirect back to the application's home page.
+## `GET` and `POST /api/v1/auth/logout`
+
+Both methods clear the local session. For a Cognito session, the handler attempts to redirect through the provider's logout endpoint and returns to `/login`; if provider logout cannot be constructed, it falls back to local logout.
+
+## Operational endpoints
+
+- `GET /api/v1/health` checks cache and Cognito OIDC discovery access. It returns `200` for a healthy result and `503` if a check fails. With no Cognito discovery URL configured, the Cognito check fails.
+- `GET /api/v1/ping` returns `{ "message": "pong", "timestamp": "…" }`.

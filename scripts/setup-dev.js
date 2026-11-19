@@ -10,7 +10,6 @@ console.log(
 
 const projectRoot = path.join(__dirname, '..');
 const envDevFile = path.join(projectRoot, '.env.development.local');
-const envExampleFile = path.join(projectRoot, '.env.development.example');
 
 function generateEncryptionKey() {
   return crypto.randomBytes(32).toString('base64');
@@ -26,8 +25,10 @@ function createDevEnvFile() {
 # APPLICATION CONFIGURATION
 # =============================================================================
 
-APP_URL=http://localhost:9002
+APP_URL=http://localhost:3000
+NO_HTTPS=true
 NODE_ENV=development
+AWS_REGION=us-east-1
 
 # =============================================================================
 # SESSION ENCRYPTION (REQUIRED)
@@ -45,7 +46,6 @@ TOTP_SECRET_ENCRYPTION_KEY=${encryptionKey}
 # COGNITO_CLIENT_SECRET=your_cognito_client_secret_here
 # NEXT_PUBLIC_COGNITO_WELLKNOWN=https://cognito-idp.us-east-1.amazonaws.com/us-east-1_XXXXXXXXX/.well-known/openid_configuration
 # NEXT_PUBLIC_OAUTH2_SCOPE=openid email profile aws.cognito.signin.user.admin
-# AWS_REGION=us-east-1
 # COGNITO_ADMIN_GROUP_NAME=admins
 # COGNITO_GROUPS_CLAIM_KEY=cognito:groups
 
@@ -57,11 +57,6 @@ TOTP_SECRET_ENCRYPTION_KEY=${encryptionKey}
 # REDIS_URL=redis://localhost:6379
 
 # =============================================================================
-# DEVELOPMENT FEATURES
-# =============================================================================
-
-# Enable development features
-DEV_MODE=true
 `;
 
   fs.writeFileSync(envDevFile, envContent);
@@ -74,7 +69,9 @@ function checkExistingEnvFile() {
   if (fs.existsSync(envDevFile)) {
     console.log('⚠️  .env.development.local already exists');
     console.log('   Delete it and run this script again to regenerate, or');
-    console.log('   manually ensure TOTP_SECRET_ENCRYPTION_KEY is set');
+    console.log(
+      '   manually ensure TOTP_SECRET_ENCRYPTION_KEY, AWS_REGION, APP_URL, and NO_HTTPS are set'
+    );
     return true;
   }
   return false;
@@ -86,7 +83,7 @@ function showInstructions() {
   console.log('1. Start the development server:');
   console.log('   npm run dev');
   console.log('');
-  console.log('2. Open http://localhost:9002 in your browser');
+  console.log('2. Open http://localhost:3000 in your browser');
   console.log('');
   console.log('3. Navigate to /login and use the development login options:');
   console.log('   • Click "Admin" for mock admin user');
@@ -104,7 +101,7 @@ function showInstructions() {
   console.log('🛠️  Useful commands:');
   console.log('   npm run generate:key    # Generate new encryption key');
   console.log('   npm run type:check      # Check TypeScript');
-  console.log('   npm run fmt:lint        # Lint and format code');
+  console.log('   npx prettier --check src # Check source formatting');
   console.log('   npm run build:pkg       # Test production build');
 }
 

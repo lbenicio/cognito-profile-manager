@@ -1,8 +1,9 @@
 # Deployment
 
-This section contains guides for deploying the Cognito Profile Manager to various hosting platforms.
+The application can run as a Node.js Next.js server or in the provided Docker image. Configure the environment before starting a production instance.
 
-## In this section
+- [Docker and Compose](./docker.md): local container development and production deployment.
+- [Vercel](./vercel.md): project setup and required environment configuration.
+- [Environment reference](../getting-started/configuration.md): required and optional variables.
 
-- **[Deploying with Docker](./docker.md)**: A comprehensive guide to building and running the application with Docker and Docker Compose.
-- **[Deploying to Vercel](./vercel.md)**: Instructions for deploying to the Vercel platform.
+Use Node.js 22 or later. Keep encryption keys, client secrets, storage credentials, and cache tokens in the hosting platform's secret settings. Do not commit production environment files.

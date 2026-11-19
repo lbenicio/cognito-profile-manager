@@ -1,12 +1,10 @@
 # Architecture
 
-This section provides a deep dive into the technical architecture of the Cognito Profile Manager. Understanding these concepts is helpful for contributors and for those who wish to customize the application.
+The app is a Next.js App Router application. UI pages and React components are under `src/app` and `src/components`; authenticated mutations use server actions; a small set of route handlers supports authentication redirects and operational checks.
 
-## In this section
-
-- **[Overview](./overview.md)**: A high-level look at the core technologies and system components.
-- **[Authentication Flow](./authentication-flow.md)**: A detailed explanation of how the OAuth2/OIDC login process works with AWS Cognito.
-- **[Type System](./type-system.md)**: A detailed guide to the application's type and interface definitions.
-- **[Logging System](./logging.md)**: Documentation for the structured logging system.
-- **[Frontend Structure](./frontend.md)**: Information on the Next.js and React component structure.
-- **[Backend API](./backend-api.md)**: A guide to the server-side API routes that handle secure operations.
+- [Overview](./overview/README.md): runtime components and source layout.
+- [Frontend](./frontend.md): page, component, and translation organization.
+- [Backend and route handlers](./backend-api.md): server actions and HTTP routes.
+- [Authentication flow](./authentication-flow/README.md): Cognito OIDC, sessions, logout, and development mock login.
+- [Type system](./type-system.md): shared types under `src/types/**`.
+- [Logging](./logging.md): logger API and configuration.

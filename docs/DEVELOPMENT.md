@@ -1,254 +1,65 @@
-# Development Guide
+# Development
 
-This guide helps you get started with developing the Cognito Profile Manager application.
+## Requirements
 
-## Quick Start
-
-### Prerequisites
-
-- Node.js 22+
-- npm or yarn
+- Node.js 22 or later
+- npm
 - Git
 
-### Setup
+## Start the app
 
-1. **Clone the repository**:
-
-   ```bash
-   git clone https://github.com/lbenicio/cognito-profile-manager.git
-   cd cognito-profile-manager
-   ```
-
-2. **Install dependencies**:
-
-   ```bash
-   npm install
-   ```
-
-3. **Set up development environment**:
-
-   ```bash
-   npm run setup:dev
-   ```
-
-   This will create `.env.development.local` with a secure encryption key.
-
-4. **Start the development server**:
-
-   ```bash
-   npm run dev
-   ```
-
-5. **Open your browser**:
-   Navigate to http://localhost:9002
-
-## Development Authentication
-
-### Mock Login (No Setup Required)
-
-For development, you can use mock authentication without any AWS setup:
-
-1. Go to http://localhost:9002/login
-2. Click **"Admin"** for mock admin user access
-3. Click **"User"** for mock regular user access
-
-Mock users have full profile data and simulate real authentication behavior.
-
-### Real AWS Cognito (Optional)
-
-To test with real AWS Cognito:
-
-1. Set up AWS Cognito User Pool (see [AUTHENTICATION.md](./AUTHENTICATION.md))
-2. Edit `.env.development.local` and uncomment Cognito variables
-3. Fill in your Cognito configuration
-4. Use **"Sign In with SSO"** button
-
-## Development Features
-
-### Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build:pkg` - Build for production
-- `npm run type:check` - TypeScript type checking
-- `npm run fmt:lint` - Lint and format code
-- `npm run fmt:pretty` - Format code with Prettier
-- `npm run generate:key` - Generate encryption key
-- `npm run setup:dev` - Set up development environment
-
-### Mock Data
-
-Mock users are defined in `src/lib/mock-data.ts`:
-
-- **Admin User**: Full admin access with comprehensive profile
-- **Regular User**: Standard user access with basic profile
-
-Both users include:
-
-- Complete profile information
-- Session management
-- Group memberships
-- Device information
-- Login history
-- Notification preferences
-
-### File Structure
-
+```sh
+npm ci
+npm run setup:dev
+npm run dev
 ```
+
+Open [http://localhost:3000](http://localhost:3000). The setup script creates `.env.development.local` with a generated session-encryption key and local settings. It does not overwrite an existing file. See the [configuration reference](./getting-started/configuration.md) before adding service credentials.
+
+Development mock login is available only when `NODE_ENV=development`. Choose a mock user or mock admin on the login page. Real Cognito sign-in is optional; see [AWS Cognito setup](./guides/aws-cognito-setup.md).
+
+## Useful commands
+
+| Command                    | Purpose                                    |
+| -------------------------- | ------------------------------------------ |
+| `npm run dev`              | Run Next.js on port 3000                   |
+| `npm run type:check`       | Check the TypeScript project               |
+| `npx prettier --check src` | Check formatting in source files           |
+| `npm run fmt:format`       | Format the repository with Prettier        |
+| `npm run build:pkg`        | Build the production app                   |
+| `npm run start:prod`       | Start the production server after building |
+| `npm run generate:key`     | Generate a session-encryption key          |
+| `npm run setup:dev`        | Create local development settings          |
+
+There is no automated unit-test command in `package.json`. `test:auth` and `test:logout` are manual HTTP smoke checks configured for a local server on port 9002. `test:cognito` checks the discovery URL in `.env.development.local` and makes a network request. They are optional scripts, not part of the default workflow.
+
+## Project layout
+
+```text
 src/
-├── app/                    # Next.js App Router pages
-│   ├── (main)/            # Authenticated pages
-│   ├── login/             # Login page
-│   └── api/               # API routes
-├── components/            # React components
-├── lib/                   # Utility functions
-│   ├── auth.ts           # Authentication logic
-│   ├── session.ts        # Session management
-│   └── mock-data.ts      # Development mock data
-├── i18n/                 # Internationalization
-└── types/                # TypeScript definitions
+├── actions/       Server actions used by the UI
+├── app/           Next.js App Router pages and route handlers
+├── components/    UI and feature components
+├── content/       Markdown rendered by app pages
+├── i18n/          Locale setup and translation JSON
+├── lib/           Authentication, Cognito, session, cache, and storage code
+└── types/         Shared type declarations
+docs/              Developer and operator documentation
+scripts/           Local setup and smoke-check scripts
 ```
 
-## Environment Variables
+## Working on a change
 
-### Required for Development
+1. Keep shared TypeScript declarations under `src/types/**` and import types with `import type` where possible.
+2. Keep credentials in ignored local environment files or a deployment secret manager. Do not put secrets in `NEXT_PUBLIC_` variables.
+3. Before opening a pull request, run:
 
-```bash
-# Application
-APP_URL=http://localhost:9002
-NODE_ENV=development
+   ```sh
+   npm run type:check
+   npx prettier --check src
+   npm run build:pkg
+   ```
 
-# Session encryption (generated by setup:dev)
-TOTP_SECRET_ENCRYPTION_KEY=your_generated_key_here
-```
+4. Describe the behavior change and include screenshots for user-visible changes.
 
-### Optional for Testing OAuth2
-
-```bash
-# AWS Cognito
-NEXT_PUBLIC_COGNITO_CLIENT_ID=your_client_id
-COGNITO_CLIENT_SECRET=your_client_secret
-NEXT_PUBLIC_COGNITO_WELLKNOWN=your_wellknown_url
-NEXT_PUBLIC_OAUTH2_SCOPE=openid email profile aws.cognito.signin.user.admin
-AWS_REGION=us-east-1
-COGNITO_ADMIN_GROUP_NAME=admins
-```
-
-## Development Workflow
-
-### 1. Authentication Flow Testing
-
-**Mock Authentication**:
-
-- Always works without external dependencies
-- Instant login with predefined users
-- Full profile data available immediately
-
-**Real Authentication**:
-
-- Requires AWS Cognito setup
-- Tests complete OAuth2 flow
-- Real JWT token validation
-
-### 2. Session Management
-
-Sessions are stored differently based on environment:
-
-- **Development**: Encrypted cookies (mock) or Redis + cookies (real)
-- **Production**: Redis/KV storage with session cookies
-
-### 3. Internationalization
-
-The app supports multiple languages:
-
-- English (default)
-- Spanish, French, German, Portuguese
-- Locale detected from cookies or Accept-Language header
-- All routes are dynamic due to i18n
-
-## Common Development Tasks
-
-### Adding New Features
-
-1. Create components in `src/components/`
-2. Add pages in `src/app/(main)/`
-3. Update types in `src/types/`
-4. Add translations in `src/i18n/locales/`
-
-### Testing Authentication
-
-1. **Test mock login**: Use Admin/User buttons
-2. **Test SSO flow**: Configure Cognito and use SSO button
-3. **Test logout**: Should clear session and redirect to login
-4. **Test session persistence**: Refresh page, should stay logged in
-
-### Debugging
-
-Enable debug mode:
-
-```bash
-NODE_ENV=development
-DEV_MODE=true
-```
-
-This provides:
-
-- Detailed error messages
-- Development login options
-- Console logging
-- Stack traces
-
-### Building for Production
-
-```bash
-npm run build:pkg
-```
-
-This will:
-
-- Compile TypeScript
-- Bundle assets
-- Optimize for production
-- Show build size analysis
-
-## Troubleshooting
-
-### Common Issues
-
-1. **"next-intl" errors**:
-   - Ensure `.env.development.local` exists
-   - Run `npm run setup:dev` to regenerate
-
-2. **Session encryption errors**:
-   - Check `TOTP_SECRET_ENCRYPTION_KEY` is set
-   - Generate new key with `npm run generate:key`
-
-3. **TypeScript errors**:
-   - Run `npm run type:check`
-   - Fix any type issues before continuing
-
-4. **Build failures**:
-   - Clear `.next` folder: `rm -rf .next`
-   - Reinstall dependencies: `rm -rf node_modules && npm install`
-
-### Getting Help
-
-1. Check [AUTHENTICATION.md](./AUTHENTICATION.md) for auth setup
-2. Review [.env.template](./.env.template) for configuration
-3. Look at mock data in `src/lib/mock-data.ts`
-4. Check console logs for error details
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests: `npm run type:check && npm run fmt:lint`
-5. Submit a pull request
-
-## Next Steps
-
-- Set up your IDE with TypeScript support
-- Install recommended extensions (Prettier, ESLint)
-- Explore the codebase starting with `src/app/login/page.tsx`
-- Try both mock and real authentication flows
-- Read the [AUTHENTICATION.md](./AUTHENTICATION.md) for production setup
+See [Coding standards](./contributing/coding-standards.md) and [Contributing](./contributing/README.md) for review expectations.
