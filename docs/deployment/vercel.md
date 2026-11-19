@@ -5,7 +5,7 @@ The project uses the Next.js App Router and can be deployed as a Vercel Next.js 
 ## Configure the project
 
 1. Import the Git repository into Vercel and select the project root.
-2. Set the Node.js runtime to 22 or later.
+2. Set the Node.js runtime to 26 LTS.
 3. Use `npm run build:pkg` as the build command. Vercel can detect the Next.js output.
 4. Add environment variables for each environment in Vercel's project settings.
 

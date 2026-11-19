@@ -16,7 +16,7 @@ Cognito Profile Manager (also called **Outpost**) is a Next.js application for m
 
 ## Run locally
 
-**Requirements:** Node.js 22 or later, npm, and Git. AWS Cognito and R2 are optional for local mock development.
+**Requirements:** Node.js 26 LTS is recommended, plus npm and Git. The package engine currently allows Node.js 22 or later. AWS Cognito and R2 are optional for local mock development.
 
 ```sh
 git clone https://github.com/lbenicio/cognito-profile-manager.git

@@ -5,7 +5,7 @@ The repository includes a multi-stage production `Dockerfile`, a development `Do
 ## Requirements
 
 - Docker Engine with Docker Compose v2
-- Node.js 22 or later for host-based commands; the container images use Node.js 22
+- Node.js 26 LTS is recommended for host-based commands; the container images use Node.js 26
 
 ## Local development
 

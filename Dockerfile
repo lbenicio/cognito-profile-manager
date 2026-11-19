@@ -1,5 +1,5 @@
 # Stage 1: Install production dependencies
-FROM node:22-alpine AS deps
+FROM node:26-alpine AS deps
 WORKDIR /app
 
 # Copy package manager files
@@ -9,7 +9,7 @@ COPY package.json package-lock.json* ./
 RUN npm ci --only=production
 
 # Stage 2: Build the application with placeholder environment variables
-FROM node:22-alpine AS builder
+FROM node:26-alpine AS builder
 WORKDIR /app
 
 # Copy package files and install all dependencies (including dev)
@@ -43,7 +43,7 @@ ENV COGNITO_GROUPS_CLAIM_KEY=__COGNITO_GROUPS_CLAIM_KEY__
 RUN npm run build:pkg
 
 # Stage 3: Production dependencies only
-FROM node:22-alpine AS production-deps
+FROM node:26-alpine AS production-deps
 WORKDIR /app
 
 # Copy package files
@@ -53,7 +53,7 @@ COPY package.json package-lock.json* ./
 RUN npm ci --only=production && npm cache clean --force
 
 # Stage 4: Production runner
-FROM node:22-alpine AS runner
+FROM node:26-alpine AS runner
 WORKDIR /app
 
 # Set environment to production

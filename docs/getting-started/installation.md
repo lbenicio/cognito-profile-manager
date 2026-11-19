@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- Node.js 22 or later
+- Node.js 26 LTS is recommended. The package engine currently allows Node.js 22 or later.
 - npm (the repository includes `package-lock.json`)
 - Git
 

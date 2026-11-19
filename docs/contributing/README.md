@@ -4,7 +4,7 @@ Thanks for considering a contribution. For larger changes, open an issue first s
 
 ## Before you open a pull request
 
-1. Use Node.js 22 or later and install dependencies with `npm ci`.
+1. Use Node.js 26 LTS (the package engine currently allows 22 or later) and install dependencies with `npm ci`.
 2. Create a branch for the change.
 3. Follow the [coding standards](./coding-standards.md).
 4. Run the project checks:

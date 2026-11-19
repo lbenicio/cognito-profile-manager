@@ -6,4 +6,4 @@ The application can run as a Node.js Next.js server or in the provided Docker im
 - [Vercel](./vercel.md): project setup and required environment configuration.
 - [Environment reference](../getting-started/configuration.md): required and optional variables.
 
-Use Node.js 22 or later. Keep encryption keys, client secrets, storage credentials, and cache tokens in the hosting platform's secret settings. Do not commit production environment files.
+Node.js 26 LTS is recommended; the package engine currently allows Node.js 22 or later. Keep encryption keys, client secrets, storage credentials, and cache tokens in the hosting platform's secret settings. Do not commit production environment files.
